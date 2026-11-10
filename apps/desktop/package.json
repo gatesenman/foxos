@@ -1,0 +1,85 @@
+{
+  "name": "foxos-desktop",
+  "version": "0.0.1",
+  "private": true,
+  "description": "狐狸OS（FoxOS）桌面外壳 · 阶段 0 原型",
+  "main": "src/main.js",
+  "author": "gaosichun",
+  "scripts": {
+    "start": "electron .",
+    "start:demo": "electron . --workspace=../../demo-workspace",
+    "screenshot": "electron . --workspace=../../demo-workspace --screenshot=../../docs/screenshots/desktop.png",
+    "dist:linux": "electron-builder --linux dir",
+    "dist:linux:appimage": "electron-builder --linux AppImage",
+    "dist:win": "electron-builder --win nsis",
+    "test:smoke": "bash scripts/smoke.sh"
+  },
+  "devDependencies": {
+    "electron": "^45.2.3",
+    "electron-builder": "^26.18.0"
+  },
+  "homepage": "https://github.com/gatesenman/foxos",
+  "build": {
+    "appId": "io.github.gatesenman.foxos",
+    "productName": "FoxOS",
+    "copyright": "Copyright © 2026 gaosichun",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "src/**/*",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "../../packages/core/foxos",
+        "to": "core/foxos",
+        "filter": [
+          "**/*.py"
+        ]
+      },
+      {
+        "from": "../../assets/icon.png",
+        "to": "icon.png"
+      }
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "../../assets/icon.ico",
+      "executableName": "FoxOS"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "perMachine": false,
+      "shortcutName": "狐狸OS",
+      "installerIcon": "../../assets/icon.ico",
+      "uninstallerIcon": "../../assets/icon.ico",
+      "artifactName": "FoxOS-Setup-${version}.${ext}"
+    },
+    "linux": {
+      "target": [
+        "dir",
+        "AppImage"
+      ],
+      "icon": "../../assets/icon.png",
+      "category": "Office",
+      "executableName": "foxos-desktop",
+      "maintainer": "gaosichun"
+    },
+    "mac": {
+      "target": [
+        "dmg"
+      ],
+      "icon": "../../assets/icon.png",
+      "category": "public.app-category.productivity"
+    }
+  }
+}

@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; style-src 'self'; script-src 'self'">
+  <title>狐狸OS</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand"><img src="icon-64.png" alt=""><span>狐狸OS</span><small>FoxOS · 阶段 0</small></div>
+    <input id="search" class="search" type="search" placeholder="搜索文件与命令…">
+    <div class="top-actions">
+      <span id="ws-path" class="ws-path" title="工作空间"></span>
+      <button class="icon-btn" title="通知">🔔</button>
+      <button class="icon-btn" title="设置">⚙</button>
+    </div>
+  </header>
+
+  <nav class="sidebar" id="nav">
+    <div class="nav-title">导航</div>
+    <button data-open="apps" class="nav-item">🧩 应用中心</button>
+    <button data-open="tasks" class="nav-item">📋 任务中心</button>
+    <button data-open="agents" class="nav-item">🤖 智能体中心</button>
+    <button data-open="files" class="nav-item">📁 文件中心</button>
+    <button data-open="terminal" class="nav-item">⌨ 命令终端</button>
+    <button data-open="activity" class="nav-item">🕘 活动记录</button>
+    <div class="nav-title">接管</div>
+    <button id="takeover" class="nav-item takeover">✋ 人工接管</button>
+    <div class="nav-foot" id="versions"></div>
+  </nav>
+
+  <main class="desktop" id="desktop">
+    <div class="desktop-icons" id="desktop-icons"></div>
+  </main>
+
+  <aside class="rightpanel">
+    <section>
+      <h3>智能体团队</h3>
+      <ul id="agents" class="agents"></ul>
+    </section>
+    <section class="grow">
+      <h3>操作记录 <small id="audit-count"></small></h3>
+      <ul id="activity" class="activity"></ul>
+    </section>
+  </aside>
+
+  <footer class="taskbar">
+    <form id="task-form">
+      <input id="task-input" autocomplete="off" placeholder="输入任务：根据销售数据制作一份分析报告……  或直接输入命令：foxos sheets read sales.xlsx">
+      <button type="submit">开始</button>
+    </form>
+  </footer>
+
+  <template id="window-tpl">
+    <div class="window">
+      <div class="win-title"><span class="win-name"></span><span class="win-buttons"><button class="win-close" title="关闭">✕</button></span></div>
+      <div class="win-body"></div>
+    </div>
+  </template>
+  <script src="renderer.js"></script>
+</body>
+</html>
