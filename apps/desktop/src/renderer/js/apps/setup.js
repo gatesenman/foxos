@@ -55,6 +55,16 @@
           { id: 'git', name: 'git', installed: tools.git.installed, version: tools.git.version, cmd: plan.components.git },
         ];
         if (plan.components.wmctrl !== undefined) comps.push({ id: 'wmctrl', name: 'wmctrl（任务栏跟踪 LibreOffice 窗口）', installed: tools.wmctrl.installed, cmd: plan.components.wmctrl });
+        // 环境组件与 Everything 分组
+        let envReady = false;
+        try { const im = await FX.k(['env', 'images']); envReady = im.backend !== 'linux-ns' ? false : im.local.length > 0; } catch { envReady = false; }
+        if (plan.components.environments) comps.push({ id: 'environments', name: `环境（${{ linux: 'Linux 命名空间 + Alpine 镜像', windows: 'WSL2', macos: 'Virtualization.framework 辅助程序' }[plan.platform] || plan.platform}）`, installed: envReady, cmd: plan.components.environments });
+        let ev = null; try { ev = await FX.loadEverything(true); } catch { ev = null; }
+        const evComps = ev ? ev.groups.map((g) => {
+          const apps = ev.apps.filter((a) => a.group === g.id);
+          const n = apps.filter((a) => a.installed).length;
+          return { id: `everything:${g.id}`, name: `${g.zh} ${g.en}（${apps.map((a) => a.name).join('、')}）`, installed: n === apps.filter((a) => !a.upstreamIssue).length, version: `${n}/${apps.length} 已安装`, cmd: plan.components[`everything:${g.id}`] };
+        }) : [];
         const featured = ['claude-acp', 'codex-acp', 'gemini', 'opencode', 'qwen-code', 'goose'];
         const agents = featured.map((id) => agentList.agents.find((a) => a.id === id)).filter(Boolean);
         if (!step || picks.size === 0) for (const c of comps) if (!c.installed && c.cmd) picks.add(c.id);
@@ -66,6 +76,9 @@
           el('h2', { text: '选择要安装的组件' }),
           el('p', { class: 'muted small', text: `平台 ${plan.platform} · 包管理器 ${plan.packageManager || '未检测到'}。系统软件会在真实终端里安装，需要时在终端里输入 sudo 密码。` }),
           el('div', { class: 'comp-list' }, comps.map((c) => row(c, c.cmd))),
+          el('h3', { text: 'Everything 应用（可选，按上游的 9 个分组）' }),
+          el('p', { class: 'muted small', text: '从 HeyPuter/everything 固定提交的源码在本机构建，需要 Node.js 22.12+。AGPL-3.0 的应用作为独立组件安装，狐狸OS 不修改其源码。' }),
+          el('div', { class: 'comp-list' }, evComps.map((c) => row(c, c.cmd))),
           el('h3', { text: 'ACP 智能体（可选）' }),
           el('p', { class: 'muted small', text: '从 ACP 官方注册表安装；使用时需要各自的账号或 API 密钥（在设置中填写）。' }),
           el('div', { class: 'comp-list' }, agents.map((a) => row({ id: `agent:${a.id}`, name: `${a.name} ${a.version}`, installed: a.installed, version: a.installedVersion },

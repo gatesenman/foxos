@@ -1,0 +1,2075 @@
+{
+ "app": "api-client",
+ "name": "API Client",
+ "generated_by": "scripts/inventory_ops.py",
+ "commit": "0fbb88cdee2f54c94a9d2c975f43322888813c5d",
+ "title": "API Client",
+ "ops": [
+  {
+   "id": "account.select",
+   "resource": "account",
+   "verb": "select",
+   "summary": "account: *（1 项，如 Account: local）",
+   "source": "ui-collection",
+   "ui": {
+    "path": "主界面 > account: *",
+    "role": "button",
+    "region": null,
+    "view": "主界面",
+    "examples": [
+     "Account: local"
+    ]
+   },
+   "params": [
+    {
+     "name": "target",
+     "type": "string",
+     "description": "要操作的项的名称（或其一部分），如 'Account: local'",
+     "required": true,
+     "positional": true
+    }
+   ],
+   "effect": "点击名称匹配的「account: *」项（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "{{target}}",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "environment.select",
+   "resource": "environment",
+   "verb": "select",
+   "summary": "environment: *（1 项，如 Environment: none）",
+   "source": "ui-collection",
+   "ui": {
+    "path": "主界面 > environment: *",
+    "role": "button",
+    "region": null,
+    "view": "主界面",
+    "examples": [
+     "Environment: none"
+    ]
+   },
+   "params": [
+    {
+     "name": "target",
+     "type": "string",
+     "description": "要操作的项的名称（或其一部分），如 'Environment: none'",
+     "required": true,
+     "positional": true
+    }
+   ],
+   "effect": "点击名称匹配的「environment: *」项（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "{{target}}",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "requests-through.send",
+   "resource": "requests-through",
+   "verb": "send",
+   "summary": "send requests through: *（1 项，如 Send requests through: Auto）",
+   "source": "ui-collection",
+   "ui": {
+    "path": "主界面 > send requests through: *",
+    "role": "button",
+    "region": null,
+    "view": "主界面",
+    "examples": [
+     "Send requests through: Auto"
+    ]
+   },
+   "params": [
+    {
+     "name": "target",
+     "type": "string",
+     "description": "要操作的项的名称（或其一部分），如 'Send requests through: Auto'",
+     "required": true,
+     "positional": true
+    }
+   ],
+   "effect": "点击名称匹配的「send requests through: *」项（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "{{target}}",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "editor.dismiss",
+   "resource": "editor",
+   "verb": "dismiss",
+   "summary": "Skip to editor",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Skip to editor",
+    "role": "link",
+    "name": "Skip to editor",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Skip to editor」（link）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Skip to editor",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "collections-requests-environments.search",
+   "resource": "collections-requests-environments",
+   "verb": "search",
+   "summary": "Search collections, requests and environments",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Search collections, requests and environments",
+    "role": "button",
+    "name": "Search collections, requests and environments",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Search collections, requests and environments」（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Search collections, requests and environments",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "import.import",
+   "resource": "import",
+   "verb": "import",
+   "summary": "Import",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Import",
+    "role": "button",
+    "name": "Import",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Import」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Import",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "theme.activate",
+   "resource": "theme",
+   "verb": "activate",
+   "summary": "Theme",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Theme",
+    "role": "button",
+    "name": "Theme",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Theme」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Theme",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "settings.show",
+   "resource": "settings",
+   "verb": "show",
+   "summary": "Settings",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Settings",
+    "role": "button",
+    "name": "Settings",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Settings」（button），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Settings",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "collections.activate",
+   "resource": "collections",
+   "verb": "activate",
+   "summary": "Collections",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Sidebar sections > Collections",
+    "role": "button",
+    "name": "Collections",
+    "region": "Sidebar sections",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Collections」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Collections",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "environments.activate",
+   "resource": "environments",
+   "verb": "activate",
+   "summary": "Environments",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Sidebar sections > Environments",
+    "role": "button",
+    "name": "Environments",
+    "region": "Sidebar sections",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Environments」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Environments",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "history.activate",
+   "resource": "history",
+   "verb": "activate",
+   "summary": "History",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Sidebar sections > History",
+    "role": "button",
+    "name": "History",
+    "region": "Sidebar sections",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「History」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "History",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "collection.create",
+   "resource": "collection",
+   "verb": "create",
+   "summary": "New collection",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > New collection",
+    "role": "button",
+    "name": "New collection",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「New collection」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "New collection",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "filter.set",
+   "resource": "filter",
+   "verb": "set",
+   "summary": "Filter",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Filter",
+    "role": "textbox",
+    "name": "Filter",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [
+    {
+     "name": "value",
+     "type": "string",
+     "description": "「Filter」的新值",
+     "required": true,
+     "positional": true
+    },
+    {
+     "name": "submit",
+     "type": "boolean",
+     "description": "设置后按 Enter 提交",
+     "default": false
+    }
+   ],
+   "effect": "把「Filter」设为给定值（触发 input / change 事件）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "set": {
+       "name": "Filter",
+       "role": "textbox",
+       "value": "{{value}}"
+      }
+     },
+     {
+      "press_if": "submit",
+      "press": {
+       "key": "Enter",
+       "name": "Filter",
+       "role": "textbox"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "collection-2.create",
+   "resource": "collection-2",
+   "verb": "create",
+   "summary": "New collection",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Sidebar > New collection",
+    "role": "button",
+    "name": "New collection",
+    "region": "Sidebar",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「New collection」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "New collection",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "import-2.import",
+   "resource": "import-2",
+   "verb": "import",
+   "summary": "Import",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Sidebar > Import",
+    "role": "button",
+    "name": "Import",
+    "region": "Sidebar",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Import」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Import",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "sidebar.resize",
+   "resource": "sidebar",
+   "verb": "resize",
+   "summary": "Resize sidebar",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Resize sidebar",
+    "role": "separator",
+    "name": "Resize sidebar",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Resize sidebar」（separator）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Resize sidebar",
+       "role": "separator"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "request.create",
+   "resource": "request",
+   "verb": "create",
+   "summary": "New request",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > New request",
+    "role": "button",
+    "name": "New request",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「New request」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "New request",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "open-tabs.activate",
+   "resource": "open-tabs",
+   "verb": "activate",
+   "summary": "All open tabs",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > All open tabs",
+    "role": "button",
+    "name": "All open tabs",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「All open tabs」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "All open tabs",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "quick-look-at-variables.activate",
+   "resource": "quick-look-at-variables",
+   "verb": "activate",
+   "summary": "Quick look at variables",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Quick look at variables",
+    "role": "button",
+    "name": "Quick look at variables",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Quick look at variables」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Quick look at variables",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "requestctrlaltn.create",
+   "resource": "requestctrlaltn",
+   "verb": "create",
+   "summary": "New requestCtrl+Alt+N",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > main > New requestCtrl+Alt+N",
+    "role": "button",
+    "name": "New requestCtrl+Alt+N",
+    "region": "main",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「New requestCtrl+Alt+N」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "New requestCtrl+Alt+N",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "collection-3.create",
+   "resource": "collection-3",
+   "verb": "create",
+   "summary": "New collection",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > main > New collection",
+    "role": "button",
+    "name": "New collection",
+    "region": "main",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「New collection」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "New collection",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "import-3.import",
+   "resource": "import-3",
+   "verb": "import",
+   "summary": "Import",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > main > Import",
+    "role": "button",
+    "name": "Import",
+    "region": "main",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Import」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Import",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "environment.create",
+   "resource": "environment",
+   "verb": "create",
+   "summary": "New environment",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > main > New environment",
+    "role": "button",
+    "name": "New environment",
+    "region": "main",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「New environment」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "New environment",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "websocket.create",
+   "resource": "websocket",
+   "verb": "create",
+   "summary": "New WebSocket",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > main > New WebSocket",
+    "role": "button",
+    "name": "New WebSocket",
+    "region": "main",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「New WebSocket」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "New WebSocket",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "collection.run",
+   "resource": "collection",
+   "verb": "run",
+   "summary": "Run a collection",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > main > Run a collection",
+    "role": "button",
+    "name": "Run a collection",
+    "region": "main",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Run a collection」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Run a collection",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "sidebar.toggle",
+   "resource": "sidebar",
+   "verb": "toggle",
+   "summary": "Toggle sidebar",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Toggle sidebar",
+    "role": "button",
+    "name": "Toggle sidebar",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "切换「Toggle sidebar」",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Toggle sidebar",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "console.activate",
+   "resource": "console",
+   "verb": "activate",
+   "summary": "Console",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Console",
+    "role": "button",
+    "name": "Console",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Console」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Console",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "cookies.activate",
+   "resource": "cookies",
+   "verb": "activate",
+   "summary": "Cookies",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Cookies",
+    "role": "button",
+    "name": "Cookies",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Cookies」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Cookies",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "response-layout.activate",
+   "resource": "response-layout",
+   "verb": "activate",
+   "summary": "Response layout",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Response layout",
+    "role": "button",
+    "name": "Response layout",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Response layout」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Response layout",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "keyboard-shortcuts.activate",
+   "resource": "keyboard-shortcuts",
+   "verb": "activate",
+   "summary": "Keyboard shortcuts",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Keyboard shortcuts",
+    "role": "button",
+    "name": "Keyboard shortcuts",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Keyboard shortcuts」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Keyboard shortcuts",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "source-code-github.show",
+   "resource": "source-code-github",
+   "verb": "show",
+   "summary": "Source code on GitHub",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Source code on GitHub",
+    "role": "link",
+    "name": "Source code on GitHub",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Source code on GitHub」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Source code on GitHub",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "notification.dismiss",
+   "resource": "notification",
+   "verb": "dismiss",
+   "summary": "Dismiss notification",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Dismiss notification",
+    "role": "button",
+    "name": "Dismiss notification",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Dismiss notification」（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Dismiss notification",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "system.activate",
+   "resource": "system",
+   "verb": "activate",
+   "summary": "System",
+   "source": "ui",
+   "ui": {
+    "path": "Theme > Theme > System",
+    "role": "menuitemradio",
+    "name": "System",
+    "region": "Theme",
+    "view": "Theme"
+   },
+   "params": [],
+   "effect": "点击「System」（menuitemradio）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Theme",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "System",
+       "role": "menuitemradio"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "light.activate",
+   "resource": "light",
+   "verb": "activate",
+   "summary": "Light",
+   "source": "ui",
+   "ui": {
+    "path": "Theme > Theme > Light",
+    "role": "menuitemradio",
+    "name": "Light",
+    "region": "Theme",
+    "view": "Theme"
+   },
+   "params": [],
+   "effect": "点击「Light」（menuitemradio）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Theme",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Light",
+       "role": "menuitemradio"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "dark.activate",
+   "resource": "dark",
+   "verb": "activate",
+   "summary": "Dark",
+   "source": "ui",
+   "ui": {
+    "path": "Theme > Theme > Dark",
+    "role": "menuitemradio",
+    "name": "Dark",
+    "region": "Theme",
+    "view": "Theme"
+   },
+   "params": [],
+   "effect": "点击「Dark」（menuitemradio）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Theme",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Dark",
+       "role": "menuitemradio"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "close.close",
+   "resource": "close",
+   "verb": "close",
+   "summary": "Close",
+   "source": "ui",
+   "ui": {
+    "path": "Settings > Close",
+    "role": "button",
+    "name": "Close",
+    "region": null,
+    "view": "Settings"
+   },
+   "params": [],
+   "effect": "点击「Close」（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Settings",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Close",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "general.show",
+   "resource": "general",
+   "verb": "show",
+   "summary": "General",
+   "source": "ui",
+   "ui": {
+    "path": "Settings > Settings sections > General",
+    "role": "tab",
+    "name": "General",
+    "region": "Settings sections",
+    "view": "Settings"
+   },
+   "params": [],
+   "effect": "点击「General」（tab），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Settings",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "General",
+       "role": "tab"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "requests.show",
+   "resource": "requests",
+   "verb": "show",
+   "summary": "Requests",
+   "source": "ui",
+   "ui": {
+    "path": "Settings > Settings sections > Requests",
+    "role": "tab",
+    "name": "Requests",
+    "region": "Settings sections",
+    "view": "Settings"
+   },
+   "params": [],
+   "effect": "点击「Requests」（tab），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Settings",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Requests",
+       "role": "tab"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "data.show",
+   "resource": "data",
+   "verb": "show",
+   "summary": "Data",
+   "source": "ui",
+   "ui": {
+    "path": "Settings > Settings sections > Data",
+    "role": "tab",
+    "name": "Data",
+    "region": "Settings sections",
+    "view": "Settings"
+   },
+   "params": [],
+   "effect": "点击「Data」（tab），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Settings",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Data",
+       "role": "tab"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "about.show",
+   "resource": "about",
+   "verb": "show",
+   "summary": "About",
+   "source": "ui",
+   "ui": {
+    "path": "Settings > Settings sections > About",
+    "role": "tab",
+    "name": "About",
+    "region": "Settings sections",
+    "view": "Settings"
+   },
+   "params": [],
+   "effect": "点击「About」（tab），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Settings",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "About",
+       "role": "tab"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "system.toggle",
+   "resource": "system",
+   "verb": "toggle",
+   "summary": "System",
+   "source": "ui",
+   "ui": {
+    "path": "Settings > dialog > System",
+    "role": "radio",
+    "name": "System",
+    "region": "dialog",
+    "view": "Settings"
+   },
+   "params": [],
+   "effect": "切换「System」",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Settings",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "System",
+       "role": "radio"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "light.toggle",
+   "resource": "light",
+   "verb": "toggle",
+   "summary": "Light",
+   "source": "ui",
+   "ui": {
+    "path": "Settings > dialog > Light",
+    "role": "radio",
+    "name": "Light",
+    "region": "dialog",
+    "view": "Settings"
+   },
+   "params": [],
+   "effect": "切换「Light」",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Settings",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Light",
+       "role": "radio"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "dark.toggle",
+   "resource": "dark",
+   "verb": "toggle",
+   "summary": "Dark",
+   "source": "ui",
+   "ui": {
+    "path": "Settings > dialog > Dark",
+    "role": "radio",
+    "name": "Dark",
+    "region": "dialog",
+    "view": "Settings"
+   },
+   "params": [],
+   "effect": "切换「Dark」",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Settings",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Dark",
+       "role": "radio"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "below.toggle",
+   "resource": "below",
+   "verb": "toggle",
+   "summary": "Below",
+   "source": "ui",
+   "ui": {
+    "path": "Settings > dialog > Below",
+    "role": "radio",
+    "name": "Below",
+    "region": "dialog",
+    "view": "Settings"
+   },
+   "params": [],
+   "effect": "切换「Below」",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Settings",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Below",
+       "role": "radio"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "beside.toggle",
+   "resource": "beside",
+   "verb": "toggle",
+   "summary": "Beside",
+   "source": "ui",
+   "ui": {
+    "path": "Settings > dialog > Beside",
+    "role": "radio",
+    "name": "Beside",
+    "region": "dialog",
+    "view": "Settings"
+   },
+   "params": [],
+   "effect": "切换「Beside」",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Settings",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Beside",
+       "role": "radio"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "sync-now.activate",
+   "resource": "sync-now",
+   "verb": "activate",
+   "summary": "Sync now",
+   "source": "ui",
+   "ui": {
+    "path": "Account: local > Account > Sync now",
+    "role": "menuitem",
+    "name": "Sync now",
+    "region": "Account",
+    "view": "Account: local"
+   },
+   "params": [],
+   "effect": "点击「Sync now」（menuitem）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Account: local",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Sync now",
+       "role": "menuitem"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "everything.export",
+   "resource": "everything",
+   "verb": "export",
+   "summary": "Export everything",
+   "source": "ui",
+   "ui": {
+    "path": "Account: local > Account > Export everything",
+    "role": "menuitem",
+    "name": "Export everything",
+    "region": "Account",
+    "view": "Account: local"
+   },
+   "params": [],
+   "effect": "点击「Export everything」（menuitem）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Account: local",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Export everything",
+       "role": "menuitem"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "websocket-request.create",
+   "resource": "websocket-request",
+   "verb": "create",
+   "summary": "New WebSocket request",
+   "source": "ui",
+   "ui": {
+    "path": "All open tabs > Open tabs > New WebSocket request",
+    "role": "menuitem",
+    "name": "New WebSocket request",
+    "region": "Open tabs",
+    "view": "All open tabs"
+   },
+   "params": [],
+   "effect": "点击「New WebSocket request」（menuitem）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "All open tabs",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "New WebSocket request",
+       "role": "menuitem"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "tabs.close",
+   "resource": "tabs",
+   "verb": "close",
+   "summary": "Close all tabs",
+   "source": "ui",
+   "ui": {
+    "path": "All open tabs > Open tabs > Close all tabs",
+    "role": "menuitem",
+    "name": "Close all tabs",
+    "region": "Open tabs",
+    "view": "All open tabs"
+   },
+   "params": [],
+   "effect": "点击「Close all tabs」（menuitem）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "All open tabs",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Close all tabs",
+       "role": "menuitem"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "no-environment.activate",
+   "resource": "no-environment",
+   "verb": "activate",
+   "summary": "No environment",
+   "source": "ui",
+   "ui": {
+    "path": "Environment: none > Environment > No environment",
+    "role": "menuitemradio",
+    "name": "No environment",
+    "region": "Environment",
+    "view": "Environment: none"
+   },
+   "params": [],
+   "effect": "点击「No environment」（menuitemradio）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Environment: none",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "No environment",
+       "role": "menuitemradio"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "environment-none-environment.create",
+   "resource": "environment-none-environment",
+   "verb": "create",
+   "summary": "New environment",
+   "source": "ui",
+   "ui": {
+    "path": "Environment: none > Environment > New environment",
+    "role": "menuitem",
+    "name": "New environment",
+    "region": "Environment",
+    "view": "Environment: none"
+   },
+   "params": [],
+   "effect": "点击「New environment」（menuitem）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Environment: none",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "New environment",
+       "role": "menuitem"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "manage-environments.activate",
+   "resource": "manage-environments",
+   "verb": "activate",
+   "summary": "Manage environments",
+   "source": "ui",
+   "ui": {
+    "path": "Environment: none > Environment > Manage environments",
+    "role": "menuitem",
+    "name": "Manage environments",
+    "region": "Environment",
+    "view": "Environment: none"
+   },
+   "params": [],
+   "effect": "点击「Manage environments」（menuitem）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Environment: none",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Manage environments",
+       "role": "menuitem"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "edit.update",
+   "resource": "edit",
+   "verb": "update",
+   "summary": "Edit",
+   "source": "ui",
+   "ui": {
+    "path": "Quick look at variables > Variables in scope > Edit",
+    "role": "button",
+    "name": "Edit",
+    "region": "Variables in scope",
+    "view": "Quick look at variables"
+   },
+   "params": [],
+   "effect": "点击「Edit」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Quick look at variables",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Edit",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "automatic.activate",
+   "resource": "automatic",
+   "verb": "activate",
+   "summary": "Automatic",
+   "source": "ui",
+   "ui": {
+    "path": "Send requests through: Auto > Send requests through > Automatic",
+    "role": "menuitemradio",
+    "name": "Automatic",
+    "region": "Send requests through",
+    "view": "Send requests through: Auto"
+   },
+   "params": [],
+   "effect": "点击「Automatic」（menuitemradio）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Send requests through: Auto",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Automatic",
+       "role": "menuitemradio"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "browser-only.activate",
+   "resource": "browser-only",
+   "verb": "activate",
+   "summary": "Browser only",
+   "source": "ui",
+   "ui": {
+    "path": "Send requests through: Auto > Send requests through > Browser only",
+    "role": "menuitemradio",
+    "name": "Browser only",
+    "region": "Send requests through",
+    "view": "Send requests through: Auto"
+   },
+   "params": [],
+   "effect": "点击「Browser only」（menuitemradio）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Send requests through: Auto",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Browser only",
+       "role": "menuitemradio"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "puter-relay.activate",
+   "resource": "puter-relay",
+   "verb": "activate",
+   "summary": "Puter relay",
+   "source": "ui",
+   "ui": {
+    "path": "Send requests through: Auto > Send requests through > Puter relay",
+    "role": "menuitemradio",
+    "name": "Puter relay",
+    "region": "Send requests through",
+    "view": "Send requests through: Auto"
+   },
+   "params": [],
+   "effect": "点击「Puter relay」（menuitemradio）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Send requests through: Auto",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Puter relay",
+       "role": "menuitemradio"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "what-is-difference.activate",
+   "resource": "what-is-difference",
+   "verb": "activate",
+   "summary": "What is the difference?",
+   "source": "ui",
+   "ui": {
+    "path": "Send requests through: Auto > Send requests through > What is the difference?",
+    "role": "menuitem",
+    "name": "What is the difference?",
+    "region": "Send requests through",
+    "view": "Send requests through: Auto"
+   },
+   "params": [],
+   "effect": "点击「What is the difference?」（menuitem）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Send requests through: Auto",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "What is the difference?",
+       "role": "menuitem"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "below-request.activate",
+   "resource": "below-request",
+   "verb": "activate",
+   "summary": "Below the request",
+   "source": "ui",
+   "ui": {
+    "path": "Response layout > Response layout > Below the request",
+    "role": "menuitemradio",
+    "name": "Below the request",
+    "region": "Response layout",
+    "view": "Response layout"
+   },
+   "params": [],
+   "effect": "点击「Below the request」（menuitemradio）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Response layout",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Below the request",
+       "role": "menuitemradio"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "beside-request.activate",
+   "resource": "beside-request",
+   "verb": "activate",
+   "summary": "Beside the request",
+   "source": "ui",
+   "ui": {
+    "path": "Response layout > Response layout > Beside the request",
+    "role": "menuitemradio",
+    "name": "Beside the request",
+    "region": "Response layout",
+    "view": "Response layout"
+   },
+   "params": [],
+   "effect": "点击「Beside the request」（menuitemradio）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Response layout",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Beside the request",
+       "role": "menuitemradio"
+      }
+     }
+    ]
+   }
+  }
+ ]
+}

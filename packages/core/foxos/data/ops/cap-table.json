@@ -1,0 +1,829 @@
+{
+ "app": "cap-table",
+ "name": "Cap Table",
+ "generated_by": "scripts/inventory_ops.py",
+ "commit": "0fbb88cdee2f54c94a9d2c975f43322888813c5d",
+ "title": "Cap Table",
+ "ops": [
+  {
+   "id": "skip.dismiss",
+   "resource": "skip",
+   "verb": "dismiss",
+   "summary": "skip for *（1 项，如 Skip for now）",
+   "source": "ui-collection",
+   "ui": {
+    "path": "主界面 > Welcome > skip for *",
+    "role": "button",
+    "region": "Welcome",
+    "view": "主界面",
+    "examples": [
+     "Skip for now"
+    ]
+   },
+   "params": [
+    {
+     "name": "target",
+     "type": "string",
+     "description": "要操作的项的名称（或其一部分），如 'Skip for now'",
+     "required": true,
+     "positional": true
+    }
+   ],
+   "effect": "点击名称匹配的「skip for *」项（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "{{target}}",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "main-content.dismiss",
+   "resource": "main-content",
+   "verb": "dismiss",
+   "summary": "Skip to main content",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Skip to main content",
+    "role": "button",
+    "name": "Skip to main content",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Skip to main content」（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Skip to main content",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "searchctrl-k.activate",
+   "resource": "searchctrl-k",
+   "verb": "activate",
+   "summary": "SearchCtrl K",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Main navigation > SearchCtrl K",
+    "role": "button",
+    "name": "SearchCtrl K",
+    "region": "Main navigation",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「SearchCtrl K」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "SearchCtrl K",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "home.activate",
+   "resource": "home",
+   "verb": "activate",
+   "summary": "Home",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Main navigation > Home",
+    "role": "button",
+    "name": "Home",
+    "region": "Main navigation",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Home」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Home",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "cap-table.activate",
+   "resource": "cap-table",
+   "verb": "activate",
+   "summary": "Cap table",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Main navigation > Cap table",
+    "role": "button",
+    "name": "Cap table",
+    "region": "Main navigation",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Cap table」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Cap table",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "securities.activate",
+   "resource": "securities",
+   "verb": "activate",
+   "summary": "Securities",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Main navigation > Securities",
+    "role": "button",
+    "name": "Securities",
+    "region": "Main navigation",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Securities」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Securities",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "stakeholders.activate",
+   "resource": "stakeholders",
+   "verb": "activate",
+   "summary": "Stakeholders",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Main navigation > Stakeholders",
+    "role": "button",
+    "name": "Stakeholders",
+    "region": "Main navigation",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Stakeholders」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Stakeholders",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "classes.share",
+   "resource": "classes",
+   "verb": "share",
+   "summary": "Share classes",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Main navigation > Share classes",
+    "role": "button",
+    "name": "Share classes",
+    "region": "Main navigation",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Share classes」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Share classes",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "round-modeling.activate",
+   "resource": "round-modeling",
+   "verb": "activate",
+   "summary": "Round modeling",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Main navigation > Round modeling",
+    "role": "button",
+    "name": "Round modeling",
+    "region": "Main navigation",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Round modeling」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Round modeling",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "exit-scenarios.activate",
+   "resource": "exit-scenarios",
+   "verb": "activate",
+   "summary": "Exit scenarios",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Main navigation > Exit scenarios",
+    "role": "button",
+    "name": "Exit scenarios",
+    "region": "Main navigation",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Exit scenarios」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Exit scenarios",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "needs-attention.activate",
+   "resource": "needs-attention",
+   "verb": "activate",
+   "summary": "Needs attention",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Main navigation > Needs attention",
+    "role": "button",
+    "name": "Needs attention",
+    "region": "Main navigation",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Needs attention」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Needs attention",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "reports.activate",
+   "resource": "reports",
+   "verb": "activate",
+   "summary": "Reports",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Main navigation > Reports",
+    "role": "button",
+    "name": "Reports",
+    "region": "Main navigation",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Reports」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Reports",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "history.activate",
+   "resource": "history",
+   "verb": "activate",
+   "summary": "History",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Main navigation > History",
+    "role": "button",
+    "name": "History",
+    "region": "Main navigation",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「History」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "History",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "settings.show",
+   "resource": "settings",
+   "verb": "show",
+   "summary": "Settings",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Main navigation > Settings",
+    "role": "button",
+    "name": "Settings",
+    "region": "Main navigation",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Settings」（button），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Settings",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "issue-security.activate",
+   "resource": "issue-security",
+   "verb": "activate",
+   "summary": "Issue security",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Main navigation > Issue security",
+    "role": "button",
+    "name": "Issue security",
+    "region": "Main navigation",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Issue security」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Issue security",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "issue-security-2.activate",
+   "resource": "issue-security-2",
+   "verb": "activate",
+   "summary": "Issue security",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > main > Issue security",
+    "role": "button",
+    "name": "Issue security",
+    "region": "main",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Issue security」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Issue security",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "by-class.activate",
+   "resource": "by-class",
+   "verb": "activate",
+   "summary": "By class",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Ownership grouping > By class",
+    "role": "button",
+    "name": "By class",
+    "region": "Ownership grouping",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「By class」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "By class",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "by-holder.activate",
+   "resource": "by-holder",
+   "verb": "activate",
+   "summary": "By holder",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Ownership grouping > By holder",
+    "role": "button",
+    "name": "By holder",
+    "region": "Ownership grouping",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「By holder」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "By holder",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "cap-table.open",
+   "resource": "cap-table",
+   "verb": "open",
+   "summary": "Open cap table",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > main > Open cap table",
+    "role": "button",
+    "name": "Open cap table",
+    "region": "main",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Open cap table」（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Open cap table",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "set-up-company-profile-do.activate",
+   "resource": "set-up-company-profile-do",
+   "verb": "activate",
+   "summary": "Set up your company profile, to do",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > main > Set up your company profile, to do",
+    "role": "button",
+    "name": "Set up your company profile, to do",
+    "region": "main",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Set up your company profile, to do」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Set up your company profile, to do",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "share-class-do.create",
+   "resource": "share-class-do",
+   "verb": "create",
+   "summary": "Create a share class, to do",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > main > Create a share class, to do",
+    "role": "button",
+    "name": "Create a share class, to do",
+    "region": "main",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Create a share class, to do」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Create a share class, to do",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "issue-founder-shares-do.activate",
+   "resource": "issue-founder-shares-do",
+   "verb": "activate",
+   "summary": "Issue founder shares, to do",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > main > Issue founder shares, to do",
+    "role": "button",
+    "name": "Issue founder shares, to do",
+    "region": "main",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Issue founder shares, to do」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Issue founder shares, to do",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "adopt-equity-plan-reserve-shares-do.activate",
+   "resource": "adopt-equity-plan-reserve-shares-do",
+   "verb": "activate",
+   "summary": "Adopt an equity plan and reserve shares, to do",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > main > Adopt an equity plan and reserve shares, to do",
+    "role": "button",
+    "name": "Adopt an equity plan and reserve shares, to do",
+    "region": "main",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Adopt an equity plan and reserve shares, to do」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Adopt an equity plan and reserve shares, to do",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "grant-options-or-add-safe-do.activate",
+   "resource": "grant-options-or-add-safe-do",
+   "verb": "activate",
+   "summary": "Grant options or add a SAFE, to do",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > main > Grant options or add a SAFE, to do",
+    "role": "button",
+    "name": "Grant options or add a SAFE, to do",
+    "region": "main",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Grant options or add a SAFE, to do」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Grant options or add a SAFE, to do",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "close.close",
+   "resource": "close",
+   "verb": "close",
+   "summary": "Close",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Close",
+    "role": "button",
+    "name": "Close",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Close」（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Close",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "set-up-company.activate",
+   "resource": "set-up-company",
+   "verb": "activate",
+   "summary": "Set up my company",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Welcome > Set up my company",
+    "role": "button",
+    "name": "Set up my company",
+    "region": "Welcome",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Set up my company」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Set up my company",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "explore-sample-data.activate",
+   "resource": "explore-sample-data",
+   "verb": "activate",
+   "summary": "Explore with sample data",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Welcome > Explore with sample data",
+    "role": "button",
+    "name": "Explore with sample data",
+    "region": "Welcome",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Explore with sample data」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Explore with sample data",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  }
+ ]
+}

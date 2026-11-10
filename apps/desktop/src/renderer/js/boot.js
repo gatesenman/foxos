@@ -44,11 +44,23 @@
       el('div', { class: 'start-head' }, el('img', { src: 'icon-64.png', alt: '' }), el('div', {}, el('b', { text: '狐狸OS' }), el('div', { class: 'muted small', text: FX.env.workspace }))),
       el('div', { class: 'start-grid' }, LAUNCHERS.map((l) => el('button', { class: `start-app ${l.office && !officeInstalled(l.id) ? 'missing' : ''}`, 'data-launch': l.id, onclick: () => { hideStart(); l.run(); } },
         icon(l.icon), el('span', { text: l.name }), l.office && !officeInstalled(l.id) ? el('span', { class: 'badge warn', text: '未安装' }) : null))),
+      evStart(),
       el('div', { class: 'start-foot' },
         el('button', { class: 'btn ghost sm', onclick: () => { hideStart(); FX.openWindow('setup', {}); } }, icon('wand'), '安装向导'),
         el('div', { class: 'spacer' }),
         el('span', { class: 'muted small', text: `${FX.env.platform}-${FX.env.arch} · v${FX.env.versions.app}` })));
   }
+  // 开始菜单里的 Everything 应用：只列出本机已安装的，按上游分组
+  function evStart() {
+    const c = FX.evCatalog; if (!c) return null;
+    const groups = c.groups.map((g) => ({ g, apps: c.apps.filter((a) => a.group === g.id && a.installed) })).filter((x) => x.apps.length);
+    if (!groups.length) return el('div', { class: 'start-ev muted small', text: 'Everything 应用尚未安装（应用中心 → Everything 应用）' });
+    return el('div', { class: 'start-ev scroll' }, groups.map(({ g, apps }) => el('div', { class: 'start-ev-group', 'data-group': g.id },
+      el('div', { class: 'muted small' }, icon(FX.groupIcon(g.id)), ` ${g.zh}`),
+      el('div', { class: 'start-ev-apps' }, apps.map((a) => el('button', { class: 'start-ev-app', 'data-ev-launch': a.id, onclick: () => { hideStart(); FX.openWindow('everything', { app: a.id }); } }, a.name))))));
+  }
+  FX.on('everything-changed', () => FX.loadEverything(true).catch(() => {}));
+  FX.loadEverything().catch(() => {});
   function hideStart() { menu.classList.add('hidden'); }
   $('#start').addEventListener('click', (e) => { e.stopPropagation(); renderStart(); menu.classList.toggle('hidden'); });
   document.addEventListener('pointerdown', (e) => { if (!menu.contains(e.target) && !$('#start').contains(e.target)) hideStart(); });

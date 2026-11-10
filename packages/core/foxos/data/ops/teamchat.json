@@ -1,0 +1,209 @@
+{
+ "app": "teamchat",
+ "name": "Teamchat",
+ "generated_by": "scripts/inventory_ops.py",
+ "commit": "0fbb88cdee2f54c94a9d2c975f43322888813c5d",
+ "title": "Teamchat",
+ "ops": [
+  {
+   "id": "workspacestart-space.create",
+   "resource": "workspacestart-space",
+   "verb": "create",
+   "summary": "create a workspacestart a space for *（1 项，如 Create a workspaceStart a space for your team）",
+   "source": "ui-collection",
+   "ui": {
+    "path": "主界面 > create a workspacestart a space for *",
+    "role": "button",
+    "region": null,
+    "view": "主界面",
+    "examples": [
+     "Create a workspaceStart a space for your team"
+    ]
+   },
+   "params": [
+    {
+     "name": "target",
+     "type": "string",
+     "description": "要操作的项的名称（或其一部分），如 'Create a workspaceStart a space for your team'",
+     "required": true,
+     "positional": true
+    }
+   ],
+   "effect": "点击名称匹配的「create a workspacestart a space for *」项（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "{{target}}",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "workspacestart-space-2.create",
+   "resource": "workspacestart-space-2",
+   "verb": "create",
+   "summary": "create a workspacestart a space for *（1 项，如 Create a workspaceStart a space for your team and invite people）",
+   "source": "ui-collection",
+   "ui": {
+    "path": "主界面 > Welcome to Teamchat > create a workspacestart a space for *",
+    "role": "button",
+    "region": "Welcome to Teamchat",
+    "view": "主界面",
+    "examples": [
+     "Create a workspaceStart a space for your team and invite people"
+    ]
+   },
+   "params": [
+    {
+     "name": "target",
+     "type": "string",
+     "description": "要操作的项的名称（或其一部分），如 'Create a workspaceStart a space for your team and invite people'",
+     "required": true,
+     "positional": true
+    }
+   ],
+   "effect": "点击名称匹配的「create a workspacestart a space for *」项（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "{{target}}",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "messages.dismiss",
+   "resource": "messages",
+   "verb": "dismiss",
+   "summary": "Skip to messages",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Skip to messages",
+    "role": "link",
+    "name": "Skip to messages",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Skip to messages」（link）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Skip to messages",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "invitepaste-code-or-link.join",
+   "resource": "invitepaste-code-or-link",
+   "verb": "join",
+   "summary": "Join with an invitePaste a code or link",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Join with an invitePaste a code or link",
+    "role": "button",
+    "name": "Join with an invitePaste a code or link",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Join with an invitePaste a code or link」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Join with an invitePaste a code or link",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "puter.show",
+   "resource": "puter",
+   "verb": "show",
+   "summary": "Puter",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Puter",
+    "role": "link",
+    "name": "Puter",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Puter」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Puter",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "close.close",
+   "resource": "close",
+   "verb": "close",
+   "summary": "Close",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Close",
+    "role": "button",
+    "name": "Close",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Close」（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Close",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  }
+ ]
+}

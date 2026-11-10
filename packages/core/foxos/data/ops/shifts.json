@@ -1,0 +1,539 @@
+{
+ "app": "shifts",
+ "name": "Shifts",
+ "generated_by": "scripts/inventory_ops.py",
+ "commit": "0fbb88cdee2f54c94a9d2c975f43322888813c5d",
+ "title": "Home · Shifts",
+ "ops": [
+  {
+   "id": "theme.select",
+   "resource": "theme",
+   "verb": "select",
+   "summary": "theme: *（1 项，如 Theme: System）",
+   "source": "ui-collection",
+   "ui": {
+    "path": "主界面 > theme: *",
+    "role": "button",
+    "region": null,
+    "view": "主界面",
+    "examples": [
+     "Theme: System"
+    ]
+   },
+   "params": [
+    {
+     "name": "target",
+     "type": "string",
+     "description": "要操作的项的名称（或其一部分），如 'Theme: System'",
+     "required": true,
+     "positional": true
+    }
+   ],
+   "effect": "点击名称匹配的「theme: *」项（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "{{target}}",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "skip.dismiss",
+   "resource": "skip",
+   "verb": "dismiss",
+   "summary": "skip for *（1 项，如 Skip for now）",
+   "source": "ui-collection",
+   "ui": {
+    "path": "主界面 > Welcome > skip for *",
+    "role": "button",
+    "region": "Welcome",
+    "view": "主界面",
+    "examples": [
+     "Skip for now"
+    ]
+   },
+   "params": [
+    {
+     "name": "target",
+     "type": "string",
+     "description": "要操作的项的名称（或其一部分），如 'Skip for now'",
+     "required": true,
+     "positional": true
+    }
+   ],
+   "effect": "点击名称匹配的「skip for *」项（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "{{target}}",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "home.activate",
+   "resource": "home",
+   "verb": "activate",
+   "summary": "Home",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Main > Home",
+    "role": "button",
+    "name": "Home",
+    "region": "Main",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Home」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Home",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "schedule.schedule",
+   "resource": "schedule",
+   "verb": "schedule",
+   "summary": "Schedule",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Main > Schedule",
+    "role": "button",
+    "name": "Schedule",
+    "region": "Main",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Schedule」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Schedule",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "team.activate",
+   "resource": "team",
+   "verb": "activate",
+   "summary": "Team",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Main > Team",
+    "role": "button",
+    "name": "Team",
+    "region": "Main",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Team」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Team",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "availability.activate",
+   "resource": "availability",
+   "verb": "activate",
+   "summary": "Availability",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Main > Availability",
+    "role": "button",
+    "name": "Availability",
+    "region": "Main",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Availability」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Availability",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "swaps.activate",
+   "resource": "swaps",
+   "verb": "activate",
+   "summary": "Swaps",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Main > Swaps",
+    "role": "button",
+    "name": "Swaps",
+    "region": "Main",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Swaps」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Swaps",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "attendance.activate",
+   "resource": "attendance",
+   "verb": "activate",
+   "summary": "Attendance",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Main > Attendance",
+    "role": "button",
+    "name": "Attendance",
+    "region": "Main",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Attendance」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Attendance",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "reports.activate",
+   "resource": "reports",
+   "verb": "activate",
+   "summary": "Reports",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Main > Reports",
+    "role": "button",
+    "name": "Reports",
+    "region": "Main",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Reports」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Reports",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "backup-restore.activate",
+   "resource": "backup-restore",
+   "verb": "activate",
+   "summary": "Backup & restore",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > aside > Backup & restore",
+    "role": "button",
+    "name": "Backup & restore",
+    "region": "aside",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Backup & restore」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Backup & restore",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "out.sign",
+   "resource": "out",
+   "verb": "sign",
+   "summary": "Sign out",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Sign out",
+    "role": "button",
+    "name": "Sign out",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Sign out」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Sign out",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "puter.show",
+   "resource": "puter",
+   "verb": "show",
+   "summary": "Puter",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > aside > Puter",
+    "role": "link",
+    "name": "Puter",
+    "region": "aside",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Puter」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Puter",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "employee.create",
+   "resource": "employee",
+   "verb": "create",
+   "summary": "Add employee",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > main > Add employee",
+    "role": "button",
+    "name": "Add employee",
+    "region": "main",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Add employee」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Add employee",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "sample-data.import",
+   "resource": "sample-data",
+   "verb": "import",
+   "summary": "Load sample data",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > main > Load sample data",
+    "role": "button",
+    "name": "Load sample data",
+    "region": "main",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Load sample data」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Load sample data",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "close.close",
+   "resource": "close",
+   "verb": "close",
+   "summary": "Close",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Close",
+    "role": "button",
+    "name": "Close",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Close」（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Close",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "set-up-team.activate",
+   "resource": "set-up-team",
+   "verb": "activate",
+   "summary": "Set up my team",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Welcome > Set up my team",
+    "role": "button",
+    "name": "Set up my team",
+    "region": "Welcome",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Set up my team」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Set up my team",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "explore-sample-data.activate",
+   "resource": "explore-sample-data",
+   "verb": "activate",
+   "summary": "Explore with sample data",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Welcome > Explore with sample data",
+    "role": "button",
+    "name": "Explore with sample data",
+    "region": "Welcome",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Explore with sample data」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Explore with sample data",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  }
+ ]
+}

@@ -1,0 +1,1215 @@
+{
+ "app": "contacts",
+ "name": "Contacts",
+ "generated_by": "scripts/inventory_ops.py",
+ "commit": "0fbb88cdee2f54c94a9d2c975f43322888813c5d",
+ "title": "Contacts — Your address book, in the cloud",
+ "ops": [
+  {
+   "id": "account-menu.activate",
+   "resource": "account-menu",
+   "verb": "activate",
+   "summary": "Account menu",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Account menu",
+    "role": "button",
+    "name": "Account menu",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Account menu」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Account menu",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "smart-add.activate",
+   "resource": "smart-add",
+   "verb": "activate",
+   "summary": "Smart add",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Smart add",
+    "role": "button",
+    "name": "Smart add",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Smart add」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Smart add",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "contact.create",
+   "resource": "contact",
+   "verb": "create",
+   "summary": "New contact",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > New contact",
+    "role": "button",
+    "name": "New contact",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「New contact」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "New contact",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "search-contacts.set",
+   "resource": "search-contacts",
+   "verb": "set",
+   "summary": "Search contacts",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Search contacts",
+    "role": "combobox",
+    "name": "Search contacts",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [
+    {
+     "name": "value",
+     "type": "string",
+     "description": "「Search contacts」的新值",
+     "required": true,
+     "positional": true
+    },
+    {
+     "name": "submit",
+     "type": "boolean",
+     "description": "设置后按 Enter 提交",
+     "default": false
+    }
+   ],
+   "effect": "把「Search contacts」设为给定值（触发 input / change 事件）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "set": {
+       "name": "Search contacts",
+       "role": "combobox",
+       "value": "{{value}}"
+      }
+     },
+     {
+      "press_if": "submit",
+      "press": {
+       "key": "Enter",
+       "name": "Search contacts",
+       "role": "combobox"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "list-options.activate",
+   "resource": "list-options",
+   "verb": "activate",
+   "summary": "List options",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > List options",
+    "role": "button",
+    "name": "List options",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「List options」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "List options",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "favorites.activate",
+   "resource": "favorites",
+   "verb": "activate",
+   "summary": "Favorites",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > aside > Favorites",
+    "role": "button",
+    "name": "Favorites",
+    "region": "aside",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Favorites」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Favorites",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "contact-2.create",
+   "resource": "contact-2",
+   "verb": "create",
+   "summary": "New contact",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > aside > New contact",
+    "role": "button",
+    "name": "New contact",
+    "region": "aside",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「New contact」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "New contact",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "import.import",
+   "resource": "import",
+   "verb": "import",
+   "summary": "Import",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > aside > Import",
+    "role": "button",
+    "name": "Import",
+    "region": "aside",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Import」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Import",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "contact-3.create",
+   "resource": "contact-3",
+   "verb": "create",
+   "summary": "New contact",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > main > New contact",
+    "role": "button",
+    "name": "New contact",
+    "region": "main",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「New contact」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "New contact",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "set-photo.activate",
+   "resource": "set-photo",
+   "verb": "activate",
+   "summary": "Set photo",
+   "source": "ui",
+   "ui": {
+    "path": "New contact > Set photo",
+    "role": "button",
+    "name": "Set photo",
+    "region": null,
+    "view": "New contact"
+   },
+   "params": [],
+   "effect": "点击「Set photo」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "New contact",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Set photo",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "close.close",
+   "resource": "close",
+   "verb": "close",
+   "summary": "Close",
+   "source": "ui",
+   "ui": {
+    "path": "New contact > Close",
+    "role": "button",
+    "name": "Close",
+    "region": null,
+    "view": "New contact"
+   },
+   "params": [],
+   "effect": "点击「Close」（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "New contact",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Close",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "first-name.set",
+   "resource": "first-name",
+   "verb": "set",
+   "summary": "First name",
+   "source": "ui",
+   "ui": {
+    "path": "New contact > dialog > First name",
+    "role": "textbox",
+    "name": "First name",
+    "region": "dialog",
+    "view": "New contact"
+   },
+   "params": [
+    {
+     "name": "value",
+     "type": "string",
+     "description": "「First name」的新值",
+     "required": true,
+     "positional": true
+    },
+    {
+     "name": "submit",
+     "type": "boolean",
+     "description": "设置后按 Enter 提交",
+     "default": false
+    }
+   ],
+   "effect": "把「First name」设为给定值（触发 input / change 事件）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "New contact",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "set": {
+       "name": "First name",
+       "role": "textbox",
+       "value": "{{value}}"
+      }
+     },
+     {
+      "press_if": "submit",
+      "press": {
+       "key": "Enter",
+       "name": "First name",
+       "role": "textbox"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "last-name.set",
+   "resource": "last-name",
+   "verb": "set",
+   "summary": "Last name",
+   "source": "ui",
+   "ui": {
+    "path": "New contact > dialog > Last name",
+    "role": "textbox",
+    "name": "Last name",
+    "region": "dialog",
+    "view": "New contact"
+   },
+   "params": [
+    {
+     "name": "value",
+     "type": "string",
+     "description": "「Last name」的新值",
+     "required": true,
+     "positional": true
+    },
+    {
+     "name": "submit",
+     "type": "boolean",
+     "description": "设置后按 Enter 提交",
+     "default": false
+    }
+   ],
+   "effect": "把「Last name」设为给定值（触发 input / change 事件）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "New contact",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "set": {
+       "name": "Last name",
+       "role": "textbox",
+       "value": "{{value}}"
+      }
+     },
+     {
+      "press_if": "submit",
+      "press": {
+       "key": "Enter",
+       "name": "Last name",
+       "role": "textbox"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "nickname.set",
+   "resource": "nickname",
+   "verb": "set",
+   "summary": "Nickname",
+   "source": "ui",
+   "ui": {
+    "path": "New contact > dialog > Nickname",
+    "role": "textbox",
+    "name": "Nickname",
+    "region": "dialog",
+    "view": "New contact"
+   },
+   "params": [
+    {
+     "name": "value",
+     "type": "string",
+     "description": "「Nickname」的新值",
+     "required": true,
+     "positional": true
+    },
+    {
+     "name": "submit",
+     "type": "boolean",
+     "description": "设置后按 Enter 提交",
+     "default": false
+    }
+   ],
+   "effect": "把「Nickname」设为给定值（触发 input / change 事件）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "New contact",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "set": {
+       "name": "Nickname",
+       "role": "textbox",
+       "value": "{{value}}"
+      }
+     },
+     {
+      "press_if": "submit",
+      "press": {
+       "key": "Enter",
+       "name": "Nickname",
+       "role": "textbox"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "company.set",
+   "resource": "company",
+   "verb": "set",
+   "summary": "Company",
+   "source": "ui",
+   "ui": {
+    "path": "New contact > dialog > Company",
+    "role": "textbox",
+    "name": "Company",
+    "region": "dialog",
+    "view": "New contact"
+   },
+   "params": [
+    {
+     "name": "value",
+     "type": "string",
+     "description": "「Company」的新值",
+     "required": true,
+     "positional": true
+    },
+    {
+     "name": "submit",
+     "type": "boolean",
+     "description": "设置后按 Enter 提交",
+     "default": false
+    }
+   ],
+   "effect": "把「Company」设为给定值（触发 input / change 事件）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "New contact",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "set": {
+       "name": "Company",
+       "role": "textbox",
+       "value": "{{value}}"
+      }
+     },
+     {
+      "press_if": "submit",
+      "press": {
+       "key": "Enter",
+       "name": "Company",
+       "role": "textbox"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "job-title.set",
+   "resource": "job-title",
+   "verb": "set",
+   "summary": "Job title",
+   "source": "ui",
+   "ui": {
+    "path": "New contact > dialog > Job title",
+    "role": "textbox",
+    "name": "Job title",
+    "region": "dialog",
+    "view": "New contact"
+   },
+   "params": [
+    {
+     "name": "value",
+     "type": "string",
+     "description": "「Job title」的新值",
+     "required": true,
+     "positional": true
+    },
+    {
+     "name": "submit",
+     "type": "boolean",
+     "description": "设置后按 Enter 提交",
+     "default": false
+    }
+   ],
+   "effect": "把「Job title」设为给定值（触发 input / change 事件）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "New contact",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "set": {
+       "name": "Job title",
+       "role": "textbox",
+       "value": "{{value}}"
+      }
+     },
+     {
+      "press_if": "submit",
+      "press": {
+       "key": "Enter",
+       "name": "Job title",
+       "role": "textbox"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "email.create",
+   "resource": "email",
+   "verb": "create",
+   "summary": "Add email",
+   "source": "ui",
+   "ui": {
+    "path": "New contact > dialog > Add email",
+    "role": "button",
+    "name": "Add email",
+    "region": "dialog",
+    "view": "New contact"
+   },
+   "params": [],
+   "effect": "点击「Add email」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "New contact",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Add email",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "phone.create",
+   "resource": "phone",
+   "verb": "create",
+   "summary": "Add phone",
+   "source": "ui",
+   "ui": {
+    "path": "New contact > dialog > Add phone",
+    "role": "button",
+    "name": "Add phone",
+    "region": "dialog",
+    "view": "New contact"
+   },
+   "params": [],
+   "effect": "点击「Add phone」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "New contact",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Add phone",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "link.create",
+   "resource": "link",
+   "verb": "create",
+   "summary": "Add link",
+   "source": "ui",
+   "ui": {
+    "path": "New contact > dialog > Add link",
+    "role": "button",
+    "name": "Add link",
+    "region": "dialog",
+    "view": "New contact"
+   },
+   "params": [],
+   "effect": "点击「Add link」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "New contact",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Add link",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "address.create",
+   "resource": "address",
+   "verb": "create",
+   "summary": "Add address",
+   "source": "ui",
+   "ui": {
+    "path": "New contact > dialog > Add address",
+    "role": "button",
+    "name": "Add address",
+    "region": "dialog",
+    "view": "New contact"
+   },
+   "params": [],
+   "effect": "点击「Add address」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "New contact",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Add address",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "birthday.set",
+   "resource": "birthday",
+   "verb": "set",
+   "summary": "Birthday",
+   "source": "ui",
+   "ui": {
+    "path": "New contact > dialog > Birthday",
+    "role": "textbox",
+    "name": "Birthday",
+    "region": "dialog",
+    "view": "New contact"
+   },
+   "params": [
+    {
+     "name": "value",
+     "type": "string",
+     "description": "「Birthday」的新值",
+     "required": true,
+     "positional": true
+    },
+    {
+     "name": "submit",
+     "type": "boolean",
+     "description": "设置后按 Enter 提交",
+     "default": false
+    }
+   ],
+   "effect": "把「Birthday」设为给定值（触发 input / change 事件）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "New contact",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "set": {
+       "name": "Birthday",
+       "role": "textbox",
+       "value": "{{value}}"
+      }
+     },
+     {
+      "press_if": "submit",
+      "press": {
+       "key": "Enter",
+       "name": "Birthday",
+       "role": "textbox"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "hide-year.toggle",
+   "resource": "hide-year",
+   "verb": "toggle",
+   "summary": "Hide year",
+   "source": "ui",
+   "ui": {
+    "path": "New contact > dialog > Hide year",
+    "role": "checkbox",
+    "name": "Hide year",
+    "region": "dialog",
+    "view": "New contact"
+   },
+   "params": [],
+   "effect": "切换「Hide year」",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "New contact",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Hide year",
+       "role": "checkbox"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "tags.set",
+   "resource": "tags",
+   "verb": "set",
+   "summary": "Tags",
+   "source": "ui",
+   "ui": {
+    "path": "New contact > dialog > Tags",
+    "role": "textbox",
+    "name": "Tags",
+    "region": "dialog",
+    "view": "New contact"
+   },
+   "params": [
+    {
+     "name": "value",
+     "type": "string",
+     "description": "「Tags」的新值",
+     "required": true,
+     "positional": true
+    },
+    {
+     "name": "submit",
+     "type": "boolean",
+     "description": "设置后按 Enter 提交",
+     "default": false
+    }
+   ],
+   "effect": "把「Tags」设为给定值（触发 input / change 事件）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "New contact",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "set": {
+       "name": "Tags",
+       "role": "textbox",
+       "value": "{{value}}"
+      }
+     },
+     {
+      "press_if": "submit",
+      "press": {
+       "key": "Enter",
+       "name": "Tags",
+       "role": "textbox"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "notes.set",
+   "resource": "notes",
+   "verb": "set",
+   "summary": "Notes",
+   "source": "ui",
+   "ui": {
+    "path": "New contact > dialog > Notes",
+    "role": "textbox",
+    "name": "Notes",
+    "region": "dialog",
+    "view": "New contact"
+   },
+   "params": [
+    {
+     "name": "value",
+     "type": "string",
+     "description": "「Notes」的新值",
+     "required": true,
+     "positional": true
+    },
+    {
+     "name": "submit",
+     "type": "boolean",
+     "description": "设置后按 Enter 提交",
+     "default": false
+    }
+   ],
+   "effect": "把「Notes」设为给定值（触发 input / change 事件）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "New contact",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "set": {
+       "name": "Notes",
+       "role": "textbox",
+       "value": "{{value}}"
+      }
+     },
+     {
+      "press_if": "submit",
+      "press": {
+       "key": "Enter",
+       "name": "Notes",
+       "role": "textbox"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "add-favorites.toggle",
+   "resource": "add-favorites",
+   "verb": "toggle",
+   "summary": "Add to favorites",
+   "source": "ui",
+   "ui": {
+    "path": "New contact > dialog > Add to favorites",
+    "role": "checkbox",
+    "name": "Add to favorites",
+    "region": "dialog",
+    "view": "New contact"
+   },
+   "params": [],
+   "effect": "切换「Add to favorites」",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "New contact",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Add to favorites",
+       "role": "checkbox"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "cancel.cancel",
+   "resource": "cancel",
+   "verb": "cancel",
+   "summary": "Cancel",
+   "source": "ui",
+   "ui": {
+    "path": "New contact > footer > Cancel",
+    "role": "button",
+    "name": "Cancel",
+    "region": "footer",
+    "view": "New contact"
+   },
+   "params": [],
+   "effect": "点击「Cancel」（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "New contact",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Cancel",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "contact-4.create",
+   "resource": "contact-4",
+   "verb": "create",
+   "summary": "Add contact",
+   "source": "ui",
+   "ui": {
+    "path": "New contact > footer > Add contact",
+    "role": "button",
+    "name": "Add contact",
+    "region": "footer",
+    "view": "New contact"
+   },
+   "params": [],
+   "effect": "点击「Add contact」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "New contact",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Add contact",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "selection.select-all",
+   "resource": "selection",
+   "verb": "select-all",
+   "summary": "快捷键 mod+a",
+   "source": "shortcut",
+   "ui": {
+    "path": "键盘 mod+a",
+    "shortcut": "mod+a",
+    "defined_in": "src/ui/app.js"
+   },
+   "params": [],
+   "effect": "在当前焦点上按 mod+a（src/ui/app.js 中定义）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "press": {
+       "key": "mod+a"
+      }
+     }
+    ]
+   }
+  }
+ ]
+}

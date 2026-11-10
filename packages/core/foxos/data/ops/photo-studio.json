@@ -1,0 +1,3486 @@
+{
+ "app": "photo-studio",
+ "name": "Photo Studio",
+ "generated_by": "scripts/inventory_ops.py",
+ "commit": "0fbb88cdee2f54c94a9d2c975f43322888813c5d",
+ "title": "Photo Studio",
+ "ops": [
+  {
+   "id": "sheet.create",
+   "resource": "sheet",
+   "verb": "create",
+   "summary": "create # sheet（1 项，如 Create A4 sheet）",
+   "source": "ui-collection",
+   "ui": {
+    "path": "主界面 > New from a preset > create # sheet",
+    "role": "button",
+    "region": "New from a preset",
+    "view": "主界面",
+    "examples": [
+     "Create A4 sheet"
+    ]
+   },
+   "params": [
+    {
+     "name": "target",
+     "type": "string",
+     "description": "要操作的项的名称（或其一部分），如 'Create A4 sheet'",
+     "required": true,
+     "positional": true
+    }
+   ],
+   "effect": "点击名称匹配的「create # sheet」项（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "{{target}}",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "photo-print.create",
+   "resource": "photo-print",
+   "verb": "create",
+   "summary": "create photo print #（1 项，如 Create Photo print 6 × 4）",
+   "source": "ui-collection",
+   "ui": {
+    "path": "主界面 > New from a preset > create photo print #",
+    "role": "button",
+    "region": "New from a preset",
+    "view": "主界面",
+    "examples": [
+     "Create Photo print 6 × 4"
+    ]
+   },
+   "params": [
+    {
+     "name": "target",
+     "type": "string",
+     "description": "要操作的项的名称（或其一部分），如 'Create Photo print 6 × 4'",
+     "required": true,
+     "positional": true
+    }
+   ],
+   "effect": "点击名称匹配的「create photo print #」项（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "{{target}}",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "copy.export",
+   "resource": "copy",
+   "verb": "export",
+   "summary": "export a copy for *（1 项，如 Export a copy for the web, repeat it in one click and keep an editable project.）",
+   "source": "ui-collection",
+   "ui": {
+    "path": "主界面 > Learn > export a copy for *",
+    "role": "button",
+    "region": "Learn",
+    "view": "主界面",
+    "examples": [
+     "Export a copy for the web, repeat it in one click and keep an editable project."
+    ]
+   },
+   "params": [
+    {
+     "name": "target",
+     "type": "string",
+     "description": "要操作的项的名称（或其一部分），如 'Export a copy for the web, repeat it in one click and keep an editable project.'",
+     "required": true,
+     "positional": true
+    }
+   ],
+   "effect": "点击名称匹配的「export a copy for *」项（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "{{target}}",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "file.activate",
+   "resource": "file",
+   "verb": "activate",
+   "summary": "File",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Application menu > File",
+    "role": "menuitem",
+    "name": "File",
+    "region": "Application menu",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「File」（menuitem）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "File",
+       "role": "menuitem"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "edit.update",
+   "resource": "edit",
+   "verb": "update",
+   "summary": "Edit",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Application menu > Edit",
+    "role": "menuitem",
+    "name": "Edit",
+    "region": "Application menu",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Edit」（menuitem）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Edit",
+       "role": "menuitem"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "image.activate",
+   "resource": "image",
+   "verb": "activate",
+   "summary": "Image",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Application menu > Image",
+    "role": "menuitem",
+    "name": "Image",
+    "region": "Application menu",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Image」（menuitem）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Image",
+       "role": "menuitem"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "layer.activate",
+   "resource": "layer",
+   "verb": "activate",
+   "summary": "Layer",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Application menu > Layer",
+    "role": "menuitem",
+    "name": "Layer",
+    "region": "Application menu",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Layer」（menuitem）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Layer",
+       "role": "menuitem"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "type.activate",
+   "resource": "type",
+   "verb": "activate",
+   "summary": "Type",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Application menu > Type",
+    "role": "menuitem",
+    "name": "Type",
+    "region": "Application menu",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Type」（menuitem）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Type",
+       "role": "menuitem"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "select.select",
+   "resource": "select",
+   "verb": "select",
+   "summary": "Select",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Application menu > Select",
+    "role": "menuitem",
+    "name": "Select",
+    "region": "Application menu",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Select」（menuitem）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Select",
+       "role": "menuitem"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "filter.filter",
+   "resource": "filter",
+   "verb": "filter",
+   "summary": "Filter",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Application menu > Filter",
+    "role": "menuitem",
+    "name": "Filter",
+    "region": "Application menu",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Filter」（menuitem）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Filter",
+       "role": "menuitem"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "view.show",
+   "resource": "view",
+   "verb": "show",
+   "summary": "View",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Application menu > View",
+    "role": "menuitem",
+    "name": "View",
+    "region": "Application menu",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「View」（menuitem），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "View",
+       "role": "menuitem"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "window.activate",
+   "resource": "window",
+   "verb": "activate",
+   "summary": "Window",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Application menu > Window",
+    "role": "menuitem",
+    "name": "Window",
+    "region": "Application menu",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Window」（menuitem）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Window",
+       "role": "menuitem"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "help.show",
+   "resource": "help",
+   "verb": "show",
+   "summary": "Help",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Application menu > Help",
+    "role": "menuitem",
+    "name": "Help",
+    "region": "Application menu",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Help」（menuitem），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Help",
+       "role": "menuitem"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "commands.search",
+   "resource": "commands",
+   "verb": "search",
+   "summary": "Search commands",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Search commands",
+    "role": "button",
+    "name": "Search commands",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Search commands」（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Search commands",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "puter.save",
+   "resource": "puter",
+   "verb": "save",
+   "summary": "Save to Puter",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > header > Save to Puter",
+    "role": "button",
+    "name": "Save to Puter",
+    "region": "header",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Save to Puter」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Save to Puter",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "export.export",
+   "resource": "export",
+   "verb": "export",
+   "summary": "Export",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > header > Export",
+    "role": "button",
+    "name": "Export",
+    "region": "header",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Export」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Export",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "puter-account.activate",
+   "resource": "puter-account",
+   "verb": "activate",
+   "summary": "Puter account",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Puter account",
+    "role": "button",
+    "name": "Puter account",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Puter account」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Puter account",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "tool-presets.activate",
+   "resource": "tool-presets",
+   "verb": "activate",
+   "summary": "Tool presets",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Tool presets",
+    "role": "button",
+    "name": "Tool presets",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Tool presets」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Tool presets",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "tool-presets-2.activate",
+   "resource": "tool-presets-2",
+   "verb": "activate",
+   "summary": "Tool Presets",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Tool Presets",
+    "role": "button",
+    "name": "Tool Presets",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Tool Presets」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Tool Presets",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "color-theme.set",
+   "resource": "color-theme",
+   "verb": "set",
+   "summary": "Color theme",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Color theme",
+    "role": "combobox",
+    "name": "Color theme",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [
+    {
+     "name": "value",
+     "type": "string",
+     "description": "「Color theme」的新值",
+     "required": true,
+     "positional": true,
+     "enum": [
+      "dark",
+      "medium",
+      "light",
+      "system"
+     ]
+    },
+    {
+     "name": "submit",
+     "type": "boolean",
+     "description": "设置后按 Enter 提交",
+     "default": false
+    }
+   ],
+   "effect": "把「Color theme」设为给定值（触发 input / change 事件）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "set": {
+       "name": "Color theme",
+       "role": "combobox",
+       "value": "{{value}}"
+      }
+     },
+     {
+      "press_if": "submit",
+      "press": {
+       "key": "Enter",
+       "name": "Color theme",
+       "role": "combobox"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "panels.toggle",
+   "resource": "panels",
+   "verb": "toggle",
+   "summary": "Toggle panels",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Toggle panels",
+    "role": "button",
+    "name": "Toggle panels",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "切换「Toggle panels」",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Toggle panels",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "default-colors.activate",
+   "resource": "default-colors",
+   "verb": "activate",
+   "summary": "Default colors",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Default colors",
+    "role": "button",
+    "name": "Default colors",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Default colors」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Default colors",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "switch-colors.activate",
+   "resource": "switch-colors",
+   "verb": "activate",
+   "summary": "Switch colors",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Switch colors",
+    "role": "button",
+    "name": "Switch colors",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Switch colors」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Switch colors",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "background-color.activate",
+   "resource": "background-color",
+   "verb": "activate",
+   "summary": "Background color",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Background color",
+    "role": "button",
+    "name": "Background color",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Background color」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Background color",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "foreground-color.activate",
+   "resource": "foreground-color",
+   "verb": "activate",
+   "summary": "Foreground color",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Foreground color",
+    "role": "button",
+    "name": "Foreground color",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Foreground color」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Foreground color",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "foreground-color-value.set",
+   "resource": "foreground-color-value",
+   "verb": "set",
+   "summary": "Foreground color value",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Foreground color value",
+    "role": "textbox",
+    "name": "Foreground color value",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [
+    {
+     "name": "value",
+     "type": "string",
+     "description": "「Foreground color value」的新值",
+     "required": true,
+     "positional": true
+    },
+    {
+     "name": "submit",
+     "type": "boolean",
+     "description": "设置后按 Enter 提交",
+     "default": false
+    }
+   ],
+   "effect": "把「Foreground color value」设为给定值（触发 input / change 事件）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "set": {
+       "name": "Foreground color value",
+       "role": "textbox",
+       "value": "{{value}}"
+      }
+     },
+     {
+      "press_if": "submit",
+      "press": {
+       "key": "Enter",
+       "name": "Foreground color value",
+       "role": "textbox"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "quick-mask-mode.activate",
+   "resource": "quick-mask-mode",
+   "verb": "activate",
+   "summary": "Quick Mask mode",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Quick Mask mode",
+    "role": "button",
+    "name": "Quick Mask mode",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Quick Mask mode」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Quick Mask mode",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "screen-mode.update",
+   "resource": "screen-mode",
+   "verb": "update",
+   "summary": "Change screen mode",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Change screen mode",
+    "role": "button",
+    "name": "Change screen mode",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Change screen mode」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Change screen mode",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "image-canvas.activate",
+   "resource": "image-canvas",
+   "verb": "activate",
+   "summary": "Image canvas",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Image canvas",
+    "role": "generic",
+    "name": "Image canvas",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Image canvas」（generic）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Image canvas",
+       "role": "generic"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "image.open",
+   "resource": "image",
+   "verb": "open",
+   "summary": "Open an image",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Image canvas > Open an image",
+    "role": "button",
+    "name": "Open an image",
+    "region": "Image canvas",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Open an image」（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Open an image",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "document.create",
+   "resource": "document",
+   "verb": "create",
+   "summary": "New document",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Image canvas > New document",
+    "role": "button",
+    "name": "New document",
+    "region": "Image canvas",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「New document」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "New document",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "describe-edit.set",
+   "resource": "describe-edit",
+   "verb": "set",
+   "summary": "Describe an edit",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Describe an edit",
+    "role": "textbox",
+    "name": "Describe an edit",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [
+    {
+     "name": "value",
+     "type": "string",
+     "description": "「Describe an edit」的新值",
+     "required": true,
+     "positional": true
+    },
+    {
+     "name": "submit",
+     "type": "boolean",
+     "description": "设置后按 Enter 提交",
+     "default": false
+    }
+   ],
+   "effect": "把「Describe an edit」设为给定值（触发 input / change 事件）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "set": {
+       "name": "Describe an edit",
+       "role": "textbox",
+       "value": "{{value}}"
+      }
+     },
+     {
+      "press_if": "submit",
+      "press": {
+       "key": "Enter",
+       "name": "Describe an edit",
+       "role": "textbox"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "image.select",
+   "resource": "image",
+   "verb": "select",
+   "summary": "Choose image…",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Describe an edit > Choose image…",
+    "role": "button",
+    "name": "Choose image…",
+    "region": "Describe an edit",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Choose image…」（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Choose image…",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "start.start",
+   "resource": "start",
+   "verb": "start",
+   "summary": "Start",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Describe an edit > Start",
+    "role": "button",
+    "name": "Start",
+    "region": "Describe an edit",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Start」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Start",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "large-web-page.create",
+   "resource": "large-web-page",
+   "verb": "create",
+   "summary": "Create Large web page",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > New from a preset > Create Large web page",
+    "role": "button",
+    "name": "Create Large web page",
+    "region": "New from a preset",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Create Large web page」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Create Large web page",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "square-social-post.create",
+   "resource": "square-social-post",
+   "verb": "create",
+   "summary": "Create Square social post",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > New from a preset > Create Square social post",
+    "role": "button",
+    "name": "Create Square social post",
+    "region": "New from a preset",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Create Square social post」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Create Square social post",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "standard-phone.create",
+   "resource": "standard-phone",
+   "verb": "create",
+   "summary": "Create Standard phone",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > New from a preset > Create Standard phone",
+    "role": "button",
+    "name": "Create Standard phone",
+    "region": "New from a preset",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Create Standard phone」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Create Standard phone",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "presets-custom-sizes.activate",
+   "resource": "presets-custom-sizes",
+   "verb": "activate",
+   "summary": "All presets and custom sizes",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > New from a preset > All presets and custom sizes",
+    "role": "button",
+    "name": "All presets and custom sizes",
+    "region": "New from a preset",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「All presets and custom sizes」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "All presets and custom sizes",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "what-s-newrecent-features.activate",
+   "resource": "what-s-newrecent-features",
+   "verb": "activate",
+   "summary": "What’s NewRecent features",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Learn > What’s NewRecent features",
+    "role": "button",
+    "name": "What’s NewRecent features",
+    "region": "Learn",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「What’s NewRecent features」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "What’s NewRecent features",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "assistant.activate",
+   "resource": "assistant",
+   "verb": "activate",
+   "summary": "Assistant",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Assistant",
+    "role": "button",
+    "name": "Assistant",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Assistant」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Assistant",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "generation-history.activate",
+   "resource": "generation-history",
+   "verb": "activate",
+   "summary": "Generation History",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Generation History",
+    "role": "button",
+    "name": "Generation History",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Generation History」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Generation History",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "history.activate",
+   "resource": "history",
+   "verb": "activate",
+   "summary": "History",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > History",
+    "role": "button",
+    "name": "History",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「History」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "History",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "actions.activate",
+   "resource": "actions",
+   "verb": "activate",
+   "summary": "Actions",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Actions",
+    "role": "button",
+    "name": "Actions",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Actions」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Actions",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "version-history.activate",
+   "resource": "version-history",
+   "verb": "activate",
+   "summary": "Version History",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Version History",
+    "role": "button",
+    "name": "Version History",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Version History」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Version History",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "navigator.activate",
+   "resource": "navigator",
+   "verb": "activate",
+   "summary": "Navigator",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Navigator",
+    "role": "button",
+    "name": "Navigator",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Navigator」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Navigator",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "info.activate",
+   "resource": "info",
+   "verb": "activate",
+   "summary": "Info",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Info",
+    "role": "button",
+    "name": "Info",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Info」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Info",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "histogram.activate",
+   "resource": "histogram",
+   "verb": "activate",
+   "summary": "Histogram",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Histogram",
+    "role": "button",
+    "name": "Histogram",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Histogram」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Histogram",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "brushes.activate",
+   "resource": "brushes",
+   "verb": "activate",
+   "summary": "Brushes",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Brushes",
+    "role": "button",
+    "name": "Brushes",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Brushes」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Brushes",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "brush-settings.activate",
+   "resource": "brush-settings",
+   "verb": "activate",
+   "summary": "Brush Settings",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Brush Settings",
+    "role": "button",
+    "name": "Brush Settings",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Brush Settings」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Brush Settings",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "character.activate",
+   "resource": "character",
+   "verb": "activate",
+   "summary": "Character",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Character",
+    "role": "button",
+    "name": "Character",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Character」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Character",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "paragraph.activate",
+   "resource": "paragraph",
+   "verb": "activate",
+   "summary": "Paragraph",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Paragraph",
+    "role": "button",
+    "name": "Paragraph",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Paragraph」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Paragraph",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "styles.activate",
+   "resource": "styles",
+   "verb": "activate",
+   "summary": "Styles",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Styles",
+    "role": "button",
+    "name": "Styles",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Styles」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Styles",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "layer-comps.activate",
+   "resource": "layer-comps",
+   "verb": "activate",
+   "summary": "Layer Comps",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Layer Comps",
+    "role": "button",
+    "name": "Layer Comps",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Layer Comps」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Layer Comps",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "scripts.activate",
+   "resource": "scripts",
+   "verb": "activate",
+   "summary": "Scripts",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Scripts",
+    "role": "button",
+    "name": "Scripts",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Scripts」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Scripts",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "color.show",
+   "resource": "color",
+   "verb": "show",
+   "summary": "Color",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Panels > Color",
+    "role": "tab",
+    "name": "Color",
+    "region": "Panels",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Color」（tab），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Color",
+       "role": "tab"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "swatches.show",
+   "resource": "swatches",
+   "verb": "show",
+   "summary": "Swatches",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Panels > Swatches",
+    "role": "tab",
+    "name": "Swatches",
+    "region": "Panels",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Swatches」（tab），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Swatches",
+       "role": "tab"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "gradients.show",
+   "resource": "gradients",
+   "verb": "show",
+   "summary": "Gradients",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Panels > Gradients",
+    "role": "tab",
+    "name": "Gradients",
+    "region": "Panels",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Gradients」（tab），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Gradients",
+       "role": "tab"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "patterns.show",
+   "resource": "patterns",
+   "verb": "show",
+   "summary": "Patterns",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Panels > Patterns",
+    "role": "tab",
+    "name": "Patterns",
+    "region": "Panels",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Patterns」（tab），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Patterns",
+       "role": "tab"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "color-panel-menu.activate",
+   "resource": "color-panel-menu",
+   "verb": "activate",
+   "summary": "Color panel menu",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Color panel menu",
+    "role": "button",
+    "name": "Color panel menu",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Color panel menu」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Color panel menu",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "color-saturation-brightness.set",
+   "resource": "color-saturation-brightness",
+   "verb": "set",
+   "summary": "Color saturation and brightness",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Color saturation and brightness",
+    "role": "slider",
+    "name": "Color saturation and brightness",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [
+    {
+     "name": "value",
+     "type": "string",
+     "description": "「Color saturation and brightness」的新值",
+     "required": true,
+     "positional": true
+    },
+    {
+     "name": "submit",
+     "type": "boolean",
+     "description": "设置后按 Enter 提交",
+     "default": false
+    }
+   ],
+   "effect": "把「Color saturation and brightness」设为给定值（触发 input / change 事件）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "set": {
+       "name": "Color saturation and brightness",
+       "role": "slider",
+       "value": "{{value}}"
+      }
+     },
+     {
+      "press_if": "submit",
+      "press": {
+       "key": "Enter",
+       "name": "Color saturation and brightness",
+       "role": "slider"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "color-hue.set",
+   "resource": "color-hue",
+   "verb": "set",
+   "summary": "Color hue",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Color hue",
+    "role": "slider",
+    "name": "Color hue",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [
+    {
+     "name": "value",
+     "type": "string",
+     "description": "「Color hue」的新值",
+     "required": true,
+     "positional": true
+    },
+    {
+     "name": "submit",
+     "type": "boolean",
+     "description": "设置后按 Enter 提交",
+     "default": false
+    }
+   ],
+   "effect": "把「Color hue」设为给定值（触发 input / change 事件）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "set": {
+       "name": "Color hue",
+       "role": "slider",
+       "value": "{{value}}"
+      }
+     },
+     {
+      "press_if": "submit",
+      "press": {
+       "key": "Enter",
+       "name": "Color hue",
+       "role": "slider"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "hex-color.set",
+   "resource": "hex-color",
+   "verb": "set",
+   "summary": "Hex color",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Hex color",
+    "role": "textbox",
+    "name": "Hex color",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [
+    {
+     "name": "value",
+     "type": "string",
+     "description": "「Hex color」的新值",
+     "required": true,
+     "positional": true
+    },
+    {
+     "name": "submit",
+     "type": "boolean",
+     "description": "设置后按 Enter 提交",
+     "default": false
+    }
+   ],
+   "effect": "把「Hex color」设为给定值（触发 input / change 事件）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "set": {
+       "name": "Hex color",
+       "role": "textbox",
+       "value": "{{value}}"
+      }
+     },
+     {
+      "press_if": "submit",
+      "press": {
+       "key": "Enter",
+       "name": "Hex color",
+       "role": "textbox"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "properties.show",
+   "resource": "properties",
+   "verb": "show",
+   "summary": "Properties",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Panels > Properties",
+    "role": "tab",
+    "name": "Properties",
+    "region": "Panels",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Properties」（tab），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Properties",
+       "role": "tab"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "adjustments.show",
+   "resource": "adjustments",
+   "verb": "show",
+   "summary": "Adjustments",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Panels > Adjustments",
+    "role": "tab",
+    "name": "Adjustments",
+    "region": "Panels",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Adjustments」（tab），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Adjustments",
+       "role": "tab"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "properties-panel-menu.activate",
+   "resource": "properties-panel-menu",
+   "verb": "activate",
+   "summary": "Properties panel menu",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Properties panel menu",
+    "role": "button",
+    "name": "Properties panel menu",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Properties panel menu」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Properties panel menu",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "image-size.activate",
+   "resource": "image-size",
+   "verb": "activate",
+   "summary": "Image size",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Properties > Image size",
+    "role": "button",
+    "name": "Image size",
+    "region": "Properties",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Image size」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Image size",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "layers.show",
+   "resource": "layers",
+   "verb": "show",
+   "summary": "Layers",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Panels > Layers",
+    "role": "tab",
+    "name": "Layers",
+    "region": "Panels",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Layers」（tab），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Layers",
+       "role": "tab"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "channels.show",
+   "resource": "channels",
+   "verb": "show",
+   "summary": "Channels",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Panels > Channels",
+    "role": "tab",
+    "name": "Channels",
+    "region": "Panels",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Channels」（tab），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Channels",
+       "role": "tab"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "paths.show",
+   "resource": "paths",
+   "verb": "show",
+   "summary": "Paths",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Panels > Paths",
+    "role": "tab",
+    "name": "Paths",
+    "region": "Panels",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Paths」（tab），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Paths",
+       "role": "tab"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "layers-panel-menu.activate",
+   "resource": "layers-panel-menu",
+   "verb": "activate",
+   "summary": "Layers panel menu",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Layers panel menu",
+    "role": "button",
+    "name": "Layers panel menu",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Layers panel menu」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Layers panel menu",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "filter-layers-by-kind.set",
+   "resource": "filter-layers-by-kind",
+   "verb": "set",
+   "summary": "Filter layers by kind",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Filter layers by kind",
+    "role": "combobox",
+    "name": "Filter layers by kind",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [
+    {
+     "name": "value",
+     "type": "string",
+     "description": "「Filter layers by kind」的新值",
+     "required": true,
+     "positional": true,
+     "enum": [
+      "",
+      "pixel",
+      "adjustment",
+      "text",
+      "vector",
+      "embedded"
+     ]
+    },
+    {
+     "name": "submit",
+     "type": "boolean",
+     "description": "设置后按 Enter 提交",
+     "default": false
+    }
+   ],
+   "effect": "把「Filter layers by kind」设为给定值（触发 input / change 事件）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "set": {
+       "name": "Filter layers by kind",
+       "role": "combobox",
+       "value": "{{value}}"
+      }
+     },
+     {
+      "press_if": "submit",
+      "press": {
+       "key": "Enter",
+       "name": "Filter layers by kind",
+       "role": "combobox"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "filter-layers-by-name.set",
+   "resource": "filter-layers-by-name",
+   "verb": "set",
+   "summary": "Filter layers by name",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Filter layers by name",
+    "role": "textbox",
+    "name": "Filter layers by name",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [
+    {
+     "name": "value",
+     "type": "string",
+     "description": "「Filter layers by name」的新值",
+     "required": true,
+     "positional": true
+    },
+    {
+     "name": "submit",
+     "type": "boolean",
+     "description": "设置后按 Enter 提交",
+     "default": false
+    }
+   ],
+   "effect": "把「Filter layers by name」设为给定值（触发 input / change 事件）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "set": {
+       "name": "Filter layers by name",
+       "role": "textbox",
+       "value": "{{value}}"
+      }
+     },
+     {
+      "press_if": "submit",
+      "press": {
+       "key": "Enter",
+       "name": "Filter layers by name",
+       "role": "textbox"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "layer-filtering.activate",
+   "resource": "layer-filtering",
+   "verb": "activate",
+   "summary": "Layer filtering",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Layer filtering",
+    "role": "button",
+    "name": "Layer filtering",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Layer filtering」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Layer filtering",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "blend-mode.set",
+   "resource": "blend-mode",
+   "verb": "set",
+   "summary": "Blend mode",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Blend mode",
+    "role": "combobox",
+    "name": "Blend mode",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [
+    {
+     "name": "value",
+     "type": "string",
+     "description": "「Blend mode」的新值",
+     "required": true,
+     "positional": true,
+     "enum": [
+      "normal",
+      "dissolve",
+      "──────────",
+      "darken",
+      "multiply",
+      "color burn",
+      "linear burn",
+      "darker color",
+      "──────────",
+      "lighten",
+      "screen",
+      "color dodge",
+      "linear dodge",
+      "lighter color",
+      "──────────",
+      "overlay",
+      "soft light",
+      "hard light",
+      "vivid light",
+      "linear light",
+      "pin light",
+      "hard mix",
+      "──────────",
+      "difference",
+      "exclusion",
+      "subtract",
+      "divide",
+      "──────────",
+      "hue",
+      "saturation",
+      "color",
+      "luminosity"
+     ]
+    },
+    {
+     "name": "submit",
+     "type": "boolean",
+     "description": "设置后按 Enter 提交",
+     "default": false
+    }
+   ],
+   "effect": "把「Blend mode」设为给定值（触发 input / change 事件）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "set": {
+       "name": "Blend mode",
+       "role": "combobox",
+       "value": "{{value}}"
+      }
+     },
+     {
+      "press_if": "submit",
+      "press": {
+       "key": "Enter",
+       "name": "Blend mode",
+       "role": "combobox"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "opacity.set",
+   "resource": "opacity",
+   "verb": "set",
+   "summary": "Opacity %",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Layers > Opacity %",
+    "role": "textbox",
+    "name": "Opacity %",
+    "region": "Layers",
+    "view": "主界面"
+   },
+   "params": [
+    {
+     "name": "value",
+     "type": "string",
+     "description": "「Opacity %」的新值",
+     "required": true,
+     "positional": true
+    },
+    {
+     "name": "submit",
+     "type": "boolean",
+     "description": "设置后按 Enter 提交",
+     "default": false
+    }
+   ],
+   "effect": "把「Opacity %」设为给定值（触发 input / change 事件）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "set": {
+       "name": "Opacity %",
+       "role": "textbox",
+       "value": "{{value}}"
+      }
+     },
+     {
+      "press_if": "submit",
+      "press": {
+       "key": "Enter",
+       "name": "Opacity %",
+       "role": "textbox"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "transparency.lock",
+   "resource": "transparency",
+   "verb": "lock",
+   "summary": "Lock transparency",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Lock transparency",
+    "role": "button",
+    "name": "Lock transparency",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Lock transparency」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Lock transparency",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "image-pixels.lock",
+   "resource": "image-pixels",
+   "verb": "lock",
+   "summary": "Lock image pixels",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Lock image pixels",
+    "role": "button",
+    "name": "Lock image pixels",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Lock image pixels」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Lock image pixels",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "position.lock",
+   "resource": "position",
+   "verb": "lock",
+   "summary": "Lock position",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Lock position",
+    "role": "button",
+    "name": "Lock position",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Lock position」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Lock position",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "layer.lock",
+   "resource": "layer",
+   "verb": "lock",
+   "summary": "Lock layer",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Lock layer",
+    "role": "button",
+    "name": "Lock layer",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Lock layer」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Lock layer",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "fill.set",
+   "resource": "fill",
+   "verb": "set",
+   "summary": "Fill %",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Layers > Fill %",
+    "role": "textbox",
+    "name": "Fill %",
+    "region": "Layers",
+    "view": "主界面"
+   },
+   "params": [
+    {
+     "name": "value",
+     "type": "string",
+     "description": "「Fill %」的新值",
+     "required": true,
+     "positional": true
+    },
+    {
+     "name": "submit",
+     "type": "boolean",
+     "description": "设置后按 Enter 提交",
+     "default": false
+    }
+   ],
+   "effect": "把「Fill %」设为给定值（触发 input / change 事件）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "set": {
+       "name": "Fill %",
+       "role": "textbox",
+       "value": "{{value}}"
+      }
+     },
+     {
+      "press_if": "submit",
+      "press": {
+       "key": "Enter",
+       "name": "Fill %",
+       "role": "textbox"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "image.create",
+   "resource": "image",
+   "verb": "create",
+   "summary": "Add an image",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Document layers > Add an image",
+    "role": "button",
+    "name": "Add an image",
+    "region": "Document layers",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Add an image」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Add an image",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "link-layers.activate",
+   "resource": "link-layers",
+   "verb": "activate",
+   "summary": "Link layers",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Link layers",
+    "role": "button",
+    "name": "Link layers",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Link layers」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Link layers",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "layer-style.create",
+   "resource": "layer-style",
+   "verb": "create",
+   "summary": "Add a layer style",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Add a layer style",
+    "role": "button",
+    "name": "Add a layer style",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Add a layer style」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Add a layer style",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "layer-mask.create",
+   "resource": "layer-mask",
+   "verb": "create",
+   "summary": "Add layer mask",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Add layer mask",
+    "role": "button",
+    "name": "Add layer mask",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Add layer mask」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Add layer mask",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "fill-or-adjustment-layer.create",
+   "resource": "fill-or-adjustment-layer",
+   "verb": "create",
+   "summary": "New fill or adjustment layer",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > New fill or adjustment layer",
+    "role": "button",
+    "name": "New fill or adjustment layer",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「New fill or adjustment layer」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "New fill or adjustment layer",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "group.create",
+   "resource": "group",
+   "verb": "create",
+   "summary": "New group",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > New group",
+    "role": "button",
+    "name": "New group",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「New group」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "New group",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "layer.create",
+   "resource": "layer",
+   "verb": "create",
+   "summary": "New layer",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > New layer",
+    "role": "button",
+    "name": "New layer",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「New layer」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "New layer",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "layer.delete",
+   "resource": "layer",
+   "verb": "delete",
+   "summary": "Delete layer",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Delete layer",
+    "role": "button",
+    "name": "Delete layer",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Delete layer」（button）",
+   "permission": "delete",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Delete layer",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "view.zoom-out",
+   "resource": "view",
+   "verb": "zoom-out",
+   "summary": "Zoom out",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Zoom out",
+    "role": "button",
+    "name": "Zoom out",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Zoom out」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Zoom out",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "zoom-level.set",
+   "resource": "zoom-level",
+   "verb": "set",
+   "summary": "Zoom level",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Zoom level",
+    "role": "textbox",
+    "name": "Zoom level",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [
+    {
+     "name": "value",
+     "type": "string",
+     "description": "「Zoom level」的新值",
+     "required": true,
+     "positional": true
+    },
+    {
+     "name": "submit",
+     "type": "boolean",
+     "description": "设置后按 Enter 提交",
+     "default": false
+    }
+   ],
+   "effect": "把「Zoom level」设为给定值（触发 input / change 事件）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "set": {
+       "name": "Zoom level",
+       "role": "textbox",
+       "value": "{{value}}"
+      }
+     },
+     {
+      "press_if": "submit",
+      "press": {
+       "key": "Enter",
+       "name": "Zoom level",
+       "role": "textbox"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "view.zoom-",
+   "resource": "view",
+   "verb": "zoom-",
+   "summary": "Zoom in",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Zoom in",
+    "role": "button",
+    "name": "Zoom in",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Zoom in」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Zoom in",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "document-sizes.activate",
+   "resource": "document-sizes",
+   "verb": "activate",
+   "summary": "Document Sizes:",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Document Sizes:",
+    "role": "button",
+    "name": "Document Sizes:",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Document Sizes:」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Document Sizes:",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "puter.show",
+   "resource": "puter",
+   "verb": "show",
+   "summary": "Puter",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > footer > Puter",
+    "role": "link",
+    "name": "Puter",
+    "region": "footer",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Puter」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Puter",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "icon.collapse",
+   "resource": "icon",
+   "verb": "collapse",
+   "summary": "Collapse to Icon",
+   "source": "ui",
+   "ui": {
+    "path": "Color panel menu > menu > Collapse to Icon",
+    "role": "menuitem",
+    "name": "Collapse to Icon",
+    "region": "menu",
+    "view": "Color panel menu"
+   },
+   "params": [],
+   "effect": "点击「Collapse to Icon」（menuitem）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Color panel menu",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Collapse to Icon",
+       "role": "menuitem"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "close.close",
+   "resource": "close",
+   "verb": "close",
+   "summary": "Close",
+   "source": "ui",
+   "ui": {
+    "path": "Color panel menu > menu > Close",
+    "role": "menuitem",
+    "name": "Close",
+    "region": "menu",
+    "view": "Color panel menu"
+   },
+   "params": [],
+   "effect": "点击「Close」（menuitem）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Color panel menu",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Close",
+       "role": "menuitem"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "tab-group.close",
+   "resource": "tab-group",
+   "verb": "close",
+   "summary": "Close Tab Group",
+   "source": "ui",
+   "ui": {
+    "path": "Color panel menu > menu > Close Tab Group",
+    "role": "menuitem",
+    "name": "Close Tab Group",
+    "region": "menu",
+    "view": "Color panel menu"
+   },
+   "params": [],
+   "effect": "点击「Close Tab Group」（menuitem）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Color panel menu",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Close Tab Group",
+       "role": "menuitem"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "shortcut.key-0",
+   "resource": "shortcut",
+   "verb": "key-0",
+   "summary": "快捷键 mod+0",
+   "source": "shortcut",
+   "ui": {
+    "path": "键盘 mod+0",
+    "shortcut": "mod+0",
+    "defined_in": "src/features/filters/liquify.ts"
+   },
+   "params": [],
+   "effect": "在当前焦点上按 mod+0（src/features/filters/liquify.ts 中定义）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "press": {
+       "key": "mod+0"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "selection.select-all",
+   "resource": "selection",
+   "verb": "select-all",
+   "summary": "快捷键 mod+a",
+   "source": "shortcut",
+   "ui": {
+    "path": "键盘 mod+a",
+    "shortcut": "mod+a",
+    "defined_in": "src/features/animation/panel.ts"
+   },
+   "params": [],
+   "effect": "在当前焦点上按 mod+a（src/features/animation/panel.ts 中定义）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "press": {
+       "key": "mod+a"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "selection.lock",
+   "resource": "selection",
+   "verb": "lock",
+   "summary": "快捷键 mod+l",
+   "source": "shortcut",
+   "ui": {
+    "path": "键盘 mod+l",
+    "shortcut": "mod+l",
+    "defined_in": "src/features/warp/perspective-warp.ts"
+   },
+   "params": [],
+   "effect": "在当前焦点上按 mod+l（src/features/warp/perspective-warp.ts 中定义）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "press": {
+       "key": "mod+l"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "document.save",
+   "resource": "document",
+   "verb": "save",
+   "summary": "快捷键 mod+s",
+   "source": "shortcut",
+   "ui": {
+    "path": "键盘 mod+s",
+    "shortcut": "mod+s",
+    "defined_in": "src/features/scripting/code-editor.ts"
+   },
+   "params": [],
+   "effect": "在当前焦点上按 mod+s（src/features/scripting/code-editor.ts 中定义）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "press": {
+       "key": "mod+s"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "edit.redo",
+   "resource": "edit",
+   "verb": "redo",
+   "summary": "快捷键 mod+shift+z",
+   "source": "shortcut",
+   "ui": {
+    "path": "键盘 mod+shift+z",
+    "shortcut": "mod+shift+z",
+    "defined_in": "src/features/warp/session.ts"
+   },
+   "params": [],
+   "effect": "在当前焦点上按 mod+shift+z（src/features/warp/session.ts 中定义）",
+   "permission": "modify",
+   "undoable": "不适用",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "press": {
+       "key": "mod+shift+z"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "clipboard.paste",
+   "resource": "clipboard",
+   "verb": "paste",
+   "summary": "快捷键 mod+v",
+   "source": "shortcut",
+   "ui": {
+    "path": "键盘 mod+v",
+    "shortcut": "mod+v",
+    "defined_in": "src/features/filters/perspective-planes.ts"
+   },
+   "params": [],
+   "effect": "在当前焦点上按 mod+v（src/features/filters/perspective-planes.ts 中定义）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "press": {
+       "key": "mod+v"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "shortcut.key-w",
+   "resource": "shortcut",
+   "verb": "key-w",
+   "summary": "快捷键 mod+w",
+   "source": "shortcut",
+   "ui": {
+    "path": "键盘 mod+w",
+    "shortcut": "mod+w",
+    "defined_in": "src/features/warp/perspective-warp.ts"
+   },
+   "params": [],
+   "effect": "在当前焦点上按 mod+w（src/features/warp/perspective-warp.ts 中定义）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "press": {
+       "key": "mod+w"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "edit.undo",
+   "resource": "edit",
+   "verb": "undo",
+   "summary": "快捷键 mod+z",
+   "source": "shortcut",
+   "ui": {
+    "path": "键盘 mod+z",
+    "shortcut": "mod+z",
+    "defined_in": "src/features/filters/liquify.ts"
+   },
+   "params": [],
+   "effect": "在当前焦点上按 mod+z（src/features/filters/liquify.ts 中定义）",
+   "permission": "modify",
+   "undoable": "不适用",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "press": {
+       "key": "mod+z"
+      }
+     }
+    ]
+   }
+  }
+ ]
+}

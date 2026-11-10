@@ -1,0 +1,3016 @@
+{
+ "app": "pdf",
+ "name": "PDF",
+ "generated_by": "scripts/inventory_ops.py",
+ "commit": "0fbb88cdee2f54c94a9d2c975f43322888813c5d",
+ "title": "Untitled.pdf · PDF Editor",
+ "ops": [
+  {
+   "id": "notes-highlight-text-up-pages.leave",
+   "resource": "notes-highlight-text-up-pages",
+   "verb": "leave",
+   "summary": "leave notes, highlight text, and # up pages.（1 项，如 Leave notes, highlight text, and mark up pages.）",
+   "source": "ui-collection",
+   "ui": {
+    "path": "主界面 > Tools > leave notes, highlight text, and # up pages.",
+    "role": "button",
+    "region": "Tools",
+    "view": "主界面",
+    "examples": [
+     "Leave notes, highlight text, and mark up pages."
+    ]
+   },
+   "params": [
+    {
+     "name": "target",
+     "type": "string",
+     "description": "要操作的项的名称（或其一部分），如 'Leave notes, highlight text, and mark up pages.'",
+     "required": true,
+     "positional": true
+    }
+   ],
+   "effect": "点击名称匹配的「leave notes, highlight text, and # up pages.」项（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "{{target}}",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "fillable-fields.create",
+   "resource": "fillable-fields",
+   "verb": "create",
+   "summary": "add fillable fields: *（1 项，如 Add fillable fields: choose a field type, then drag a box on the page or click to place one. Double-click a field for it）",
+   "source": "ui-collection",
+   "ui": {
+    "path": "主界面 > Tools > add fillable fields: *",
+    "role": "button",
+    "region": "Tools",
+    "view": "主界面",
+    "examples": [
+     "Add fillable fields: choose a field type, then drag a box on the page or click to place one. Double-click a field for it"
+    ]
+   },
+   "params": [
+    {
+     "name": "target",
+     "type": "string",
+     "description": "要操作的项的名称（或其一部分），如 'Add fillable fields: choose a field type, then drag a box on the page or click to place one. Double-click a field for it'",
+     "required": true,
+     "positional": true
+    }
+   ],
+   "effect": "点击名称匹配的「add fillable fields: *」项（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "{{target}}",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "tools.select",
+   "resource": "tools",
+   "verb": "select",
+   "summary": "# text, pictures, or areas, then apply to remove them from the file for good.（1 项，如 Mark text, pictures, or areas, then apply to remove them from the file for good.）",
+   "source": "ui-collection",
+   "ui": {
+    "path": "主界面 > Tools > # text, pictures, or areas, then apply to remove them from the file for good.",
+    "role": "button",
+    "region": "Tools",
+    "view": "主界面",
+    "examples": [
+     "Mark text, pictures, or areas, then apply to remove them from the file for good."
+    ]
+   },
+   "params": [
+    {
+     "name": "target",
+     "type": "string",
+     "description": "要操作的项的名称（或其一部分），如 'Mark text, pictures, or areas, then apply to remove them from the file for good.'",
+     "required": true,
+     "positional": true
+    }
+   ],
+   "effect": "点击名称匹配的「# text, pictures, or areas, then apply to remove them from the file for good.」项（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "{{target}}",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "go-page.select",
+   "resource": "go-page",
+   "verb": "select",
+   "summary": "go to page #（1 项，如 Go to page 1）",
+   "source": "ui-collection",
+   "ui": {
+    "path": "主界面 > go to page #",
+    "role": "button",
+    "region": null,
+    "view": "主界面",
+    "examples": [
+     "Go to page 1"
+    ]
+   },
+   "params": [
+    {
+     "name": "target",
+     "type": "string",
+     "description": "要操作的项的名称（或其一部分），如 'Go to page 1'",
+     "required": true,
+     "positional": true
+    }
+   ],
+   "effect": "点击名称匹配的「go to page #」项（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "{{target}}",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "page-actions.select",
+   "resource": "page-actions",
+   "verb": "select",
+   "summary": "page # actions（1 项，如 Page 1 actions）",
+   "source": "ui-collection",
+   "ui": {
+    "path": "主界面 > page # actions",
+    "role": "button",
+    "region": null,
+    "view": "主界面",
+    "examples": [
+     "Page 1 actions"
+    ]
+   },
+   "params": [
+    {
+     "name": "target",
+     "type": "string",
+     "description": "要操作的项的名称（或其一部分），如 'Page 1 actions'",
+     "required": true,
+     "positional": true
+    }
+   ],
+   "effect": "点击名称匹配的「page # actions」项（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "{{target}}",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "pages.select",
+   "resource": "pages",
+   "verb": "select",
+   "summary": "all pages (#)（1 项，如 All pages (1)）",
+   "source": "ui-collection",
+   "ui": {
+    "path": "Print file > Pages to include > all pages (#)",
+    "role": "radio",
+    "region": "Pages to include",
+    "view": "Print file",
+    "examples": [
+     "All pages (1)"
+    ]
+   },
+   "params": [
+    {
+     "name": "target",
+     "type": "string",
+     "description": "要操作的项的名称（或其一部分），如 'All pages (1)'",
+     "required": true,
+     "positional": true
+    }
+   ],
+   "effect": "点击名称匹配的「all pages (#)」项（radio）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Print file",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "{{target}}",
+       "role": "radio"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "current-page.select",
+   "resource": "current-page",
+   "verb": "select",
+   "summary": "current page (#)（1 项，如 Current page (1)）",
+   "source": "ui-collection",
+   "ui": {
+    "path": "Print file > Pages to include > current page (#)",
+    "role": "radio",
+    "region": "Pages to include",
+    "view": "Print file",
+    "examples": [
+     "Current page (1)"
+    ]
+   },
+   "params": [
+    {
+     "name": "target",
+     "type": "string",
+     "description": "要操作的项的名称（或其一部分），如 'Current page (1)'",
+     "required": true,
+     "positional": true
+    }
+   ],
+   "effect": "点击名称匹配的「current page (#)」项（radio）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Print file",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "{{target}}",
+       "role": "radio"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "content.dismiss",
+   "resource": "content",
+   "verb": "dismiss",
+   "summary": "Skip to content",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Skip to content",
+    "role": "link",
+    "name": "Skip to content",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Skip to content」（link）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Skip to content",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "pdfs.previous",
+   "resource": "pdfs",
+   "verb": "previous",
+   "summary": "Back to your PDFs",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Back to your PDFs",
+    "role": "button",
+    "name": "Back to your PDFs",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Back to your PDFs」（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Back to your PDFs",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "file.activate",
+   "resource": "file",
+   "verb": "activate",
+   "summary": "File",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > PDF menus > File",
+    "role": "menuitem",
+    "name": "File",
+    "region": "PDF menus",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「File」（menuitem）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "File",
+       "role": "menuitem"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "edit.update",
+   "resource": "edit",
+   "verb": "update",
+   "summary": "Edit",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > PDF menus > Edit",
+    "role": "menuitem",
+    "name": "Edit",
+    "region": "PDF menus",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Edit」（menuitem）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Edit",
+       "role": "menuitem"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "view.show",
+   "resource": "view",
+   "verb": "show",
+   "summary": "View",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > PDF menus > View",
+    "role": "menuitem",
+    "name": "View",
+    "region": "PDF menus",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「View」（menuitem），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "View",
+       "role": "menuitem"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "page.activate",
+   "resource": "page",
+   "verb": "activate",
+   "summary": "Page",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > PDF menus > Page",
+    "role": "menuitem",
+    "name": "Page",
+    "region": "PDF menus",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Page」（menuitem）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Page",
+       "role": "menuitem"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "insert.create",
+   "resource": "insert",
+   "verb": "create",
+   "summary": "Insert",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > PDF menus > Insert",
+    "role": "menuitem",
+    "name": "Insert",
+    "region": "PDF menus",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Insert」（menuitem）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Insert",
+       "role": "menuitem"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "untitled-pdf.rename",
+   "resource": "untitled-pdf",
+   "verb": "rename",
+   "summary": "Rename Untitled.pdf",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Rename Untitled.pdf",
+    "role": "button",
+    "name": "Rename Untitled.pdf",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Rename Untitled.pdf」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Rename Untitled.pdf",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "settings.show",
+   "resource": "settings",
+   "verb": "show",
+   "summary": "Settings",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Settings",
+    "role": "button",
+    "name": "Settings",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Settings」（button），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Settings",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "tools.activate",
+   "resource": "tools",
+   "verb": "activate",
+   "summary": "Tools",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Tool sets > Tools",
+    "role": "button",
+    "name": "Tools",
+    "region": "Tool sets",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Tools」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Tools",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "edit-2.update",
+   "resource": "edit-2",
+   "verb": "update",
+   "summary": "Edit",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Tool sets > Edit",
+    "role": "button",
+    "name": "Edit",
+    "region": "Tool sets",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Edit」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Edit",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "comment.activate",
+   "resource": "comment",
+   "verb": "activate",
+   "summary": "Comment",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Tool sets > Comment",
+    "role": "button",
+    "name": "Comment",
+    "region": "Tool sets",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Comment」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Comment",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "export.export",
+   "resource": "export",
+   "verb": "export",
+   "summary": "Export",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Tool sets > Export",
+    "role": "button",
+    "name": "Export",
+    "region": "Tool sets",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Export」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Export",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "fill-sign.activate",
+   "resource": "fill-sign",
+   "verb": "activate",
+   "summary": "Fill & Sign",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Tool sets > Fill & Sign",
+    "role": "button",
+    "name": "Fill & Sign",
+    "region": "Tool sets",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Fill & Sign」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Fill & Sign",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "text-or-tools.search",
+   "resource": "text-or-tools",
+   "verb": "search",
+   "summary": "Find text or tools",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Find text or tools",
+    "role": "button",
+    "name": "Find text or tools",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Find text or tools」（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Find text or tools",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "undo.undo",
+   "resource": "undo",
+   "verb": "undo",
+   "summary": "Undo",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Undo",
+    "role": "button",
+    "name": "Undo",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Undo」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Undo",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "redo.redo",
+   "resource": "redo",
+   "verb": "redo",
+   "summary": "Redo",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Redo",
+    "role": "button",
+    "name": "Redo",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Redo」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Redo",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "download.export",
+   "resource": "download",
+   "verb": "export",
+   "summary": "Download",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Download",
+    "role": "button",
+    "name": "Download",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Download」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Download",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "file.print",
+   "resource": "file",
+   "verb": "print",
+   "summary": "Print file",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Print file",
+    "role": "button",
+    "name": "Print file",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Print file」（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Print file",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "puter.save",
+   "resource": "puter",
+   "verb": "save",
+   "summary": "Save to Puter",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Save to Puter",
+    "role": "button",
+    "name": "Save to Puter",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Save to Puter」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Save to Puter",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "tools-panel.close",
+   "resource": "tools-panel",
+   "verb": "close",
+   "summary": "Close tools panel",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Close tools panel",
+    "role": "button",
+    "name": "Close tools panel",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Close tools panel」（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Close tools panel",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "pdf-or-its-pages-another-format.save",
+   "resource": "pdf-or-its-pages-another-format",
+   "verb": "save",
+   "summary": "Save the PDF, or its pages, in another format.",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Tools > Save the PDF, or its pages, in another format.",
+    "role": "button",
+    "name": "Save the PDF, or its pages, in another format.",
+    "region": "Tools",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Save the PDF, or its pages, in another format.」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Save the PDF, or its pages, in another format.",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "pdf-or-turn-pictures-into-pdf-pages.start",
+   "resource": "pdf-or-turn-pictures-into-pdf-pages",
+   "verb": "start",
+   "summary": "Start a new PDF, or turn pictures into PDF pages.",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Tools > Start a new PDF, or turn pictures into PDF pages.",
+    "role": "button",
+    "name": "Start a new PDF, or turn pictures into PDF pages.",
+    "region": "Tools",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Start a new PDF, or turn pictures into PDF pages.」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Start a new PDF, or turn pictures into PDF pages.",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "combine-pdfs-pictures-into-one-pdf.activate",
+   "resource": "combine-pdfs-pictures-into-one-pdf",
+   "verb": "activate",
+   "summary": "Combine PDFs and pictures into one new PDF.",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Tools > Combine PDFs and pictures into one new PDF.",
+    "role": "button",
+    "name": "Combine PDFs and pictures into one new PDF.",
+    "region": "Tools",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Combine PDFs and pictures into one new PDF.」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Combine PDFs and pictures into one new PDF.",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "fill-forms-add-signature.activate",
+   "resource": "fill-forms-add-signature",
+   "verb": "activate",
+   "summary": "Fill in forms and add your signature.",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Tools > Fill in forms and add your signature.",
+    "role": "button",
+    "name": "Fill in forms and add your signature.",
+    "region": "Tools",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Fill in forms and add your signature.」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Fill in forms and add your signature.",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "make-file-smaller-by-shrinking-its-pictu.activate",
+   "resource": "make-file-smaller-by-shrinking-its-pictu",
+   "verb": "activate",
+   "summary": "Make the file smaller by shrinking its pictures.",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Tools > Make the file smaller by shrinking its pictures.",
+    "role": "button",
+    "name": "Make the file smaller by shrinking its pictures.",
+    "region": "Tools",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Make the file smaller by shrinking its pictures.」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Make the file smaller by shrinking its pictures.",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "more.show",
+   "resource": "more",
+   "verb": "show",
+   "summary": "View more",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Tools > View more",
+    "role": "button",
+    "name": "View more",
+    "region": "Tools",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「View more」（button），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "View more",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "select.select",
+   "resource": "select",
+   "verb": "select",
+   "summary": "Select",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Select",
+    "role": "button",
+    "name": "Select",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Select」（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Select",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "hand.activate",
+   "resource": "hand",
+   "verb": "activate",
+   "summary": "Hand",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Hand",
+    "role": "button",
+    "name": "Hand",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Hand」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Hand",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "text.activate",
+   "resource": "text",
+   "verb": "activate",
+   "summary": "Text",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Text",
+    "role": "button",
+    "name": "Text",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Text」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Text",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "highlight.activate",
+   "resource": "highlight",
+   "verb": "activate",
+   "summary": "Highlight",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Highlight",
+    "role": "button",
+    "name": "Highlight",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Highlight」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Highlight",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "draw.draw",
+   "resource": "draw",
+   "verb": "draw",
+   "summary": "Draw",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Draw",
+    "role": "button",
+    "name": "Draw",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Draw」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Draw",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "shape.activate",
+   "resource": "shape",
+   "verb": "activate",
+   "summary": "Shape",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Shape",
+    "role": "button",
+    "name": "Shape",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Shape」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Shape",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "note.activate",
+   "resource": "note",
+   "verb": "activate",
+   "summary": "Note",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Note",
+    "role": "button",
+    "name": "Note",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Note」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Note",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "image.activate",
+   "resource": "image",
+   "verb": "activate",
+   "summary": "Image",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Image",
+    "role": "button",
+    "name": "Image",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Image」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Image",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "sign.sign",
+   "resource": "sign",
+   "verb": "sign",
+   "summary": "Sign",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Sign",
+    "role": "button",
+    "name": "Sign",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Sign」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Sign",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "fill-forms.activate",
+   "resource": "fill-forms",
+   "verb": "activate",
+   "summary": "Fill forms",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Fill forms",
+    "role": "button",
+    "name": "Fill forms",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Fill forms」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Fill forms",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "pdf-page-view.activate",
+   "resource": "pdf-page-view",
+   "verb": "activate",
+   "summary": "PDF page view",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > PDF page view",
+    "role": "region",
+    "name": "PDF page view",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「PDF page view」（region）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "PDF page view",
+       "role": "region"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "page.previous",
+   "resource": "page",
+   "verb": "previous",
+   "summary": "Previous page",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Previous page",
+    "role": "button",
+    "name": "Previous page",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Previous page」（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Previous page",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "page-number.set",
+   "resource": "page-number",
+   "verb": "set",
+   "summary": "Page number",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Page number",
+    "role": "textbox",
+    "name": "Page number",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [
+    {
+     "name": "value",
+     "type": "string",
+     "description": "「Page number」的新值",
+     "required": true,
+     "positional": true
+    },
+    {
+     "name": "submit",
+     "type": "boolean",
+     "description": "设置后按 Enter 提交",
+     "default": false
+    }
+   ],
+   "effect": "把「Page number」设为给定值（触发 input / change 事件）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "set": {
+       "name": "Page number",
+       "role": "textbox",
+       "value": "{{value}}"
+      }
+     },
+     {
+      "press_if": "submit",
+      "press": {
+       "key": "Enter",
+       "name": "Page number",
+       "role": "textbox"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "page.next",
+   "resource": "page",
+   "verb": "next",
+   "summary": "Next page",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Next page",
+    "role": "button",
+    "name": "Next page",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Next page」（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Next page",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "view.zoom-out",
+   "resource": "view",
+   "verb": "zoom-out",
+   "summary": "Zoom out",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Zoom out",
+    "role": "button",
+    "name": "Zoom out",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Zoom out」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Zoom out",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "zoom.set",
+   "resource": "zoom",
+   "verb": "set",
+   "summary": "Zoom",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Zoom",
+    "role": "combobox",
+    "name": "Zoom",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [
+    {
+     "name": "value",
+     "type": "string",
+     "description": "「Zoom」的新值",
+     "required": true,
+     "positional": true,
+     "enum": [
+      "fit",
+      "page",
+      "0.5",
+      "0.75",
+      "1",
+      "1.25",
+      "1.5",
+      "2",
+      "3",
+      "4"
+     ]
+    },
+    {
+     "name": "submit",
+     "type": "boolean",
+     "description": "设置后按 Enter 提交",
+     "default": false
+    }
+   ],
+   "effect": "把「Zoom」设为给定值（触发 input / change 事件）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "set": {
+       "name": "Zoom",
+       "role": "combobox",
+       "value": "{{value}}"
+      }
+     },
+     {
+      "press_if": "submit",
+      "press": {
+       "key": "Enter",
+       "name": "Zoom",
+       "role": "combobox"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "view.zoom-",
+   "resource": "view",
+   "verb": "zoom-",
+   "summary": "Zoom in",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Zoom in",
+    "role": "button",
+    "name": "Zoom in",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Zoom in」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Zoom in",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "pages.show",
+   "resource": "pages",
+   "verb": "show",
+   "summary": "Pages",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Pages",
+    "role": "tab",
+    "name": "Pages",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Pages」（tab），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Pages",
+       "role": "tab"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "comments.show",
+   "resource": "comments",
+   "verb": "show",
+   "summary": "Comments",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Comments",
+    "role": "tab",
+    "name": "Comments",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Comments」（tab），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Comments",
+       "role": "tab"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "attachments.show",
+   "resource": "attachments",
+   "verb": "show",
+   "summary": "Attachments",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Attachments",
+    "role": "tab",
+    "name": "Attachments",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Attachments」（tab），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Attachments",
+       "role": "tab"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "pages-panel.toggle",
+   "resource": "pages-panel",
+   "verb": "toggle",
+   "summary": "Toggle pages panel",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Toggle pages panel",
+    "role": "button",
+    "name": "Toggle pages panel",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "切换「Toggle pages panel」",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Toggle pages panel",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "pages-panel.close",
+   "resource": "pages-panel",
+   "verb": "close",
+   "summary": "Close pages panel",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Close pages panel",
+    "role": "button",
+    "name": "Close pages panel",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Close pages panel」（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Close pages panel",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "dialog.close",
+   "resource": "dialog",
+   "verb": "close",
+   "summary": "Close dialog",
+   "source": "ui",
+   "ui": {
+    "path": "Settings > Close dialog",
+    "role": "button",
+    "name": "Close dialog",
+    "region": null,
+    "view": "Settings"
+   },
+   "params": [],
+   "effect": "点击「Close dialog」（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Settings",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Close dialog",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "appearance.set",
+   "resource": "appearance",
+   "verb": "set",
+   "summary": "Appearance",
+   "source": "ui",
+   "ui": {
+    "path": "Settings > dialog > Appearance",
+    "role": "combobox",
+    "name": "Appearance",
+    "region": "dialog",
+    "view": "Settings"
+   },
+   "params": [
+    {
+     "name": "value",
+     "type": "string",
+     "description": "「Appearance」的新值",
+     "required": true,
+     "positional": true,
+     "enum": [
+      "system",
+      "light",
+      "dark"
+     ]
+    },
+    {
+     "name": "submit",
+     "type": "boolean",
+     "description": "设置后按 Enter 提交",
+     "default": false
+    }
+   ],
+   "effect": "把「Appearance」设为给定值（触发 input / change 事件）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Settings",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "set": {
+       "name": "Appearance",
+       "role": "combobox",
+       "value": "{{value}}"
+      }
+     },
+     {
+      "press_if": "submit",
+      "press": {
+       "key": "Enter",
+       "name": "Appearance",
+       "role": "combobox"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "keyboard-shortcuts.activate",
+   "resource": "keyboard-shortcuts",
+   "verb": "activate",
+   "summary": "Keyboard shortcuts",
+   "source": "ui",
+   "ui": {
+    "path": "Settings > Keyboard shortcuts",
+    "role": "button",
+    "name": "Keyboard shortcuts",
+    "region": null,
+    "view": "Settings"
+   },
+   "params": [],
+   "effect": "点击「Keyboard shortcuts」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Settings",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Keyboard shortcuts",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "pdf-editor.show",
+   "resource": "pdf-editor",
+   "verb": "show",
+   "summary": "About PDF Editor",
+   "source": "ui",
+   "ui": {
+    "path": "Settings > About PDF Editor",
+    "role": "button",
+    "name": "About PDF Editor",
+    "region": null,
+    "view": "Settings"
+   },
+   "params": [],
+   "effect": "点击「About PDF Editor」（button），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Settings",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "About PDF Editor",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "tools.previous",
+   "resource": "tools",
+   "verb": "previous",
+   "summary": "Back to all tools",
+   "source": "ui",
+   "ui": {
+    "path": "Edit > Back to all tools",
+    "role": "button",
+    "name": "Back to all tools",
+    "region": null,
+    "view": "Edit"
+   },
+   "params": [],
+   "effect": "点击「Back to all tools」（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Edit",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Back to all tools",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "text.create",
+   "resource": "text",
+   "verb": "create",
+   "summary": "Add text",
+   "source": "ui",
+   "ui": {
+    "path": "Edit > Add text",
+    "role": "button",
+    "name": "Add text",
+    "region": null,
+    "view": "Edit"
+   },
+   "params": [],
+   "effect": "点击「Add text」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Edit",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Add text",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "image.create",
+   "resource": "image",
+   "verb": "create",
+   "summary": "Add image",
+   "source": "ui",
+   "ui": {
+    "path": "Edit > Add image",
+    "role": "button",
+    "name": "Add image",
+    "region": null,
+    "view": "Edit"
+   },
+   "params": [],
+   "effect": "点击「Add image」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Edit",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Add image",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "link.create",
+   "resource": "link",
+   "verb": "create",
+   "summary": "Add link",
+   "source": "ui",
+   "ui": {
+    "path": "Edit > Add link",
+    "role": "button",
+    "name": "Add link",
+    "region": null,
+    "view": "Edit"
+   },
+   "params": [],
+   "effect": "点击「Add link」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Edit",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Add link",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "text-images.update",
+   "resource": "text-images",
+   "verb": "update",
+   "summary": "Edit text and images",
+   "source": "ui",
+   "ui": {
+    "path": "Edit > Edit text and images",
+    "role": "button",
+    "name": "Edit text and images",
+    "region": null,
+    "view": "Edit"
+   },
+   "params": [],
+   "effect": "点击「Edit text and images」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Edit",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Edit text and images",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "pages.crop",
+   "resource": "pages",
+   "verb": "crop",
+   "summary": "Crop pages",
+   "source": "ui",
+   "ui": {
+    "path": "Edit > Crop pages",
+    "role": "button",
+    "name": "Crop pages",
+    "region": null,
+    "view": "Edit"
+   },
+   "params": [],
+   "effect": "点击「Crop pages」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Edit",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Crop pages",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "header-footer.activate",
+   "resource": "header-footer",
+   "verb": "activate",
+   "summary": "Header and footer…",
+   "source": "ui",
+   "ui": {
+    "path": "Edit > Header and footer…",
+    "role": "button",
+    "name": "Header and footer…",
+    "region": null,
+    "view": "Edit"
+   },
+   "params": [],
+   "effect": "点击「Header and footer…」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Edit",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Header and footer…",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "watermark.activate",
+   "resource": "watermark",
+   "verb": "activate",
+   "summary": "Watermark…",
+   "source": "ui",
+   "ui": {
+    "path": "Edit > Watermark…",
+    "role": "button",
+    "name": "Watermark…",
+    "region": null,
+    "view": "Edit"
+   },
+   "params": [],
+   "effect": "点击「Watermark…」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Edit",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Watermark…",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "page-numbers.activate",
+   "resource": "page-numbers",
+   "verb": "activate",
+   "summary": "Page numbers…",
+   "source": "ui",
+   "ui": {
+    "path": "Edit > Page numbers…",
+    "role": "button",
+    "name": "Page numbers…",
+    "region": null,
+    "view": "Edit"
+   },
+   "params": [],
+   "effect": "点击「Page numbers…」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Edit",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Page numbers…",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "bates-numbering.activate",
+   "resource": "bates-numbering",
+   "verb": "activate",
+   "summary": "Bates numbering…",
+   "source": "ui",
+   "ui": {
+    "path": "Edit > Bates numbering…",
+    "role": "button",
+    "name": "Bates numbering…",
+    "region": null,
+    "view": "Edit"
+   },
+   "params": [],
+   "effect": "点击「Bates numbering…」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Edit",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Bates numbering…",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "headers-footers.delete",
+   "resource": "headers-footers",
+   "verb": "delete",
+   "summary": "Remove headers and footers",
+   "source": "ui",
+   "ui": {
+    "path": "Edit > Remove headers and footers",
+    "role": "button",
+    "name": "Remove headers and footers",
+    "region": null,
+    "view": "Edit"
+   },
+   "params": [],
+   "effect": "点击「Remove headers and footers」（button）",
+   "permission": "delete",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Edit",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Remove headers and footers",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "watermarks.delete",
+   "resource": "watermarks",
+   "verb": "delete",
+   "summary": "Remove watermarks",
+   "source": "ui",
+   "ui": {
+    "path": "Edit > Remove watermarks",
+    "role": "button",
+    "name": "Remove watermarks",
+    "region": null,
+    "view": "Edit"
+   },
+   "params": [],
+   "effect": "点击「Remove watermarks」（button）",
+   "permission": "delete",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Edit",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Remove watermarks",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "find-pdf.set",
+   "resource": "find-pdf",
+   "verb": "set",
+   "summary": "Find in PDF",
+   "source": "ui",
+   "ui": {
+    "path": "Find text or tools > Find in PDF",
+    "role": "combobox",
+    "name": "Find in PDF",
+    "region": null,
+    "view": "Find text or tools"
+   },
+   "params": [
+    {
+     "name": "value",
+     "type": "string",
+     "description": "「Find in PDF」的新值",
+     "required": true,
+     "positional": true
+    },
+    {
+     "name": "submit",
+     "type": "boolean",
+     "description": "设置后按 Enter 提交",
+     "default": false
+    }
+   ],
+   "effect": "把「Find in PDF」设为给定值（触发 input / change 事件）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Find text or tools",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "set": {
+       "name": "Find in PDF",
+       "role": "combobox",
+       "value": "{{value}}"
+      }
+     },
+     {
+      "press_if": "submit",
+      "press": {
+       "key": "Enter",
+       "name": "Find in PDF",
+       "role": "combobox"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "match.previous",
+   "resource": "match",
+   "verb": "previous",
+   "summary": "Previous match",
+   "source": "ui",
+   "ui": {
+    "path": "Find text or tools > Previous match",
+    "role": "button",
+    "name": "Previous match",
+    "region": null,
+    "view": "Find text or tools"
+   },
+   "params": [],
+   "effect": "点击「Previous match」（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Find text or tools",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Previous match",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "match.next",
+   "resource": "match",
+   "verb": "next",
+   "summary": "Next match",
+   "source": "ui",
+   "ui": {
+    "path": "Find text or tools > Next match",
+    "role": "button",
+    "name": "Next match",
+    "region": null,
+    "view": "Find text or tools"
+   },
+   "params": [],
+   "effect": "点击「Next match」（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Find text or tools",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Next match",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "search.close",
+   "resource": "search",
+   "verb": "close",
+   "summary": "Close search",
+   "source": "ui",
+   "ui": {
+    "path": "Find text or tools > Close search",
+    "role": "button",
+    "name": "Close search",
+    "region": null,
+    "view": "Find text or tools"
+   },
+   "params": [],
+   "effect": "点击「Close search」（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Find text or tools",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Close search",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "pages.toggle",
+   "resource": "pages",
+   "verb": "toggle",
+   "summary": "Pages",
+   "source": "ui",
+   "ui": {
+    "path": "Print file > Pages to include > Pages",
+    "role": "radio",
+    "name": "Pages",
+    "region": "Pages to include",
+    "view": "Print file"
+   },
+   "params": [],
+   "effect": "切换「Pages」",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Print file",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Pages",
+       "role": "radio"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "page-range.set",
+   "resource": "page-range",
+   "verb": "set",
+   "summary": "Page range",
+   "source": "ui",
+   "ui": {
+    "path": "Print file > Page range",
+    "role": "textbox",
+    "name": "Page range",
+    "region": null,
+    "view": "Print file"
+   },
+   "params": [
+    {
+     "name": "value",
+     "type": "string",
+     "description": "「Page range」的新值",
+     "required": true,
+     "positional": true
+    },
+    {
+     "name": "submit",
+     "type": "boolean",
+     "description": "设置后按 Enter 提交",
+     "default": false
+    }
+   ],
+   "effect": "把「Page range」设为给定值（触发 input / change 事件）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Print file",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "set": {
+       "name": "Page range",
+       "role": "textbox",
+       "value": "{{value}}"
+      }
+     },
+     {
+      "press_if": "submit",
+      "press": {
+       "key": "Enter",
+       "name": "Page range",
+       "role": "textbox"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "cancel.cancel",
+   "resource": "cancel",
+   "verb": "cancel",
+   "summary": "Cancel",
+   "source": "ui",
+   "ui": {
+    "path": "Print file > Cancel",
+    "role": "button",
+    "name": "Cancel",
+    "region": null,
+    "view": "Print file"
+   },
+   "params": [],
+   "effect": "点击「Cancel」（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Print file",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Cancel",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "print.print",
+   "resource": "print",
+   "verb": "print",
+   "summary": "Print",
+   "source": "ui",
+   "ui": {
+    "path": "Print file > Print",
+    "role": "button",
+    "name": "Print",
+    "region": null,
+    "view": "Print file"
+   },
+   "params": [],
+   "effect": "点击「Print」（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Print file",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Print",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "comments-panel.close",
+   "resource": "comments-panel",
+   "verb": "close",
+   "summary": "Close comments panel",
+   "source": "ui",
+   "ui": {
+    "path": "Comments > Close comments panel",
+    "role": "button",
+    "name": "Close comments panel",
+    "region": null,
+    "view": "Comments"
+   },
+   "params": [],
+   "effect": "点击「Close comments panel」（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Comments",
+       "role": "tab"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Close comments panel",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "attachments-panel.close",
+   "resource": "attachments-panel",
+   "verb": "close",
+   "summary": "Close attachments panel",
+   "source": "ui",
+   "ui": {
+    "path": "Attachments > Close attachments panel",
+    "role": "button",
+    "name": "Close attachments panel",
+    "region": null,
+    "view": "Attachments"
+   },
+   "params": [],
+   "effect": "点击「Close attachments panel」（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Attachments",
+       "role": "tab"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Close attachments panel",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "attach-file.activate",
+   "resource": "attach-file",
+   "verb": "activate",
+   "summary": "Attach a file…",
+   "source": "ui",
+   "ui": {
+    "path": "Attachments > Attach a file…",
+    "role": "button",
+    "name": "Attach a file…",
+    "region": null,
+    "view": "Attachments"
+   },
+   "params": [],
+   "effect": "点击「Attach a file…」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Attachments",
+       "role": "tab"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Attach a file…",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "selection.select-all",
+   "resource": "selection",
+   "verb": "select-all",
+   "summary": "快捷键 mod+a",
+   "source": "shortcut",
+   "ui": {
+    "path": "键盘 mod+a",
+    "shortcut": "mod+a",
+    "defined_in": "src/organize-view.js"
+   },
+   "params": [],
+   "effect": "在当前焦点上按 mod+a（src/organize-view.js 中定义）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "press": {
+       "key": "mod+a"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "selection.group-shift",
+   "resource": "selection",
+   "verb": "group-shift",
+   "summary": "快捷键 mod+shift+g",
+   "source": "shortcut",
+   "ui": {
+    "path": "键盘 mod+shift+g",
+    "shortcut": "mod+shift+g",
+    "defined_in": "src/compare-view.js"
+   },
+   "params": [],
+   "effect": "在当前焦点上按 mod+shift+g（src/compare-view.js 中定义）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "press": {
+       "key": "mod+shift+g"
+      }
+     }
+    ]
+   }
+  }
+ ]
+}

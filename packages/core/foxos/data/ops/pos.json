@@ -1,0 +1,552 @@
+{
+ "app": "pos",
+ "name": "Point of Sale",
+ "generated_by": "scripts/inventory_ops.py",
+ "commit": "0fbb88cdee2f54c94a9d2c975f43322888813c5d",
+ "title": "Register · Point of Sale",
+ "ops": [
+  {
+   "id": "skip.dismiss",
+   "resource": "skip",
+   "verb": "dismiss",
+   "summary": "skip for *（1 项，如 Skip for now）",
+   "source": "ui-collection",
+   "ui": {
+    "path": "主界面 > Welcome > skip for *",
+    "role": "button",
+    "region": "Welcome",
+    "view": "主界面",
+    "examples": [
+     "Skip for now"
+    ]
+   },
+   "params": [
+    {
+     "name": "target",
+     "type": "string",
+     "description": "要操作的项的名称（或其一部分），如 'Skip for now'",
+     "required": true,
+     "positional": true
+    }
+   ],
+   "effect": "点击名称匹配的「skip for *」项（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "{{target}}",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "register.show",
+   "resource": "register",
+   "verb": "show",
+   "summary": "Register",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Main navigation > Register",
+    "role": "link",
+    "name": "Register",
+    "region": "Main navigation",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Register」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Register",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "products.show",
+   "resource": "products",
+   "verb": "show",
+   "summary": "Products",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Main navigation > Products",
+    "role": "link",
+    "name": "Products",
+    "region": "Main navigation",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Products」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Products",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "receipts.show",
+   "resource": "receipts",
+   "verb": "show",
+   "summary": "Receipts",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Main navigation > Receipts",
+    "role": "link",
+    "name": "Receipts",
+    "region": "Main navigation",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Receipts」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Receipts",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "customers.show",
+   "resource": "customers",
+   "verb": "show",
+   "summary": "Customers",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Main navigation > Customers",
+    "role": "link",
+    "name": "Customers",
+    "region": "Main navigation",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Customers」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Customers",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "reports.show",
+   "resource": "reports",
+   "verb": "show",
+   "summary": "Reports",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Main navigation > Reports",
+    "role": "link",
+    "name": "Reports",
+    "region": "Main navigation",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Reports」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Reports",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "settings.show",
+   "resource": "settings",
+   "verb": "show",
+   "summary": "Settings",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Main navigation > Settings",
+    "role": "link",
+    "name": "Settings",
+    "region": "Main navigation",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Settings」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Settings",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "search-products-or-scan-barcode.set",
+   "resource": "search-products-or-scan-barcode",
+   "verb": "set",
+   "summary": "Search products or scan a barcode",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Search products or scan a barcode",
+    "role": "textbox",
+    "name": "Search products or scan a barcode",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [
+    {
+     "name": "value",
+     "type": "string",
+     "description": "「Search products or scan a barcode」的新值",
+     "required": true,
+     "positional": true
+    },
+    {
+     "name": "submit",
+     "type": "boolean",
+     "description": "设置后按 Enter 提交",
+     "default": false
+    }
+   ],
+   "effect": "把「Search products or scan a barcode」设为给定值（触发 input / change 事件）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "set": {
+       "name": "Search products or scan a barcode",
+       "role": "textbox",
+       "value": "{{value}}"
+      }
+     },
+     {
+      "press_if": "submit",
+      "press": {
+       "key": "Enter",
+       "name": "Search products or scan a barcode",
+       "role": "textbox"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "cash-drawer.activate",
+   "resource": "cash-drawer",
+   "verb": "activate",
+   "summary": "Cash drawer",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Cash drawer",
+    "role": "button",
+    "name": "Cash drawer",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Cash drawer」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Cash drawer",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "products.create",
+   "resource": "products",
+   "verb": "create",
+   "summary": "Add products",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Product catalog > Add products",
+    "role": "link",
+    "name": "Add products",
+    "region": "Product catalog",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Add products」（link）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Add products",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "custom-item.create",
+   "resource": "custom-item",
+   "verb": "create",
+   "summary": "Add a custom item",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Add a custom item",
+    "role": "button",
+    "name": "Add a custom item",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Add a custom item」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Add a custom item",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "park-sale-serve-next-customer.activate",
+   "resource": "park-sale-serve-next-customer",
+   "verb": "activate",
+   "summary": "Park this sale and serve the next customer",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Current sale > Park this sale and serve the next customer",
+    "role": "button",
+    "name": "Park this sale and serve the next customer",
+    "region": "Current sale",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Park this sale and serve the next customer」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Park this sale and serve the next customer",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "clear.clear",
+   "resource": "clear",
+   "verb": "clear",
+   "summary": "Clear",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Current sale > Clear",
+    "role": "button",
+    "name": "Clear",
+    "region": "Current sale",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Clear」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Clear",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "charge.activate",
+   "resource": "charge",
+   "verb": "activate",
+   "summary": "Charge",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Current sale > Charge",
+    "role": "button",
+    "name": "Charge",
+    "region": "Current sale",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Charge」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Charge",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "close.close",
+   "resource": "close",
+   "verb": "close",
+   "summary": "Close",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Close",
+    "role": "button",
+    "name": "Close",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Close」（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Close",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "set-up-store.activate",
+   "resource": "set-up-store",
+   "verb": "activate",
+   "summary": "Set up my store",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Welcome > Set up my store",
+    "role": "button",
+    "name": "Set up my store",
+    "region": "Welcome",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Set up my store」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Set up my store",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "explore-sample-data.activate",
+   "resource": "explore-sample-data",
+   "verb": "activate",
+   "summary": "Explore with sample data",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Welcome > Explore with sample data",
+    "role": "button",
+    "name": "Explore with sample data",
+    "region": "Welcome",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Explore with sample data」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Explore with sample data",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  }
+ ]
+}

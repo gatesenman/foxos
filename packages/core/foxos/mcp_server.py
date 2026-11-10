@@ -1,7 +1,7 @@
-"""最小 MCP（Model Context Protocol）stdio 服务器。
+"""MCP（Model Context Protocol）服务器：stdio（每行一条 JSON-RPC 2.0 消息）与 Streamable HTTP（POST /mcp）。
 
-每行一条 JSON-RPC 2.0 消息。支持 initialize / ping / tools/list / tools/call。
-tools/call 直接调用 kernel.invoke()，与 CLI 走同一内核、同一审计日志。
+支持 initialize / ping / tools/list / tools/call。tools/call 直接调用 kernel.invoke()，与 CLI 走同一内核、同一审计日志、
+同一锁与人工接管规则。工具由命令注册表生成，与 CLI、docs/mcp-reference.md 同源。
 """
 
 from __future__ import annotations
@@ -39,12 +39,14 @@ def handle(msg: dict, state: dict) -> dict | None:
             "protocolVersion": pv if pv in SUPPORTED else SUPPORTED[0],
             "capabilities": {"tools": {"listChanged": False}},
             "serverInfo": {"name": "foxos", "title": "狐狸OS", "version": __version__},
-            "instructions": "狐狸OS 命令内核。路径相对于工作空间；先调用 tools/list 了解参数与限制。",
+            "instructions": ("狐狸OS 命令内核。路径相对于工作空间；先调用 tools/list 了解参数与限制。"
+                             "Everything 应用（51 个）的操作：先 everything_commands {app} 查看，再 everything_run {app, command, args} 执行；"
+                             "写操作会写审计、遵守写锁；人工接管时返回 PAUSED。" + catalog.ERROR_CODES),
         })
     if method == "ping":
         return _resp(id_, {})
     if method == "tools/list":
-        return _resp(id_, {"tools": catalog.mcp_tools()})
+        return _resp(id_, {"tools": catalog.mcp_tools(state.get("profile", "compact"), state.get("apps"), state.get("names", "underscore"))})
     if method == "tools/call":
         name = params.get("name")
         args = params.get("arguments") or {}
@@ -66,10 +68,11 @@ def handle(msg: dict, state: dict) -> dict | None:
     return _resp(id_, error={"code": -32601, "message": f"Method not found: {method}"})
 
 
-def serve(ws: Workspace, agent_default: str | None = None, task: str | None = None, stdin=None, stdout=None) -> int:
+def serve(ws: Workspace, agent_default: str | None = None, task: str | None = None, stdin=None, stdout=None,
+          profile: str = "compact", apps: list[str] | None = None, names: str = "underscore") -> int:
     stdin = stdin or sys.stdin
     stdout = stdout or sys.stdout
-    state = {"ws": ws, "agent": agent_default, "task": task}
+    state = {"ws": ws, "agent": agent_default, "task": task, "profile": profile, "apps": apps, "names": names}
     for line in stdin:
         line = line.strip()
         if not line:
@@ -83,4 +86,84 @@ def serve(ws: Workspace, agent_default: str | None = None, task: str | None = No
         if out is not None:
             stdout.write(json.dumps(out, ensure_ascii=False, default=str) + "\n")
             stdout.flush()
+    return 0
+
+
+def serve_http(ws: Workspace, host: str = "127.0.0.1", port: int = 8765, token: str | None = None, agent_default: str | None = None,
+               task: str | None = None, profile: str = "compact", apps: list[str] | None = None, names: str = "underscore", ready=None) -> int:
+    """Streamable HTTP 传输（MCP 2025-03-26 起）：客户端 POST JSON-RPC 到 /mcp，服务器以 application/json 返回。
+
+    不提供服务器主动推送（GET 返回 405，规范允许）。会话以 Mcp-Session-Id 头区分；可用 --token 要求 Bearer 认证。
+    默认只监听 127.0.0.1。
+    """
+    import secrets
+    import uuid
+    from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+
+    sessions: dict[str, dict] = {}
+
+    class H(BaseHTTPRequestHandler):
+        protocol_version = "HTTP/1.1"
+
+        def log_message(self, *a):  # 不把请求写到 stderr
+            pass
+
+        def _send(self, code, body=None, headers=None):
+            data = b"" if body is None else json.dumps(body, ensure_ascii=False, default=str).encode("utf-8")
+            self.send_response(code)
+            for k, v in (headers or {}).items():
+                self.send_header(k, v)
+            if body is not None:
+                self.send_header("Content-Type", "application/json")
+            self.send_header("Content-Length", str(len(data)))
+            self.end_headers()
+            self.wfile.write(data)
+
+        def _auth(self) -> bool:
+            if not token:
+                return True
+            got = self.headers.get("Authorization", "")
+            return secrets.compare_digest(got, f"Bearer {token}")
+
+        def do_GET(self):  # noqa: N802
+            self._send(405, {"error": "本服务器不提供 SSE 推送流"}, {"Allow": "POST, DELETE"})
+
+        def do_DELETE(self):  # noqa: N802
+            sessions.pop(self.headers.get("Mcp-Session-Id", ""), None)
+            self._send(200, {})
+
+        def do_POST(self):  # noqa: N802
+            if self.path.split("?")[0] not in ("/mcp", "/"):
+                return self._send(404, {"error": "not found"})
+            if not self._auth():
+                return self._send(401, {"error": "unauthorized"}, {"WWW-Authenticate": "Bearer"})
+            n = int(self.headers.get("Content-Length") or 0)
+            try:
+                msg = json.loads(self.rfile.read(n).decode("utf-8"))
+            except (ValueError, UnicodeDecodeError):
+                return self._send(400, _resp(None, error={"code": -32700, "message": "Parse error"}))
+            sid = self.headers.get("Mcp-Session-Id")
+            msgs = msg if isinstance(msg, list) else [msg]
+            is_init = any(isinstance(m, dict) and m.get("method") == "initialize" for m in msgs)
+            if is_init:
+                sid = uuid.uuid4().hex
+                sessions[sid] = {"ws": ws, "agent": agent_default, "task": task, "profile": profile, "apps": apps, "names": names}
+            elif not sid or sid not in sessions:
+                return self._send(404 if sid else 400, _resp(None, error={"code": -32000, "message": "缺少或无效的 Mcp-Session-Id"}))
+            outs = [o for o in (handle(m, sessions[sid]) for m in msgs if isinstance(m, dict)) if o is not None]
+            hdr = {"Mcp-Session-Id": sid}
+            if not outs:
+                return self._send(202, None, hdr)
+            self._send(200, outs if isinstance(msg, list) else outs[0], hdr)
+
+    srv = ThreadingHTTPServer((host, port), H)
+    url = f"http://{srv.server_address[0]}:{srv.server_address[1]}/mcp"
+    if ready:
+        ready(url)
+    else:
+        print(json.dumps({"url": url, "auth": "bearer" if token else None}, ensure_ascii=False), flush=True)
+    try:
+        srv.serve_forever()
+    except KeyboardInterrupt:
+        pass
     return 0

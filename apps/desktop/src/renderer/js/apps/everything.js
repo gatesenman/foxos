@@ -22,7 +22,7 @@
           el('button', { class: 'btn primary sm', onclick: () => FX.openWindow('appcenter', {}) }, '打开应用中心')));
         return {};
       }
-      const view = el('webview', { src: `foxapp://${params.app}/index.html`, partition: `persist:ev-${params.app}`, class: 'webview', allowpopups: true });
+      const view = el('webview', { src: `foxapp://${params.app}/index.html`, partition: a.partition, class: 'webview', allowpopups: true });
       body.append(view);
       view.addEventListener('dom-ready', () => {
         window.foxos.everything.attach(params.app, view.getWebContentsId()).then(() => { if (params.file && !win.fileSent) { win.fileSent = true; window.foxos.everything.openFile(params.app, params.file); } });

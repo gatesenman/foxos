@@ -170,7 +170,9 @@ def setup_root(env_dir: Path, cfg: dict) -> Path:
         mount(ws["path"], str(root / "workspace"), None, MS_BIND | MS_REC)
         if ws.get("mode") == "ro":
             mount(None, str(root / "workspace"), None, MS_REMOUNT | MS_BIND | MS_RDONLY | MS_REC)
-    for m in cfg.get("mounts", []):
+    for m in [*cfg.get("mounts", []), *cfg.get("system_mounts", [])]:
+        if not Path(m["source"]).exists():
+            continue
         t = root / m["target"].lstrip("/")
         if Path(m["source"]).is_dir():
             t.mkdir(parents=True, exist_ok=True)

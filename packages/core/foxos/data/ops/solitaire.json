@@ -1,0 +1,352 @@
+{
+ "app": "solitaire",
+ "name": "Solitaire",
+ "generated_by": "scripts/inventory_ops.py",
+ "commit": "0fbb88cdee2f54c94a9d2c975f43322888813c5d",
+ "title": "Play Klondike Solitaire Online — Draw-One, Undo Any Move",
+ "ops": [
+  {
+   "id": "klondike-draw.select",
+   "resource": "klondike-draw",
+   "verb": "select",
+   "summary": "klondike, draw #（2 项，如 Klondike, Draw 1）",
+   "source": "ui-collection",
+   "ui": {
+    "path": "Choose a game > klondike, draw #",
+    "role": "menuitemradio",
+    "region": null,
+    "view": "Choose a game",
+    "examples": [
+     "Klondike, Draw 1",
+     "Klondike, Draw 3"
+    ]
+   },
+   "params": [
+    {
+     "name": "target",
+     "type": "string",
+     "description": "要操作的项的名称（或其一部分），如 'Klondike, Draw 1'",
+     "required": true,
+     "positional": true
+    }
+   ],
+   "effect": "点击名称匹配的「klondike, draw #」项（menuitemradio）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Choose a game",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "{{target}}",
+       "role": "menuitemradio"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "vegas-draw.select",
+   "resource": "vegas-draw",
+   "verb": "select",
+   "summary": "vegas, draw #（2 项，如 Vegas, Draw 1）",
+   "source": "ui-collection",
+   "ui": {
+    "path": "Choose a game > vegas, draw #",
+    "role": "menuitemradio",
+    "region": null,
+    "view": "Choose a game",
+    "examples": [
+     "Vegas, Draw 1",
+     "Vegas, Draw 3"
+    ]
+   },
+   "params": [
+    {
+     "name": "target",
+     "type": "string",
+     "description": "要操作的项的名称（或其一部分），如 'Vegas, Draw 1'",
+     "required": true,
+     "positional": true
+    }
+   ],
+   "effect": "点击名称匹配的「vegas, draw #」项（menuitemradio）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Choose a game",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "{{target}}",
+       "role": "menuitemradio"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "spider-suit.select",
+   "resource": "spider-suit",
+   "verb": "select",
+   "summary": "spider, # suit（1 项，如 Spider, 1 suit）",
+   "source": "ui-collection",
+   "ui": {
+    "path": "Choose a game > spider, # suit",
+    "role": "menuitemradio",
+    "region": null,
+    "view": "Choose a game",
+    "examples": [
+     "Spider, 1 suit"
+    ]
+   },
+   "params": [
+    {
+     "name": "target",
+     "type": "string",
+     "description": "要操作的项的名称（或其一部分），如 'Spider, 1 suit'",
+     "required": true,
+     "positional": true
+    }
+   ],
+   "effect": "点击名称匹配的「spider, # suit」项（menuitemradio）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Choose a game",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "{{target}}",
+       "role": "menuitemradio"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "spider-suits.select",
+   "resource": "spider-suits",
+   "verb": "select",
+   "summary": "spider, # suits（2 项，如 Spider, 2 suits）",
+   "source": "ui-collection",
+   "ui": {
+    "path": "Choose a game > spider, # suits",
+    "role": "menuitemradio",
+    "region": null,
+    "view": "Choose a game",
+    "examples": [
+     "Spider, 2 suits",
+     "Spider, 4 suits"
+    ]
+   },
+   "params": [
+    {
+     "name": "target",
+     "type": "string",
+     "description": "要操作的项的名称（或其一部分），如 'Spider, 2 suits'",
+     "required": true,
+     "positional": true
+    }
+   ],
+   "effect": "点击名称匹配的「spider, # suits」项（menuitemradio）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Choose a game",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "{{target}}",
+       "role": "menuitemradio"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "game.select",
+   "resource": "game",
+   "verb": "select",
+   "summary": "Choose a game",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > header > Choose a game",
+    "role": "button",
+    "name": "Choose a game",
+    "region": "header",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Choose a game」（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Choose a game",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "undo.undo",
+   "resource": "undo",
+   "verb": "undo",
+   "summary": "Undo",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > header > Undo",
+    "role": "button",
+    "name": "Undo",
+    "region": "header",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Undo」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Undo",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "powered-by-puter.show",
+   "resource": "powered-by-puter",
+   "verb": "show",
+   "summary": "Powered by Puter",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > footer > Powered by Puter",
+    "role": "link",
+    "name": "Powered by Puter",
+    "region": "footer",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Powered by Puter」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Powered by Puter",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "document.create",
+   "resource": "document",
+   "verb": "create",
+   "summary": "快捷键 mod+n",
+   "source": "shortcut",
+   "ui": {
+    "path": "键盘 mod+n",
+    "shortcut": "mod+n",
+    "defined_in": "src/main.js"
+   },
+   "params": [],
+   "effect": "在当前焦点上按 mod+n（src/main.js 中定义）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "press": {
+       "key": "mod+n"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "edit.undo",
+   "resource": "edit",
+   "verb": "undo",
+   "summary": "快捷键 mod+z",
+   "source": "shortcut",
+   "ui": {
+    "path": "键盘 mod+z",
+    "shortcut": "mod+z",
+    "defined_in": "src/main.js"
+   },
+   "params": [],
+   "effect": "在当前焦点上按 mod+z（src/main.js 中定义）",
+   "permission": "modify",
+   "undoable": "不适用",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "press": {
+       "key": "mod+z"
+      }
+     }
+    ]
+   }
+  }
+ ]
+}

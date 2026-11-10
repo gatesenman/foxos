@@ -1,0 +1,66 @@
+{
+ "app": "email",
+ "name": "Email",
+ "generated_by": "scripts/inventory_ops.py",
+ "commit": "0fbb88cdee2f54c94a9d2c975f43322888813c5d",
+ "title": "Puter Mail",
+ "ops": [
+  {
+   "id": "grant-read-access.activate",
+   "resource": "grant-read-access",
+   "verb": "activate",
+   "summary": "Grant read access",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Grant read access",
+    "role": "button",
+    "name": "Grant read access",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Grant read access」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Grant read access",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "command-palette.show",
+   "resource": "command-palette",
+   "verb": "show",
+   "summary": "快捷键 mod+k",
+   "source": "shortcut",
+   "ui": {
+    "path": "键盘 mod+k",
+    "shortcut": "mod+k",
+    "defined_in": "src/ui/editor.js"
+   },
+   "params": [],
+   "effect": "在当前焦点上按 mod+k（src/ui/editor.js 中定义）",
+   "permission": "read",
+   "undoable": "不适用",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "press": {
+       "key": "mod+k"
+      }
+     }
+    ]
+   }
+  }
+ ]
+}

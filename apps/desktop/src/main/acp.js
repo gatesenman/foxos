@@ -25,9 +25,27 @@ class AcpConnection {
 
   get identity() { return `acp:${this.agent.id}`; }
 
-  start() {
-    const env = { ...process.env, ...settings.secretEnv(), ...(this.agent.env || {}), FOXOS_WORKSPACE: kernel.getWorkspace() };
-    this.proc = spawn(this.agent.command, this.agent.args || [], { cwd: kernel.getWorkspace(), env, stdio: ['pipe', 'pipe', 'pipe'], windowsHide: true });
+  // envName：在狐狸OS 环境里运行智能体（Linux 后端）。智能体目录只读挂载在环境的 /opt/foxos/agents，
+  // 工作空间在 /workspace；MCP 改用宿主上的 Streamable HTTP 服务器（环境需共享宿主网络）。
+  async start(envName = null) {
+    const extra = { ...settings.secretEnv(), ...(this.agent.env || {}), FOXOS_WORKSPACE: kernel.getWorkspace(), FOXOS_AGENT: this.identity };
+    if (!envName) {
+      this.proc = spawn(this.agent.command, this.agent.args || [], { cwd: kernel.getWorkspace(), env: { ...process.env, ...extra }, stdio: ['pipe', 'pipe', 'pipe'], windowsHide: true });
+    } else {
+      const info = await kernel.run(['env', 'info', envName]);
+      if (!info.ok) throw new Error(info.data?.error?.message || `环境 ${envName} 不可用`);
+      const e = info.data.result;
+      if (e.state !== 'running') throw new Error(`环境 ${envName} 没有运行，先启动它`);
+      if (e.backend !== 'linux-ns') throw new Error(`在环境中运行智能体目前只支持 Linux 后端（当前 ${e.backend}）`);
+      const agentsRoot = require('./agents').agentsDir();
+      const map = (p) => (typeof p === 'string' && p.startsWith(agentsRoot) ? `/opt/foxos/agents${p.slice(agentsRoot.length)}` : p);
+      const args = ['-m', 'foxos.envs.linux', 'exec', e.path, '--cwd', e.workspace.mode === 'none' ? '/' : '/workspace'];
+      for (const [k, v] of Object.entries({ ...extra, FOXOS_WORKSPACE: '/workspace' })) args.push('--env', `${k}=${v}`);
+      args.push('--', map(this.agent.command), ...(this.agent.args || []).map(map));
+      this.envName = envName; this.envNetwork = e.network;
+      this.proc = spawn(kernel.pythonPath(), args, { cwd: kernel.getWorkspace(), env: { ...process.env, PYTHONPATH: corePath() }, stdio: ['pipe', 'pipe', 'pipe'], windowsHide: true });
+      if (e.network === 'host') await this._startHttpMcp();
+    }
     this.proc.stdout.on('data', (d) => this._onData(String(d)));
     this.proc.stderr.on('data', (d) => {
       this.stderr = (this.stderr + String(d)).slice(-20000);
@@ -134,7 +152,10 @@ class AcpConnection {
   }
 
   _rel(p) {
-    const abs = path.resolve(kernel.getWorkspace(), String(p || ''));
+    let s = String(p || '');
+    // 环境里的智能体看到的工作空间是 /workspace
+    if (this.envName && (s === '/workspace' || s.startsWith('/workspace/'))) s = s.slice('/workspace'.length).replace(/^\//, '') || '.';
+    const abs = path.resolve(kernel.getWorkspace(), s);
     return path.relative(kernel.getWorkspace(), abs) || '.';
   }
 
@@ -147,7 +168,33 @@ class AcpConnection {
     return this.init;
   }
 
+  // 宿主上的 Streamable HTTP MCP 服务器（只监听 127.0.0.1，随机端口 + 随机令牌），供环境里的智能体连接
+  _startHttpMcp() {
+    return new Promise((resolve, reject) => {
+      const token = require('node:crypto').randomBytes(24).toString('hex');
+      const p = spawn(kernel.pythonPath(), ['-m', 'foxos', '--workspace', kernel.getWorkspace(), '--agent', this.identity, 'mcp', '--http', '127.0.0.1:0'],
+        { env: { ...process.env, PYTHONPATH: corePath(), FOXOS_MCP_TOKEN: token, PYTHONIOENCODING: 'utf-8' }, stdio: ['ignore', 'pipe', 'pipe'] });
+      this.mcpProc = p;
+      let buf = '';
+      const t = setTimeout(() => reject(new Error('MCP HTTP 服务器启动超时')), 15000);
+      p.stdout.on('data', (d) => {
+        buf += String(d);
+        const line = buf.split('\n')[0];
+        try { const j = JSON.parse(line); clearTimeout(t); this.mcpHttp = { url: j.url, token }; resolve(this.mcpHttp); } catch { /* 等待完整一行 */ }
+      });
+      p.on('exit', (c) => { clearTimeout(t); if (!this.mcpHttp) reject(new Error(`MCP HTTP 服务器退出（${c}）`)); });
+    });
+  }
+
   mcpServers() {
+    if (this.envName) {
+      const caps = (this.init && this.init.agentCapabilities && this.init.agentCapabilities.mcpCapabilities) || {};
+      if (!this.mcpHttp || !caps.http) {
+        this.onEvent({ type: 'stderr', text: `[狐狸OS] 环境 ${this.envName} 中的智能体${!this.mcpHttp ? '（环境无网络）' : '不支持 HTTP MCP'}，未注入 foxos MCP；可在环境里直接运行 foxos 命令以外的工具。\n` });
+        return [];
+      }
+      return [{ type: 'http', name: 'foxos', url: this.mcpHttp.url, headers: [{ name: 'Authorization', value: `Bearer ${this.mcpHttp.token}` }] }];
+    }
     return [{
       name: 'foxos',
       command: kernel.pythonPath(),
@@ -161,7 +208,7 @@ class AcpConnection {
   }
 
   async newSession() {
-    const r = await this.request('session/new', { cwd: kernel.getWorkspace(), mcpServers: this.mcpServers() }, 120000);
+    const r = await this.request('session/new', { cwd: this.envName ? '/workspace' : kernel.getWorkspace(), mcpServers: this.mcpServers() }, 120000);
     this.sessions.add(r.sessionId);
     return r;
   }
@@ -176,6 +223,7 @@ class AcpConnection {
 
   stop() {
     if (this.proc && !this.closed) { try { this.proc.kill(); } catch { /* 已退出 */ } }
+    if (this.mcpProc) { try { this.mcpProc.kill(); } catch { /* 已退出 */ } }
   }
 }
 

@@ -201,6 +201,22 @@ def ev_uninstall(ctx: Context, app: str) -> dict:
     return {"message": f"已卸载 {app}（工作空间里的数据 AppData/{app} 保留）", "app": app}
 
 
+def ev_commands(ctx: Context, app: str) -> dict:
+    from ..kernel import REGISTRY
+    _need(app)
+    cmds = [c for c in REGISTRY.values() if c.app == app]
+    return {"app": app, "count": len(cmds), "commands": [
+        {"command": c.name, "id": c.id, "tool": c.tool_name, "cli": c.usage(), "summary": c.summary, "permission": c.permission,
+         "params": c.input_schema()} for c in cmds]}
+
+
+def ev_run(ctx: Context, app: str, command: str, args: dict | None = None) -> dict:
+    from ..kernel import invoke
+    _need(app)
+    cid = f"{app}.{'.'.join(command.replace('.', ' ').split())}"
+    return {"app": app, "command": cid, "result": invoke(cid, args or {}, ctx)}
+
+
 APPP = Param("app", "string", "应用 ID（foxos everything list 查看）", required=True, positional=True, metavar="APP")
 register(Command("everything", "list", "列出 51 个 Everything 应用（分组、许可证、安装状态、操作数）", ev_list,
                  params=[Param("group", "string", "只看某个分组", enum=list(GROUPS)), Param("installed_only", "boolean", "只列出已安装的", cli_flag="--installed")],
@@ -213,6 +229,13 @@ register(Command("everything", "install", "从上游源码在本机构建并安�
                          Param("force", "boolean", "已安装也重新构建", cli_short="-f")],
                  examples=["foxos everything install tasks chess", "foxos everything install --group games", "foxos everything install --all"],
                  limits=["需要 git、Node.js 22.12+ 与 npm；每个应用构建约 2–20 秒（不含下载）"], permission="run"))
+register(Command("everything", "commands", "列出一个应用的全部命令（语义操作 + 通用界面命令）及参数 Schema", ev_commands, params=[APPP],
+                 examples=["foxos everything commands tasks --json"]))
+register(Command("everything", "run", "执行一个应用的任意命令（与 foxos <app> <资源> <动词> 相同；权限、审计、写锁按被执行的命令计）", ev_run,
+                 params=[APPP, Param("command", "string", "命令，如 \"task create\" 或 \"ui snapshot\"", required=True, positional=True, metavar="COMMAND"),
+                         Param("args", "object", "命令参数（JSON 对象）")],
+                 examples=["foxos everything run tasks \"add-task set\" --args '{\"value\": \"买牛奶\", \"submit\": true}' --json"],
+                 audited=False))
 register(Command("everything", "uninstall", "卸载应用（保留工作空间中的数据）", ev_uninstall, params=[APPP], permission="delete",
                  examples=["foxos everything uninstall chess"]))
 
@@ -252,6 +275,9 @@ def make_handlers(app: str) -> dict:
     def app_close(ctx):
         return {"message": f"已关闭 {name}", **desktop_client.call(ctx.workspace, "ev.close", app, agent=ctx.agent)}
 
+    def app_reset(ctx):
+        return {"message": f"已重置 {name}（清空本工作空间下的应用数据）", **desktop_client.call(ctx.workspace, "ev.reset", app, agent=ctx.agent)}
+
     def app_status(ctx):
         try:
             return desktop_client.call(ctx.workspace, "ev.status", app, agent=ctx.agent) if desktop_client._info(ctx.workspace) else {"app": app, "installed": installed(app), "running": False, "mode": None}
@@ -267,16 +293,16 @@ def make_handlers(app: str) -> dict:
     def ui_text(ctx):
         return {"text": _bridge(ctx, app, "text")}
 
-    def ui_click(ctx, ref=None, name=None, role=None):
+    def ui_click(ctx, ref=None, name=None, role=None, force=False):
         if not ref and not name:
             raise FoxError("USAGE", "需要 --ref 或 --name")
-        return {"clicked": _bridge(ctx, app, "click", {"ref": ref, "name": name, "role": role}, mutate=True)}
+        return {"clicked": _bridge(ctx, app, "click", {"ref": ref, "name": name, "role": role, "force": force}, mutate=True)}
 
     def ui_type(ctx, text, ref=None, clear=False):
         return {"element": _bridge(ctx, app, "type", {"ref": ref, "text": text, "clear": clear}, mutate=True)}
 
-    def ui_set(ctx, ref, value):
-        return {"element": _bridge(ctx, app, "setValue", {"ref": ref, "value": value}, mutate=True)}
+    def ui_set(ctx, ref, value, force=False):
+        return {"element": _bridge(ctx, app, "setValue", {"ref": ref, "value": value, "force": force}, mutate=True)}
 
     def ui_press(ctx, key, ref=None):
         return _bridge(ctx, app, "press", {"key": key, "ref": ref}, mutate=True)
@@ -317,7 +343,7 @@ def make_handlers(app: str) -> dict:
         return {"count": len(ops), "bound": sum(1 for o in ops if o.get("binding", {}).get("kind") not in (None, "none")), "ops": [
             {k: o.get(k) for k in ("id", "summary", "ui", "params", "undoable")} | {"binding": (o.get("binding") or {}).get("kind", "none"), "cli": _op_cli(app, o)} for o in ops]}
 
-    return dict(app_open=app_open, app_close=app_close, app_status=app_status, file_open=file_open, ui_snapshot=ui_snapshot, ui_text=ui_text,
+    return dict(app_open=app_open, app_close=app_close, app_reset=app_reset, app_status=app_status, file_open=file_open, ui_snapshot=ui_snapshot, ui_text=ui_text,
                 ui_click=ui_click, ui_type=ui_type, ui_set=ui_set, ui_press=ui_press, ui_screenshot=ui_screenshot, data_list=data_list,
                 data_get=data_get, module_list=module_list, module_call=module_call, module_read=module_read, op_list=op_list)
 
@@ -340,6 +366,17 @@ def _op_cli(app: str, o: dict) -> str:
     return f"foxos {app} {o['resource']} {o['verb']}"
 
 
+def _op_example(app: str, o: dict) -> str:
+    import shlex
+    parts = [_op_cli(app, o)]
+    for p in o.get("params", []):
+        if p.get("required") and p.get("positional"):
+            ex = (o.get("ui") or {}).get("examples") or []
+            v = ex[0] if p["name"] == "target" and ex else (p.get("enum") or ["示例"])[0]
+            parts.append(shlex.quote(str(v)))
+    return " ".join(parts) + " --json"
+
+
 def _subst(v, values: dict):
     if isinstance(v, str):
         m = re.fullmatch(r"\{\{(\w+)\}\}", v)
@@ -356,7 +393,8 @@ def _subst(v, values: dict):
 def _op_handler(app: str, op: dict):
     def handler(ctx, **values):
         b = op["binding"]
-        steps = _subst(b.get("steps", []), values)
+        raw = [s for s in b.get("steps", []) if not s.get("press_if") or values.get(s["press_if"])]
+        steps = _subst([{k: v for k, v in s.items() if k != "press_if"} for s in raw], values)
         if b.get("open"):
             _ensure_installed(app)
         results = _bridge(ctx, app, "run", {"steps": steps}, mutate=op.get("permission", "modify") != "read")
@@ -373,12 +411,13 @@ GENERIC = [
     ("app open", "打开应用（桌面窗口；--headless 用无界面实例）", "app_open", [Param("file", "string", "同时打开工作空间中的文件", path="read"), Param("headless", "boolean", "不显示窗口")], "run"),
     ("app close", "关闭应用实例", "app_close", [], "run"),
     ("app status", "应用是否已安装、是否在运行", "app_status", [], "read"),
+    ("app reset", "重置应用：关闭实例并清空本工作空间下的应用数据（AppData/<应用> 与浏览器存储）", "app_reset", [], "delete"),
     ("file open", "在应用中打开工作空间里的文件（与在文件管理器里双击相同）", "file_open", [Param("path", "string", "文件路径", required=True, positional=True, path="read", metavar="PATH")], "run"),
     ("ui snapshot", "界面可访问性快照：可交互元素及其引用（ref）、角色、名称、值", "ui_snapshot", [Param("all", "boolean", "包括不可见元素"), Param("limit", "integer", "最多返回元素数", default=400)], "read"),
     ("ui text", "读取界面上的可见文本", "ui_text", [], "read"),
-    ("ui click", "点击控件（按 ref 或名称），与人点击相同", "ui_click", [Param("ref", "string", "snapshot 返回的元素引用"), Param("name", "string", "按可访问名称查找"), Param("role", "string", "限定角色，如 button")], "modify"),
+    ("ui click", "点击控件（按 ref 或名称），与人点击相同", "ui_click", [Param("ref", "string", "snapshot 返回的元素引用"), Param("name", "string", "按可访问名称查找"), Param("role", "string", "限定角色，如 button"), Param("force", "boolean", "控件被弹窗挡住时也强制点击")], "modify"),
     ("ui type", "向控件输入文本（真实输入事件）", "ui_type", [Param("text", "string", "要输入的文本", required=True, positional=True, metavar="TEXT"), Param("ref", "string", "元素引用，缺省为当前焦点"), Param("clear", "boolean", "先清空")], "modify"),
-    ("ui set", "设置输入框 / 下拉框 / 复选框的值", "ui_set", [Param("ref", "string", "元素引用", required=True), Param("value", "string", "值", required=True)], "modify"),
+    ("ui set", "设置输入框 / 下拉框 / 复选框的值", "ui_set", [Param("ref", "string", "元素引用", required=True), Param("value", "string", "值", required=True), Param("force", "boolean", "控件被挡住时也强制设置")], "modify"),
     ("ui press", "按键或快捷键（如 Enter、ctrl+z、mod+s）", "ui_press", [Param("key", "string", "按键", required=True, positional=True, metavar="KEY"), Param("ref", "string", "先聚焦的元素引用")], "modify"),
     ("ui screenshot", "应用窗口截图（PNG）", "ui_screenshot", [Param("out", "string", "保存到工作空间路径", path="write")], "read"),
     ("data list", "列出应用保存的数据键（工作空间 AppData/<应用>/kv.json）", "data_list", [Param("pattern", "string", "通配符", default="*", positional=True, metavar="PATTERN")], "read"),
@@ -417,7 +456,7 @@ def register_everything_apps() -> None:
             ui = o.get("ui") or {}
             register(Command(app, verb, o["summary"], _op_handler(app, o), params=params,
                              description=f"界面：{ui.get('path', '')}" + (f"；快捷键 {ui['shortcut']}" if ui.get("shortcut") else "") + f"。效果：{o.get('effect', '')}",
-                             examples=o.get("examples") or [_op_cli(app, o) + " --json"], permission=o.get("permission", "modify")))
+                             examples=o.get("examples") or [_op_example(app, o)], permission=o.get("permission", "modify")))
 
 
 register_everything_apps()

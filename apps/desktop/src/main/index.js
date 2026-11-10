@@ -69,7 +69,7 @@ function createWindow() {
 app.on('web-contents-created', (_e, contents) => {
   contents.on('will-attach-webview', (_ev, webPreferences, params) => {
     delete webPreferences.preload;
-    const evApp = /^persist:ev-([a-z0-9-]+)$/.exec(params.partition || '');
+    const evApp = /^persist:ev-([a-z0-9]+(?:-[a-z0-9]+)*)--[0-9a-f]{8}$/.exec(params.partition || '');
     if (evApp) { everything.setupSession(evApp[1]); webPreferences.preload = everything.PRELOAD; }
     webPreferences.nodeIntegration = false;
     webPreferences.contextIsolation = true;
@@ -126,6 +126,7 @@ async function controlHandler(msg) {
     return everything.status(appId);
   }
   if (op === 'ev.close') return { closed: everything.close(appId) };
+  if (op === 'ev.reset') return everything.reset(appId);
   if (op === 'ev.bridge') return everything.bridge(appId, params.method, params.args || {});
   if (op === 'ev.reloadData') { everything.kvInvalidate(appId); const inst = everything.instances.get(appId); if (inst) { inst.wc.reload(); await everything.waitReady(inst.wc); } return everything.status(appId); }
   throw Object.assign(new Error(`未知操作 ${op}`), { code: 'USAGE' });
@@ -153,7 +154,7 @@ const conns = new Map();
 const permWaiters = new Map();
 let nextConn = 1;
 let nextPerm = 1;
-handle('acp:start', async (agentId) => {
+handle('acp:start', async (agentId, opts = {}) => {
   const info = agents.installedInfo(agentId);
   if (!info) throw new Error(`未安装：${agentId}`);
   const connId = nextConn++;
@@ -166,7 +167,7 @@ handle('acp:start', async (agentId) => {
     }),
   });
   conns.set(connId, c);
-  c.start();
+  try { await c.start(opts.env || null); } catch (e) { conns.delete(connId); c.stop(); throw e; }
   const init = await c.initialize();
   return { connId, init, identity: c.identity };
 });

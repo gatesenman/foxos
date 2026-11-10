@@ -1,0 +1,1536 @@
+{
+ "app": "accounting",
+ "name": "Accounting",
+ "generated_by": "scripts/inventory_ops.py",
+ "commit": "0fbb88cdee2f54c94a9d2c975f43322888813c5d",
+ "title": "Accounting",
+ "ops": [
+  {
+   "id": "account-menu.select",
+   "resource": "account-menu",
+   "verb": "select",
+   "summary": "account menu for *（1 项，如 Account menu for local）",
+   "source": "ui-collection",
+   "ui": {
+    "path": "主界面 > account menu for *",
+    "role": "button",
+    "region": null,
+    "view": "主界面",
+    "examples": [
+     "Account menu for local"
+    ]
+   },
+   "params": [
+    {
+     "name": "target",
+     "type": "string",
+     "description": "要操作的项的名称（或其一部分），如 'Account menu for local'",
+     "required": true,
+     "positional": true
+    }
+   ],
+   "effect": "点击名称匹配的「account menu for *」项（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "{{target}}",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "company-name.select",
+   "resource": "company-name",
+   "verb": "select",
+   "summary": "company name *（1 项，如 Company name *）",
+   "source": "ui-collection",
+   "ui": {
+    "path": "主界面 > dialog > company name *",
+    "role": "textbox",
+    "region": "dialog",
+    "view": "主界面",
+    "examples": [
+     "Company name *"
+    ]
+   },
+   "params": [
+    {
+     "name": "target",
+     "type": "string",
+     "description": "要操作的项的名称（或其一部分），如 'Company name *'",
+     "required": true,
+     "positional": true
+    }
+   ],
+   "effect": "点击名称匹配的「company name *」项（textbox）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "{{target}}",
+       "role": "textbox"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "content.dismiss",
+   "resource": "content",
+   "verb": "dismiss",
+   "summary": "Skip to content",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Skip to content",
+    "role": "link",
+    "name": "Skip to content",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Skip to content」（link）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Skip to content",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "home.show",
+   "resource": "home",
+   "verb": "show",
+   "summary": "Home",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Home",
+    "role": "link",
+    "name": "Home",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Home」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Home",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "create.create",
+   "resource": "create",
+   "verb": "create",
+   "summary": "Create",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Primary > Create",
+    "role": "button",
+    "name": "Create",
+    "region": "Primary",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Create」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Create",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "home-2.show",
+   "resource": "home-2",
+   "verb": "show",
+   "summary": "Home",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Primary > Home",
+    "role": "link",
+    "name": "Home",
+    "region": "Primary",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Home」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Home",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "banking.show",
+   "resource": "banking",
+   "verb": "show",
+   "summary": "Banking",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Primary > Banking",
+    "role": "link",
+    "name": "Banking",
+    "region": "Primary",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Banking」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Banking",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "sales.show",
+   "resource": "sales",
+   "verb": "show",
+   "summary": "Sales",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Primary > Sales",
+    "role": "link",
+    "name": "Sales",
+    "region": "Primary",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Sales」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Sales",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "purchases.show",
+   "resource": "purchases",
+   "verb": "show",
+   "summary": "Purchases",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Primary > Purchases",
+    "role": "link",
+    "name": "Purchases",
+    "region": "Primary",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Purchases」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Purchases",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "reports.show",
+   "resource": "reports",
+   "verb": "show",
+   "summary": "Reports",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Primary > Reports",
+    "role": "link",
+    "name": "Reports",
+    "region": "Primary",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Reports」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Reports",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "menu.show",
+   "resource": "menu",
+   "verb": "show",
+   "summary": "Menu",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Primary > Menu",
+    "role": "button",
+    "name": "Menu",
+    "region": "Primary",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Menu」（button），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Menu",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "settings.show",
+   "resource": "settings",
+   "verb": "show",
+   "summary": "Settings",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Primary > Settings",
+    "role": "link",
+    "name": "Settings",
+    "region": "Primary",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Settings」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Settings",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "navigation.open",
+   "resource": "navigation",
+   "verb": "open",
+   "summary": "Open navigation",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Open navigation",
+    "role": "button",
+    "name": "Open navigation",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Open navigation」（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Open navigation",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "search.set",
+   "resource": "search",
+   "verb": "set",
+   "summary": "Search",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Search",
+    "role": "combobox",
+    "name": "Search",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [
+    {
+     "name": "value",
+     "type": "string",
+     "description": "「Search」的新值",
+     "required": true,
+     "positional": true
+    },
+    {
+     "name": "submit",
+     "type": "boolean",
+     "description": "设置后按 Enter 提交",
+     "default": false
+    }
+   ],
+   "effect": "把「Search」设为给定值（触发 input / change 事件）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "set": {
+       "name": "Search",
+       "role": "combobox",
+       "value": "{{value}}"
+      }
+     },
+     {
+      "press_if": "submit",
+      "press": {
+       "key": "Enter",
+       "name": "Search",
+       "role": "combobox"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "keyboard-shortcuts.activate",
+   "resource": "keyboard-shortcuts",
+   "verb": "activate",
+   "summary": "Keyboard shortcuts",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Keyboard shortcuts",
+    "role": "button",
+    "name": "Keyboard shortcuts",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Keyboard shortcuts」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Keyboard shortcuts",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "settings-2.show",
+   "resource": "settings-2",
+   "verb": "show",
+   "summary": "Settings",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Settings",
+    "role": "link",
+    "name": "Settings",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Settings」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Settings",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "panel.collapse",
+   "resource": "panel",
+   "verb": "collapse",
+   "summary": "Collapse panel",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Collapse panel",
+    "role": "button",
+    "name": "Collapse panel",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Collapse panel」（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Collapse panel",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "accounting.activate",
+   "resource": "accounting",
+   "verb": "activate",
+   "summary": "Accounting",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Sections > Accounting",
+    "role": "button",
+    "name": "Accounting",
+    "region": "Sections",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Accounting」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Accounting",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "purchases.activate",
+   "resource": "purchases",
+   "verb": "activate",
+   "summary": "Purchases",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Sections > Purchases",
+    "role": "button",
+    "name": "Purchases",
+    "region": "Sections",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Purchases」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Purchases",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "sales.activate",
+   "resource": "sales",
+   "verb": "activate",
+   "summary": "Sales",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Sections > Sales",
+    "role": "button",
+    "name": "Sales",
+    "region": "Sections",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Sales」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Sales",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "sales-tax.activate",
+   "resource": "sales-tax",
+   "verb": "activate",
+   "summary": "Sales Tax",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Sections > Sales Tax",
+    "role": "button",
+    "name": "Sales Tax",
+    "region": "Sections",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Sales Tax」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Sales Tax",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "reports.activate",
+   "resource": "reports",
+   "verb": "activate",
+   "summary": "Reports",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Sections > Reports",
+    "role": "button",
+    "name": "Reports",
+    "region": "Sections",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Reports」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Reports",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "puter.show",
+   "resource": "puter",
+   "verb": "show",
+   "summary": "Puter",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Sections > Puter",
+    "role": "link",
+    "name": "Puter",
+    "region": "Sections",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Puter」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Puter",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "privacy.activate",
+   "resource": "privacy",
+   "verb": "activate",
+   "summary": "Privacy",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > main > Privacy",
+    "role": "button",
+    "name": "Privacy",
+    "region": "main",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Privacy」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Privacy",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "invoice.create",
+   "resource": "invoice",
+   "verb": "create",
+   "summary": "Create invoice",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > main > Create invoice",
+    "role": "button",
+    "name": "Create invoice",
+    "region": "main",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Create invoice」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Create invoice",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "payment.record",
+   "resource": "payment",
+   "verb": "record",
+   "summary": "Record payment",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > main > Record payment",
+    "role": "button",
+    "name": "Record payment",
+    "region": "main",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Record payment」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Record payment",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "expense.record",
+   "resource": "expense",
+   "verb": "record",
+   "summary": "Record expense",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > main > Record expense",
+    "role": "button",
+    "name": "Record expense",
+    "region": "main",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Record expense」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Record expense",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "enter-bill.activate",
+   "resource": "enter-bill",
+   "verb": "activate",
+   "summary": "Enter bill",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > main > Enter bill",
+    "role": "button",
+    "name": "Enter bill",
+    "region": "main",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Enter bill」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Enter bill",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "pay-bills.activate",
+   "resource": "pay-bills",
+   "verb": "activate",
+   "summary": "Pay bills",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > main > Pay bills",
+    "role": "button",
+    "name": "Pay bills",
+    "region": "main",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Pay bills」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Pay bills",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "deposit.record",
+   "resource": "deposit",
+   "verb": "record",
+   "summary": "Record deposit",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > main > Record deposit",
+    "role": "button",
+    "name": "Record deposit",
+    "region": "main",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Record deposit」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Record deposit",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "write-check.activate",
+   "resource": "write-check",
+   "verb": "activate",
+   "summary": "Write check",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > main > Write check",
+    "role": "button",
+    "name": "Write check",
+    "region": "main",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Write check」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Write check",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "bank-statement.import",
+   "resource": "bank-statement",
+   "verb": "import",
+   "summary": "Upload bank statement",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > main > Upload bank statement",
+    "role": "button",
+    "name": "Upload bank statement",
+    "region": "main",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Upload bank statement」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Upload bank statement",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "period.set",
+   "resource": "period",
+   "verb": "set",
+   "summary": "Period",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Period",
+    "role": "combobox",
+    "name": "Period",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [
+    {
+     "name": "value",
+     "type": "string",
+     "description": "「Period」的新值",
+     "required": true,
+     "positional": true,
+     "enum": [
+      "thisMonth",
+      "lastMonth",
+      "thisQuarter",
+      "lastQuarter",
+      "thisYearToDate",
+      "last365"
+     ]
+    },
+    {
+     "name": "submit",
+     "type": "boolean",
+     "description": "设置后按 Enter 提交",
+     "default": false
+    }
+   ],
+   "effect": "把「Period」设为给定值（触发 input / change 事件）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "set": {
+       "name": "Period",
+       "role": "combobox",
+       "value": "{{value}}"
+      }
+     },
+     {
+      "press_if": "submit",
+      "press": {
+       "key": "Enter",
+       "name": "Period",
+       "role": "combobox"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "report.show",
+   "resource": "report",
+   "verb": "show",
+   "summary": "View report",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Profit and loss > View report",
+    "role": "link",
+    "name": "View report",
+    "region": "Profit and loss",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「View report」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "View report",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "overdue.show",
+   "resource": "overdue",
+   "verb": "show",
+   "summary": "Overdue",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Invoices > Overdue",
+    "role": "link",
+    "name": "Overdue",
+    "region": "Invoices",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Overdue」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Overdue",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "not-due-yet.show",
+   "resource": "not-due-yet",
+   "verb": "show",
+   "summary": "Not due yet",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Invoices > Not due yet",
+    "role": "link",
+    "name": "Not due yet",
+    "region": "Invoices",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Not due yet」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Not due yet",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "paid.show",
+   "resource": "paid",
+   "verb": "show",
+   "summary": "Paid",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Invoices > Paid",
+    "role": "link",
+    "name": "Paid",
+    "region": "Invoices",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Paid」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Paid",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "go-banking.show",
+   "resource": "go-banking",
+   "verb": "show",
+   "summary": "Go to banking",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Bank accounts > Go to banking",
+    "role": "link",
+    "name": "Go to banking",
+    "region": "Bank accounts",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Go to banking」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Go to banking",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "as-table.show",
+   "resource": "as-table",
+   "verb": "show",
+   "summary": "View as table",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Income and expenses > View as table",
+    "role": "button",
+    "name": "View as table",
+    "region": "Income and expenses",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「View as table」（button），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "View as table",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "close.close",
+   "resource": "close",
+   "verb": "close",
+   "summary": "Close",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Close",
+    "role": "button",
+    "name": "Close",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Close」（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Close",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "home-currency.set",
+   "resource": "home-currency",
+   "verb": "set",
+   "summary": "Home currency",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > dialog > Home currency",
+    "role": "combobox",
+    "name": "Home currency",
+    "region": "dialog",
+    "view": "主界面"
+   },
+   "params": [
+    {
+     "name": "value",
+     "type": "string",
+     "description": "「Home currency」的新值",
+     "required": true,
+     "positional": true,
+     "enum": [
+      "USD",
+      "CAD",
+      "EUR",
+      "GBP",
+      "AUD",
+      "NZD",
+      "JPY",
+      "CHF",
+      "INR",
+      "SGD",
+      "ZAR",
+      "MXN",
+      "BRL"
+     ]
+    },
+    {
+     "name": "submit",
+     "type": "boolean",
+     "description": "设置后按 Enter 提交",
+     "default": false
+    }
+   ],
+   "effect": "把「Home currency」设为给定值（触发 input / change 事件）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "set": {
+       "name": "Home currency",
+       "role": "combobox",
+       "value": "{{value}}"
+      }
+     },
+     {
+      "press_if": "submit",
+      "press": {
+       "key": "Enter",
+       "name": "Home currency",
+       "role": "combobox"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "fiscal-year-starts.set",
+   "resource": "fiscal-year-starts",
+   "verb": "set",
+   "summary": "Fiscal year starts in",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > dialog > Fiscal year starts in",
+    "role": "combobox",
+    "name": "Fiscal year starts in",
+    "region": "dialog",
+    "view": "主界面"
+   },
+   "params": [
+    {
+     "name": "value",
+     "type": "string",
+     "description": "「Fiscal year starts in」的新值",
+     "required": true,
+     "positional": true,
+     "enum": [
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6",
+      "7",
+      "8",
+      "9",
+      "10",
+      "11",
+      "12"
+     ]
+    },
+    {
+     "name": "submit",
+     "type": "boolean",
+     "description": "设置后按 Enter 提交",
+     "default": false
+    }
+   ],
+   "effect": "把「Fiscal year starts in」设为给定值（触发 input / change 事件）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "set": {
+       "name": "Fiscal year starts in",
+       "role": "combobox",
+       "value": "{{value}}"
+      }
+     },
+     {
+      "press_if": "submit",
+      "press": {
+       "key": "Enter",
+       "name": "Fiscal year starts in",
+       "role": "combobox"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "date-format.set",
+   "resource": "date-format",
+   "verb": "set",
+   "summary": "Date format",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > dialog > Date format",
+    "role": "combobox",
+    "name": "Date format",
+    "region": "dialog",
+    "view": "主界面"
+   },
+   "params": [
+    {
+     "name": "value",
+     "type": "string",
+     "description": "「Date format」的新值",
+     "required": true,
+     "positional": true,
+     "enum": [
+      "mdy",
+      "dmy",
+      "ymd"
+     ]
+    },
+    {
+     "name": "submit",
+     "type": "boolean",
+     "description": "设置后按 Enter 提交",
+     "default": false
+    }
+   ],
+   "effect": "把「Date format」设为给定值（触发 input / change 事件）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "set": {
+       "name": "Date format",
+       "role": "combobox",
+       "value": "{{value}}"
+      }
+     },
+     {
+      "press_if": "submit",
+      "press": {
+       "key": "Enter",
+       "name": "Date format",
+       "role": "combobox"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "start-sample-company-explore.toggle",
+   "resource": "start-sample-company-explore",
+   "verb": "toggle",
+   "summary": "Start with a sample company to explore",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > dialog > Start with a sample company to explore",
+    "role": "checkbox",
+    "name": "Start with a sample company to explore",
+    "region": "dialog",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "切换「Start with a sample company to explore」",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Start with a sample company to explore",
+       "role": "checkbox"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "books.create",
+   "resource": "books",
+   "verb": "create",
+   "summary": "Create my books",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > dialog > Create my books",
+    "role": "button",
+    "name": "Create my books",
+    "region": "dialog",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Create my books」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Create my books",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  }
+ ]
+}

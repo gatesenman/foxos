@@ -1,0 +1,439 @@
+{
+ "app": "contracts",
+ "name": "Contracts",
+ "generated_by": "scripts/inventory_ops.py",
+ "commit": "0fbb88cdee2f54c94a9d2c975f43322888813c5d",
+ "title": "Contract Manager",
+ "ops": [
+  {
+   "id": "skip.dismiss",
+   "resource": "skip",
+   "verb": "dismiss",
+   "summary": "skip for *（1 项，如 Skip for now）",
+   "source": "ui-collection",
+   "ui": {
+    "path": "主界面 > Welcome > skip for *",
+    "role": "button",
+    "region": "Welcome",
+    "view": "主界面",
+    "examples": [
+     "Skip for now"
+    ]
+   },
+   "params": [
+    {
+     "name": "target",
+     "type": "string",
+     "description": "要操作的项的名称（或其一部分），如 'Skip for now'",
+     "required": true,
+     "positional": true
+    }
+   ],
+   "effect": "点击名称匹配的「skip for *」项（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "{{target}}",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "content.dismiss",
+   "resource": "content",
+   "verb": "dismiss",
+   "summary": "Skip to content",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Skip to content",
+    "role": "button",
+    "name": "Skip to content",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Skip to content」（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Skip to content",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "home.show",
+   "resource": "home",
+   "verb": "show",
+   "summary": "Home",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Main navigation > Home",
+    "role": "link",
+    "name": "Home",
+    "region": "Main navigation",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Home」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Home",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "contracts.show",
+   "resource": "contracts",
+   "verb": "show",
+   "summary": "Contracts",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Main navigation > Contracts",
+    "role": "link",
+    "name": "Contracts",
+    "region": "Main navigation",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Contracts」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Contracts",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "renewals.show",
+   "resource": "renewals",
+   "verb": "show",
+   "summary": "Renewals",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Main navigation > Renewals",
+    "role": "link",
+    "name": "Renewals",
+    "region": "Main navigation",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Renewals」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Renewals",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "obligations.show",
+   "resource": "obligations",
+   "verb": "show",
+   "summary": "Obligations",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Main navigation > Obligations",
+    "role": "link",
+    "name": "Obligations",
+    "region": "Main navigation",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Obligations」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Obligations",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "contacts.show",
+   "resource": "contacts",
+   "verb": "show",
+   "summary": "Contacts",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Main navigation > Contacts",
+    "role": "link",
+    "name": "Contacts",
+    "region": "Main navigation",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Contacts」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Contacts",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "settings.show",
+   "resource": "settings",
+   "verb": "show",
+   "summary": "Settings",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Main navigation > Settings",
+    "role": "link",
+    "name": "Settings",
+    "region": "Main navigation",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Settings」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Settings",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "contract.create",
+   "resource": "contract",
+   "verb": "create",
+   "summary": "New contract",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Main navigation > New contract",
+    "role": "button",
+    "name": "New contract",
+    "region": "Main navigation",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「New contract」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "New contract",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "contract-2.create",
+   "resource": "contract-2",
+   "verb": "create",
+   "summary": "New contract",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > main > New contract",
+    "role": "button",
+    "name": "New contract",
+    "region": "main",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「New contract」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "New contract",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "contract-3.create",
+   "resource": "contract-3",
+   "verb": "create",
+   "summary": "Add a contract",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > main > Add a contract",
+    "role": "button",
+    "name": "Add a contract",
+    "region": "main",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Add a contract」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Add a contract",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "close.close",
+   "resource": "close",
+   "verb": "close",
+   "summary": "Close",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Close",
+    "role": "button",
+    "name": "Close",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Close」（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Close",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "first-contract.create",
+   "resource": "first-contract",
+   "verb": "create",
+   "summary": "Add my first contract",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Welcome > Add my first contract",
+    "role": "button",
+    "name": "Add my first contract",
+    "region": "Welcome",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Add my first contract」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Add my first contract",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "explore-sample-data.activate",
+   "resource": "explore-sample-data",
+   "verb": "activate",
+   "summary": "Explore with sample data",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Welcome > Explore with sample data",
+    "role": "button",
+    "name": "Explore with sample data",
+    "region": "Welcome",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Explore with sample data」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Explore with sample data",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  }
+ ]
+}

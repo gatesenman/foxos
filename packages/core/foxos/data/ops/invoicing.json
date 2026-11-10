@@ -1,0 +1,619 @@
+{
+ "app": "invoicing",
+ "name": "Invoicing",
+ "generated_by": "scripts/inventory_ops.py",
+ "commit": "0fbb88cdee2f54c94a9d2c975f43322888813c5d",
+ "title": "Invoicing & Estimates",
+ "ops": [
+  {
+   "id": "skip.dismiss",
+   "resource": "skip",
+   "verb": "dismiss",
+   "summary": "skip for *（1 项，如 Skip for now）",
+   "source": "ui-collection",
+   "ui": {
+    "path": "主界面 > Welcome > skip for *",
+    "role": "button",
+    "region": "Welcome",
+    "view": "主界面",
+    "examples": [
+     "Skip for now"
+    ]
+   },
+   "params": [
+    {
+     "name": "target",
+     "type": "string",
+     "description": "要操作的项的名称（或其一部分），如 'Skip for now'",
+     "required": true,
+     "positional": true
+    }
+   ],
+   "effect": "点击名称匹配的「skip for *」项（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "{{target}}",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "content.dismiss",
+   "resource": "content",
+   "verb": "dismiss",
+   "summary": "Skip to content",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Skip to content",
+    "role": "link",
+    "name": "Skip to content",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Skip to content」（link）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Skip to content",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "switch-dark-theme.activate",
+   "resource": "switch-dark-theme",
+   "verb": "activate",
+   "summary": "Switch to dark theme",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Switch to dark theme",
+    "role": "button",
+    "name": "Switch to dark theme",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Switch to dark theme」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Switch to dark theme",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "home.show",
+   "resource": "home",
+   "verb": "show",
+   "summary": "Home",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Main navigation > Home",
+    "role": "link",
+    "name": "Home",
+    "region": "Main navigation",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Home」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Home",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "invoices.show",
+   "resource": "invoices",
+   "verb": "show",
+   "summary": "Invoices",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Main navigation > Invoices",
+    "role": "link",
+    "name": "Invoices",
+    "region": "Main navigation",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Invoices」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Invoices",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "estimates.show",
+   "resource": "estimates",
+   "verb": "show",
+   "summary": "Estimates",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Main navigation > Estimates",
+    "role": "link",
+    "name": "Estimates",
+    "region": "Main navigation",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Estimates」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Estimates",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "recurring.show",
+   "resource": "recurring",
+   "verb": "show",
+   "summary": "Recurring",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Main navigation > Recurring",
+    "role": "link",
+    "name": "Recurring",
+    "region": "Main navigation",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Recurring」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Recurring",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "clients.show",
+   "resource": "clients",
+   "verb": "show",
+   "summary": "Clients",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Main navigation > Clients",
+    "role": "link",
+    "name": "Clients",
+    "region": "Main navigation",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Clients」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Clients",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "receipts.show",
+   "resource": "receipts",
+   "verb": "show",
+   "summary": "Receipts",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Main navigation > Receipts",
+    "role": "link",
+    "name": "Receipts",
+    "region": "Main navigation",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Receipts」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Receipts",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "saved-items.show",
+   "resource": "saved-items",
+   "verb": "show",
+   "summary": "Saved items",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Main navigation > Saved items",
+    "role": "link",
+    "name": "Saved items",
+    "region": "Main navigation",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Saved items」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Saved items",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "reports.show",
+   "resource": "reports",
+   "verb": "show",
+   "summary": "Reports",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Main navigation > Reports",
+    "role": "link",
+    "name": "Reports",
+    "region": "Main navigation",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Reports」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Reports",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "trash.delete",
+   "resource": "trash",
+   "verb": "delete",
+   "summary": "Trash",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Main navigation > Trash",
+    "role": "link",
+    "name": "Trash",
+    "region": "Main navigation",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Trash」（link）",
+   "permission": "delete",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Trash",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "invoice.create",
+   "resource": "invoice",
+   "verb": "create",
+   "summary": "New invoice",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Main navigation > New invoice",
+    "role": "button",
+    "name": "New invoice",
+    "region": "Main navigation",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「New invoice」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "New invoice",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "estimate.create",
+   "resource": "estimate",
+   "verb": "create",
+   "summary": "New estimate",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Main navigation > New estimate",
+    "role": "button",
+    "name": "New estimate",
+    "region": "Main navigation",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「New estimate」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "New estimate",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "settings.show",
+   "resource": "settings",
+   "verb": "show",
+   "summary": "Settings",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Main navigation > Settings",
+    "role": "link",
+    "name": "Settings",
+    "region": "Main navigation",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Settings」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Settings",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "invoice-2.create",
+   "resource": "invoice-2",
+   "verb": "create",
+   "summary": "New invoice",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > main > New invoice",
+    "role": "button",
+    "name": "New invoice",
+    "region": "main",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「New invoice」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "New invoice",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "estimate-2.create",
+   "resource": "estimate-2",
+   "verb": "create",
+   "summary": "New estimate",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > main > New estimate",
+    "role": "button",
+    "name": "New estimate",
+    "region": "main",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「New estimate」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "New estimate",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "close.close",
+   "resource": "close",
+   "verb": "close",
+   "summary": "Close",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Close",
+    "role": "button",
+    "name": "Close",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Close」（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Close",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "set-up-business.activate",
+   "resource": "set-up-business",
+   "verb": "activate",
+   "summary": "Set up my business",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Welcome > Set up my business",
+    "role": "button",
+    "name": "Set up my business",
+    "region": "Welcome",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Set up my business」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Set up my business",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "explore-sample-data.activate",
+   "resource": "explore-sample-data",
+   "verb": "activate",
+   "summary": "Explore with sample data",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Welcome > Explore with sample data",
+    "role": "button",
+    "name": "Explore with sample data",
+    "region": "Welcome",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Explore with sample data」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Explore with sample data",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  }
+ ]
+}

@@ -1,0 +1,569 @@
+{
+ "app": "expense",
+ "name": "Expenses",
+ "generated_by": "scripts/inventory_ops.py",
+ "commit": "0fbb88cdee2f54c94a9d2c975f43322888813c5d",
+ "title": "Expenses",
+ "ops": [
+  {
+   "id": "month-nothing-last-month.select",
+   "resource": "month-nothing-last-month",
+   "verb": "select",
+   "summary": "this month$# nothing last month（1 项，如 This month$0.00vs. nothing last month）",
+   "source": "ui-collection",
+   "ui": {
+    "path": "主界面 > main > this month$# nothing last month",
+    "role": "button",
+    "region": "main",
+    "view": "主界面",
+    "examples": [
+     "This month$0.00vs. nothing last month"
+    ]
+   },
+   "params": [
+    {
+     "name": "target",
+     "type": "string",
+     "description": "要操作的项的名称（或其一部分），如 'This month$0.00vs. nothing last month'",
+     "required": true,
+     "positional": true
+    }
+   ],
+   "effect": "点击名称匹配的「this month$# nothing last month」项（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "{{target}}",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "not-report-expenses.select",
+   "resource": "not-report-expenses",
+   "verb": "select",
+   "summary": "not in a report$# expenses（1 项，如 Not in a report$0.000 expenses）",
+   "source": "ui-collection",
+   "ui": {
+    "path": "主界面 > main > not in a report$# expenses",
+    "role": "button",
+    "region": "main",
+    "view": "主界面",
+    "examples": [
+     "Not in a report$0.000 expenses"
+    ]
+   },
+   "params": [
+    {
+     "name": "target",
+     "type": "string",
+     "description": "要操作的项的名称（或其一部分），如 'Not in a report$0.000 expenses'",
+     "required": true,
+     "positional": true
+    }
+   ],
+   "effect": "点击名称匹配的「not in a report$# expenses」项（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "{{target}}",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "awaiting-reimbursement-expenses-flight.select",
+   "resource": "awaiting-reimbursement-expenses-flight",
+   "verb": "select",
+   "summary": "awaiting reimbursement$# expenses in flight（1 项，如 Awaiting reimbursement$0.000 expenses in flight）",
+   "source": "ui-collection",
+   "ui": {
+    "path": "主界面 > main > awaiting reimbursement$# expenses in flight",
+    "role": "button",
+    "region": "main",
+    "view": "主界面",
+    "examples": [
+     "Awaiting reimbursement$0.000 expenses in flight"
+    ]
+   },
+   "params": [
+    {
+     "name": "target",
+     "type": "string",
+     "description": "要操作的项的名称（或其一部分），如 'Awaiting reimbursement$0.000 expenses in flight'",
+     "required": true,
+     "positional": true
+    }
+   ],
+   "effect": "点击名称匹配的「awaiting reimbursement$# expenses in flight」项（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "{{target}}",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "lines-open.select",
+   "resource": "lines-open",
+   "verb": "select",
+   "summary": "to # lines open（1 项，如 To reconcile0statement lines open）",
+   "source": "ui-collection",
+   "ui": {
+    "path": "主界面 > main > to # lines open",
+    "role": "button",
+    "region": "main",
+    "view": "主界面",
+    "examples": [
+     "To reconcile0statement lines open"
+    ]
+   },
+   "params": [
+    {
+     "name": "target",
+     "type": "string",
+     "description": "要操作的项的名称（或其一部分），如 'To reconcile0statement lines open'",
+     "required": true,
+     "positional": true
+    }
+   ],
+   "effect": "点击名称匹配的「to # lines open」项（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "{{target}}",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "skip.dismiss",
+   "resource": "skip",
+   "verb": "dismiss",
+   "summary": "skip for *（1 项，如 Skip for now）",
+   "source": "ui-collection",
+   "ui": {
+    "path": "主界面 > Welcome > skip for *",
+    "role": "button",
+    "region": "Welcome",
+    "view": "主界面",
+    "examples": [
+     "Skip for now"
+    ]
+   },
+   "params": [
+    {
+     "name": "target",
+     "type": "string",
+     "description": "要操作的项的名称（或其一部分），如 'Skip for now'",
+     "required": true,
+     "positional": true
+    }
+   ],
+   "effect": "点击名称匹配的「skip for *」项（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "{{target}}",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "content.dismiss",
+   "resource": "content",
+   "verb": "dismiss",
+   "summary": "Skip to content",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Skip to content",
+    "role": "link",
+    "name": "Skip to content",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Skip to content」（link）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Skip to content",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "home.show",
+   "resource": "home",
+   "verb": "show",
+   "summary": "Home",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Main navigation > Home",
+    "role": "link",
+    "name": "Home",
+    "region": "Main navigation",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Home」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Home",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "expenses.show",
+   "resource": "expenses",
+   "verb": "show",
+   "summary": "Expenses",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Main navigation > Expenses",
+    "role": "link",
+    "name": "Expenses",
+    "region": "Main navigation",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Expenses」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Expenses",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "reports.show",
+   "resource": "reports",
+   "verb": "show",
+   "summary": "Reports",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Main navigation > Reports",
+    "role": "link",
+    "name": "Reports",
+    "region": "Main navigation",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Reports」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Reports",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "reconcile.show",
+   "resource": "reconcile",
+   "verb": "show",
+   "summary": "Reconcile",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Main navigation > Reconcile",
+    "role": "link",
+    "name": "Reconcile",
+    "region": "Main navigation",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Reconcile」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Reconcile",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "settings.show",
+   "resource": "settings",
+   "verb": "show",
+   "summary": "Settings",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Main navigation > Settings",
+    "role": "link",
+    "name": "Settings",
+    "region": "Main navigation",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Settings」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Settings",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "capture-receipt.activate",
+   "resource": "capture-receipt",
+   "verb": "activate",
+   "summary": "Capture receipt",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Main navigation > Capture receipt",
+    "role": "button",
+    "name": "Capture receipt",
+    "region": "Main navigation",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Capture receipt」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Capture receipt",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "manual-entry.activate",
+   "resource": "manual-entry",
+   "verb": "activate",
+   "summary": "Manual entry",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > main > Manual entry",
+    "role": "button",
+    "name": "Manual entry",
+    "region": "main",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Manual entry」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Manual entry",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "capture-receipt-2.activate",
+   "resource": "capture-receipt-2",
+   "verb": "activate",
+   "summary": "Capture receipt",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > main > Capture receipt",
+    "role": "button",
+    "name": "Capture receipt",
+    "region": "main",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Capture receipt」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Capture receipt",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "close.close",
+   "resource": "close",
+   "verb": "close",
+   "summary": "Close",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Close",
+    "role": "button",
+    "name": "Close",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Close」（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Close",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "set-up-expenses.activate",
+   "resource": "set-up-expenses",
+   "verb": "activate",
+   "summary": "Set up my expenses",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Welcome > Set up my expenses",
+    "role": "button",
+    "name": "Set up my expenses",
+    "region": "Welcome",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Set up my expenses」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Set up my expenses",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "explore-sample-data.activate",
+   "resource": "explore-sample-data",
+   "verb": "activate",
+   "summary": "Explore with sample data",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Welcome > Explore with sample data",
+    "role": "button",
+    "name": "Explore with sample data",
+    "region": "Welcome",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Explore with sample data」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Explore with sample data",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  }
+ ]
+}

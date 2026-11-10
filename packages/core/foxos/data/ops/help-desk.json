@@ -1,0 +1,235 @@
+{
+ "app": "help-desk",
+ "name": "Help Desk",
+ "generated_by": "scripts/inventory_ops.py",
+ "commit": "0fbb88cdee2f54c94a9d2c975f43322888813c5d",
+ "title": "Help Desk",
+ "ops": [
+  {
+   "id": "help-desk-name.set",
+   "resource": "help-desk-name",
+   "verb": "set",
+   "summary": "Help desk name",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > main > Help desk name",
+    "role": "textbox",
+    "name": "Help desk name",
+    "region": "main",
+    "view": "主界面"
+   },
+   "params": [
+    {
+     "name": "value",
+     "type": "string",
+     "description": "「Help desk name」的新值",
+     "required": true,
+     "positional": true
+    },
+    {
+     "name": "submit",
+     "type": "boolean",
+     "description": "设置后按 Enter 提交",
+     "default": false
+    }
+   ],
+   "effect": "把「Help desk name」设为给定值（触发 input / change 事件）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "set": {
+       "name": "Help desk name",
+       "role": "textbox",
+       "value": "{{value}}"
+      }
+     },
+     {
+      "press_if": "submit",
+      "press": {
+       "key": "Enter",
+       "name": "Help desk name",
+       "role": "textbox"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "name.set",
+   "resource": "name",
+   "verb": "set",
+   "summary": "Your name",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > main > Your name",
+    "role": "textbox",
+    "name": "Your name",
+    "region": "main",
+    "view": "主界面"
+   },
+   "params": [
+    {
+     "name": "value",
+     "type": "string",
+     "description": "「Your name」的新值",
+     "required": true,
+     "positional": true
+    },
+    {
+     "name": "submit",
+     "type": "boolean",
+     "description": "设置后按 Enter 提交",
+     "default": false
+    }
+   ],
+   "effect": "把「Your name」设为给定值（触发 input / change 事件）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "set": {
+       "name": "Your name",
+       "role": "textbox",
+       "value": "{{value}}"
+      }
+     },
+     {
+      "press_if": "submit",
+      "press": {
+       "key": "Enter",
+       "name": "Your name",
+       "role": "textbox"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "help-desk.create",
+   "resource": "help-desk",
+   "verb": "create",
+   "summary": "Create help desk",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > main > Create help desk",
+    "role": "button",
+    "name": "Create help desk",
+    "region": "main",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Create help desk」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Create help desk",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "source-code.show",
+   "resource": "source-code",
+   "verb": "show",
+   "summary": "Source code",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > main > Source code",
+    "role": "link",
+    "name": "Source code",
+    "region": "main",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Source code」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Source code",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "puter.show",
+   "resource": "puter",
+   "verb": "show",
+   "summary": "Puter",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > main > Puter",
+    "role": "link",
+    "name": "Puter",
+    "region": "main",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Puter」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Puter",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "dismiss.dismiss",
+   "resource": "dismiss",
+   "verb": "dismiss",
+   "summary": "Dismiss",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Dismiss",
+    "role": "button",
+    "name": "Dismiss",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Dismiss」（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Dismiss",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  }
+ ]
+}

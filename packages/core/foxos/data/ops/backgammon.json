@@ -1,0 +1,1012 @@
+{
+ "app": "backgammon",
+ "name": "Backgammon",
+ "generated_by": "scripts/inventory_ops.py",
+ "commit": "0fbb88cdee2f54c94a9d2c975f43322888813c5d",
+ "title": "Play Backgammon Online — vs the Computer or a Friend",
+ "ops": [
+  {
+   "id": "point-white-checkers.select",
+   "resource": "point-white-checkers",
+   "verb": "select",
+   "summary": "point # white checkers（4 项，如 Point 13, 5 White checkers）",
+   "source": "ui-collection",
+   "ui": {
+    "path": "主界面 > point # white checkers",
+    "role": "gridcell",
+    "region": null,
+    "view": "主界面",
+    "examples": [
+     "Point 13, 5 White checkers",
+     "Point 24, 2 White checkers",
+     "Point 8, 3 White checkers",
+     "Point 6, 5 White checkers"
+    ]
+   },
+   "params": [
+    {
+     "name": "target",
+     "type": "string",
+     "description": "要操作的项的名称（或其一部分），如 'Point 13, 5 White checkers'",
+     "required": true,
+     "positional": true
+    }
+   ],
+   "effect": "点击名称匹配的「point # white checkers」项（gridcell）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "{{target}}",
+       "role": "gridcell"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "point-empty.select",
+   "resource": "point-empty",
+   "verb": "select",
+   "summary": "point #, empty（16 项，如 Point 14, empty）",
+   "source": "ui-collection",
+   "ui": {
+    "path": "主界面 > point #, empty",
+    "role": "gridcell",
+    "region": null,
+    "view": "主界面",
+    "examples": [
+     "Point 14, empty",
+     "Point 15, empty",
+     "Point 16, empty",
+     "Point 18, empty",
+     "Point 20, empty"
+    ]
+   },
+   "params": [
+    {
+     "name": "target",
+     "type": "string",
+     "description": "要操作的项的名称（或其一部分），如 'Point 14, empty'",
+     "required": true,
+     "positional": true
+    }
+   ],
+   "effect": "点击名称匹配的「point #, empty」项（gridcell）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "{{target}}",
+       "role": "gridcell"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "point-black-checkers.select",
+   "resource": "point-black-checkers",
+   "verb": "select",
+   "summary": "point # black checkers（4 项，如 Point 17, 3 Black checkers）",
+   "source": "ui-collection",
+   "ui": {
+    "path": "主界面 > point # black checkers",
+    "role": "gridcell",
+    "region": null,
+    "view": "主界面",
+    "examples": [
+     "Point 17, 3 Black checkers",
+     "Point 19, 5 Black checkers",
+     "Point 12, 5 Black checkers",
+     "Point 1, 2 Black checkers"
+    ]
+   },
+   "params": [
+    {
+     "name": "target",
+     "type": "string",
+     "description": "要操作的项的名称（或其一部分），如 'Point 17, 3 Black checkers'",
+     "required": true,
+     "positional": true
+    }
+   ],
+   "effect": "点击名称匹配的「point # black checkers」项（gridcell）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "{{target}}",
+       "role": "gridcell"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "light-theme.activate",
+   "resource": "light-theme",
+   "verb": "activate",
+   "summary": "Light theme",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Light theme",
+    "role": "button",
+    "name": "Light theme",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Light theme」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Light theme",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "dark-theme.activate",
+   "resource": "dark-theme",
+   "verb": "activate",
+   "summary": "Dark theme",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Dark theme",
+    "role": "button",
+    "name": "Dark theme",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Dark theme」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Dark theme",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "follow-system-theme.activate",
+   "resource": "follow-system-theme",
+   "verb": "activate",
+   "summary": "Follow system theme",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Follow system theme",
+    "role": "button",
+    "name": "Follow system theme",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Follow system theme」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Follow system theme",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "black-bar-empty.activate",
+   "resource": "black-bar-empty",
+   "verb": "activate",
+   "summary": "Black bar, empty",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Black bar, empty",
+    "role": "gridcell",
+    "name": "Black bar, empty",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Black bar, empty」（gridcell）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Black bar, empty",
+       "role": "gridcell"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "black-tray-empty.activate",
+   "resource": "black-tray-empty",
+   "verb": "activate",
+   "summary": "Black tray, empty",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Black tray, empty",
+    "role": "gridcell",
+    "name": "Black tray, empty",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Black tray, empty」（gridcell）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Black tray, empty",
+       "role": "gridcell"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "white-bar-empty.activate",
+   "resource": "white-bar-empty",
+   "verb": "activate",
+   "summary": "White bar, empty",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > White bar, empty",
+    "role": "gridcell",
+    "name": "White bar, empty",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「White bar, empty」（gridcell）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "White bar, empty",
+       "role": "gridcell"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "white-tray-empty.activate",
+   "resource": "white-tray-empty",
+   "verb": "activate",
+   "summary": "White tray, empty",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > White tray, empty",
+    "role": "gridcell",
+    "name": "White tray, empty",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「White tray, empty」（gridcell）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "White tray, empty",
+       "role": "gridcell"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "computer.activate",
+   "resource": "computer",
+   "verb": "activate",
+   "summary": "Computer",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Game mode > Computer",
+    "role": "button",
+    "name": "Computer",
+    "region": "Game mode",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Computer」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Computer",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "pass-play.activate",
+   "resource": "pass-play",
+   "verb": "activate",
+   "summary": "Pass & Play",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Game mode > Pass & Play",
+    "role": "button",
+    "name": "Pass & Play",
+    "region": "Game mode",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Pass & Play」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Pass & Play",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "online.activate",
+   "resource": "online",
+   "verb": "activate",
+   "summary": "Online",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Game mode > Online",
+    "role": "button",
+    "name": "Online",
+    "region": "Game mode",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Online」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Online",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "moves.activate",
+   "resource": "moves",
+   "verb": "activate",
+   "summary": "Moves",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > aside > Moves",
+    "role": "button",
+    "name": "Moves",
+    "region": "aside",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Moves」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Moves",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "game-as-mat-transcript.copy",
+   "resource": "game-as-mat-transcript",
+   "verb": "copy",
+   "summary": "Copy the game as a .mat transcript",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Copy the game as a .mat transcript",
+    "role": "button",
+    "name": "Copy the game as a .mat transcript",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Copy the game as a .mat transcript」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Copy the game as a .mat transcript",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "game-as-mat-file.export",
+   "resource": "game-as-mat-file",
+   "verb": "export",
+   "summary": "Download the game as a .mat file",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Download the game as a .mat file",
+    "role": "button",
+    "name": "Download the game as a .mat file",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Download the game as a .mat file」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Download the game as a .mat file",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "roll-start.activate",
+   "resource": "roll-start",
+   "verb": "activate",
+   "summary": "Roll to start",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > aside > Roll to start",
+    "role": "button",
+    "name": "Roll to start",
+    "region": "aside",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Roll to start」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Roll to start",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "difficulty.set",
+   "resource": "difficulty",
+   "verb": "set",
+   "summary": "Difficulty",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > aside > Difficulty",
+    "role": "combobox",
+    "name": "Difficulty",
+    "region": "aside",
+    "view": "主界面"
+   },
+   "params": [
+    {
+     "name": "value",
+     "type": "string",
+     "description": "「Difficulty」的新值",
+     "required": true,
+     "positional": true,
+     "enum": [
+      "easy",
+      "medium",
+      "hard"
+     ]
+    },
+    {
+     "name": "submit",
+     "type": "boolean",
+     "description": "设置后按 Enter 提交",
+     "default": false
+    }
+   ],
+   "effect": "把「Difficulty」设为给定值（触发 input / change 事件）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "set": {
+       "name": "Difficulty",
+       "role": "combobox",
+       "value": "{{value}}"
+      }
+     },
+     {
+      "press_if": "submit",
+      "press": {
+       "key": "Enter",
+       "name": "Difficulty",
+       "role": "combobox"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "clock.set",
+   "resource": "clock",
+   "verb": "set",
+   "summary": "Clock",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > aside > Clock",
+    "role": "combobox",
+    "name": "Clock",
+    "region": "aside",
+    "view": "主界面"
+   },
+   "params": [
+    {
+     "name": "value",
+     "type": "string",
+     "description": "「Clock」的新值",
+     "required": true,
+     "positional": true,
+     "enum": [
+      "unlimited",
+      "1+0",
+      "2+1",
+      "3+0",
+      "3+2",
+      "5+0",
+      "5+3",
+      "10+0",
+      "15+10"
+     ]
+    },
+    {
+     "name": "submit",
+     "type": "boolean",
+     "description": "设置后按 Enter 提交",
+     "default": false
+    }
+   ],
+   "effect": "把「Clock」设为给定值（触发 input / change 事件）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "set": {
+       "name": "Clock",
+       "role": "combobox",
+       "value": "{{value}}"
+      }
+     },
+     {
+      "press_if": "submit",
+      "press": {
+       "key": "Enter",
+       "name": "Clock",
+       "role": "combobox"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "doubling-cube.set",
+   "resource": "doubling-cube",
+   "verb": "set",
+   "summary": "Doubling cube",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > aside > Doubling cube",
+    "role": "combobox",
+    "name": "Doubling cube",
+    "region": "aside",
+    "view": "主界面"
+   },
+   "params": [
+    {
+     "name": "value",
+     "type": "string",
+     "description": "「Doubling cube」的新值",
+     "required": true,
+     "positional": true,
+     "enum": [
+      "off",
+      "on"
+     ]
+    },
+    {
+     "name": "submit",
+     "type": "boolean",
+     "description": "设置后按 Enter 提交",
+     "default": false
+    }
+   ],
+   "effect": "把「Doubling cube」设为给定值（触发 input / change 事件）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "set": {
+       "name": "Doubling cube",
+       "role": "combobox",
+       "value": "{{value}}"
+      }
+     },
+     {
+      "press_if": "submit",
+      "press": {
+       "key": "Enter",
+       "name": "Doubling cube",
+       "role": "combobox"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "play-as.set",
+   "resource": "play-as",
+   "verb": "set",
+   "summary": "Play as",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > aside > Play as",
+    "role": "combobox",
+    "name": "Play as",
+    "region": "aside",
+    "view": "主界面"
+   },
+   "params": [
+    {
+     "name": "value",
+     "type": "string",
+     "description": "「Play as」的新值",
+     "required": true,
+     "positional": true,
+     "enum": [
+      "w",
+      "b",
+      "random"
+     ]
+    },
+    {
+     "name": "submit",
+     "type": "boolean",
+     "description": "设置后按 Enter 提交",
+     "default": false
+    }
+   ],
+   "effect": "把「Play as」设为给定值（触发 input / change 事件）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "set": {
+       "name": "Play as",
+       "role": "combobox",
+       "value": "{{value}}"
+      }
+     },
+     {
+      "press_if": "submit",
+      "press": {
+       "key": "Enter",
+       "name": "Play as",
+       "role": "combobox"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "game.create",
+   "resource": "game",
+   "verb": "create",
+   "summary": "New game",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > aside > New game",
+    "role": "button",
+    "name": "New game",
+    "region": "aside",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「New game」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "New game",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "turn.undo",
+   "resource": "turn",
+   "verb": "undo",
+   "summary": "Undo turn",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > aside > Undo turn",
+    "role": "button",
+    "name": "Undo turn",
+    "region": "aside",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Undo turn」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Undo turn",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "go-starting-position.activate",
+   "resource": "go-starting-position",
+   "verb": "activate",
+   "summary": "Go to the starting position",
+   "source": "ui",
+   "ui": {
+    "path": "Moves > Go to the starting position",
+    "role": "button",
+    "name": "Go to the starting position",
+    "region": null,
+    "view": "Moves"
+   },
+   "params": [],
+   "effect": "点击「Go to the starting position」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Moves",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Go to the starting position",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "go-back-one-turn.activate",
+   "resource": "go-back-one-turn",
+   "verb": "activate",
+   "summary": "Go back one turn",
+   "source": "ui",
+   "ui": {
+    "path": "Moves > Go back one turn",
+    "role": "button",
+    "name": "Go back one turn",
+    "region": null,
+    "view": "Moves"
+   },
+   "params": [],
+   "effect": "点击「Go back one turn」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Moves",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Go back one turn",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "go-forward-one-turn.activate",
+   "resource": "go-forward-one-turn",
+   "verb": "activate",
+   "summary": "Go forward one turn",
+   "source": "ui",
+   "ui": {
+    "path": "Moves > Go forward one turn",
+    "role": "button",
+    "name": "Go forward one turn",
+    "region": null,
+    "view": "Moves"
+   },
+   "params": [],
+   "effect": "点击「Go forward one turn」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Moves",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Go forward one turn",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "return-current-position.activate",
+   "resource": "return-current-position",
+   "verb": "activate",
+   "summary": "Return to the current position",
+   "source": "ui",
+   "ui": {
+    "path": "Moves > Return to the current position",
+    "role": "button",
+    "name": "Return to the current position",
+    "region": null,
+    "view": "Moves"
+   },
+   "params": [],
+   "effect": "点击「Return to the current position」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Moves",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Return to the current position",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  }
+ ]
+}

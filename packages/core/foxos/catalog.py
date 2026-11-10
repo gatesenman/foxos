@@ -64,19 +64,55 @@ def catalog(app: str | None = None) -> dict:
     return {"name": "foxos", "version": __version__, "conventions": CONVENTIONS, "apps": apps}
 
 
+ERROR_CODES = "错误码：USAGE(2) NOT_FOUND(3) PERMISSION_DENIED(4) LOCKED(5) DEPENDENCY_MISSING(6) CONFLICT(7) PAUSED(8)，失败时 isError=true，structuredContent.error.code 给出错误码"
+
+
 def tool_description(cmd) -> str:
     d = f"{cmd.summary}。CLI：{cmd.usage()}"
+    if cmd.description:
+        d += f"。{cmd.description}"
     if cmd.limits:
         d += "。限制：" + "；".join(cmd.limits)
+    if cmd.examples:
+        d += "。示例：" + cmd.examples[0]
     return d
 
 
-def mcp_tools() -> list[dict]:
+def everything_ids() -> set[str]:
+    try:
+        from .apps.everything import APPS as EV
+        return set(EV)
+    except Exception:  # noqa: BLE001
+        return set()
+
+
+def select_commands(profile: str = "compact", apps: list[str] | None = None) -> list:
+    """MCP 暴露哪些命令。
+
+    compact（默认）：内置应用的全部命令 + Everything 的元工具（everything run / commands 等），
+                    51 个 Everything 应用的数千个操作通过 everything_run 调用，避免客户端工具列表过长；
+    full：全部命令；apps：额外暴露这些应用的全部命令（如 --apps tasks,chess）。
+    """
     load_apps()
-    return [
-        {"name": c.tool_name, "title": c.cli, "description": tool_description(c), "inputSchema": c.input_schema()}
-        for c in REGISTRY.values()
-    ]
+    ev = everything_ids()
+    want = set(apps or [])
+    out = []
+    for c in REGISTRY.values():
+        if profile == "full" or c.app not in ev or c.app in want:
+            out.append(c)
+    return out
+
+
+def mcp_tools(profile: str = "full", apps: list[str] | None = None, names: str = "underscore") -> list[dict]:
+    out = []
+    for c in select_commands(profile, apps):
+        t = {"name": c.id if names == "dotted" else c.tool_name, "title": c.cli, "description": tool_description(c),
+             "inputSchema": c.input_schema(),
+             "annotations": {"title": c.cli, "readOnlyHint": c.permission == "read", "destructiveHint": c.permission == "delete",
+                             "idempotentHint": c.permission == "read", "openWorldHint": False},
+             "_meta": {"foxos/id": c.id, "foxos/cli": c.cli, "foxos/permission": c.permission, "foxos/examples": c.examples}}
+        out.append(t)
+    return out
 
 
 def openai_tools() -> list[dict]:

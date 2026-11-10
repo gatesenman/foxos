@@ -1,0 +1,1399 @@
+{
+ "app": "legal",
+ "name": "Legal",
+ "generated_by": "scripts/inventory_ops.py",
+ "commit": "0fbb88cdee2f54c94a9d2c975f43322888813c5d",
+ "title": "Dashboard · Legal",
+ "ops": [
+  {
+   "id": "timer.start",
+   "resource": "timer",
+   "verb": "start",
+   "summary": "start timer, #（1 项，如 Start timer, 00:00:00）",
+   "source": "ui-collection",
+   "ui": {
+    "path": "主界面 > start timer, #",
+    "role": "button",
+    "region": null,
+    "view": "主界面",
+    "examples": [
+     "Start timer, 00:00:00"
+    ]
+   },
+   "params": [
+    {
+     "name": "target",
+     "type": "string",
+     "description": "要操作的项的名称（或其一部分），如 'Start timer, 00:00:00'",
+     "required": true,
+     "positional": true
+    }
+   ],
+   "effect": "点击名称匹配的「start timer, #」项（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "{{target}}",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "draft-bills-bills.select",
+   "resource": "draft-bills-bills",
+   "verb": "select",
+   "summary": "draft bills$# bills（1 项，如 Draft bills$00 bills）",
+   "source": "ui-collection",
+   "ui": {
+    "path": "主界面 > Personal > draft bills$# bills",
+    "role": "link",
+    "region": "Personal",
+    "view": "主界面",
+    "examples": [
+     "Draft bills$00 bills"
+    ]
+   },
+   "params": [
+    {
+     "name": "target",
+     "type": "string",
+     "description": "要操作的项的名称（或其一部分），如 'Draft bills$00 bills'",
+     "required": true,
+     "positional": true
+    }
+   ],
+   "effect": "点击名称匹配的「draft bills$# bills」项（link）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "{{target}}",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "unpaid-bills.select",
+   "resource": "unpaid-bills",
+   "verb": "select",
+   "summary": "unpaid$# bills（1 项，如 Unpaid$00 bills）",
+   "source": "ui-collection",
+   "ui": {
+    "path": "主界面 > Personal > unpaid$# bills",
+    "role": "link",
+    "region": "Personal",
+    "view": "主界面",
+    "examples": [
+     "Unpaid$00 bills"
+    ]
+   },
+   "params": [
+    {
+     "name": "target",
+     "type": "string",
+     "description": "要操作的项的名称（或其一部分），如 'Unpaid$00 bills'",
+     "required": true,
+     "positional": true
+    }
+   ],
+   "effect": "点击名称匹配的「unpaid$# bills」项（link）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "{{target}}",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "overdue-bills.select",
+   "resource": "overdue-bills",
+   "verb": "select",
+   "summary": "overdue$# bills（1 项，如 Overdue$00 bills）",
+   "source": "ui-collection",
+   "ui": {
+    "path": "主界面 > Personal > overdue$# bills",
+    "role": "link",
+    "region": "Personal",
+    "view": "主界面",
+    "examples": [
+     "Overdue$00 bills"
+    ]
+   },
+   "params": [
+    {
+     "name": "target",
+     "type": "string",
+     "description": "要操作的项的名称（或其一部分），如 'Overdue$00 bills'",
+     "required": true,
+     "positional": true
+    }
+   ],
+   "effect": "点击名称匹配的「overdue$# bills」项（link）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "{{target}}",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "held-trust-trust-accounts.select",
+   "resource": "held-trust-trust-accounts",
+   "verb": "select",
+   "summary": "held in trust$# trust accounts（1 项，如 Held in trust$0All trust accounts）",
+   "source": "ui-collection",
+   "ui": {
+    "path": "主界面 > Personal > held in trust$# trust accounts",
+    "role": "link",
+    "region": "Personal",
+    "view": "主界面",
+    "examples": [
+     "Held in trust$0All trust accounts"
+    ]
+   },
+   "params": [
+    {
+     "name": "target",
+     "type": "string",
+     "description": "要操作的项的名称（或其一部分），如 'Held in trust$0All trust accounts'",
+     "required": true,
+     "positional": true
+    }
+   ],
+   "effect": "点击名称匹配的「held in trust$# trust accounts」项（link）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "{{target}}",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "firm-name.select",
+   "resource": "firm-name",
+   "verb": "select",
+   "summary": "firm name *（1 项，如 Firm name *）",
+   "source": "ui-collection",
+   "ui": {
+    "path": "主界面 > dialog > firm name *",
+    "role": "textbox",
+    "region": "dialog",
+    "view": "主界面",
+    "examples": [
+     "Firm name *"
+    ]
+   },
+   "params": [
+    {
+     "name": "target",
+     "type": "string",
+     "description": "要操作的项的名称（或其一部分），如 'Firm name *'",
+     "required": true,
+     "positional": true
+    }
+   ],
+   "effect": "点击名称匹配的「firm name *」项（textbox）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "{{target}}",
+       "role": "textbox"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "content.dismiss",
+   "resource": "content",
+   "verb": "dismiss",
+   "summary": "Skip to content",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Skip to content",
+    "role": "link",
+    "name": "Skip to content",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Skip to content」（link）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Skip to content",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "legal-dashboard.show",
+   "resource": "legal-dashboard",
+   "verb": "show",
+   "summary": "Legal dashboard",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Legal dashboard",
+    "role": "link",
+    "name": "Legal dashboard",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Legal dashboard」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Legal dashboard",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "dashboard.show",
+   "resource": "dashboard",
+   "verb": "show",
+   "summary": "Dashboard",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Main > Dashboard",
+    "role": "link",
+    "name": "Dashboard",
+    "region": "Main",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Dashboard」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Dashboard",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "calendar.show",
+   "resource": "calendar",
+   "verb": "show",
+   "summary": "Calendar",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Main > Calendar",
+    "role": "link",
+    "name": "Calendar",
+    "region": "Main",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Calendar」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Calendar",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "tasks.show",
+   "resource": "tasks",
+   "verb": "show",
+   "summary": "Tasks",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Tasks",
+    "role": "link",
+    "name": "Tasks",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Tasks」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Tasks",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "matters.show",
+   "resource": "matters",
+   "verb": "show",
+   "summary": "Matters",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Main > Matters",
+    "role": "link",
+    "name": "Matters",
+    "region": "Main",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Matters」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Matters",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "contacts.show",
+   "resource": "contacts",
+   "verb": "show",
+   "summary": "Contacts",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Main > Contacts",
+    "role": "link",
+    "name": "Contacts",
+    "region": "Main",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Contacts」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Contacts",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "activities.show",
+   "resource": "activities",
+   "verb": "show",
+   "summary": "Activities",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Main > Activities",
+    "role": "link",
+    "name": "Activities",
+    "region": "Main",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Activities」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Activities",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "billing.show",
+   "resource": "billing",
+   "verb": "show",
+   "summary": "Billing",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Billing",
+    "role": "link",
+    "name": "Billing",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Billing」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Billing",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "accounts.show",
+   "resource": "accounts",
+   "verb": "show",
+   "summary": "Accounts",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Main > Accounts",
+    "role": "link",
+    "name": "Accounts",
+    "region": "Main",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Accounts」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Accounts",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "documents.show",
+   "resource": "documents",
+   "verb": "show",
+   "summary": "Documents",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Main > Documents",
+    "role": "link",
+    "name": "Documents",
+    "region": "Main",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Documents」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Documents",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "communications.show",
+   "resource": "communications",
+   "verb": "show",
+   "summary": "Communications",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Main > Communications",
+    "role": "link",
+    "name": "Communications",
+    "region": "Main",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Communications」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Communications",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "reports.show",
+   "resource": "reports",
+   "verb": "show",
+   "summary": "Reports",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Main > Reports",
+    "role": "link",
+    "name": "Reports",
+    "region": "Main",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Reports」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Reports",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "settings.show",
+   "resource": "settings",
+   "verb": "show",
+   "summary": "Settings",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > aside > Settings",
+    "role": "link",
+    "name": "Settings",
+    "region": "aside",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Settings」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Settings",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "source-code-github-opens-tab.show",
+   "resource": "source-code-github-opens-tab",
+   "verb": "show",
+   "summary": "Source code on GitHub (opens in a new tab)",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Source code on GitHub (opens in a new tab)",
+    "role": "link",
+    "name": "Source code on GitHub (opens in a new tab)",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Source code on GitHub (opens in a new tab)」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Source code on GitHub (opens in a new tab)",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "navigation.collapse",
+   "resource": "navigation",
+   "verb": "collapse",
+   "summary": "Collapse navigation",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Collapse navigation",
+    "role": "button",
+    "name": "Collapse navigation",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Collapse navigation」（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Collapse navigation",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "search.search",
+   "resource": "search",
+   "verb": "search",
+   "summary": "Search",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Search",
+    "role": "button",
+    "name": "Search",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Search」（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Search",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "timer-details.activate",
+   "resource": "timer-details",
+   "verb": "activate",
+   "summary": "Timer details",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Timer details",
+    "role": "button",
+    "name": "Timer details",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Timer details」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Timer details",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "n.create",
+   "resource": "n",
+   "verb": "create",
+   "summary": "Create new (N)",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > header > Create new (N)",
+    "role": "button",
+    "name": "Create new (N)",
+    "region": "header",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Create new (N)」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Create new (N)",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "alerts.activate",
+   "resource": "alerts",
+   "verb": "activate",
+   "summary": "Alerts",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Alerts",
+    "role": "button",
+    "name": "Alerts",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Alerts」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Alerts",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "account-appearance.activate",
+   "resource": "account-appearance",
+   "verb": "activate",
+   "summary": "Account and appearance",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Account and appearance",
+    "role": "button",
+    "name": "Account and appearance",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Account and appearance」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Account and appearance",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "task.create",
+   "resource": "task",
+   "verb": "create",
+   "summary": "New task",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > header > New task",
+    "role": "button",
+    "name": "New task",
+    "region": "header",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「New task」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "New task",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "time.record",
+   "resource": "time",
+   "verb": "record",
+   "summary": "Record time",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > header > Record time",
+    "role": "button",
+    "name": "Record time",
+    "region": "header",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Record time」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Record time",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "personal.show",
+   "resource": "personal",
+   "verb": "show",
+   "summary": "Personal",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Dashboard > Personal",
+    "role": "tab",
+    "name": "Personal",
+    "region": "Dashboard",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Personal」（tab），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Personal",
+       "role": "tab"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "firm.show",
+   "resource": "firm",
+   "verb": "show",
+   "summary": "Firm",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Dashboard > Firm",
+    "role": "tab",
+    "name": "Firm",
+    "region": "Dashboard",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Firm」（tab），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Firm",
+       "role": "tab"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "firm-users.open",
+   "resource": "firm-users",
+   "verb": "open",
+   "summary": "Open firm users",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Personal > Open firm users",
+    "role": "link",
+    "name": "Open firm users",
+    "region": "Personal",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Open firm users」（link）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Open firm users",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "calendar-2.show",
+   "resource": "calendar-2",
+   "verb": "show",
+   "summary": "Calendar",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Personal > Calendar",
+    "role": "link",
+    "name": "Calendar",
+    "region": "Personal",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Calendar」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Calendar",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "matters-2.show",
+   "resource": "matters-2",
+   "verb": "show",
+   "summary": "Matters",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Personal > Matters",
+    "role": "link",
+    "name": "Matters",
+    "region": "Personal",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Matters」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Matters",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "matter.create",
+   "resource": "matter",
+   "verb": "create",
+   "summary": "New matter",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Personal > New matter",
+    "role": "link",
+    "name": "New matter",
+    "region": "Personal",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「New matter」（link）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "New matter",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "activities-2.show",
+   "resource": "activities-2",
+   "verb": "show",
+   "summary": "Activities",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Personal > Activities",
+    "role": "link",
+    "name": "Activities",
+    "region": "Personal",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Activities」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Activities",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "billing-2.show",
+   "resource": "billing-2",
+   "verb": "show",
+   "summary": "Billing",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Personal > Billing",
+    "role": "link",
+    "name": "Billing",
+    "region": "Personal",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Billing」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Billing",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "i-understand.activate",
+   "resource": "i-understand",
+   "verb": "activate",
+   "summary": "I understand",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Early alpha notice > I understand",
+    "role": "button",
+    "name": "I understand",
+    "region": "Early alpha notice",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「I understand」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "I understand",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "close.close",
+   "resource": "close",
+   "verb": "close",
+   "summary": "Close",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Close",
+    "role": "button",
+    "name": "Close",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Close」（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Close",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "currency.set",
+   "resource": "currency",
+   "verb": "set",
+   "summary": "Currency",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > dialog > Currency",
+    "role": "combobox",
+    "name": "Currency",
+    "region": "dialog",
+    "view": "主界面"
+   },
+   "params": [
+    {
+     "name": "value",
+     "type": "string",
+     "description": "「Currency」的新值",
+     "required": true,
+     "positional": true,
+     "enum": [
+      "USD",
+      "CAD",
+      "EUR",
+      "GBP",
+      "AUD",
+      "NZD",
+      "CHF",
+      "JPY",
+      "INR",
+      "SGD",
+      "HKD",
+      "ZAR",
+      "MXN",
+      "BRL",
+      "SEK",
+      "NOK",
+      "DKK",
+      "AED"
+     ]
+    },
+    {
+     "name": "submit",
+     "type": "boolean",
+     "description": "设置后按 Enter 提交",
+     "default": false
+    }
+   ],
+   "effect": "把「Currency」设为给定值（触发 input / change 事件）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "set": {
+       "name": "Currency",
+       "role": "combobox",
+       "value": "{{value}}"
+      }
+     },
+     {
+      "press_if": "submit",
+      "press": {
+       "key": "Enter",
+       "name": "Currency",
+       "role": "combobox"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "explore-sample-data.activate",
+   "resource": "explore-sample-data",
+   "verb": "activate",
+   "summary": "Explore with sample data",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > dialog > Explore with sample data",
+    "role": "button",
+    "name": "Explore with sample data",
+    "region": "dialog",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Explore with sample data」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Explore with sample data",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "continue.activate",
+   "resource": "continue",
+   "verb": "activate",
+   "summary": "Continue",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > dialog > Continue",
+    "role": "button",
+    "name": "Continue",
+    "region": "dialog",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Continue」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Continue",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "command-palette.show",
+   "resource": "command-palette",
+   "verb": "show",
+   "summary": "快捷键 mod+k",
+   "source": "shortcut",
+   "ui": {
+    "path": "键盘 mod+k",
+    "shortcut": "mod+k",
+    "defined_in": "src/ui/shell.js"
+   },
+   "params": [],
+   "effect": "在当前焦点上按 mod+k（src/ui/shell.js 中定义）",
+   "permission": "read",
+   "undoable": "不适用",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "press": {
+       "key": "mod+k"
+      }
+     }
+    ]
+   }
+  }
+ ]
+}

@@ -36,7 +36,7 @@ contextBridge.exposeInMainWorld('foxos', {
     onProgress: (cb) => on('agents:progress', cb),
   },
   acp: {
-    start: (id) => call('acp:start', id),
+    start: (id, opts) => call('acp:start', id, opts || {}),
     newSession: (c) => call('acp:newSession', c),
     authenticate: (c, m) => call('acp:authenticate', c, m),
     prompt: (c, s, t) => call('acp:prompt', c, s, t),

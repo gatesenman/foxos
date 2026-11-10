@@ -1,0 +1,2153 @@
+{
+ "app": "wiki",
+ "name": "Wiki",
+ "generated_by": "scripts/inventory_ops.py",
+ "commit": "0fbb88cdee2f54c94a9d2c975f43322888813c5d",
+ "title": "Getting started - Wiki",
+ "ops": [
+  {
+   "id": "heading.select",
+   "resource": "heading",
+   "verb": "select",
+   "summary": "heading #（1 项，如 Heading 2）",
+   "source": "ui-collection",
+   "ui": {
+    "path": "主界面 > heading #",
+    "role": "textbox",
+    "region": null,
+    "view": "主界面",
+    "examples": [
+     "Heading 2"
+    ]
+   },
+   "params": [
+    {
+     "name": "target",
+     "type": "string",
+     "description": "要操作的项的名称（或其一部分），如 'Heading 2'",
+     "required": true,
+     "positional": true
+    }
+   ],
+   "effect": "点击名称匹配的「heading #」项（textbox）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "{{target}}",
+       "role": "textbox"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "files.import",
+   "resource": "files",
+   "verb": "import",
+   "summary": "import # files（1 项，如 Import Markdown files）",
+   "source": "ui-collection",
+   "ui": {
+    "path": "Settings > dialog > import # files",
+    "role": "button",
+    "region": "dialog",
+    "view": "Settings",
+    "examples": [
+     "Import Markdown files"
+    ]
+   },
+   "params": [
+    {
+     "name": "target",
+     "type": "string",
+     "description": "要操作的项的名称（或其一部分），如 'Import Markdown files'",
+     "required": true,
+     "positional": true
+    }
+   ],
+   "effect": "点击名称匹配的「import # files」项（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Settings",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "{{target}}",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "here.import",
+   "resource": "here",
+   "verb": "import",
+   "summary": "import # here（1 项，如 Import Markdown here）",
+   "source": "ui-collection",
+   "ui": {
+    "path": "Page options > Getting started options > import # here",
+    "role": "menuitem",
+    "region": "Getting started options",
+    "view": "Page options",
+    "examples": [
+     "Import Markdown here"
+    ]
+   },
+   "params": [
+    {
+     "name": "target",
+     "type": "string",
+     "description": "要操作的项的名称（或其一部分），如 'Import Markdown here'",
+     "required": true,
+     "positional": true
+    }
+   ],
+   "effect": "点击名称匹配的「import # here」项（menuitem）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Page options",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "{{target}}",
+       "role": "menuitem"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "page.dismiss",
+   "resource": "page",
+   "verb": "dismiss",
+   "summary": "Skip to page",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Skip to page",
+    "role": "link",
+    "name": "Skip to page",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Skip to page」（link）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Skip to page",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "lolocal-s-wiki.activate",
+   "resource": "lolocal-s-wiki",
+   "verb": "activate",
+   "summary": "LOlocal’s wiki",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Sidebar > LOlocal’s wiki",
+    "role": "button",
+    "name": "LOlocal’s wiki",
+    "region": "Sidebar",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「LOlocal’s wiki」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "LOlocal’s wiki",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "sidebar.close",
+   "resource": "sidebar",
+   "verb": "close",
+   "summary": "Close sidebar",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Close sidebar",
+    "role": "button",
+    "name": "Close sidebar",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Close sidebar」（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Close sidebar",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "searchctrlk.activate",
+   "resource": "searchctrlk",
+   "verb": "activate",
+   "summary": "SearchCtrl+K",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Workspace > SearchCtrl+K",
+    "role": "button",
+    "name": "SearchCtrl+K",
+    "region": "Workspace",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「SearchCtrl+K」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "SearchCtrl+K",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "home.activate",
+   "resource": "home",
+   "verb": "activate",
+   "summary": "Home",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Workspace > Home",
+    "role": "button",
+    "name": "Home",
+    "region": "Workspace",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Home」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Home",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "pagectrlaltn.create",
+   "resource": "pagectrlaltn",
+   "verb": "create",
+   "summary": "New pageCtrl+Alt+N",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Workspace > New pageCtrl+Alt+N",
+    "role": "button",
+    "name": "New pageCtrl+Alt+N",
+    "region": "Workspace",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「New pageCtrl+Alt+N」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "New pageCtrl+Alt+N",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "private.activate",
+   "resource": "private",
+   "verb": "activate",
+   "summary": "Private",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Private > Private",
+    "role": "button",
+    "name": "Private",
+    "region": "Private",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Private」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Private",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "private-page.create",
+   "resource": "private-page",
+   "verb": "create",
+   "summary": "Add a private page",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Add a private page",
+    "role": "button",
+    "name": "Add a private page",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Add a private page」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Add a private page",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "getting-started.activate",
+   "resource": "getting-started",
+   "verb": "activate",
+   "summary": "Getting started",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Getting started",
+    "role": "treeitem",
+    "name": "Getting started",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Getting started」（treeitem）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Getting started",
+       "role": "treeitem"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "tasks.activate",
+   "resource": "tasks",
+   "verb": "activate",
+   "summary": "Tasks",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Tasks",
+    "role": "treeitem",
+    "name": "Tasks",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Tasks」（treeitem）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Tasks",
+       "role": "treeitem"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "notes.activate",
+   "resource": "notes",
+   "verb": "activate",
+   "summary": "Notes",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Notes",
+    "role": "treeitem",
+    "name": "Notes",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Notes」（treeitem）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Notes",
+       "role": "treeitem"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "templates.activate",
+   "resource": "templates",
+   "verb": "activate",
+   "summary": "Templates",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Sidebar > Templates",
+    "role": "button",
+    "name": "Templates",
+    "region": "Sidebar",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Templates」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Templates",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "import.import",
+   "resource": "import",
+   "verb": "import",
+   "summary": "Import",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Sidebar > Import",
+    "role": "button",
+    "name": "Import",
+    "region": "Sidebar",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Import」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Import",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "trash.delete",
+   "resource": "trash",
+   "verb": "delete",
+   "summary": "Trash",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Sidebar > Trash",
+    "role": "button",
+    "name": "Trash",
+    "region": "Sidebar",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Trash」（button）",
+   "permission": "delete",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Trash",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "settings.show",
+   "resource": "settings",
+   "verb": "show",
+   "summary": "Settings",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Sidebar > Settings",
+    "role": "button",
+    "name": "Settings",
+    "region": "Sidebar",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Settings」（button），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Settings",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "powered-by-puter.show",
+   "resource": "powered-by-puter",
+   "verb": "show",
+   "summary": "Powered by Puter",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Sidebar > Powered by Puter",
+    "role": "link",
+    "name": "Powered by Puter",
+    "region": "Sidebar",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Powered by Puter」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Powered by Puter",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "sidebar.resize",
+   "resource": "sidebar",
+   "verb": "resize",
+   "summary": "Resize sidebar",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Resize sidebar",
+    "role": "separator",
+    "name": "Resize sidebar",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Resize sidebar」（separator）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Resize sidebar",
+       "role": "separator"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "getting-started-2.activate",
+   "resource": "getting-started-2",
+   "verb": "activate",
+   "summary": "Getting started",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Breadcrumb > Getting started",
+    "role": "button",
+    "name": "Getting started",
+    "region": "Breadcrumb",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Getting started」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Getting started",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "share.share",
+   "resource": "share",
+   "verb": "share",
+   "summary": "Share",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > header > Share",
+    "role": "button",
+    "name": "Share",
+    "region": "header",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Share」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Share",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "comments.activate",
+   "resource": "comments",
+   "verb": "activate",
+   "summary": "Comments",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Comments",
+    "role": "button",
+    "name": "Comments",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Comments」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Comments",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "favorites.create",
+   "resource": "favorites",
+   "verb": "create",
+   "summary": "Add to favorites",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Add to favorites",
+    "role": "button",
+    "name": "Add to favorites",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Add to favorites」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Add to favorites",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "page-options.activate",
+   "resource": "page-options",
+   "verb": "activate",
+   "summary": "Page options",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Page options",
+    "role": "button",
+    "name": "Page options",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Page options」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Page options",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "page-icon.update",
+   "resource": "page-icon",
+   "verb": "update",
+   "summary": "Change page icon",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Change page icon",
+    "role": "button",
+    "name": "Change page icon",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Change page icon」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Change page icon",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "cover.create",
+   "resource": "cover",
+   "verb": "create",
+   "summary": "Add cover",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > header > Add cover",
+    "role": "button",
+    "name": "Add cover",
+    "region": "header",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Add cover」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Add cover",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "getting-started.set",
+   "resource": "getting-started",
+   "verb": "set",
+   "summary": "Getting started",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > header > Getting started",
+    "role": "textbox",
+    "name": "Getting started",
+    "region": "header",
+    "view": "主界面"
+   },
+   "params": [
+    {
+     "name": "value",
+     "type": "string",
+     "description": "「Getting started」的新值",
+     "required": true,
+     "positional": true
+    },
+    {
+     "name": "submit",
+     "type": "boolean",
+     "description": "设置后按 Enter 提交",
+     "default": false
+    }
+   ],
+   "effect": "把「Getting started」设为给定值（触发 input / change 事件）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "set": {
+       "name": "Getting started",
+       "role": "textbox",
+       "value": "{{value}}"
+      }
+     },
+     {
+      "press_if": "submit",
+      "press": {
+       "key": "Enter",
+       "name": "Getting started",
+       "role": "textbox"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "callout-icon.update",
+   "resource": "callout-icon",
+   "verb": "update",
+   "summary": "Change callout icon",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Change callout icon",
+    "role": "button",
+    "name": "Change callout icon",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Change callout icon」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Change callout icon",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "callout.set",
+   "resource": "callout",
+   "verb": "set",
+   "summary": "Callout",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Callout",
+    "role": "textbox",
+    "name": "Callout",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [
+    {
+     "name": "value",
+     "type": "string",
+     "description": "「Callout」的新值",
+     "required": true,
+     "positional": true
+    },
+    {
+     "name": "submit",
+     "type": "boolean",
+     "description": "设置后按 Enter 提交",
+     "default": false
+    }
+   ],
+   "effect": "把「Callout」设为给定值（触发 input / change 事件）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "set": {
+       "name": "Callout",
+       "role": "textbox",
+       "value": "{{value}}"
+      }
+     },
+     {
+      "press_if": "submit",
+      "press": {
+       "key": "Enter",
+       "name": "Callout",
+       "role": "textbox"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "text.set",
+   "resource": "text",
+   "verb": "set",
+   "summary": "Text",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Text",
+    "role": "textbox",
+    "name": "Text",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [
+    {
+     "name": "value",
+     "type": "string",
+     "description": "「Text」的新值",
+     "required": true,
+     "positional": true
+    },
+    {
+     "name": "submit",
+     "type": "boolean",
+     "description": "设置后按 Enter 提交",
+     "default": false
+    }
+   ],
+   "effect": "把「Text」设为给定值（触发 input / change 事件）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "set": {
+       "name": "Text",
+       "role": "textbox",
+       "value": "{{value}}"
+      }
+     },
+     {
+      "press_if": "submit",
+      "press": {
+       "key": "Enter",
+       "name": "Text",
+       "role": "textbox"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "bulleted-list.set",
+   "resource": "bulleted-list",
+   "verb": "set",
+   "summary": "Bulleted list",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Bulleted list",
+    "role": "textbox",
+    "name": "Bulleted list",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [
+    {
+     "name": "value",
+     "type": "string",
+     "description": "「Bulleted list」的新值",
+     "required": true,
+     "positional": true
+    },
+    {
+     "name": "submit",
+     "type": "boolean",
+     "description": "设置后按 Enter 提交",
+     "default": false
+    }
+   ],
+   "effect": "把「Bulleted list」设为给定值（触发 input / change 事件）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "set": {
+       "name": "Bulleted list",
+       "role": "textbox",
+       "value": "{{value}}"
+      }
+     },
+     {
+      "press_if": "submit",
+      "press": {
+       "key": "Enter",
+       "name": "Bulleted list",
+       "role": "textbox"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "done.toggle",
+   "resource": "done",
+   "verb": "toggle",
+   "summary": "Done",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Done",
+    "role": "checkbox",
+    "name": "Done",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "切换「Done」",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Done",
+       "role": "checkbox"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "to-do-list.set",
+   "resource": "to-do-list",
+   "verb": "set",
+   "summary": "To-do list",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > To-do list",
+    "role": "textbox",
+    "name": "To-do list",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [
+    {
+     "name": "value",
+     "type": "string",
+     "description": "「To-do list」的新值",
+     "required": true,
+     "positional": true
+    },
+    {
+     "name": "submit",
+     "type": "boolean",
+     "description": "设置后按 Enter 提交",
+     "default": false
+    }
+   ],
+   "effect": "把「To-do list」设为给定值（触发 input / change 事件）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "set": {
+       "name": "To-do list",
+       "role": "textbox",
+       "value": "{{value}}"
+      }
+     },
+     {
+      "press_if": "submit",
+      "press": {
+       "key": "Enter",
+       "name": "To-do list",
+       "role": "textbox"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "content.hide",
+   "resource": "content",
+   "verb": "hide",
+   "summary": "Hide content",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Hide content",
+    "role": "button",
+    "name": "Hide content",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Hide content」（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Hide content",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "toggle-list.set",
+   "resource": "toggle-list",
+   "verb": "set",
+   "summary": "Toggle list",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Toggle list",
+    "role": "textbox",
+    "name": "Toggle list",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [
+    {
+     "name": "value",
+     "type": "string",
+     "description": "「Toggle list」的新值",
+     "required": true,
+     "positional": true
+    },
+    {
+     "name": "submit",
+     "type": "boolean",
+     "description": "设置后按 Enter 提交",
+     "default": false
+    }
+   ],
+   "effect": "把「Toggle list」设为给定值（触发 input / change 事件）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "set": {
+       "name": "Toggle list",
+       "role": "textbox",
+       "value": "{{value}}"
+      }
+     },
+     {
+      "press_if": "submit",
+      "press": {
+       "key": "Enter",
+       "name": "Toggle list",
+       "role": "textbox"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "quote.set",
+   "resource": "quote",
+   "verb": "set",
+   "summary": "Quote",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Quote",
+    "role": "textbox",
+    "name": "Quote",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [
+    {
+     "name": "value",
+     "type": "string",
+     "description": "「Quote」的新值",
+     "required": true,
+     "positional": true
+    },
+    {
+     "name": "submit",
+     "type": "boolean",
+     "description": "设置后按 Enter 提交",
+     "default": false
+    }
+   ],
+   "effect": "把「Quote」设为给定值（触发 input / change 事件）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "set": {
+       "name": "Quote",
+       "role": "textbox",
+       "value": "{{value}}"
+      }
+     },
+     {
+      "press_if": "submit",
+      "press": {
+       "key": "Enter",
+       "name": "Quote",
+       "role": "textbox"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "theme.activate",
+   "resource": "theme",
+   "verb": "activate",
+   "summary": "Theme",
+   "source": "ui",
+   "ui": {
+    "path": "LOlocal’s wiki > Account > Theme",
+    "role": "menuitem",
+    "name": "Theme",
+    "region": "Account",
+    "view": "LOlocal’s wiki"
+   },
+   "params": [],
+   "effect": "点击「Theme」（menuitem）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "LOlocal’s wiki",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Theme",
+       "role": "menuitem"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "lolocals-wiki-settings.show",
+   "resource": "lolocals-wiki-settings",
+   "verb": "show",
+   "summary": "Settings",
+   "source": "ui",
+   "ui": {
+    "path": "LOlocal’s wiki > Account > Settings",
+    "role": "menuitem",
+    "name": "Settings",
+    "region": "Account",
+    "view": "LOlocal’s wiki"
+   },
+   "params": [],
+   "effect": "点击「Settings」（menuitem），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "LOlocal’s wiki",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Settings",
+       "role": "menuitem"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "keyboard-shortcutsctrl.activate",
+   "resource": "keyboard-shortcutsctrl",
+   "verb": "activate",
+   "summary": "Keyboard shortcutsCtrl+/",
+   "source": "ui",
+   "ui": {
+    "path": "LOlocal’s wiki > Account > Keyboard shortcutsCtrl+/",
+    "role": "menuitem",
+    "name": "Keyboard shortcutsCtrl+/",
+    "region": "Account",
+    "view": "LOlocal’s wiki"
+   },
+   "params": [],
+   "effect": "点击「Keyboard shortcutsCtrl+/」（menuitem）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "LOlocal’s wiki",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Keyboard shortcutsCtrl+/",
+       "role": "menuitem"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "close.close",
+   "resource": "close",
+   "verb": "close",
+   "summary": "Close",
+   "source": "ui",
+   "ui": {
+    "path": "Settings > Close",
+    "role": "button",
+    "name": "Close",
+    "region": null,
+    "view": "Settings"
+   },
+   "params": [],
+   "effect": "点击「Close」（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Settings",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Close",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "system.toggle",
+   "resource": "system",
+   "verb": "toggle",
+   "summary": "System",
+   "source": "ui",
+   "ui": {
+    "path": "Settings > Theme > System",
+    "role": "radio",
+    "name": "System",
+    "region": "Theme",
+    "view": "Settings"
+   },
+   "params": [],
+   "effect": "切换「System」",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Settings",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "System",
+       "role": "radio"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "light.toggle",
+   "resource": "light",
+   "verb": "toggle",
+   "summary": "Light",
+   "source": "ui",
+   "ui": {
+    "path": "Settings > Theme > Light",
+    "role": "radio",
+    "name": "Light",
+    "region": "Theme",
+    "view": "Settings"
+   },
+   "params": [],
+   "effect": "切换「Light」",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Settings",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Light",
+       "role": "radio"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "dark.toggle",
+   "resource": "dark",
+   "verb": "toggle",
+   "summary": "Dark",
+   "source": "ui",
+   "ui": {
+    "path": "Settings > Theme > Dark",
+    "role": "radio",
+    "name": "Dark",
+    "region": "Theme",
+    "view": "Settings"
+   },
+   "params": [],
+   "effect": "切换「Dark」",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Settings",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Dark",
+       "role": "radio"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "settings-powered-by-puter.show",
+   "resource": "settings-powered-by-puter",
+   "verb": "show",
+   "summary": "Powered by Puter",
+   "source": "ui",
+   "ui": {
+    "path": "Settings > dialog > Powered by Puter",
+    "role": "link",
+    "name": "Powered by Puter",
+    "region": "dialog",
+    "view": "Settings"
+   },
+   "params": [],
+   "effect": "点击「Powered by Puter」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Settings",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Powered by Puter",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "page.share",
+   "resource": "page",
+   "verb": "share",
+   "summary": "Share this page",
+   "source": "ui",
+   "ui": {
+    "path": "Share > dialog > Share this page",
+    "role": "button",
+    "name": "Share this page",
+    "region": "dialog",
+    "view": "Share"
+   },
+   "params": [],
+   "effect": "点击「Share this page」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Share",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Share this page",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "page-options-favorites.create",
+   "resource": "page-options-favorites",
+   "verb": "create",
+   "summary": "Add to favorites",
+   "source": "ui",
+   "ui": {
+    "path": "Page options > Getting started options > Add to favorites",
+    "role": "menuitem",
+    "name": "Add to favorites",
+    "region": "Getting started options",
+    "view": "Page options"
+   },
+   "params": [],
+   "effect": "点击「Add to favorites」（menuitem）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Page options",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Add to favorites",
+       "role": "menuitem"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "link.copy",
+   "resource": "link",
+   "verb": "copy",
+   "summary": "Copy link",
+   "source": "ui",
+   "ui": {
+    "path": "Page options > Getting started options > Copy link",
+    "role": "menuitem",
+    "name": "Copy link",
+    "region": "Getting started options",
+    "view": "Page options"
+   },
+   "params": [],
+   "effect": "点击「Copy link」（menuitem）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Page options",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Copy link",
+       "role": "menuitem"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "duplicate.duplicate",
+   "resource": "duplicate",
+   "verb": "duplicate",
+   "summary": "Duplicate",
+   "source": "ui",
+   "ui": {
+    "path": "Page options > Getting started options > Duplicate",
+    "role": "menuitem",
+    "name": "Duplicate",
+    "region": "Getting started options",
+    "view": "Page options"
+   },
+   "params": [],
+   "effect": "点击「Duplicate」（menuitem）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Page options",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Duplicate",
+       "role": "menuitem"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "move.move",
+   "resource": "move",
+   "verb": "move",
+   "summary": "Move to",
+   "source": "ui",
+   "ui": {
+    "path": "Page options > Getting started options > Move to",
+    "role": "menuitem",
+    "name": "Move to",
+    "region": "Getting started options",
+    "view": "Page options"
+   },
+   "params": [],
+   "effect": "点击「Move to」（menuitem）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Page options",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Move to",
+       "role": "menuitem"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "page.lock",
+   "resource": "page",
+   "verb": "lock",
+   "summary": "Lock page",
+   "source": "ui",
+   "ui": {
+    "path": "Page options > Getting started options > Lock page",
+    "role": "menuitem",
+    "name": "Lock page",
+    "region": "Getting started options",
+    "view": "Page options"
+   },
+   "params": [],
+   "effect": "点击「Lock page」（menuitem）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Page options",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Lock page",
+       "role": "menuitem"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "export.export",
+   "resource": "export",
+   "verb": "export",
+   "summary": "Export",
+   "source": "ui",
+   "ui": {
+    "path": "Page options > Getting started options > Export",
+    "role": "menuitem",
+    "name": "Export",
+    "region": "Getting started options",
+    "view": "Page options"
+   },
+   "params": [],
+   "effect": "点击「Export」（menuitem）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Page options",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Export",
+       "role": "menuitem"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "page-history.activate",
+   "resource": "page-history",
+   "verb": "activate",
+   "summary": "Page history",
+   "source": "ui",
+   "ui": {
+    "path": "Page options > Getting started options > Page history",
+    "role": "menuitem",
+    "name": "Page history",
+    "region": "Getting started options",
+    "view": "Page options"
+   },
+   "params": [],
+   "effect": "点击「Page history」（menuitem）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Page options",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Page history",
+       "role": "menuitem"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "trash.move",
+   "resource": "trash",
+   "verb": "move",
+   "summary": "Move to trash",
+   "source": "ui",
+   "ui": {
+    "path": "Page options > Getting started options > Move to trash",
+    "role": "menuitem",
+    "name": "Move to trash",
+    "region": "Getting started options",
+    "view": "Page options"
+   },
+   "params": [],
+   "effect": "点击「Move to trash」（menuitem）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Page options",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Move to trash",
+       "role": "menuitem"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "selection.select-all",
+   "resource": "selection",
+   "verb": "select-all",
+   "summary": "快捷键 mod+a",
+   "source": "shortcut",
+   "ui": {
+    "path": "键盘 mod+a",
+    "shortcut": "mod+a",
+    "defined_in": "src/editor/editor.js"
+   },
+   "params": [],
+   "effect": "在当前焦点上按 mod+a（src/editor/editor.js 中定义）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "press": {
+       "key": "mod+a"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "selection.copy",
+   "resource": "selection",
+   "verb": "copy",
+   "summary": "快捷键 mod+c",
+   "source": "shortcut",
+   "ui": {
+    "path": "键盘 mod+c",
+    "shortcut": "mod+c",
+    "defined_in": "src/editor/editor.js"
+   },
+   "params": [],
+   "effect": "在当前焦点上按 mod+c（src/editor/editor.js 中定义）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "press": {
+       "key": "mod+c"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "selection.duplicate",
+   "resource": "selection",
+   "verb": "duplicate",
+   "summary": "快捷键 mod+d",
+   "source": "shortcut",
+   "ui": {
+    "path": "键盘 mod+d",
+    "shortcut": "mod+d",
+    "defined_in": "src/editor/editor.js"
+   },
+   "params": [],
+   "effect": "在当前焦点上按 mod+d（src/editor/editor.js 中定义）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "press": {
+       "key": "mod+d"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "command-palette.show",
+   "resource": "command-palette",
+   "verb": "show",
+   "summary": "快捷键 mod+k",
+   "source": "shortcut",
+   "ui": {
+    "path": "键盘 mod+k",
+    "shortcut": "mod+k",
+    "defined_in": "src/ui/app.js"
+   },
+   "params": [],
+   "effect": "在当前焦点上按 mod+k（src/ui/app.js 中定义）",
+   "permission": "read",
+   "undoable": "不适用",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "press": {
+       "key": "mod+k"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "selection.lock-shift",
+   "resource": "selection",
+   "verb": "lock-shift",
+   "summary": "快捷键 mod+shift+l",
+   "source": "shortcut",
+   "ui": {
+    "path": "键盘 mod+shift+l",
+    "shortcut": "mod+shift+l",
+    "defined_in": "src/ui/app.js"
+   },
+   "params": [],
+   "effect": "在当前焦点上按 mod+shift+l（src/ui/app.js 中定义）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "press": {
+       "key": "mod+shift+l"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "edit.undo",
+   "resource": "edit",
+   "verb": "undo",
+   "summary": "快捷键 mod+z",
+   "source": "shortcut",
+   "ui": {
+    "path": "键盘 mod+z",
+    "shortcut": "mod+z",
+    "defined_in": "src/editor/editor.js"
+   },
+   "params": [],
+   "effect": "在当前焦点上按 mod+z（src/editor/editor.js 中定义）",
+   "permission": "modify",
+   "undoable": "不适用",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "press": {
+       "key": "mod+z"
+      }
+     }
+    ]
+   }
+  }
+ ]
+}

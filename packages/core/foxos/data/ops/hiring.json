@@ -1,0 +1,730 @@
+{
+ "app": "hiring",
+ "name": "Hiring",
+ "generated_by": "scripts/inventory_ops.py",
+ "commit": "0fbb88cdee2f54c94a9d2c975f43322888813c5d",
+ "title": "Overview · Hiring",
+ "ops": [
+  {
+   "id": "yet.open",
+   "resource": "yet",
+   "verb": "open",
+   "summary": "open # yet（1 项，如 Open jobs0None yet）",
+   "source": "ui-collection",
+   "ui": {
+    "path": "主界面 > main > open # yet",
+    "role": "button",
+    "region": "main",
+    "view": "主界面",
+    "examples": [
+     "Open jobs0None yet"
+    ]
+   },
+   "params": [
+    {
+     "name": "target",
+     "type": "string",
+     "description": "要操作的项的名称（或其一部分），如 'Open jobs0None yet'",
+     "required": true,
+     "positional": true
+    }
+   ],
+   "effect": "点击名称匹配的「open # yet」项（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "{{target}}",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "candidates-not-yet-hired.select",
+   "resource": "candidates-not-yet-hired",
+   "verb": "select",
+   "summary": "candidates in #, not yet hired（1 项，如 Candidates in play0Active, not yet hired）",
+   "source": "ui-collection",
+   "ui": {
+    "path": "主界面 > main > candidates in #, not yet hired",
+    "role": "button",
+    "region": "main",
+    "view": "主界面",
+    "examples": [
+     "Candidates in play0Active, not yet hired"
+    ]
+   },
+   "params": [
+    {
+     "name": "target",
+     "type": "string",
+     "description": "要操作的项的名称（或其一部分），如 'Candidates in play0Active, not yet hired'",
+     "required": true,
+     "positional": true
+    }
+   ],
+   "effect": "点击名称匹配的「candidates in #, not yet hired」项（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "{{target}}",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "interviews-today.select",
+   "resource": "interviews-today",
+   "verb": "select",
+   "summary": "interviews · # today（1 项，如 Interviews · 7 days0Nothing today）",
+   "source": "ui-collection",
+   "ui": {
+    "path": "主界面 > main > interviews · # today",
+    "role": "button",
+    "region": "main",
+    "view": "主界面",
+    "examples": [
+     "Interviews · 7 days0Nothing today"
+    ]
+   },
+   "params": [
+    {
+     "name": "target",
+     "type": "string",
+     "description": "要操作的项的名称（或其一部分），如 'Interviews · 7 days0Nothing today'",
+     "required": true,
+     "positional": true
+    }
+   ],
+   "effect": "点击名称匹配的「interviews · # today」项（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "{{target}}",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "offers-signature.select",
+   "resource": "offers-signature",
+   "verb": "select",
+   "summary": "offers # signature（1 项，如 Offers out0Awaiting signature）",
+   "source": "ui-collection",
+   "ui": {
+    "path": "主界面 > main > offers # signature",
+    "role": "button",
+    "region": "main",
+    "view": "主界面",
+    "examples": [
+     "Offers out0Awaiting signature"
+    ]
+   },
+   "params": [
+    {
+     "name": "target",
+     "type": "string",
+     "description": "要操作的项的名称（或其一部分），如 'Offers out0Awaiting signature'",
+     "required": true,
+     "positional": true
+    }
+   ],
+   "effect": "点击名称匹配的「offers # signature」项（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "{{target}}",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "main.select",
+   "resource": "main",
+   "verb": "select",
+   "summary": "#（5 项，如 Applied0）",
+   "source": "ui-collection",
+   "ui": {
+    "path": "主界面 > main > #",
+    "role": "button",
+    "region": "main",
+    "view": "主界面",
+    "examples": [
+     "Applied0",
+     "Screening0",
+     "Interview0",
+     "Offer0",
+     "Hired0"
+    ]
+   },
+   "params": [
+    {
+     "name": "target",
+     "type": "string",
+     "description": "要操作的项的名称（或其一部分），如 'Applied0'",
+     "required": true,
+     "positional": true
+    }
+   ],
+   "effect": "点击名称匹配的「#」项（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "{{target}}",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "skip.dismiss",
+   "resource": "skip",
+   "verb": "dismiss",
+   "summary": "skip for *（1 项，如 Skip for now）",
+   "source": "ui-collection",
+   "ui": {
+    "path": "主界面 > Welcome > skip for *",
+    "role": "button",
+    "region": "Welcome",
+    "view": "主界面",
+    "examples": [
+     "Skip for now"
+    ]
+   },
+   "params": [
+    {
+     "name": "target",
+     "type": "string",
+     "description": "要操作的项的名称（或其一部分），如 'Skip for now'",
+     "required": true,
+     "positional": true
+    }
+   ],
+   "effect": "点击名称匹配的「skip for *」项（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "{{target}}",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "searchctrl-k.activate",
+   "resource": "searchctrl-k",
+   "verb": "activate",
+   "summary": "SearchCtrl K",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > aside > SearchCtrl K",
+    "role": "button",
+    "name": "SearchCtrl K",
+    "region": "aside",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「SearchCtrl K」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "SearchCtrl K",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "overview.activate",
+   "resource": "overview",
+   "verb": "activate",
+   "summary": "Overview",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Main > Overview",
+    "role": "button",
+    "name": "Overview",
+    "region": "Main",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Overview」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Overview",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "jobs.activate",
+   "resource": "jobs",
+   "verb": "activate",
+   "summary": "Jobs",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Main > Jobs",
+    "role": "button",
+    "name": "Jobs",
+    "region": "Main",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Jobs」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Jobs",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "pipeline.activate",
+   "resource": "pipeline",
+   "verb": "activate",
+   "summary": "Pipeline",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Main > Pipeline",
+    "role": "button",
+    "name": "Pipeline",
+    "region": "Main",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Pipeline」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Pipeline",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "interviews.activate",
+   "resource": "interviews",
+   "verb": "activate",
+   "summary": "Interviews",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Main > Interviews",
+    "role": "button",
+    "name": "Interviews",
+    "region": "Main",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Interviews」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Interviews",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "offers.activate",
+   "resource": "offers",
+   "verb": "activate",
+   "summary": "Offers",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Main > Offers",
+    "role": "button",
+    "name": "Offers",
+    "region": "Main",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Offers」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Offers",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "onboarding.activate",
+   "resource": "onboarding",
+   "verb": "activate",
+   "summary": "Onboarding",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Main > Onboarding",
+    "role": "button",
+    "name": "Onboarding",
+    "region": "Main",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Onboarding」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Onboarding",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "reports.activate",
+   "resource": "reports",
+   "verb": "activate",
+   "summary": "Reports",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Main > Reports",
+    "role": "button",
+    "name": "Reports",
+    "region": "Main",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Reports」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Reports",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "settings.show",
+   "resource": "settings",
+   "verb": "show",
+   "summary": "Settings",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Settings",
+    "role": "button",
+    "name": "Settings",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Settings」（button），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Settings",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "theme.activate",
+   "resource": "theme",
+   "verb": "activate",
+   "summary": "Theme",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Theme",
+    "role": "button",
+    "name": "Theme",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Theme」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Theme",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "puter.show",
+   "resource": "puter",
+   "verb": "show",
+   "summary": "Puter",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > aside > Puter",
+    "role": "link",
+    "name": "Puter",
+    "region": "aside",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Puter」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Puter",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "reports-2.activate",
+   "resource": "reports-2",
+   "verb": "activate",
+   "summary": "Reports",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > main > Reports",
+    "role": "button",
+    "name": "Reports",
+    "region": "main",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Reports」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Reports",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "close.close",
+   "resource": "close",
+   "verb": "close",
+   "summary": "Close",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Close",
+    "role": "button",
+    "name": "Close",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Close」（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Close",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "set-up-hiring.activate",
+   "resource": "set-up-hiring",
+   "verb": "activate",
+   "summary": "Set up my hiring",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Welcome > Set up my hiring",
+    "role": "button",
+    "name": "Set up my hiring",
+    "region": "Welcome",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Set up my hiring」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Set up my hiring",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "explore-sample-data.activate",
+   "resource": "explore-sample-data",
+   "verb": "activate",
+   "summary": "Explore with sample data",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Welcome > Explore with sample data",
+    "role": "button",
+    "name": "Explore with sample data",
+    "region": "Welcome",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Explore with sample data」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Explore with sample data",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "command-palette.show",
+   "resource": "command-palette",
+   "verb": "show",
+   "summary": "快捷键 mod+k",
+   "source": "shortcut",
+   "ui": {
+    "path": "键盘 mod+k",
+    "shortcut": "mod+k",
+    "defined_in": "src/ui/app.js"
+   },
+   "params": [],
+   "effect": "在当前焦点上按 mod+k（src/ui/app.js 中定义）",
+   "permission": "read",
+   "undoable": "不适用",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "press": {
+       "key": "mod+k"
+      }
+     }
+    ]
+   }
+  }
+ ]
+}

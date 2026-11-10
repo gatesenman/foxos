@@ -52,6 +52,7 @@ async function detect() {
       { id: 'files', name: '文件管理器', installed: true, kind: 'builtin' },
       { id: 'editor', name: '代码编辑器', installed: true, kind: 'builtin', version: `Monaco ${JSON.parse(fs.readFileSync(path.join(__dirname, '..', '..', 'node_modules', 'monaco-editor', 'package.json'), 'utf8')).version}` },
       { id: 'browser', name: '浏览器', installed: true, kind: 'builtin', version: `Chromium ${process.versions.chrome}` },
+      { id: 'environments', name: '环境', installed: true, kind: 'builtin', version: { linux: 'Linux 命名空间', win32: 'WSL2', darwin: 'Virtualization.framework' }[process.platform] || process.platform },
     ],
     office: [
       office('writer', 'LibreOffice Writer', '--writer', ['.docx', '.doc', '.odt', '.rtf', '.txt']),

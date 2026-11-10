@@ -1,0 +1,1299 @@
+{
+ "app": "circuits",
+ "name": "Circuits",
+ "generated_by": "scripts/inventory_ops.py",
+ "commit": "0fbb88cdee2f54c94a9d2c975f43322888813c5d",
+ "title": "Circuits",
+ "ops": [
+  {
+   "id": "theme.select",
+   "resource": "theme",
+   "verb": "select",
+   "summary": "theme: *（1 项，如 Theme: match system）",
+   "source": "ui-collection",
+   "ui": {
+    "path": "主界面 > theme: *",
+    "role": "button",
+    "region": null,
+    "view": "主界面",
+    "examples": [
+     "Theme: match system"
+    ]
+   },
+   "params": [
+    {
+     "name": "target",
+     "type": "string",
+     "description": "要操作的项的名称（或其一部分），如 'Theme: match system'",
+     "required": true,
+     "positional": true
+    }
+   ],
+   "effect": "点击名称匹配的「theme: *」项（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "{{target}}",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "account.select",
+   "resource": "account",
+   "verb": "select",
+   "summary": "account: *（1 项，如 Account: local）",
+   "source": "ui-collection",
+   "ui": {
+    "path": "主界面 > account: *",
+    "role": "button",
+    "region": null,
+    "view": "主界面",
+    "examples": [
+     "Account: local"
+    ]
+   },
+   "params": [
+    {
+     "name": "target",
+     "type": "string",
+     "description": "要操作的项的名称（或其一部分），如 'Account: local'",
+     "required": true,
+     "positional": true
+    }
+   ],
+   "effect": "点击名称匹配的「account: *」项（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "{{target}}",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "examplea-led-blinker-its-board.open",
+   "resource": "examplea-led-blinker-its-board",
+   "verb": "open",
+   "summary": "open the examplea # led blinker with its board（1 项，如 Open the exampleA 555 LED blinker with its board）",
+   "source": "ui-collection",
+   "ui": {
+    "path": "主界面 > Start > open the examplea # led blinker with its board",
+    "role": "button",
+    "region": "Start",
+    "view": "主界面",
+    "examples": [
+     "Open the exampleA 555 LED blinker with its board"
+    ]
+   },
+   "params": [
+    {
+     "name": "target",
+     "type": "string",
+     "description": "要操作的项的名称（或其一部分），如 'Open the exampleA 555 LED blinker with its board'",
+     "required": true,
+     "positional": true
+    }
+   ],
+   "effect": "点击名称匹配的「open the examplea # led blinker with its board」项（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "{{target}}",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "design-canvas.dismiss",
+   "resource": "design-canvas",
+   "verb": "dismiss",
+   "summary": "Skip to the design canvas",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Skip to the design canvas",
+    "role": "link",
+    "name": "Skip to the design canvas",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Skip to the design canvas」（link）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Skip to the design canvas",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "project.create",
+   "resource": "project",
+   "verb": "create",
+   "summary": "New project",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > New project",
+    "role": "button",
+    "name": "New project",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「New project」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "New project",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "project.open",
+   "resource": "project",
+   "verb": "open",
+   "summary": "Open project",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Open project",
+    "role": "button",
+    "name": "Open project",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Open project」（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Open project",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "save.save",
+   "resource": "save",
+   "verb": "save",
+   "summary": "Save",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Save",
+    "role": "button",
+    "name": "Save",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Save」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Save",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "undo.undo",
+   "resource": "undo",
+   "verb": "undo",
+   "summary": "Undo",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Undo",
+    "role": "button",
+    "name": "Undo",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Undo」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Undo",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "redo.redo",
+   "resource": "redo",
+   "verb": "redo",
+   "summary": "Redo",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Redo",
+    "role": "button",
+    "name": "Redo",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Redo」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Redo",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "commandsctrlk.search",
+   "resource": "commandsctrlk",
+   "verb": "search",
+   "summary": "Search commandsCtrl+K",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > banner > Search commandsCtrl+K",
+    "role": "button",
+    "name": "Search commandsCtrl+K",
+    "region": "banner",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Search commandsCtrl+K」（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Search commandsCtrl+K",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "source-code-github-opens-tab.show",
+   "resource": "source-code-github-opens-tab",
+   "verb": "show",
+   "summary": "Source code on GitHub (opens in a new tab)",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Source code on GitHub (opens in a new tab)",
+    "role": "link",
+    "name": "Source code on GitHub (opens in a new tab)",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Source code on GitHub (opens in a new tab)」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Source code on GitHub (opens in a new tab)",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "file.activate",
+   "resource": "file",
+   "verb": "activate",
+   "summary": "File",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Main menu > File",
+    "role": "menuitem",
+    "name": "File",
+    "region": "Main menu",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「File」（menuitem）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "File",
+       "role": "menuitem"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "edit.update",
+   "resource": "edit",
+   "verb": "update",
+   "summary": "Edit",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Main menu > Edit",
+    "role": "menuitem",
+    "name": "Edit",
+    "region": "Main menu",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Edit」（menuitem）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Edit",
+       "role": "menuitem"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "view.show",
+   "resource": "view",
+   "verb": "show",
+   "summary": "View",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Main menu > View",
+    "role": "menuitem",
+    "name": "View",
+    "region": "Main menu",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「View」（menuitem），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "View",
+       "role": "menuitem"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "project.activate",
+   "resource": "project",
+   "verb": "activate",
+   "summary": "Project",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Main menu > Project",
+    "role": "menuitem",
+    "name": "Project",
+    "region": "Main menu",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Project」（menuitem）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Project",
+       "role": "menuitem"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "reports.activate",
+   "resource": "reports",
+   "verb": "activate",
+   "summary": "Reports",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Main menu > Reports",
+    "role": "menuitem",
+    "name": "Reports",
+    "region": "Main menu",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Reports」（menuitem）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Reports",
+       "role": "menuitem"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "window.activate",
+   "resource": "window",
+   "verb": "activate",
+   "summary": "Window",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Main menu > Window",
+    "role": "menuitem",
+    "name": "Window",
+    "region": "Main menu",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Window」（menuitem）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Window",
+       "role": "menuitem"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "help.show",
+   "resource": "help",
+   "verb": "show",
+   "summary": "Help",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Main menu > Help",
+    "role": "menuitem",
+    "name": "Help",
+    "region": "Main menu",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Help」（menuitem），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Help",
+       "role": "menuitem"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "schematic-sheet.create",
+   "resource": "schematic-sheet",
+   "verb": "create",
+   "summary": "Add schematic sheet",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Add schematic sheet",
+    "role": "button",
+    "name": "Add schematic sheet",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Add schematic sheet」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Add schematic sheet",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "board.create",
+   "resource": "board",
+   "verb": "create",
+   "summary": "Add board",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Add board",
+    "role": "button",
+    "name": "Add board",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Add board」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Add board",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "project-options.activate",
+   "resource": "project-options",
+   "verb": "activate",
+   "summary": "Project options",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Project options",
+    "role": "button",
+    "name": "Project options",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Project options」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Project options",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "projects.show",
+   "resource": "projects",
+   "verb": "show",
+   "summary": "Projects",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Project panels > Projects",
+    "role": "tab",
+    "name": "Projects",
+    "region": "Project panels",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Projects」（tab），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Projects",
+       "role": "tab"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "navigator.show",
+   "resource": "navigator",
+   "verb": "show",
+   "summary": "Navigator",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Project panels > Navigator",
+    "role": "tab",
+    "name": "Navigator",
+    "region": "Project panels",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Navigator」（tab），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Navigator",
+       "role": "tab"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "properties.show",
+   "resource": "properties",
+   "verb": "show",
+   "summary": "Properties",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Design panels > Properties",
+    "role": "tab",
+    "name": "Properties",
+    "region": "Design panels",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Properties」（tab），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Properties",
+       "role": "tab"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "components.show",
+   "resource": "components",
+   "verb": "show",
+   "summary": "Components",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Design panels > Components",
+    "role": "tab",
+    "name": "Components",
+    "region": "Design panels",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Components」（tab），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Components",
+       "role": "tab"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "puter.show",
+   "resource": "puter",
+   "verb": "show",
+   "summary": "Puter",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Status > Puter",
+    "role": "link",
+    "name": "Puter",
+    "region": "Status",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Puter」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Puter",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "panels.activate",
+   "resource": "panels",
+   "verb": "activate",
+   "summary": "Panels",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Status > Panels",
+    "role": "button",
+    "name": "Panels",
+    "region": "Status",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Panels」（button）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Panels",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "it.dismiss",
+   "resource": "it",
+   "verb": "dismiss",
+   "summary": "Got it",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Notifications > Got it",
+    "role": "button",
+    "name": "Got it",
+    "region": "Notifications",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Got it」（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Got it",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "notification.dismiss",
+   "resource": "notification",
+   "verb": "dismiss",
+   "summary": "Dismiss notification",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Dismiss notification",
+    "role": "button",
+    "name": "Dismiss notification",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Dismiss notification」（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Dismiss notification",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "preferences.activate",
+   "resource": "preferences",
+   "verb": "activate",
+   "summary": "Preferences",
+   "source": "ui",
+   "ui": {
+    "path": "Account: local > Account > Preferences",
+    "role": "menuitem",
+    "name": "Preferences",
+    "region": "Account",
+    "view": "Account: local"
+   },
+   "params": [],
+   "effect": "点击「Preferences」（menuitem）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Account: local",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Preferences",
+       "role": "menuitem"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "schematic-sheet.activate",
+   "resource": "schematic-sheet",
+   "verb": "activate",
+   "summary": "Schematic sheet",
+   "source": "ui",
+   "ui": {
+    "path": "Project options > Context menu > Schematic sheet",
+    "role": "menuitem",
+    "name": "Schematic sheet",
+    "region": "Context menu",
+    "view": "Project options"
+   },
+   "params": [],
+   "effect": "点击「Schematic sheet」（menuitem）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Project options",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Schematic sheet",
+       "role": "menuitem"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "board.activate",
+   "resource": "board",
+   "verb": "activate",
+   "summary": "Board",
+   "source": "ui",
+   "ui": {
+    "path": "Project options > Context menu > Board",
+    "role": "menuitem",
+    "name": "Board",
+    "region": "Context menu",
+    "view": "Project options"
+   },
+   "params": [],
+   "effect": "点击「Board」（menuitem）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Project options",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Board",
+       "role": "menuitem"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "project.rename",
+   "resource": "project",
+   "verb": "rename",
+   "summary": "Rename project...",
+   "source": "ui",
+   "ui": {
+    "path": "Project options > Context menu > Rename project...",
+    "role": "menuitem",
+    "name": "Rename project...",
+    "region": "Context menu",
+    "view": "Project options"
+   },
+   "params": [],
+   "effect": "点击「Rename project...」（menuitem）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Project options",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Rename project...",
+       "role": "menuitem"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "savectrls.activate",
+   "resource": "savectrls",
+   "verb": "activate",
+   "summary": "SaveCtrl+S",
+   "source": "ui",
+   "ui": {
+    "path": "Project options > Context menu > SaveCtrl+S",
+    "role": "menuitem",
+    "name": "SaveCtrl+S",
+    "region": "Context menu",
+    "view": "Project options"
+   },
+   "params": [],
+   "effect": "点击「SaveCtrl+S」（menuitem）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Project options",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "SaveCtrl+S",
+       "role": "menuitem"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "project-file.export",
+   "resource": "project-file",
+   "verb": "export",
+   "summary": "Download project file",
+   "source": "ui",
+   "ui": {
+    "path": "Project options > Context menu > Download project file",
+    "role": "menuitem",
+    "name": "Download project file",
+    "region": "Context menu",
+    "view": "Project options"
+   },
+   "params": [],
+   "effect": "点击「Download project file」（menuitem）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Project options",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Download project file",
+       "role": "menuitem"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "compile-electrical-rules-check.activate",
+   "resource": "compile-electrical-rules-check",
+   "verb": "activate",
+   "summary": "Compile (electrical rules check)",
+   "source": "ui",
+   "ui": {
+    "path": "Project options > Context menu > Compile (electrical rules check)",
+    "role": "menuitem",
+    "name": "Compile (electrical rules check)",
+    "region": "Context menu",
+    "view": "Project options"
+   },
+   "params": [],
+   "effect": "点击「Compile (electrical rules check)」（menuitem）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Project options",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Compile (electrical rules check)",
+       "role": "menuitem"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "annotate-schematics.activate",
+   "resource": "annotate-schematics",
+   "verb": "activate",
+   "summary": "Annotate schematics...",
+   "source": "ui",
+   "ui": {
+    "path": "Project options > Context menu > Annotate schematics...",
+    "role": "menuitem",
+    "name": "Annotate schematics...",
+    "region": "Context menu",
+    "view": "Project options"
+   },
+   "params": [],
+   "effect": "点击「Annotate schematics...」（menuitem）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Project options",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Annotate schematics...",
+       "role": "menuitem"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "board-from-schematic.update",
+   "resource": "board-from-schematic",
+   "verb": "update",
+   "summary": "Update board from schematic...",
+   "source": "ui",
+   "ui": {
+    "path": "Project options > Context menu > Update board from schematic...",
+    "role": "menuitem",
+    "name": "Update board from schematic...",
+    "region": "Context menu",
+    "view": "Project options"
+   },
+   "params": [],
+   "effect": "点击「Update board from schematic...」（menuitem）",
+   "permission": "modify",
+   "undoable": "可能（应用提供撤销，未逐项验证）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Project options",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Update board from schematic...",
+       "role": "menuitem"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "project.close",
+   "resource": "project",
+   "verb": "close",
+   "summary": "Close project",
+   "source": "ui",
+   "ui": {
+    "path": "Project options > Context menu > Close project",
+    "role": "menuitem",
+    "name": "Close project",
+    "region": "Context menu",
+    "view": "Project options"
+   },
+   "params": [],
+   "effect": "点击「Close project」（menuitem）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Project options",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Close project",
+       "role": "menuitem"
+      }
+     }
+    ]
+   }
+  }
+ ]
+}

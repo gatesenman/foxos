@@ -1,0 +1,2414 @@
+{
+ "app": "tasks",
+ "name": "Tasks",
+ "generated_by": "scripts/inventory_ops.py",
+ "commit": "0fbb88cdee2f54c94a9d2c975f43322888813c5d",
+ "title": "Tasks",
+ "ops": [
+  {
+   "id": "add.create",
+   "resource": "add",
+   "verb": "create",
+   "summary": "add for *（1 项，如 Add for today）",
+   "source": "ui-collection",
+   "ui": {
+    "path": "主界面 > header > add for *",
+    "role": "button",
+    "region": "header",
+    "view": "主界面",
+    "examples": [
+     "Add for today"
+    ]
+   },
+   "params": [
+    {
+     "name": "target",
+     "type": "string",
+     "description": "要操作的项的名称（或其一部分），如 'Add for today'",
+     "required": true,
+     "positional": true
+    }
+   ],
+   "effect": "点击名称匹配的「add for *」项（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "{{target}}",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "skip.dismiss",
+   "resource": "skip",
+   "verb": "dismiss",
+   "summary": "skip for *（1 项，如 Skip for now）",
+   "source": "ui-collection",
+   "ui": {
+    "path": "主界面 > Welcome > skip for *",
+    "role": "button",
+    "region": "Welcome",
+    "view": "主界面",
+    "examples": [
+     "Skip for now"
+    ]
+   },
+   "params": [
+    {
+     "name": "target",
+     "type": "string",
+     "description": "要操作的项的名称（或其一部分），如 'Skip for now'",
+     "required": true,
+     "positional": true
+    }
+   ],
+   "effect": "点击名称匹配的「skip for *」项（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "{{target}}",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "list.open",
+   "resource": "list",
+   "verb": "open",
+   "summary": "open list: *（2 项，如 Open list: Personal）",
+   "source": "ui-collection",
+   "ui": {
+    "path": "Lists > open list: *",
+    "role": "button",
+    "region": null,
+    "view": "Lists",
+    "examples": [
+     "Open list: Personal",
+     "Open list: Work"
+    ]
+   },
+   "params": [
+    {
+     "name": "target",
+     "type": "string",
+     "description": "要操作的项的名称（或其一部分），如 'Open list: Personal'",
+     "required": true,
+     "positional": true
+    }
+   ],
+   "effect": "点击名称匹配的「open list: *」项（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Lists",
+       "role": "link"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "{{target}}",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "actions.select",
+   "resource": "actions",
+   "verb": "select",
+   "summary": "actions for *（2 项，如 Actions for Personal）",
+   "source": "ui-collection",
+   "ui": {
+    "path": "Lists > actions for *",
+    "role": "button",
+    "region": null,
+    "view": "Lists",
+    "examples": [
+     "Actions for Personal",
+     "Actions for Work"
+    ]
+   },
+   "params": [
+    {
+     "name": "target",
+     "type": "string",
+     "description": "要操作的项的名称（或其一部分），如 'Actions for Personal'",
+     "required": true,
+     "positional": true
+    }
+   ],
+   "effect": "点击名称匹配的「actions for *」项（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Lists",
+       "role": "link"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "{{target}}",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "tasks.open",
+   "resource": "tasks",
+   "verb": "open",
+   "summary": "# open tasks（42 项，如 Mon, Oct 26, 0 open tasks）",
+   "source": "ui-collection",
+   "ui": {
+    "path": "Calendar > # open tasks",
+    "role": "button",
+    "region": null,
+    "view": "Calendar",
+    "examples": [
+     "Mon, Oct 26, 0 open tasks",
+     "Tue, Oct 27, 0 open tasks",
+     "Wed, Oct 28, 0 open tasks",
+     "Thu, Oct 29, 0 open tasks",
+     "Fri, Oct 30, 0 open tasks"
+    ]
+   },
+   "params": [
+    {
+     "name": "target",
+     "type": "string",
+     "description": "要操作的项的名称（或其一部分），如 'Mon, Oct 26, 0 open tasks'",
+     "required": true,
+     "positional": true
+    }
+   ],
+   "effect": "点击名称匹配的「# open tasks」项（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Calendar",
+       "role": "link"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "{{target}}",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "week-starts.select",
+   "resource": "week-starts",
+   "verb": "select",
+   "summary": "week starts on #（1 项，如 Week starts on Monday）",
+   "source": "ui-collection",
+   "ui": {
+    "path": "Settings > week starts on #",
+    "role": "switch",
+    "region": null,
+    "view": "Settings",
+    "examples": [
+     "Week starts on Monday"
+    ]
+   },
+   "params": [
+    {
+     "name": "target",
+     "type": "string",
+     "description": "要操作的项的名称（或其一部分），如 'Week starts on Monday'",
+     "required": true,
+     "positional": true
+    }
+   ],
+   "effect": "点击名称匹配的「week starts on #」项（switch）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Settings",
+       "role": "link"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "{{target}}",
+       "role": "switch"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "content.dismiss",
+   "resource": "content",
+   "verb": "dismiss",
+   "summary": "Skip to content",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Skip to content",
+    "role": "link",
+    "name": "Skip to content",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Skip to content」（link）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Skip to content",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "task.create",
+   "resource": "task",
+   "verb": "create",
+   "summary": "New task",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > aside > New task",
+    "role": "button",
+    "name": "New task",
+    "region": "aside",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「New task」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "New task",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "today.show",
+   "resource": "today",
+   "verb": "show",
+   "summary": "Today",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Main > Today",
+    "role": "link",
+    "name": "Today",
+    "region": "Main",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Today」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Today",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "upcoming.show",
+   "resource": "upcoming",
+   "verb": "show",
+   "summary": "Upcoming",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Main > Upcoming",
+    "role": "link",
+    "name": "Upcoming",
+    "region": "Main",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Upcoming」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Upcoming",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "lists.show",
+   "resource": "lists",
+   "verb": "show",
+   "summary": "Lists",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Main > Lists",
+    "role": "link",
+    "name": "Lists",
+    "region": "Main",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Lists」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Lists",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "calendar.show",
+   "resource": "calendar",
+   "verb": "show",
+   "summary": "Calendar",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Main > Calendar",
+    "role": "link",
+    "name": "Calendar",
+    "region": "Main",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Calendar」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Calendar",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "logbook.show",
+   "resource": "logbook",
+   "verb": "show",
+   "summary": "Logbook",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Main > Logbook",
+    "role": "link",
+    "name": "Logbook",
+    "region": "Main",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Logbook」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Logbook",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "settings.show",
+   "resource": "settings",
+   "verb": "show",
+   "summary": "Settings",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Main > Settings",
+    "role": "link",
+    "name": "Settings",
+    "region": "Main",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Settings」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Settings",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "list.create",
+   "resource": "list",
+   "verb": "create",
+   "summary": "New list",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > New list",
+    "role": "button",
+    "name": "New list",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「New list」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "New list",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "personal.show",
+   "resource": "personal",
+   "verb": "show",
+   "summary": "Personal",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Main > Personal",
+    "role": "link",
+    "name": "Personal",
+    "region": "Main",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Personal」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Personal",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "work.show",
+   "resource": "work",
+   "verb": "show",
+   "summary": "Work",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Main > Work",
+    "role": "link",
+    "name": "Work",
+    "region": "Main",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Work」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Work",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "search.search",
+   "resource": "search",
+   "verb": "search",
+   "summary": "Search/",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > aside > Search/",
+    "role": "button",
+    "name": "Search/",
+    "region": "aside",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Search/」（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Search/",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "add-task.set",
+   "resource": "add-task",
+   "verb": "set",
+   "summary": "Add a task",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Add a task",
+    "role": "textbox",
+    "name": "Add a task",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [
+    {
+     "name": "value",
+     "type": "string",
+     "description": "「Add a task」的新值",
+     "required": true,
+     "positional": true
+    },
+    {
+     "name": "submit",
+     "type": "boolean",
+     "description": "设置后按 Enter 提交",
+     "default": false
+    }
+   ],
+   "effect": "把「Add a task」设为给定值（触发 input / change 事件）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "set": {
+       "name": "Add a task",
+       "role": "textbox",
+       "value": "{{value}}"
+      }
+     },
+     {
+      "press_if": "submit",
+      "press": {
+       "key": "Enter",
+       "name": "Add a task",
+       "role": "textbox"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "options.show",
+   "resource": "options",
+   "verb": "show",
+   "summary": "More options",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > More options",
+    "role": "button",
+    "name": "More options",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「More options」（button），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "More options",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "close.close",
+   "resource": "close",
+   "verb": "close",
+   "summary": "Close",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Close",
+    "role": "button",
+    "name": "Close",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Close」（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Close",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "first-task.create",
+   "resource": "first-task",
+   "verb": "create",
+   "summary": "Add my first task",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Welcome > Add my first task",
+    "role": "button",
+    "name": "Add my first task",
+    "region": "Welcome",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Add my first task」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Add my first task",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "explore-sample-data.activate",
+   "resource": "explore-sample-data",
+   "verb": "activate",
+   "summary": "Explore with sample data",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Welcome > Explore with sample data",
+    "role": "button",
+    "name": "Explore with sample data",
+    "region": "Welcome",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Explore with sample data」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Explore with sample data",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "task-title.set",
+   "resource": "task-title",
+   "verb": "set",
+   "summary": "Task title",
+   "source": "ui",
+   "ui": {
+    "path": "New task > Task title",
+    "role": "textbox",
+    "name": "Task title",
+    "region": null,
+    "view": "New task"
+   },
+   "params": [
+    {
+     "name": "value",
+     "type": "string",
+     "description": "「Task title」的新值",
+     "required": true,
+     "positional": true
+    },
+    {
+     "name": "submit",
+     "type": "boolean",
+     "description": "设置后按 Enter 提交",
+     "default": false
+    }
+   ],
+   "effect": "把「Task title」设为给定值（触发 input / change 事件）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "New task",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "set": {
+       "name": "Task title",
+       "role": "textbox",
+       "value": "{{value}}"
+      }
+     },
+     {
+      "press_if": "submit",
+      "press": {
+       "key": "Enter",
+       "name": "Task title",
+       "role": "textbox"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "notes.set",
+   "resource": "notes",
+   "verb": "set",
+   "summary": "Notes",
+   "source": "ui",
+   "ui": {
+    "path": "New task > New task > Notes",
+    "role": "textbox",
+    "name": "Notes",
+    "region": "New task",
+    "view": "New task"
+   },
+   "params": [
+    {
+     "name": "value",
+     "type": "string",
+     "description": "「Notes」的新值",
+     "required": true,
+     "positional": true
+    },
+    {
+     "name": "submit",
+     "type": "boolean",
+     "description": "设置后按 Enter 提交",
+     "default": false
+    }
+   ],
+   "effect": "把「Notes」设为给定值（触发 input / change 事件）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "New task",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "set": {
+       "name": "Notes",
+       "role": "textbox",
+       "value": "{{value}}"
+      }
+     },
+     {
+      "press_if": "submit",
+      "press": {
+       "key": "Enter",
+       "name": "Notes",
+       "role": "textbox"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "list.set",
+   "resource": "list",
+   "verb": "set",
+   "summary": "List",
+   "source": "ui",
+   "ui": {
+    "path": "New task > New task > List",
+    "role": "combobox",
+    "name": "List",
+    "region": "New task",
+    "view": "New task"
+   },
+   "params": [
+    {
+     "name": "value",
+     "type": "string",
+     "description": "「List」的新值",
+     "required": true,
+     "positional": true,
+     "enum": [
+      "mwar80xr-lx3rl2",
+      "mwar80xr-4lf339"
+     ]
+    },
+    {
+     "name": "submit",
+     "type": "boolean",
+     "description": "设置后按 Enter 提交",
+     "default": false
+    }
+   ],
+   "effect": "把「List」设为给定值（触发 input / change 事件）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "New task",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "set": {
+       "name": "List",
+       "role": "combobox",
+       "value": "{{value}}"
+      }
+     },
+     {
+      "press_if": "submit",
+      "press": {
+       "key": "Enter",
+       "name": "List",
+       "role": "combobox"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "due-date.set",
+   "resource": "due-date",
+   "verb": "set",
+   "summary": "Due date",
+   "source": "ui",
+   "ui": {
+    "path": "New task > Due date",
+    "role": "textbox",
+    "name": "Due date",
+    "region": null,
+    "view": "New task"
+   },
+   "params": [
+    {
+     "name": "value",
+     "type": "string",
+     "description": "「Due date」的新值",
+     "required": true,
+     "positional": true
+    },
+    {
+     "name": "submit",
+     "type": "boolean",
+     "description": "设置后按 Enter 提交",
+     "default": false
+    }
+   ],
+   "effect": "把「Due date」设为给定值（触发 input / change 事件）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "New task",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "set": {
+       "name": "Due date",
+       "role": "textbox",
+       "value": "{{value}}"
+      }
+     },
+     {
+      "press_if": "submit",
+      "press": {
+       "key": "Enter",
+       "name": "Due date",
+       "role": "textbox"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "due-time.set",
+   "resource": "due-time",
+   "verb": "set",
+   "summary": "Due time",
+   "source": "ui",
+   "ui": {
+    "path": "New task > Due time",
+    "role": "textbox",
+    "name": "Due time",
+    "region": null,
+    "view": "New task"
+   },
+   "params": [
+    {
+     "name": "value",
+     "type": "string",
+     "description": "「Due time」的新值",
+     "required": true,
+     "positional": true
+    },
+    {
+     "name": "submit",
+     "type": "boolean",
+     "description": "设置后按 Enter 提交",
+     "default": false
+    }
+   ],
+   "effect": "把「Due time」设为给定值（触发 input / change 事件）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "New task",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "set": {
+       "name": "Due time",
+       "role": "textbox",
+       "value": "{{value}}"
+      }
+     },
+     {
+      "press_if": "submit",
+      "press": {
+       "key": "Enter",
+       "name": "Due time",
+       "role": "textbox"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "today.activate",
+   "resource": "today",
+   "verb": "activate",
+   "summary": "Today",
+   "source": "ui",
+   "ui": {
+    "path": "New task > New task > Today",
+    "role": "button",
+    "name": "Today",
+    "region": "New task",
+    "view": "New task"
+   },
+   "params": [],
+   "effect": "点击「Today」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "New task",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Today",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "tomorrow.activate",
+   "resource": "tomorrow",
+   "verb": "activate",
+   "summary": "Tomorrow",
+   "source": "ui",
+   "ui": {
+    "path": "New task > New task > Tomorrow",
+    "role": "button",
+    "name": "Tomorrow",
+    "region": "New task",
+    "view": "New task"
+   },
+   "params": [],
+   "effect": "点击「Tomorrow」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "New task",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Tomorrow",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "week.next",
+   "resource": "week",
+   "verb": "next",
+   "summary": "Next week",
+   "source": "ui",
+   "ui": {
+    "path": "New task > New task > Next week",
+    "role": "button",
+    "name": "Next week",
+    "region": "New task",
+    "view": "New task"
+   },
+   "params": [],
+   "effect": "点击「Next week」（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "New task",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Next week",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "no-date.activate",
+   "resource": "no-date",
+   "verb": "activate",
+   "summary": "No date",
+   "source": "ui",
+   "ui": {
+    "path": "New task > New task > No date",
+    "role": "button",
+    "name": "No date",
+    "region": "New task",
+    "view": "New task"
+   },
+   "params": [],
+   "effect": "点击「No date」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "New task",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "No date",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "remind-me.set",
+   "resource": "remind-me",
+   "verb": "set",
+   "summary": "Remind me",
+   "source": "ui",
+   "ui": {
+    "path": "New task > New task > Remind me",
+    "role": "combobox",
+    "name": "Remind me",
+    "region": "New task",
+    "view": "New task"
+   },
+   "params": [
+    {
+     "name": "value",
+     "type": "string",
+     "description": "「Remind me」的新值",
+     "required": true,
+     "positional": true,
+     "enum": [
+      "",
+      "0",
+      "10",
+      "60",
+      "1440"
+     ]
+    },
+    {
+     "name": "submit",
+     "type": "boolean",
+     "description": "设置后按 Enter 提交",
+     "default": false
+    }
+   ],
+   "effect": "把「Remind me」设为给定值（触发 input / change 事件）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "New task",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "set": {
+       "name": "Remind me",
+       "role": "combobox",
+       "value": "{{value}}"
+      }
+     },
+     {
+      "press_if": "submit",
+      "press": {
+       "key": "Enter",
+       "name": "Remind me",
+       "role": "combobox"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "none.activate",
+   "resource": "none",
+   "verb": "activate",
+   "summary": "None",
+   "source": "ui",
+   "ui": {
+    "path": "New task > Priority > None",
+    "role": "button",
+    "name": "None",
+    "region": "Priority",
+    "view": "New task"
+   },
+   "params": [],
+   "effect": "点击「None」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "New task",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "None",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "low.activate",
+   "resource": "low",
+   "verb": "activate",
+   "summary": "Low",
+   "source": "ui",
+   "ui": {
+    "path": "New task > Priority > Low",
+    "role": "button",
+    "name": "Low",
+    "region": "Priority",
+    "view": "New task"
+   },
+   "params": [],
+   "effect": "点击「Low」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "New task",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Low",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "medium.activate",
+   "resource": "medium",
+   "verb": "activate",
+   "summary": "Medium",
+   "source": "ui",
+   "ui": {
+    "path": "New task > Priority > Medium",
+    "role": "button",
+    "name": "Medium",
+    "region": "Priority",
+    "view": "New task"
+   },
+   "params": [],
+   "effect": "点击「Medium」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "New task",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Medium",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "high.activate",
+   "resource": "high",
+   "verb": "activate",
+   "summary": "High",
+   "source": "ui",
+   "ui": {
+    "path": "New task > Priority > High",
+    "role": "button",
+    "name": "High",
+    "region": "Priority",
+    "view": "New task"
+   },
+   "params": [],
+   "effect": "点击「High」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "New task",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "High",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "add-tag.set",
+   "resource": "add-tag",
+   "verb": "set",
+   "summary": "Add a tag",
+   "source": "ui",
+   "ui": {
+    "path": "New task > Add a tag",
+    "role": "textbox",
+    "name": "Add a tag",
+    "region": null,
+    "view": "New task"
+   },
+   "params": [
+    {
+     "name": "value",
+     "type": "string",
+     "description": "「Add a tag」的新值",
+     "required": true,
+     "positional": true
+    },
+    {
+     "name": "submit",
+     "type": "boolean",
+     "description": "设置后按 Enter 提交",
+     "default": false
+    }
+   ],
+   "effect": "把「Add a tag」设为给定值（触发 input / change 事件）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "New task",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "set": {
+       "name": "Add a tag",
+       "role": "textbox",
+       "value": "{{value}}"
+      }
+     },
+     {
+      "press_if": "submit",
+      "press": {
+       "key": "Enter",
+       "name": "Add a tag",
+       "role": "textbox"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "repeat.set",
+   "resource": "repeat",
+   "verb": "set",
+   "summary": "Repeat",
+   "source": "ui",
+   "ui": {
+    "path": "New task > New task > Repeat",
+    "role": "combobox",
+    "name": "Repeat",
+    "region": "New task",
+    "view": "New task"
+   },
+   "params": [
+    {
+     "name": "value",
+     "type": "string",
+     "description": "「Repeat」的新值",
+     "required": true,
+     "positional": true,
+     "enum": [
+      "never",
+      "daily",
+      "weekly",
+      "monthly",
+      "yearly"
+     ]
+    },
+    {
+     "name": "submit",
+     "type": "boolean",
+     "description": "设置后按 Enter 提交",
+     "default": false
+    }
+   ],
+   "effect": "把「Repeat」设为给定值（触发 input / change 事件）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "New task",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "set": {
+       "name": "Repeat",
+       "role": "combobox",
+       "value": "{{value}}"
+      }
+     },
+     {
+      "press_if": "submit",
+      "press": {
+       "key": "Enter",
+       "name": "Repeat",
+       "role": "combobox"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "subtask.create",
+   "resource": "subtask",
+   "verb": "create",
+   "summary": "Add subtask",
+   "source": "ui",
+   "ui": {
+    "path": "New task > New task > Add subtask",
+    "role": "button",
+    "name": "Add subtask",
+    "region": "New task",
+    "view": "New task"
+   },
+   "params": [],
+   "effect": "点击「Add subtask」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "New task",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Add subtask",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "cancel.cancel",
+   "resource": "cancel",
+   "verb": "cancel",
+   "summary": "Cancel",
+   "source": "ui",
+   "ui": {
+    "path": "New task > New task > Cancel",
+    "role": "button",
+    "name": "Cancel",
+    "region": "New task",
+    "view": "New task"
+   },
+   "params": [],
+   "effect": "点击「Cancel」（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "New task",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Cancel",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "task-2.create",
+   "resource": "task-2",
+   "verb": "create",
+   "summary": "Add task",
+   "source": "ui",
+   "ui": {
+    "path": "New task > New task > Add task",
+    "role": "button",
+    "name": "Add task",
+    "region": "New task",
+    "view": "New task"
+   },
+   "params": [],
+   "effect": "点击「Add task」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "New task",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Add task",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "upcoming-task.create",
+   "resource": "upcoming-task",
+   "verb": "create",
+   "summary": "New task",
+   "source": "ui",
+   "ui": {
+    "path": "Upcoming > header > New task",
+    "role": "button",
+    "name": "New task",
+    "region": "header",
+    "view": "Upcoming"
+   },
+   "params": [],
+   "effect": "点击「New task」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Upcoming",
+       "role": "link"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "New task",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "lists-list.create",
+   "resource": "lists-list",
+   "verb": "create",
+   "summary": "New list",
+   "source": "ui",
+   "ui": {
+    "path": "Lists > header > New list",
+    "role": "button",
+    "name": "New list",
+    "region": "header",
+    "view": "Lists"
+   },
+   "params": [],
+   "effect": "点击「New list」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Lists",
+       "role": "link"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "New list",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "ics-calendar-file.export",
+   "resource": "ics-calendar-file",
+   "verb": "export",
+   "summary": "Download .ics calendar file",
+   "source": "ui",
+   "ui": {
+    "path": "Calendar > Download .ics calendar file",
+    "role": "button",
+    "name": "Download .ics calendar file",
+    "region": null,
+    "view": "Calendar"
+   },
+   "params": [],
+   "effect": "点击「Download .ics calendar file」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Calendar",
+       "role": "link"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Download .ics calendar file",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "month.previous",
+   "resource": "month",
+   "verb": "previous",
+   "summary": "Previous month",
+   "source": "ui",
+   "ui": {
+    "path": "Calendar > Previous month",
+    "role": "button",
+    "name": "Previous month",
+    "region": null,
+    "view": "Calendar"
+   },
+   "params": [],
+   "effect": "点击「Previous month」（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Calendar",
+       "role": "link"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Previous month",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "calendar-today.activate",
+   "resource": "calendar-today",
+   "verb": "activate",
+   "summary": "Today",
+   "source": "ui",
+   "ui": {
+    "path": "Calendar > header > Today",
+    "role": "button",
+    "name": "Today",
+    "region": "header",
+    "view": "Calendar"
+   },
+   "params": [],
+   "effect": "点击「Today」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Calendar",
+       "role": "link"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Today",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "month.next",
+   "resource": "month",
+   "verb": "next",
+   "summary": "Next month",
+   "source": "ui",
+   "ui": {
+    "path": "Calendar > Next month",
+    "role": "button",
+    "name": "Next month",
+    "region": null,
+    "view": "Calendar"
+   },
+   "params": [],
+   "effect": "点击「Next month」（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Calendar",
+       "role": "link"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Next month",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "system.activate",
+   "resource": "system",
+   "verb": "activate",
+   "summary": "System",
+   "source": "ui",
+   "ui": {
+    "path": "Settings > Theme > System",
+    "role": "button",
+    "name": "System",
+    "region": "Theme",
+    "view": "Settings"
+   },
+   "params": [],
+   "effect": "点击「System」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Settings",
+       "role": "link"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "System",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "light.activate",
+   "resource": "light",
+   "verb": "activate",
+   "summary": "Light",
+   "source": "ui",
+   "ui": {
+    "path": "Settings > Theme > Light",
+    "role": "button",
+    "name": "Light",
+    "region": "Theme",
+    "view": "Settings"
+   },
+   "params": [],
+   "effect": "点击「Light」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Settings",
+       "role": "link"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Light",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "dark.activate",
+   "resource": "dark",
+   "verb": "activate",
+   "summary": "Dark",
+   "source": "ui",
+   "ui": {
+    "path": "Settings > Theme > Dark",
+    "role": "button",
+    "name": "Dark",
+    "region": "Theme",
+    "view": "Settings"
+   },
+   "params": [],
+   "effect": "点击「Dark」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Settings",
+       "role": "link"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Dark",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "due-date-reminders.toggle",
+   "resource": "due-date-reminders",
+   "verb": "toggle",
+   "summary": "Due-date reminders",
+   "source": "ui",
+   "ui": {
+    "path": "Settings > Due-date reminders",
+    "role": "switch",
+    "name": "Due-date reminders",
+    "region": null,
+    "view": "Settings"
+   },
+   "params": [],
+   "effect": "切换「Due-date reminders」",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Settings",
+       "role": "link"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Due-date reminders",
+       "role": "switch"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "exportdownload-everything-as-json-file.activate",
+   "resource": "exportdownload-everything-as-json-file",
+   "verb": "activate",
+   "summary": "ExportDownload everything as a JSON file",
+   "source": "ui",
+   "ui": {
+    "path": "Settings > main > ExportDownload everything as a JSON file",
+    "role": "button",
+    "name": "ExportDownload everything as a JSON file",
+    "region": "main",
+    "view": "Settings"
+   },
+   "params": [],
+   "effect": "点击「ExportDownload everything as a JSON file」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Settings",
+       "role": "link"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "ExportDownload everything as a JSON file",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "lists.previous",
+   "resource": "lists",
+   "verb": "previous",
+   "summary": "Back to lists",
+   "source": "ui",
+   "ui": {
+    "path": "Personal > Back to lists",
+    "role": "button",
+    "name": "Back to lists",
+    "region": null,
+    "view": "Personal"
+   },
+   "params": [],
+   "effect": "点击「Back to lists」（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Personal",
+       "role": "link"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Back to lists",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "list.share",
+   "resource": "list",
+   "verb": "share",
+   "summary": "Share list",
+   "source": "ui",
+   "ui": {
+    "path": "Personal > Share list",
+    "role": "button",
+    "name": "Share list",
+    "region": null,
+    "view": "Personal"
+   },
+   "params": [],
+   "effect": "点击「Share list」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Personal",
+       "role": "link"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Share list",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "list.update",
+   "resource": "list",
+   "verb": "update",
+   "summary": "Edit list",
+   "source": "ui",
+   "ui": {
+    "path": "Personal > Edit list",
+    "role": "button",
+    "name": "Edit list",
+    "region": null,
+    "view": "Personal"
+   },
+   "params": [],
+   "effect": "点击「Edit list」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Personal",
+       "role": "link"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Edit list",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "personal-add.create",
+   "resource": "personal-add",
+   "verb": "create",
+   "summary": "Add",
+   "source": "ui",
+   "ui": {
+    "path": "Personal > header > Add",
+    "role": "button",
+    "name": "Add",
+    "region": "header",
+    "view": "Personal"
+   },
+   "params": [],
+   "effect": "点击「Add」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Personal",
+       "role": "link"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Add",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "search-tasks.set",
+   "resource": "search-tasks",
+   "verb": "set",
+   "summary": "Search tasks",
+   "source": "ui",
+   "ui": {
+    "path": "Search/ > Search tasks",
+    "role": "textbox",
+    "name": "Search tasks",
+    "region": null,
+    "view": "Search/"
+   },
+   "params": [
+    {
+     "name": "value",
+     "type": "string",
+     "description": "「Search tasks」的新值",
+     "required": true,
+     "positional": true
+    },
+    {
+     "name": "submit",
+     "type": "boolean",
+     "description": "设置后按 Enter 提交",
+     "default": false
+    }
+   ],
+   "effect": "把「Search tasks」设为给定值（触发 input / change 事件）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Search/",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "set": {
+       "name": "Search tasks",
+       "role": "textbox",
+       "value": "{{value}}"
+      }
+     },
+     {
+      "press_if": "submit",
+      "press": {
+       "key": "Enter",
+       "name": "Search tasks",
+       "role": "textbox"
+      }
+     }
+    ]
+   }
+  }
+ ]
+}

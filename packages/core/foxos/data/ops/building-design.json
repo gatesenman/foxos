@@ -1,0 +1,39 @@
+{
+ "app": "building-design",
+ "name": "Building Design",
+ "generated_by": "scripts/inventory_ops.py",
+ "commit": "0fbb88cdee2f54c94a9d2c975f43322888813c5d",
+ "title": "Building Design",
+ "ops": [
+  {
+   "id": "it.dismiss",
+   "resource": "it",
+   "verb": "dismiss",
+   "summary": "Got it",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Early alpha notice > Got it",
+    "role": "button",
+    "name": "Got it",
+    "region": "Early alpha notice",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Got it」（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Got it",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  }
+ ]
+}

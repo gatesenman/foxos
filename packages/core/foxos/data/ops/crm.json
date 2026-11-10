@@ -1,0 +1,496 @@
+{
+ "app": "crm",
+ "name": "CRM",
+ "generated_by": "scripts/inventory_ops.py",
+ "commit": "0fbb88cdee2f54c94a9d2c975f43322888813c5d",
+ "title": "Sales CRM",
+ "ops": [
+  {
+   "id": "skip.dismiss",
+   "resource": "skip",
+   "verb": "dismiss",
+   "summary": "skip for *（1 项，如 Skip for now）",
+   "source": "ui-collection",
+   "ui": {
+    "path": "主界面 > Welcome > skip for *",
+    "role": "button",
+    "region": "Welcome",
+    "view": "主界面",
+    "examples": [
+     "Skip for now"
+    ]
+   },
+   "params": [
+    {
+     "name": "target",
+     "type": "string",
+     "description": "要操作的项的名称（或其一部分），如 'Skip for now'",
+     "required": true,
+     "positional": true
+    }
+   ],
+   "effect": "点击名称匹配的「skip for *」项（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "{{target}}",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "searchctrl-k.activate",
+   "resource": "searchctrl-k",
+   "verb": "activate",
+   "summary": "SearchCtrl K",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Main navigation > SearchCtrl K",
+    "role": "button",
+    "name": "SearchCtrl K",
+    "region": "Main navigation",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「SearchCtrl K」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "SearchCtrl K",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "home.show",
+   "resource": "home",
+   "verb": "show",
+   "summary": "Home",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Main navigation > Home",
+    "role": "link",
+    "name": "Home",
+    "region": "Main navigation",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Home」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Home",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "pipeline.show",
+   "resource": "pipeline",
+   "verb": "show",
+   "summary": "Pipeline",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Main navigation > Pipeline",
+    "role": "link",
+    "name": "Pipeline",
+    "region": "Main navigation",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Pipeline」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Pipeline",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "leads.show",
+   "resource": "leads",
+   "verb": "show",
+   "summary": "Leads",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Main navigation > Leads",
+    "role": "link",
+    "name": "Leads",
+    "region": "Main navigation",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Leads」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Leads",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "follow-ups.show",
+   "resource": "follow-ups",
+   "verb": "show",
+   "summary": "Follow-ups",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Main navigation > Follow-ups",
+    "role": "link",
+    "name": "Follow-ups",
+    "region": "Main navigation",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Follow-ups」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Follow-ups",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "companies.show",
+   "resource": "companies",
+   "verb": "show",
+   "summary": "Companies",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Main navigation > Companies",
+    "role": "link",
+    "name": "Companies",
+    "region": "Main navigation",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Companies」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Companies",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "activity.show",
+   "resource": "activity",
+   "verb": "show",
+   "summary": "Activity",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Main navigation > Activity",
+    "role": "link",
+    "name": "Activity",
+    "region": "Main navigation",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Activity」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Activity",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "forecast.show",
+   "resource": "forecast",
+   "verb": "show",
+   "summary": "Forecast",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Main navigation > Forecast",
+    "role": "link",
+    "name": "Forecast",
+    "region": "Main navigation",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Forecast」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Forecast",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "settings.show",
+   "resource": "settings",
+   "verb": "show",
+   "summary": "Settings",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Main navigation > Settings",
+    "role": "link",
+    "name": "Settings",
+    "region": "Main navigation",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Settings」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Settings",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "lead.create",
+   "resource": "lead",
+   "verb": "create",
+   "summary": "Add a lead",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > main > Add a lead",
+    "role": "button",
+    "name": "Add a lead",
+    "region": "main",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Add a lead」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Add a lead",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "me-around.show",
+   "resource": "me-around",
+   "verb": "show",
+   "summary": "Show me around",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > main > Show me around",
+    "role": "button",
+    "name": "Show me around",
+    "region": "main",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Show me around」（button），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Show me around",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "close.close",
+   "resource": "close",
+   "verb": "close",
+   "summary": "Close",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Close",
+    "role": "button",
+    "name": "Close",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Close」（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Close",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "set-up-pipeline.activate",
+   "resource": "set-up-pipeline",
+   "verb": "activate",
+   "summary": "Set up my pipeline",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Welcome > Set up my pipeline",
+    "role": "button",
+    "name": "Set up my pipeline",
+    "region": "Welcome",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Set up my pipeline」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Set up my pipeline",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "explore-sample-data.activate",
+   "resource": "explore-sample-data",
+   "verb": "activate",
+   "summary": "Explore with sample data",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Welcome > Explore with sample data",
+    "role": "button",
+    "name": "Explore with sample data",
+    "region": "Welcome",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Explore with sample data」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Explore with sample data",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "command-palette.show",
+   "resource": "command-palette",
+   "verb": "show",
+   "summary": "快捷键 mod+k",
+   "source": "shortcut",
+   "ui": {
+    "path": "键盘 mod+k",
+    "shortcut": "mod+k",
+    "defined_in": "src/ui/palette.js"
+   },
+   "params": [],
+   "effect": "在当前焦点上按 mod+k（src/ui/palette.js 中定义）",
+   "permission": "read",
+   "undoable": "不适用",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "press": {
+       "key": "mod+k"
+      }
+     }
+    ]
+   }
+  }
+ ]
+}

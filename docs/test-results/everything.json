@@ -1,0 +1,38 @@
+{
+ "tasks": {
+  "app": "tasks",
+  "group": "productivity",
+  "boot": "ok",
+  "parity": "different",
+  "op": "first-task.create",
+  "cli": "foxos tasks first-task create",
+  "note": "{\"onlyGui\":[],\"onlyCli\":[],\"kvEqual\":false}"
+ },
+ "chess": {
+  "app": "chess",
+  "group": "games",
+  "boot": "ok",
+  "parity": "equal",
+  "op": "game.create",
+  "cli": "foxos chess game create",
+  "note": null
+ },
+ "spreadsheet": {
+  "app": "spreadsheet",
+  "group": "office",
+  "boot": "ok",
+  "parity": "equal",
+  "op": "cell-reference.set",
+  "cli": "foxos spreadsheet cell-reference set foxos parity",
+  "note": null
+ },
+ "crm": {
+  "app": "crm",
+  "group": "business",
+  "boot": "ok",
+  "parity": "no-op",
+  "op": null,
+  "cli": null,
+  "note": "主界面没有适合做等价检查的操作"
+ }
+}

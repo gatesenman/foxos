@@ -1,0 +1,1262 @@
+{
+ "app": "childcare",
+ "name": "Childcare",
+ "generated_by": "scripts/inventory_ops.py",
+ "commit": "0fbb88cdee2f54c94a9d2c975f43322888813c5d",
+ "title": "Good evening · Childcare",
+ "ops": [
+  {
+   "id": "children-enrolled.select",
+   "resource": "children-enrolled",
+   "verb": "select",
+   "summary": "children # enrolled（1 项，如 Children here0of 0 enrolled）",
+   "source": "ui-collection",
+   "ui": {
+    "path": "主界面 > main > children # enrolled",
+    "role": "link",
+    "region": "main",
+    "view": "主界面",
+    "examples": [
+     "Children here0of 0 enrolled"
+    ]
+   },
+   "params": [
+    {
+     "name": "target",
+     "type": "string",
+     "description": "要操作的项的名称（或其一部分），如 'Children here0of 0 enrolled'",
+     "required": true,
+     "positional": true
+    }
+   ],
+   "effect": "点击名称匹配的「children # enrolled」项（link）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "{{target}}",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "absent-reported.select",
+   "resource": "absent-reported",
+   "verb": "select",
+   "summary": "absent # reported（1 项，如 Absent today0Nobody reported）",
+   "source": "ui-collection",
+   "ui": {
+    "path": "主界面 > main > absent # reported",
+    "role": "link",
+    "region": "main",
+    "view": "主界面",
+    "examples": [
+     "Absent today0Nobody reported"
+    ]
+   },
+   "params": [
+    {
+     "name": "target",
+     "type": "string",
+     "description": "要操作的项的名称（或其一部分），如 'Absent today0Nobody reported'",
+     "required": true,
+     "positional": true
+    }
+   ],
+   "effect": "点击名称匹配的「absent # reported」项（link）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "{{target}}",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "staff-staff-members.select",
+   "resource": "staff-staff-members",
+   "verb": "select",
+   "summary": "staff on # staff members（1 项，如 Staff on site00 staff members）",
+   "source": "ui-collection",
+   "ui": {
+    "path": "主界面 > main > staff on # staff members",
+    "role": "link",
+    "region": "main",
+    "view": "主界面",
+    "examples": [
+     "Staff on site00 staff members"
+    ]
+   },
+   "params": [
+    {
+     "name": "target",
+     "type": "string",
+     "description": "要操作的项的名称（或其一部分），如 'Staff on site00 staff members'",
+     "required": true,
+     "positional": true
+    }
+   ],
+   "effect": "点击名称匹配的「staff on # staff members」项（link）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "{{target}}",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "ratio-rooms-ratio.select",
+   "resource": "ratio-rooms-ratio",
+   "verb": "select",
+   "summary": "ratio # rooms in ratio（1 项，如 Ratio alerts0All rooms in ratio）",
+   "source": "ui-collection",
+   "ui": {
+    "path": "主界面 > main > ratio # rooms in ratio",
+    "role": "link",
+    "region": "main",
+    "view": "主界面",
+    "examples": [
+     "Ratio alerts0All rooms in ratio"
+    ]
+   },
+   "params": [
+    {
+     "name": "target",
+     "type": "string",
+     "description": "要操作的项的名称（或其一部分），如 'Ratio alerts0All rooms in ratio'",
+     "required": true,
+     "positional": true
+    }
+   ],
+   "effect": "点击名称匹配的「ratio # rooms in ratio」项（link）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "{{target}}",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "content.dismiss",
+   "resource": "content",
+   "verb": "dismiss",
+   "summary": "Skip to content",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Skip to content",
+    "role": "link",
+    "name": "Skip to content",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Skip to content」（link）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Skip to content",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "log-or-add-n.activate",
+   "resource": "log-or-add-n",
+   "verb": "activate",
+   "summary": "Log or add (N)",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > aside > Log or add (N)",
+    "role": "button",
+    "name": "Log or add (N)",
+    "region": "aside",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Log or add (N)」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Log or add (N)",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "home.show",
+   "resource": "home",
+   "verb": "show",
+   "summary": "Home",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Main > Home",
+    "role": "link",
+    "name": "Home",
+    "region": "Main",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Home」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Home",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "check-in.show",
+   "resource": "check-in",
+   "verb": "show",
+   "summary": "Check-in",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Main > Check-in",
+    "role": "link",
+    "name": "Check-in",
+    "region": "Main",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Check-in」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Check-in",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "activities.show",
+   "resource": "activities",
+   "verb": "show",
+   "summary": "Activities",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Main > Activities",
+    "role": "link",
+    "name": "Activities",
+    "region": "Main",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Activities」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Activities",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "messages.show",
+   "resource": "messages",
+   "verb": "show",
+   "summary": "Messages",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Messages",
+    "role": "link",
+    "name": "Messages",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Messages」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Messages",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "children.show",
+   "resource": "children",
+   "verb": "show",
+   "summary": "Children",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Main > Children",
+    "role": "link",
+    "name": "Children",
+    "region": "Main",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Children」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Children",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "families.show",
+   "resource": "families",
+   "verb": "show",
+   "summary": "Families",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Main > Families",
+    "role": "link",
+    "name": "Families",
+    "region": "Main",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Families」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Families",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "rooms.show",
+   "resource": "rooms",
+   "verb": "show",
+   "summary": "Rooms",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Main > Rooms",
+    "role": "link",
+    "name": "Rooms",
+    "region": "Main",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Rooms」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Rooms",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "staff.show",
+   "resource": "staff",
+   "verb": "show",
+   "summary": "Staff",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Main > Staff",
+    "role": "link",
+    "name": "Staff",
+    "region": "Main",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Staff」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Staff",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "calendar.show",
+   "resource": "calendar",
+   "verb": "show",
+   "summary": "Calendar",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Main > Calendar",
+    "role": "link",
+    "name": "Calendar",
+    "region": "Main",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Calendar」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Calendar",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "menus.show",
+   "resource": "menus",
+   "verb": "show",
+   "summary": "Menus",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Main > Menus",
+    "role": "link",
+    "name": "Menus",
+    "region": "Main",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Menus」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Menus",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "billing.show",
+   "resource": "billing",
+   "verb": "show",
+   "summary": "Billing",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Billing",
+    "role": "link",
+    "name": "Billing",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Billing」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Billing",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "reports.show",
+   "resource": "reports",
+   "verb": "show",
+   "summary": "Reports",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Main > Reports",
+    "role": "link",
+    "name": "Reports",
+    "region": "Main",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Reports」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Reports",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "source-code-github-opens-tab.show",
+   "resource": "source-code-github-opens-tab",
+   "verb": "show",
+   "summary": "Source code on GitHub (opens in a new tab)",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Source code on GitHub (opens in a new tab)",
+    "role": "link",
+    "name": "Source code on GitHub (opens in a new tab)",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Source code on GitHub (opens in a new tab)」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Source code on GitHub (opens in a new tab)",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "puter.show",
+   "resource": "puter",
+   "verb": "show",
+   "summary": "Puter",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > aside > Puter",
+    "role": "link",
+    "name": "Puter",
+    "region": "aside",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Puter」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Puter",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "navigation.collapse",
+   "resource": "navigation",
+   "verb": "collapse",
+   "summary": "Collapse navigation",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Collapse navigation",
+    "role": "button",
+    "name": "Collapse navigation",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Collapse navigation」（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Collapse navigation",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "search.search",
+   "resource": "search",
+   "verb": "search",
+   "summary": "Search",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Search",
+    "role": "button",
+    "name": "Search",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Search」（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Search",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "keyboard-shortcuts.activate",
+   "resource": "keyboard-shortcuts",
+   "verb": "activate",
+   "summary": "Keyboard shortcuts",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Keyboard shortcuts",
+    "role": "button",
+    "name": "Keyboard shortcuts",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Keyboard shortcuts」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Keyboard shortcuts",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "settings.show",
+   "resource": "settings",
+   "verb": "show",
+   "summary": "Settings",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Settings",
+    "role": "link",
+    "name": "Settings",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Settings」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Settings",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "account-appearance.activate",
+   "resource": "account-appearance",
+   "verb": "activate",
+   "summary": "Account and appearance",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Account and appearance",
+    "role": "button",
+    "name": "Account and appearance",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Account and appearance」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Account and appearance",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "kiosk.show",
+   "resource": "kiosk",
+   "verb": "show",
+   "summary": "Kiosk",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > header > Kiosk",
+    "role": "link",
+    "name": "Kiosk",
+    "region": "header",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Kiosk」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Kiosk",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "check.run",
+   "resource": "check",
+   "verb": "run",
+   "summary": "Check in",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > header > Check in",
+    "role": "link",
+    "name": "Check in",
+    "region": "header",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Check in」（link）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Check in",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "log-activity.activate",
+   "resource": "log-activity",
+   "verb": "activate",
+   "summary": "Log activity",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > header > Log activity",
+    "role": "button",
+    "name": "Log activity",
+    "region": "header",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Log activity」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Log activity",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "room.create",
+   "resource": "room",
+   "verb": "create",
+   "summary": "Add a room",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > main > Add a room",
+    "role": "link",
+    "name": "Add a room",
+    "region": "main",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Add a room」（link）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Add a room",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "log.open",
+   "resource": "log",
+   "verb": "open",
+   "summary": "Open log",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > main > Open log",
+    "role": "link",
+    "name": "Open log",
+    "region": "main",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Open log」（link）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Open log",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "log-activity-2.activate",
+   "resource": "log-activity-2",
+   "verb": "activate",
+   "summary": "Log an activity",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > main > Log an activity",
+    "role": "button",
+    "name": "Log an activity",
+    "region": "main",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Log an activity」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Log an activity",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "calendar-2.show",
+   "resource": "calendar-2",
+   "verb": "show",
+   "summary": "Calendar",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > main > Calendar",
+    "role": "link",
+    "name": "Calendar",
+    "region": "main",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Calendar」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Calendar",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "it.dismiss",
+   "resource": "it",
+   "verb": "dismiss",
+   "summary": "Got it",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Early alpha notice > Got it",
+    "role": "button",
+    "name": "Got it",
+    "region": "Early alpha notice",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Got it」（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Got it",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "close.close",
+   "resource": "close",
+   "verb": "close",
+   "summary": "Close",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Close",
+    "role": "button",
+    "name": "Close",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Close」（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Close",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "school-name.set",
+   "resource": "school-name",
+   "verb": "set",
+   "summary": "School name",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > dialog > School name",
+    "role": "textbox",
+    "name": "School name",
+    "region": "dialog",
+    "view": "主界面"
+   },
+   "params": [
+    {
+     "name": "value",
+     "type": "string",
+     "description": "「School name」的新值",
+     "required": true,
+     "positional": true
+    },
+    {
+     "name": "submit",
+     "type": "boolean",
+     "description": "设置后按 Enter 提交",
+     "default": false
+    }
+   ],
+   "effect": "把「School name」设为给定值（触发 input / change 事件）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "set": {
+       "name": "School name",
+       "role": "textbox",
+       "value": "{{value}}"
+      }
+     },
+     {
+      "press_if": "submit",
+      "press": {
+       "key": "Enter",
+       "name": "School name",
+       "role": "textbox"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "rooms.set",
+   "resource": "rooms",
+   "verb": "set",
+   "summary": "Rooms",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > dialog > Rooms",
+    "role": "textbox",
+    "name": "Rooms",
+    "region": "dialog",
+    "view": "主界面"
+   },
+   "params": [
+    {
+     "name": "value",
+     "type": "string",
+     "description": "「Rooms」的新值",
+     "required": true,
+     "positional": true
+    },
+    {
+     "name": "submit",
+     "type": "boolean",
+     "description": "设置后按 Enter 提交",
+     "default": false
+    }
+   ],
+   "effect": "把「Rooms」设为给定值（触发 input / change 事件）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "set": {
+       "name": "Rooms",
+       "role": "textbox",
+       "value": "{{value}}"
+      }
+     },
+     {
+      "press_if": "submit",
+      "press": {
+       "key": "Enter",
+       "name": "Rooms",
+       "role": "textbox"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "use-sample-data.activate",
+   "resource": "use-sample-data",
+   "verb": "activate",
+   "summary": "Use sample data",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > dialog > Use sample data",
+    "role": "button",
+    "name": "Use sample data",
+    "region": "dialog",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Use sample data」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Use sample data",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "get-started.activate",
+   "resource": "get-started",
+   "verb": "activate",
+   "summary": "Get started",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > dialog > Get started",
+    "role": "button",
+    "name": "Get started",
+    "region": "dialog",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Get started」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Get started",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "command-palette.show",
+   "resource": "command-palette",
+   "verb": "show",
+   "summary": "快捷键 mod+k",
+   "source": "shortcut",
+   "ui": {
+    "path": "键盘 mod+k",
+    "shortcut": "mod+k",
+    "defined_in": "src/ui/shell.js"
+   },
+   "params": [],
+   "effect": "在当前焦点上按 mod+k（src/ui/shell.js 中定义）",
+   "permission": "read",
+   "undoable": "不适用",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "press": {
+       "key": "mod+k"
+      }
+     }
+    ]
+   }
+  }
+ ]
+}

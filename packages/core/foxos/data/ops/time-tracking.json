@@ -1,0 +1,3301 @@
+{
+ "app": "time-tracking",
+ "name": "Time Tracking",
+ "generated_by": "scripts/inventory_ops.py",
+ "commit": "0fbb88cdee2f54c94a9d2c975f43322888813c5d",
+ "title": "Hourly · Time Tracking",
+ "ops": [
+  {
+   "id": "skip.dismiss",
+   "resource": "skip",
+   "verb": "dismiss",
+   "summary": "skip for *（1 项，如 Skip for now）",
+   "source": "ui-collection",
+   "ui": {
+    "path": "主界面 > Welcome > skip for *",
+    "role": "button",
+    "region": "Welcome",
+    "view": "主界面",
+    "examples": [
+     "Skip for now"
+    ]
+   },
+   "params": [
+    {
+     "name": "target",
+     "type": "string",
+     "description": "要操作的项的名称（或其一部分），如 'Skip for now'",
+     "required": true,
+     "positional": true
+    }
+   ],
+   "effect": "点击名称匹配的「skip for *」项（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "{{target}}",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "nov-9-nov-15-0m-across-0-days.select",
+   "resource": "nov-9-nov-15-0m-across-0-days",
+   "verb": "select",
+   "summary": "#（7 项，如 Mon）",
+   "source": "ui-collection",
+   "ui": {
+    "path": "Timesheet > Nov 9 - Nov 15: 0m across 0 days > #",
+    "role": "button",
+    "region": "Nov 9 - Nov 15: 0m across 0 days",
+    "view": "Timesheet",
+    "examples": [
+     "Mon",
+     "Tue",
+     "Wed",
+     "Thu",
+     "Fri"
+    ]
+   },
+   "params": [
+    {
+     "name": "target",
+     "type": "string",
+     "description": "要操作的项的名称（或其一部分），如 'Mon'",
+     "required": true,
+     "positional": true
+    }
+   ],
+   "effect": "点击名称匹配的「#」项（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Timesheet",
+       "role": "link"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "{{target}}",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "log-time.select",
+   "resource": "log-time",
+   "verb": "select",
+   "summary": "log time on #（5 项，如 Log time on Wednesday, Nov 11）",
+   "source": "ui-collection",
+   "ui": {
+    "path": "Timesheet > log time on #",
+    "role": "button",
+    "region": null,
+    "view": "Timesheet",
+    "examples": [
+     "Log time on Wednesday, Nov 11",
+     "Log time on Thursday, Nov 12",
+     "Log time on Friday, Nov 13",
+     "Log time on Saturday, Nov 14",
+     "Log time on Sunday, Nov 15"
+    ]
+   },
+   "params": [
+    {
+     "name": "target",
+     "type": "string",
+     "description": "要操作的项的名称（或其一部分），如 'Log time on Wednesday, Nov 11'",
+     "required": true,
+     "positional": true
+    }
+   ],
+   "effect": "点击名称匹配的「log time on #」项（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Timesheet",
+       "role": "link"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "{{target}}",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "printable-timesheet.select",
+   "resource": "printable-timesheet",
+   "verb": "select",
+   "summary": "a printable timesheet for *（1 项，如 A printable timesheet for this range）",
+   "source": "ui-collection",
+   "ui": {
+    "path": "Reports > main > a printable timesheet for *",
+    "role": "button",
+    "region": "main",
+    "view": "Reports",
+    "examples": [
+     "A printable timesheet for this range"
+    ]
+   },
+   "params": [
+    {
+     "name": "target",
+     "type": "string",
+     "description": "要操作的项的名称（或其一部分），如 'A printable timesheet for this range'",
+     "required": true,
+     "positional": true
+    }
+   ],
+   "effect": "点击名称匹配的「a printable timesheet for *」项（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Reports",
+       "role": "link"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "{{target}}",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "backup-from.export",
+   "resource": "backup-from",
+   "verb": "export",
+   "summary": "download the backup from #（1 项，如 Download the backup from Nov 10, 2026）",
+   "source": "ui-collection",
+   "ui": {
+    "path": "Settings > download the backup from #",
+    "role": "button",
+    "region": null,
+    "view": "Settings",
+    "examples": [
+     "Download the backup from Nov 10, 2026"
+    ]
+   },
+   "params": [
+    {
+     "name": "target",
+     "type": "string",
+     "description": "要操作的项的名称（或其一部分），如 'Download the backup from Nov 10, 2026'",
+     "required": true,
+     "positional": true
+    }
+   ],
+   "effect": "点击名称匹配的「download the backup from #」项（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Settings",
+       "role": "link"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "{{target}}",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "restore-backup-from.select",
+   "resource": "restore-backup-from",
+   "verb": "select",
+   "summary": "restore the backup from #（1 项，如 Restore the backup from Nov 10, 2026）",
+   "source": "ui-collection",
+   "ui": {
+    "path": "Settings > restore the backup from #",
+    "role": "button",
+    "region": null,
+    "view": "Settings",
+    "examples": [
+     "Restore the backup from Nov 10, 2026"
+    ]
+   },
+   "params": [
+    {
+     "name": "target",
+     "type": "string",
+     "description": "要操作的项的名称（或其一部分），如 'Restore the backup from Nov 10, 2026'",
+     "required": true,
+     "positional": true
+    }
+   ],
+   "effect": "点击名称匹配的「restore the backup from #」项（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Settings",
+       "role": "link"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "{{target}}",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "csvevery-entry-ready.export",
+   "resource": "csvevery-entry-ready",
+   "verb": "export",
+   "summary": "export csvevery entry, ready for *（1 项，如 Export CSVEvery entry, ready for invoicing or a spreadsheet）",
+   "source": "ui-collection",
+   "ui": {
+    "path": "Settings > main > export csvevery entry, ready for *",
+    "role": "button",
+    "region": "main",
+    "view": "Settings",
+    "examples": [
+     "Export CSVEvery entry, ready for invoicing or a spreadsheet"
+    ]
+   },
+   "params": [
+    {
+     "name": "target",
+     "type": "string",
+     "description": "要操作的项的名称（或其一部分），如 'Export CSVEvery entry, ready for invoicing or a spreadsheet'",
+     "required": true,
+     "positional": true
+    }
+   ],
+   "effect": "点击名称匹配的「export csvevery entry, ready for *」项（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Settings",
+       "role": "link"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "{{target}}",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "content.dismiss",
+   "resource": "content",
+   "verb": "dismiss",
+   "summary": "Skip to content",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Skip to content",
+    "role": "button",
+    "name": "Skip to content",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Skip to content」（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Skip to content",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "timer.show",
+   "resource": "timer",
+   "verb": "show",
+   "summary": "Timer",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Main navigation > Timer",
+    "role": "link",
+    "name": "Timer",
+    "region": "Main navigation",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Timer」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Timer",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "timesheet.show",
+   "resource": "timesheet",
+   "verb": "show",
+   "summary": "Timesheet",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Main navigation > Timesheet",
+    "role": "link",
+    "name": "Timesheet",
+    "region": "Main navigation",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Timesheet」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Timesheet",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "reports.show",
+   "resource": "reports",
+   "verb": "show",
+   "summary": "Reports",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Main navigation > Reports",
+    "role": "link",
+    "name": "Reports",
+    "region": "Main navigation",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Reports」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Reports",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "projects.show",
+   "resource": "projects",
+   "verb": "show",
+   "summary": "Projects",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Main navigation > Projects",
+    "role": "link",
+    "name": "Projects",
+    "region": "Main navigation",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Projects」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Projects",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "settings.show",
+   "resource": "settings",
+   "verb": "show",
+   "summary": "Settings",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Main navigation > Settings",
+    "role": "link",
+    "name": "Settings",
+    "region": "Main navigation",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Settings」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Settings",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "log-time.activate",
+   "resource": "log-time",
+   "verb": "activate",
+   "summary": "Log time",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Main navigation > Log time",
+    "role": "button",
+    "name": "Log time",
+    "region": "Main navigation",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Log time」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Log time",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "client.create",
+   "resource": "client",
+   "verb": "create",
+   "summary": "Add a client",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Timer > Add a client",
+    "role": "link",
+    "name": "Add a client",
+    "region": "Timer",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Add a client」（link）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Add a client",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "close.close",
+   "resource": "close",
+   "verb": "close",
+   "summary": "Close",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Close",
+    "role": "button",
+    "name": "Close",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Close」（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Close",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "set-up-tracking.activate",
+   "resource": "set-up-tracking",
+   "verb": "activate",
+   "summary": "Set up tracking",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Welcome > Set up tracking",
+    "role": "button",
+    "name": "Set up tracking",
+    "region": "Welcome",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Set up tracking」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Set up tracking",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "explore-sample-data.activate",
+   "resource": "explore-sample-data",
+   "verb": "activate",
+   "summary": "Explore with sample data",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Welcome > Explore with sample data",
+    "role": "button",
+    "name": "Explore with sample data",
+    "region": "Welcome",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Explore with sample data」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Explore with sample data",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "jump-date.activate",
+   "resource": "jump-date",
+   "verb": "activate",
+   "summary": "Jump to a date",
+   "source": "ui",
+   "ui": {
+    "path": "Timesheet > main > Jump to a date",
+    "role": "button",
+    "name": "Jump to a date",
+    "region": "main",
+    "view": "Timesheet"
+   },
+   "params": [],
+   "effect": "点击「Jump to a date」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Timesheet",
+       "role": "link"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Jump to a date",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "entries.search",
+   "resource": "entries",
+   "verb": "search",
+   "summary": "Search entries",
+   "source": "ui",
+   "ui": {
+    "path": "Timesheet > Search entries",
+    "role": "button",
+    "name": "Search entries",
+    "region": null,
+    "view": "Timesheet"
+   },
+   "params": [],
+   "effect": "点击「Search entries」（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Timesheet",
+       "role": "link"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Search entries",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "week.activate",
+   "resource": "week",
+   "verb": "activate",
+   "summary": "Week",
+   "source": "ui",
+   "ui": {
+    "path": "Timesheet > Timesheet unit > Week",
+    "role": "button",
+    "name": "Week",
+    "region": "Timesheet unit",
+    "view": "Timesheet"
+   },
+   "params": [],
+   "effect": "点击「Week」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Timesheet",
+       "role": "link"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Week",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "grid.activate",
+   "resource": "grid",
+   "verb": "activate",
+   "summary": "Grid",
+   "source": "ui",
+   "ui": {
+    "path": "Timesheet > Timesheet unit > Grid",
+    "role": "button",
+    "name": "Grid",
+    "region": "Timesheet unit",
+    "view": "Timesheet"
+   },
+   "params": [],
+   "effect": "点击「Grid」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Timesheet",
+       "role": "link"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Grid",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "month.activate",
+   "resource": "month",
+   "verb": "activate",
+   "summary": "Month",
+   "source": "ui",
+   "ui": {
+    "path": "Timesheet > Timesheet unit > Month",
+    "role": "button",
+    "name": "Month",
+    "region": "Timesheet unit",
+    "view": "Timesheet"
+   },
+   "params": [],
+   "effect": "点击「Month」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Timesheet",
+       "role": "link"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Month",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "week.previous",
+   "resource": "week",
+   "verb": "previous",
+   "summary": "Previous week",
+   "source": "ui",
+   "ui": {
+    "path": "Timesheet > Previous week",
+    "role": "button",
+    "name": "Previous week",
+    "region": null,
+    "view": "Timesheet"
+   },
+   "params": [],
+   "effect": "点击「Previous week」（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Timesheet",
+       "role": "link"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Previous week",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "today.activate",
+   "resource": "today",
+   "verb": "activate",
+   "summary": "Today",
+   "source": "ui",
+   "ui": {
+    "path": "Timesheet > Timesheet navigation > Today",
+    "role": "button",
+    "name": "Today",
+    "region": "Timesheet navigation",
+    "view": "Timesheet"
+   },
+   "params": [],
+   "effect": "点击「Today」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Timesheet",
+       "role": "link"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Today",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "week.next",
+   "resource": "week",
+   "verb": "next",
+   "summary": "Next week",
+   "source": "ui",
+   "ui": {
+    "path": "Timesheet > Next week",
+    "role": "button",
+    "name": "Next week",
+    "region": null,
+    "view": "Timesheet"
+   },
+   "params": [],
+   "effect": "点击「Next week」（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Timesheet",
+       "role": "link"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Next week",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "log-time-yesterday.activate",
+   "resource": "log-time-yesterday",
+   "verb": "activate",
+   "summary": "Log time on Yesterday",
+   "source": "ui",
+   "ui": {
+    "path": "Timesheet > Log time on Yesterday",
+    "role": "button",
+    "name": "Log time on Yesterday",
+    "region": null,
+    "view": "Timesheet"
+   },
+   "params": [],
+   "effect": "点击「Log time on Yesterday」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Timesheet",
+       "role": "link"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Log time on Yesterday",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "log-time-today.activate",
+   "resource": "log-time-today",
+   "verb": "activate",
+   "summary": "Log time on Today",
+   "source": "ui",
+   "ui": {
+    "path": "Timesheet > Log time on Today",
+    "role": "button",
+    "name": "Log time on Today",
+    "region": null,
+    "view": "Timesheet"
+   },
+   "params": [],
+   "effect": "点击「Log time on Today」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Timesheet",
+       "role": "link"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Log time on Today",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "invoice-ready-summary-report.print",
+   "resource": "invoice-ready-summary-report",
+   "verb": "print",
+   "summary": "Print an invoice-ready summary of this report",
+   "source": "ui",
+   "ui": {
+    "path": "Reports > main > Print an invoice-ready summary of this report",
+    "role": "button",
+    "name": "Print an invoice-ready summary of this report",
+    "region": "main",
+    "view": "Reports"
+   },
+   "params": [],
+   "effect": "点击「Print an invoice-ready summary of this report」（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Reports",
+       "role": "link"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Print an invoice-ready summary of this report",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "csv.export",
+   "resource": "csv",
+   "verb": "export",
+   "summary": "Export CSV",
+   "source": "ui",
+   "ui": {
+    "path": "Reports > main > Export CSV",
+    "role": "button",
+    "name": "Export CSV",
+    "region": "main",
+    "view": "Reports"
+   },
+   "params": [],
+   "effect": "点击「Export CSV」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Reports",
+       "role": "link"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Export CSV",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "report.activate",
+   "resource": "report",
+   "verb": "activate",
+   "summary": "Report",
+   "source": "ui",
+   "ui": {
+    "path": "Reports > Reports view > Report",
+    "role": "button",
+    "name": "Report",
+    "region": "Reports view",
+    "view": "Reports"
+   },
+   "params": [],
+   "effect": "点击「Report」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Reports",
+       "role": "link"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Report",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "insights.activate",
+   "resource": "insights",
+   "verb": "activate",
+   "summary": "Insights",
+   "source": "ui",
+   "ui": {
+    "path": "Reports > Reports view > Insights",
+    "role": "button",
+    "name": "Insights",
+    "region": "Reports view",
+    "view": "Reports"
+   },
+   "params": [],
+   "effect": "点击「Insights」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Reports",
+       "role": "link"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Insights",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "invoices.activate",
+   "resource": "invoices",
+   "verb": "activate",
+   "summary": "Invoices",
+   "source": "ui",
+   "ui": {
+    "path": "Reports > Reports view > Invoices",
+    "role": "button",
+    "name": "Invoices",
+    "region": "Reports view",
+    "view": "Reports"
+   },
+   "params": [],
+   "effect": "点击「Invoices」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Reports",
+       "role": "link"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Invoices",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "reports-week.activate",
+   "resource": "reports-week",
+   "verb": "activate",
+   "summary": "This week",
+   "source": "ui",
+   "ui": {
+    "path": "Reports > Date range > This week",
+    "role": "button",
+    "name": "This week",
+    "region": "Date range",
+    "view": "Reports"
+   },
+   "params": [],
+   "effect": "点击「This week」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Reports",
+       "role": "link"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "This week",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "last-week.activate",
+   "resource": "last-week",
+   "verb": "activate",
+   "summary": "Last week",
+   "source": "ui",
+   "ui": {
+    "path": "Reports > Date range > Last week",
+    "role": "button",
+    "name": "Last week",
+    "region": "Date range",
+    "view": "Reports"
+   },
+   "params": [],
+   "effect": "点击「Last week」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Reports",
+       "role": "link"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Last week",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "reports-month.activate",
+   "resource": "reports-month",
+   "verb": "activate",
+   "summary": "This month",
+   "source": "ui",
+   "ui": {
+    "path": "Reports > Date range > This month",
+    "role": "button",
+    "name": "This month",
+    "region": "Date range",
+    "view": "Reports"
+   },
+   "params": [],
+   "effect": "点击「This month」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Reports",
+       "role": "link"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "This month",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "last-month.activate",
+   "resource": "last-month",
+   "verb": "activate",
+   "summary": "Last month",
+   "source": "ui",
+   "ui": {
+    "path": "Reports > Date range > Last month",
+    "role": "button",
+    "name": "Last month",
+    "region": "Date range",
+    "view": "Reports"
+   },
+   "params": [],
+   "effect": "点击「Last month」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Reports",
+       "role": "link"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Last month",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "custom.activate",
+   "resource": "custom",
+   "verb": "activate",
+   "summary": "Custom",
+   "source": "ui",
+   "ui": {
+    "path": "Reports > Date range > Custom",
+    "role": "button",
+    "name": "Custom",
+    "region": "Date range",
+    "view": "Reports"
+   },
+   "params": [],
+   "effect": "点击「Custom」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Reports",
+       "role": "link"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Custom",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "client.activate",
+   "resource": "client",
+   "verb": "activate",
+   "summary": "Client",
+   "source": "ui",
+   "ui": {
+    "path": "Reports > Group by > Client",
+    "role": "button",
+    "name": "Client",
+    "region": "Group by",
+    "view": "Reports"
+   },
+   "params": [],
+   "effect": "点击「Client」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Reports",
+       "role": "link"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Client",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "project.activate",
+   "resource": "project",
+   "verb": "activate",
+   "summary": "Project",
+   "source": "ui",
+   "ui": {
+    "path": "Reports > Group by > Project",
+    "role": "button",
+    "name": "Project",
+    "region": "Group by",
+    "view": "Reports"
+   },
+   "params": [],
+   "effect": "点击「Project」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Reports",
+       "role": "link"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Project",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "task.activate",
+   "resource": "task",
+   "verb": "activate",
+   "summary": "Task",
+   "source": "ui",
+   "ui": {
+    "path": "Reports > Group by > Task",
+    "role": "button",
+    "name": "Task",
+    "region": "Group by",
+    "view": "Reports"
+   },
+   "params": [],
+   "effect": "点击「Task」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Reports",
+       "role": "link"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Task",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "unbilled.activate",
+   "resource": "unbilled",
+   "verb": "activate",
+   "summary": "Unbilled",
+   "source": "ui",
+   "ui": {
+    "path": "Reports > Billing state > Unbilled",
+    "role": "button",
+    "name": "Unbilled",
+    "region": "Billing state",
+    "view": "Reports"
+   },
+   "params": [],
+   "effect": "点击「Unbilled」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Reports",
+       "role": "link"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Unbilled",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "invoiced.activate",
+   "resource": "invoiced",
+   "verb": "activate",
+   "summary": "Invoiced",
+   "source": "ui",
+   "ui": {
+    "path": "Reports > Billing state > Invoiced",
+    "role": "button",
+    "name": "Invoiced",
+    "region": "Billing state",
+    "view": "Reports"
+   },
+   "params": [],
+   "effect": "点击「Invoiced」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Reports",
+       "role": "link"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Invoiced",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "projects-client.create",
+   "resource": "projects-client",
+   "verb": "create",
+   "summary": "New client",
+   "source": "ui",
+   "ui": {
+    "path": "Projects > main > New client",
+    "role": "button",
+    "name": "New client",
+    "region": "main",
+    "view": "Projects"
+   },
+   "params": [],
+   "effect": "点击「New client」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Projects",
+       "role": "link"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "New client",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "first-client.create",
+   "resource": "first-client",
+   "verb": "create",
+   "summary": "Add your first client",
+   "source": "ui",
+   "ui": {
+    "path": "Projects > main > Add your first client",
+    "role": "button",
+    "name": "Add your first client",
+    "region": "main",
+    "view": "Projects"
+   },
+   "params": [],
+   "effect": "点击「Add your first client」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Projects",
+       "role": "link"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Add your first client",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "light.activate",
+   "resource": "light",
+   "verb": "activate",
+   "summary": "Light",
+   "source": "ui",
+   "ui": {
+    "path": "Settings > Theme > Light",
+    "role": "button",
+    "name": "Light",
+    "region": "Theme",
+    "view": "Settings"
+   },
+   "params": [],
+   "effect": "点击「Light」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Settings",
+       "role": "link"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Light",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "dark.activate",
+   "resource": "dark",
+   "verb": "activate",
+   "summary": "Dark",
+   "source": "ui",
+   "ui": {
+    "path": "Settings > Theme > Dark",
+    "role": "button",
+    "name": "Dark",
+    "region": "Theme",
+    "view": "Settings"
+   },
+   "params": [],
+   "effect": "点击「Dark」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Settings",
+       "role": "link"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Dark",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "system.activate",
+   "resource": "system",
+   "verb": "activate",
+   "summary": "System",
+   "source": "ui",
+   "ui": {
+    "path": "Settings > Theme > System",
+    "role": "button",
+    "name": "System",
+    "region": "Theme",
+    "view": "Settings"
+   },
+   "params": [],
+   "effect": "点击「System」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Settings",
+       "role": "link"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "System",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "currency.set",
+   "resource": "currency",
+   "verb": "set",
+   "summary": "Currency",
+   "source": "ui",
+   "ui": {
+    "path": "Settings > main > Currency",
+    "role": "combobox",
+    "name": "Currency",
+    "region": "main",
+    "view": "Settings"
+   },
+   "params": [
+    {
+     "name": "value",
+     "type": "string",
+     "description": "「Currency」的新值",
+     "required": true,
+     "positional": true,
+     "enum": [
+      "USD",
+      "EUR",
+      "GBP",
+      "JPY",
+      "AUD",
+      "CAD",
+      "CHF",
+      "CNY",
+      "INR",
+      "AED",
+      "BRL",
+      "DKK",
+      "HKD",
+      "IDR",
+      "ILS",
+      "KRW",
+      "MXN",
+      "NOK",
+      "NZD",
+      "PHP",
+      "PLN",
+      "SAR",
+      "SEK",
+      "SGD",
+      "THB",
+      "TRY",
+      "ZAR"
+     ]
+    },
+    {
+     "name": "submit",
+     "type": "boolean",
+     "description": "设置后按 Enter 提交",
+     "default": false
+    }
+   ],
+   "effect": "把「Currency」设为给定值（触发 input / change 事件）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Settings",
+       "role": "link"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "set": {
+       "name": "Currency",
+       "role": "combobox",
+       "value": "{{value}}"
+      }
+     },
+     {
+      "press_if": "submit",
+      "press": {
+       "key": "Enter",
+       "name": "Currency",
+       "role": "combobox"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "default-hourly-rate.set",
+   "resource": "default-hourly-rate",
+   "verb": "set",
+   "summary": "Default hourly rate",
+   "source": "ui",
+   "ui": {
+    "path": "Settings > main > Default hourly rate",
+    "role": "textbox",
+    "name": "Default hourly rate",
+    "region": "main",
+    "view": "Settings"
+   },
+   "params": [
+    {
+     "name": "value",
+     "type": "string",
+     "description": "「Default hourly rate」的新值",
+     "required": true,
+     "positional": true
+    },
+    {
+     "name": "submit",
+     "type": "boolean",
+     "description": "设置后按 Enter 提交",
+     "default": false
+    }
+   ],
+   "effect": "把「Default hourly rate」设为给定值（触发 input / change 事件）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Settings",
+       "role": "link"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "set": {
+       "name": "Default hourly rate",
+       "role": "textbox",
+       "value": "{{value}}"
+      }
+     },
+     {
+      "press_if": "submit",
+      "press": {
+       "key": "Enter",
+       "name": "Default hourly rate",
+       "role": "textbox"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "default-rate-applies-from.set",
+   "resource": "default-rate-applies-from",
+   "verb": "set",
+   "summary": "Default rate applies from",
+   "source": "ui",
+   "ui": {
+    "path": "Settings > Default rate applies from",
+    "role": "textbox",
+    "name": "Default rate applies from",
+    "region": null,
+    "view": "Settings"
+   },
+   "params": [
+    {
+     "name": "value",
+     "type": "string",
+     "description": "「Default rate applies from」的新值",
+     "required": true,
+     "positional": true
+    },
+    {
+     "name": "submit",
+     "type": "boolean",
+     "description": "设置后按 Enter 提交",
+     "default": false
+    }
+   ],
+   "effect": "把「Default rate applies from」设为给定值（触发 input / change 事件）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Settings",
+       "role": "link"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "set": {
+       "name": "Default rate applies from",
+       "role": "textbox",
+       "value": "{{value}}"
+      }
+     },
+     {
+      "press_if": "submit",
+      "press": {
+       "key": "Enter",
+       "name": "Default rate applies from",
+       "role": "textbox"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "round-billable-time.set",
+   "resource": "round-billable-time",
+   "verb": "set",
+   "summary": "Round billable time",
+   "source": "ui",
+   "ui": {
+    "path": "Settings > main > Round billable time",
+    "role": "combobox",
+    "name": "Round billable time",
+    "region": "main",
+    "view": "Settings"
+   },
+   "params": [
+    {
+     "name": "value",
+     "type": "string",
+     "description": "「Round billable time」的新值",
+     "required": true,
+     "positional": true,
+     "enum": [
+      "0",
+      "5",
+      "6",
+      "10",
+      "15",
+      "30"
+     ]
+    },
+    {
+     "name": "submit",
+     "type": "boolean",
+     "description": "设置后按 Enter 提交",
+     "default": false
+    }
+   ],
+   "effect": "把「Round billable time」设为给定值（触发 input / change 事件）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Settings",
+       "role": "link"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "set": {
+       "name": "Round billable time",
+       "role": "combobox",
+       "value": "{{value}}"
+      }
+     },
+     {
+      "press_if": "submit",
+      "press": {
+       "key": "Enter",
+       "name": "Round billable time",
+       "role": "combobox"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "week-starts.set",
+   "resource": "week-starts",
+   "verb": "set",
+   "summary": "Week starts on",
+   "source": "ui",
+   "ui": {
+    "path": "Settings > main > Week starts on",
+    "role": "combobox",
+    "name": "Week starts on",
+    "region": "main",
+    "view": "Settings"
+   },
+   "params": [
+    {
+     "name": "value",
+     "type": "string",
+     "description": "「Week starts on」的新值",
+     "required": true,
+     "positional": true,
+     "enum": [
+      "1",
+      "0"
+     ]
+    },
+    {
+     "name": "submit",
+     "type": "boolean",
+     "description": "设置后按 Enter 提交",
+     "default": false
+    }
+   ],
+   "effect": "把「Week starts on」设为给定值（触发 input / change 事件）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Settings",
+       "role": "link"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "set": {
+       "name": "Week starts on",
+       "role": "combobox",
+       "value": "{{value}}"
+      }
+     },
+     {
+      "press_if": "submit",
+      "press": {
+       "key": "Enter",
+       "name": "Week starts on",
+       "role": "combobox"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "weekly-target-hours.set",
+   "resource": "weekly-target-hours",
+   "verb": "set",
+   "summary": "Weekly target (hours)",
+   "source": "ui",
+   "ui": {
+    "path": "Settings > main > Weekly target (hours)",
+    "role": "textbox",
+    "name": "Weekly target (hours)",
+    "region": "main",
+    "view": "Settings"
+   },
+   "params": [
+    {
+     "name": "value",
+     "type": "string",
+     "description": "「Weekly target (hours)」的新值",
+     "required": true,
+     "positional": true
+    },
+    {
+     "name": "submit",
+     "type": "boolean",
+     "description": "设置后按 Enter 提交",
+     "default": false
+    }
+   ],
+   "effect": "把「Weekly target (hours)」设为给定值（触发 input / change 事件）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Settings",
+       "role": "link"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "set": {
+       "name": "Weekly target (hours)",
+       "role": "textbox",
+       "value": "{{value}}"
+      }
+     },
+     {
+      "press_if": "submit",
+      "press": {
+       "key": "Enter",
+       "name": "Weekly target (hours)",
+       "role": "textbox"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "target-counts.set",
+   "resource": "target-counts",
+   "verb": "set",
+   "summary": "Target counts",
+   "source": "ui",
+   "ui": {
+    "path": "Settings > main > Target counts",
+    "role": "combobox",
+    "name": "Target counts",
+    "region": "main",
+    "view": "Settings"
+   },
+   "params": [
+    {
+     "name": "value",
+     "type": "string",
+     "description": "「Target counts」的新值",
+     "required": true,
+     "positional": true,
+     "enum": [
+      "billable",
+      "tracked"
+     ]
+    },
+    {
+     "name": "submit",
+     "type": "boolean",
+     "description": "设置后按 Enter 提交",
+     "default": false
+    }
+   ],
+   "effect": "把「Target counts」设为给定值（触发 input / change 事件）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Settings",
+       "role": "link"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "set": {
+       "name": "Target counts",
+       "role": "combobox",
+       "value": "{{value}}"
+      }
+     },
+     {
+      "press_if": "submit",
+      "press": {
+       "key": "Enter",
+       "name": "Target counts",
+       "role": "combobox"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "business-name.set",
+   "resource": "business-name",
+   "verb": "set",
+   "summary": "Business name",
+   "source": "ui",
+   "ui": {
+    "path": "Settings > main > Business name",
+    "role": "textbox",
+    "name": "Business name",
+    "region": "main",
+    "view": "Settings"
+   },
+   "params": [
+    {
+     "name": "value",
+     "type": "string",
+     "description": "「Business name」的新值",
+     "required": true,
+     "positional": true
+    },
+    {
+     "name": "submit",
+     "type": "boolean",
+     "description": "设置后按 Enter 提交",
+     "default": false
+    }
+   ],
+   "effect": "把「Business name」设为给定值（触发 input / change 事件）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Settings",
+       "role": "link"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "set": {
+       "name": "Business name",
+       "role": "textbox",
+       "value": "{{value}}"
+      }
+     },
+     {
+      "press_if": "submit",
+      "press": {
+       "key": "Enter",
+       "name": "Business name",
+       "role": "textbox"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "address.set",
+   "resource": "address",
+   "verb": "set",
+   "summary": "Address",
+   "source": "ui",
+   "ui": {
+    "path": "Settings > main > Address",
+    "role": "textbox",
+    "name": "Address",
+    "region": "main",
+    "view": "Settings"
+   },
+   "params": [
+    {
+     "name": "value",
+     "type": "string",
+     "description": "「Address」的新值",
+     "required": true,
+     "positional": true
+    },
+    {
+     "name": "submit",
+     "type": "boolean",
+     "description": "设置后按 Enter 提交",
+     "default": false
+    }
+   ],
+   "effect": "把「Address」设为给定值（触发 input / change 事件）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Settings",
+       "role": "link"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "set": {
+       "name": "Address",
+       "role": "textbox",
+       "value": "{{value}}"
+      }
+     },
+     {
+      "press_if": "submit",
+      "press": {
+       "key": "Enter",
+       "name": "Address",
+       "role": "textbox"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "tax-vat-id.set",
+   "resource": "tax-vat-id",
+   "verb": "set",
+   "summary": "Tax / VAT ID",
+   "source": "ui",
+   "ui": {
+    "path": "Settings > main > Tax / VAT ID",
+    "role": "textbox",
+    "name": "Tax / VAT ID",
+    "region": "main",
+    "view": "Settings"
+   },
+   "params": [
+    {
+     "name": "value",
+     "type": "string",
+     "description": "「Tax / VAT ID」的新值",
+     "required": true,
+     "positional": true
+    },
+    {
+     "name": "submit",
+     "type": "boolean",
+     "description": "设置后按 Enter 提交",
+     "default": false
+    }
+   ],
+   "effect": "把「Tax / VAT ID」设为给定值（触发 input / change 事件）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Settings",
+       "role": "link"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "set": {
+       "name": "Tax / VAT ID",
+       "role": "textbox",
+       "value": "{{value}}"
+      }
+     },
+     {
+      "press_if": "submit",
+      "press": {
+       "key": "Enter",
+       "name": "Tax / VAT ID",
+       "role": "textbox"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "default-tax-rate.set",
+   "resource": "default-tax-rate",
+   "verb": "set",
+   "summary": "Default tax rate (%)",
+   "source": "ui",
+   "ui": {
+    "path": "Settings > main > Default tax rate (%)",
+    "role": "textbox",
+    "name": "Default tax rate (%)",
+    "region": "main",
+    "view": "Settings"
+   },
+   "params": [
+    {
+     "name": "value",
+     "type": "string",
+     "description": "「Default tax rate (%)」的新值",
+     "required": true,
+     "positional": true
+    },
+    {
+     "name": "submit",
+     "type": "boolean",
+     "description": "设置后按 Enter 提交",
+     "default": false
+    }
+   ],
+   "effect": "把「Default tax rate (%)」设为给定值（触发 input / change 事件）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Settings",
+       "role": "link"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "set": {
+       "name": "Default tax rate (%)",
+       "role": "textbox",
+       "value": "{{value}}"
+      }
+     },
+     {
+      "press_if": "submit",
+      "press": {
+       "key": "Enter",
+       "name": "Default tax rate (%)",
+       "role": "textbox"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "payment-terms.set",
+   "resource": "payment-terms",
+   "verb": "set",
+   "summary": "Payment terms",
+   "source": "ui",
+   "ui": {
+    "path": "Settings > main > Payment terms",
+    "role": "combobox",
+    "name": "Payment terms",
+    "region": "main",
+    "view": "Settings"
+   },
+   "params": [
+    {
+     "name": "value",
+     "type": "string",
+     "description": "「Payment terms」的新值",
+     "required": true,
+     "positional": true,
+     "enum": [
+      "",
+      "0",
+      "7",
+      "14",
+      "21",
+      "30",
+      "45",
+      "60"
+     ]
+    },
+    {
+     "name": "submit",
+     "type": "boolean",
+     "description": "设置后按 Enter 提交",
+     "default": false
+    }
+   ],
+   "effect": "把「Payment terms」设为给定值（触发 input / change 事件）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Settings",
+       "role": "link"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "set": {
+       "name": "Payment terms",
+       "role": "combobox",
+       "value": "{{value}}"
+      }
+     },
+     {
+      "press_if": "submit",
+      "press": {
+       "key": "Enter",
+       "name": "Payment terms",
+       "role": "combobox"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "terms-line.set",
+   "resource": "terms-line",
+   "verb": "set",
+   "summary": "Terms line",
+   "source": "ui",
+   "ui": {
+    "path": "Settings > main > Terms line",
+    "role": "textbox",
+    "name": "Terms line",
+    "region": "main",
+    "view": "Settings"
+   },
+   "params": [
+    {
+     "name": "value",
+     "type": "string",
+     "description": "「Terms line」的新值",
+     "required": true,
+     "positional": true
+    },
+    {
+     "name": "submit",
+     "type": "boolean",
+     "description": "设置后按 Enter 提交",
+     "default": false
+    }
+   ],
+   "effect": "把「Terms line」设为给定值（触发 input / change 事件）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Settings",
+       "role": "link"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "set": {
+       "name": "Terms line",
+       "role": "textbox",
+       "value": "{{value}}"
+      }
+     },
+     {
+      "press_if": "submit",
+      "press": {
+       "key": "Enter",
+       "name": "Terms line",
+       "role": "textbox"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "how-pay.set",
+   "resource": "how-pay",
+   "verb": "set",
+   "summary": "How to pay",
+   "source": "ui",
+   "ui": {
+    "path": "Settings > main > How to pay",
+    "role": "textbox",
+    "name": "How to pay",
+    "region": "main",
+    "view": "Settings"
+   },
+   "params": [
+    {
+     "name": "value",
+     "type": "string",
+     "description": "「How to pay」的新值",
+     "required": true,
+     "positional": true
+    },
+    {
+     "name": "submit",
+     "type": "boolean",
+     "description": "设置后按 Enter 提交",
+     "default": false
+    }
+   ],
+   "effect": "把「How to pay」设为给定值（触发 input / change 事件）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Settings",
+       "role": "link"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "set": {
+       "name": "How to pay",
+       "role": "textbox",
+       "value": "{{value}}"
+      }
+     },
+     {
+      "press_if": "submit",
+      "press": {
+       "key": "Enter",
+       "name": "How to pay",
+       "role": "textbox"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "logo.import",
+   "resource": "logo",
+   "verb": "import",
+   "summary": "Upload logo",
+   "source": "ui",
+   "ui": {
+    "path": "Settings > main > Upload logo",
+    "role": "button",
+    "name": "Upload logo",
+    "region": "main",
+    "view": "Settings"
+   },
+   "params": [],
+   "effect": "点击「Upload logo」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Settings",
+       "role": "link"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Upload logo",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "long-timer-warning.set",
+   "resource": "long-timer-warning",
+   "verb": "set",
+   "summary": "Long timer warning",
+   "source": "ui",
+   "ui": {
+    "path": "Settings > main > Long timer warning",
+    "role": "combobox",
+    "name": "Long timer warning",
+    "region": "main",
+    "view": "Settings"
+   },
+   "params": [
+    {
+     "name": "value",
+     "type": "string",
+     "description": "「Long timer warning」的新值",
+     "required": true,
+     "positional": true,
+     "enum": [
+      "0",
+      "4",
+      "8",
+      "12"
+     ]
+    },
+    {
+     "name": "submit",
+     "type": "boolean",
+     "description": "设置后按 Enter 提交",
+     "default": false
+    }
+   ],
+   "effect": "把「Long timer warning」设为给定值（触发 input / change 事件）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Settings",
+       "role": "link"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "set": {
+       "name": "Long timer warning",
+       "role": "combobox",
+       "value": "{{value}}"
+      }
+     },
+     {
+      "press_if": "submit",
+      "press": {
+       "key": "Enter",
+       "name": "Long timer warning",
+       "role": "combobox"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "away-sleep-gaps.set",
+   "resource": "away-sleep-gaps",
+   "verb": "set",
+   "summary": "Away and sleep gaps",
+   "source": "ui",
+   "ui": {
+    "path": "Settings > main > Away and sleep gaps",
+    "role": "combobox",
+    "name": "Away and sleep gaps",
+    "region": "main",
+    "view": "Settings"
+   },
+   "params": [
+    {
+     "name": "value",
+     "type": "string",
+     "description": "「Away and sleep gaps」的新值",
+     "required": true,
+     "positional": true,
+     "enum": [
+      "0",
+      "5",
+      "10",
+      "20",
+      "30"
+     ]
+    },
+    {
+     "name": "submit",
+     "type": "boolean",
+     "description": "设置后按 Enter 提交",
+     "default": false
+    }
+   ],
+   "effect": "把「Away and sleep gaps」设为给定值（触发 input / change 事件）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Settings",
+       "role": "link"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "set": {
+       "name": "Away and sleep gaps",
+       "role": "combobox",
+       "value": "{{value}}"
+      }
+     },
+     {
+      "press_if": "submit",
+      "press": {
+       "key": "Enter",
+       "name": "Away and sleep gaps",
+       "role": "combobox"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "daily-tracking-nudge.set",
+   "resource": "daily-tracking-nudge",
+   "verb": "set",
+   "summary": "Daily tracking nudge",
+   "source": "ui",
+   "ui": {
+    "path": "Settings > main > Daily tracking nudge",
+    "role": "combobox",
+    "name": "Daily tracking nudge",
+    "region": "main",
+    "view": "Settings"
+   },
+   "params": [
+    {
+     "name": "value",
+     "type": "string",
+     "description": "「Daily tracking nudge」的新值",
+     "required": true,
+     "positional": true,
+     "enum": [
+      "",
+      "9",
+      "12",
+      "15",
+      "17"
+     ]
+    },
+    {
+     "name": "submit",
+     "type": "boolean",
+     "description": "设置后按 Enter 提交",
+     "default": false
+    }
+   ],
+   "effect": "把「Daily tracking nudge」设为给定值（触发 input / change 事件）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Settings",
+       "role": "link"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "set": {
+       "name": "Daily tracking nudge",
+       "role": "combobox",
+       "value": "{{value}}"
+      }
+     },
+     {
+      "press_if": "submit",
+      "press": {
+       "key": "Enter",
+       "name": "Daily tracking nudge",
+       "role": "combobox"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "unbilled-time-reminder.set",
+   "resource": "unbilled-time-reminder",
+   "verb": "set",
+   "summary": "Unbilled time reminder",
+   "source": "ui",
+   "ui": {
+    "path": "Settings > main > Unbilled time reminder",
+    "role": "combobox",
+    "name": "Unbilled time reminder",
+    "region": "main",
+    "view": "Settings"
+   },
+   "params": [
+    {
+     "name": "value",
+     "type": "string",
+     "description": "「Unbilled time reminder」的新值",
+     "required": true,
+     "positional": true,
+     "enum": [
+      "",
+      "1",
+      "7",
+      "15",
+      "25"
+     ]
+    },
+    {
+     "name": "submit",
+     "type": "boolean",
+     "description": "设置后按 Enter 提交",
+     "default": false
+    }
+   ],
+   "effect": "把「Unbilled time reminder」设为给定值（触发 input / change 事件）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Settings",
+       "role": "link"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "set": {
+       "name": "Unbilled time reminder",
+       "role": "combobox",
+       "value": "{{value}}"
+      }
+     },
+     {
+      "press_if": "submit",
+      "press": {
+       "key": "Enter",
+       "name": "Unbilled time reminder",
+       "role": "combobox"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "counts-as-aging.set",
+   "resource": "counts-as-aging",
+   "verb": "set",
+   "summary": "Counts as aging",
+   "source": "ui",
+   "ui": {
+    "path": "Settings > main > Counts as aging",
+    "role": "combobox",
+    "name": "Counts as aging",
+    "region": "main",
+    "view": "Settings"
+   },
+   "params": [
+    {
+     "name": "value",
+     "type": "string",
+     "description": "「Counts as aging」的新值",
+     "required": true,
+     "positional": true,
+     "enum": [
+      "14",
+      "30",
+      "60",
+      "90"
+     ]
+    },
+    {
+     "name": "submit",
+     "type": "boolean",
+     "description": "设置后按 Enter 提交",
+     "default": false
+    }
+   ],
+   "effect": "把「Counts as aging」设为给定值（触发 input / change 事件）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Settings",
+       "role": "link"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "set": {
+       "name": "Counts as aging",
+       "role": "combobox",
+       "value": "{{value}}"
+      }
+     },
+     {
+      "press_if": "submit",
+      "press": {
+       "key": "Enter",
+       "name": "Counts as aging",
+       "role": "combobox"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "system-notifications.toggle",
+   "resource": "system-notifications",
+   "verb": "toggle",
+   "summary": "System notifications",
+   "source": "ui",
+   "ui": {
+    "path": "Settings > main > System notifications",
+    "role": "checkbox",
+    "name": "System notifications",
+    "region": "main",
+    "view": "Settings"
+   },
+   "params": [],
+   "effect": "切换「System notifications」",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Settings",
+       "role": "link"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "System notifications",
+       "role": "checkbox"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "automatic-backups.set",
+   "resource": "automatic-backups",
+   "verb": "set",
+   "summary": "Automatic backups",
+   "source": "ui",
+   "ui": {
+    "path": "Settings > main > Automatic backups",
+    "role": "combobox",
+    "name": "Automatic backups",
+    "region": "main",
+    "view": "Settings"
+   },
+   "params": [
+    {
+     "name": "value",
+     "type": "string",
+     "description": "「Automatic backups」的新值",
+     "required": true,
+     "positional": true,
+     "enum": [
+      "off",
+      "weekly",
+      "monthly"
+     ]
+    },
+    {
+     "name": "submit",
+     "type": "boolean",
+     "description": "设置后按 Enter 提交",
+     "default": false
+    }
+   ],
+   "effect": "把「Automatic backups」设为给定值（触发 input / change 事件）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Settings",
+       "role": "link"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "set": {
+       "name": "Automatic backups",
+       "role": "combobox",
+       "value": "{{value}}"
+      }
+     },
+     {
+      "press_if": "submit",
+      "press": {
+       "key": "Enter",
+       "name": "Automatic backups",
+       "role": "combobox"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "puter.show",
+   "resource": "puter",
+   "verb": "show",
+   "summary": "Puter",
+   "source": "ui",
+   "ui": {
+    "path": "Settings > main > Puter",
+    "role": "link",
+    "name": "Puter",
+    "region": "main",
+    "view": "Settings"
+   },
+   "params": [],
+   "effect": "点击「Puter」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Settings",
+       "role": "link"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Puter",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  }
+ ]
+}

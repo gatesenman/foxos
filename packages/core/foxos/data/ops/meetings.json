@@ -1,0 +1,634 @@
+{
+ "app": "meetings",
+ "name": "Meetings",
+ "generated_by": "scripts/inventory_ops.py",
+ "commit": "0fbb88cdee2f54c94a9d2c975f43322888813c5d",
+ "title": "Puter Meetings",
+ "ops": [
+  {
+   "id": "item.select",
+   "resource": "item",
+   "verb": "select",
+   "summary": "#（7 项，如 Sunday, November 8）",
+   "source": "ui-collection",
+   "ui": {
+    "path": "主界面 > #",
+    "role": "button",
+    "region": null,
+    "view": "主界面",
+    "examples": [
+     "Sunday, November 8",
+     "Monday, November 9",
+     "Tuesday, November 10",
+     "Wednesday, November 11",
+     "Thursday, November 12"
+    ]
+   },
+   "params": [
+    {
+     "name": "target",
+     "type": "string",
+     "description": "要操作的项的名称（或其一部分），如 'Sunday, November 8'",
+     "required": true,
+     "positional": true
+    }
+   ],
+   "effect": "点击名称匹配的「#」项（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "{{target}}",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "meeting.create",
+   "resource": "meeting",
+   "verb": "create",
+   "summary": "create a meeting for *（1 项，如 Create a meeting for later）",
+   "source": "ui-collection",
+   "ui": {
+    "path": "New meeting > menu > create a meeting for *",
+    "role": "menuitem",
+    "region": "menu",
+    "view": "New meeting",
+    "examples": [
+     "Create a meeting for later"
+    ]
+   },
+   "params": [
+    {
+     "name": "target",
+     "type": "string",
+     "description": "要操作的项的名称（或其一部分），如 'Create a meeting for later'",
+     "required": true,
+     "positional": true
+    }
+   ],
+   "effect": "点击名称匹配的「create a meeting for *」项（menuitem）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "New meeting",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "{{target}}",
+       "role": "menuitem"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "settings.show",
+   "resource": "settings",
+   "verb": "show",
+   "summary": "Settings",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Settings",
+    "role": "button",
+    "name": "Settings",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Settings」（button），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Settings",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "theme.toggle",
+   "resource": "theme",
+   "verb": "toggle",
+   "summary": "Toggle theme",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Toggle theme",
+    "role": "button",
+    "name": "Toggle theme",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "切换「Toggle theme」",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Toggle theme",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "out.sign",
+   "resource": "out",
+   "verb": "sign",
+   "summary": "Sign out",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Sign out",
+    "role": "button",
+    "name": "Sign out",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Sign out」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Sign out",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "meeting-2.create",
+   "resource": "meeting-2",
+   "verb": "create",
+   "summary": "New meeting",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > main > New meeting",
+    "role": "button",
+    "name": "New meeting",
+    "region": "main",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「New meeting」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "New meeting",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "meeting-code-or-link.set",
+   "resource": "meeting-code-or-link",
+   "verb": "set",
+   "summary": "Meeting code or link",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Meeting code or link",
+    "role": "textbox",
+    "name": "Meeting code or link",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [
+    {
+     "name": "value",
+     "type": "string",
+     "description": "「Meeting code or link」的新值",
+     "required": true,
+     "positional": true
+    },
+    {
+     "name": "submit",
+     "type": "boolean",
+     "description": "设置后按 Enter 提交",
+     "default": false
+    }
+   ],
+   "effect": "把「Meeting code or link」设为给定值（触发 input / change 事件）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "set": {
+       "name": "Meeting code or link",
+       "role": "textbox",
+       "value": "{{value}}"
+      }
+     },
+     {
+      "press_if": "submit",
+      "press": {
+       "key": "Enter",
+       "name": "Meeting code or link",
+       "role": "textbox"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "join.join",
+   "resource": "join",
+   "verb": "join",
+   "summary": "Join",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > main > Join",
+    "role": "button",
+    "name": "Join",
+    "region": "main",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Join」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Join",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "today.activate",
+   "resource": "today",
+   "verb": "activate",
+   "summary": "Today",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > aside > Today",
+    "role": "button",
+    "name": "Today",
+    "region": "aside",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Today」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Today",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "week.previous",
+   "resource": "week",
+   "verb": "previous",
+   "summary": "Previous week",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Previous week",
+    "role": "button",
+    "name": "Previous week",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Previous week」（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Previous week",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "week.next",
+   "resource": "week",
+   "verb": "next",
+   "summary": "Next week",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Next week",
+    "role": "button",
+    "name": "Next week",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Next week」（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Next week",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "try-again.activate",
+   "resource": "try-again",
+   "verb": "activate",
+   "summary": "Try again",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > aside > Try again",
+    "role": "button",
+    "name": "Try again",
+    "region": "aside",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Try again」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Try again",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "refresh.activate",
+   "resource": "refresh",
+   "verb": "activate",
+   "summary": "Refresh",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Refresh",
+    "role": "button",
+    "name": "Refresh",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Refresh」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Refresh",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "close.close",
+   "resource": "close",
+   "verb": "close",
+   "summary": "Close",
+   "source": "ui",
+   "ui": {
+    "path": "Settings > Close",
+    "role": "button",
+    "name": "Close",
+    "region": null,
+    "view": "Settings"
+   },
+   "params": [],
+   "effect": "点击「Close」（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Settings",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Close",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "nickname.set",
+   "resource": "nickname",
+   "verb": "set",
+   "summary": "Nickname",
+   "source": "ui",
+   "ui": {
+    "path": "Settings > Nickname",
+    "role": "textbox",
+    "name": "Nickname",
+    "region": null,
+    "view": "Settings"
+   },
+   "params": [
+    {
+     "name": "value",
+     "type": "string",
+     "description": "「Nickname」的新值",
+     "required": true,
+     "positional": true
+    },
+    {
+     "name": "submit",
+     "type": "boolean",
+     "description": "设置后按 Enter 提交",
+     "default": false
+    }
+   ],
+   "effect": "把「Nickname」设为给定值（触发 input / change 事件）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Settings",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "set": {
+       "name": "Nickname",
+       "role": "textbox",
+       "value": "{{value}}"
+      }
+     },
+     {
+      "press_if": "submit",
+      "press": {
+       "key": "Enter",
+       "name": "Nickname",
+       "role": "textbox"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "nickname.save",
+   "resource": "nickname",
+   "verb": "save",
+   "summary": "Save nickname",
+   "source": "ui",
+   "ui": {
+    "path": "Settings > Settings > Save nickname",
+    "role": "button",
+    "name": "Save nickname",
+    "region": "Settings",
+    "view": "Settings"
+   },
+   "params": [],
+   "effect": "点击「Save nickname」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Settings",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Save nickname",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "instant-meeting.start",
+   "resource": "instant-meeting",
+   "verb": "start",
+   "summary": "Start an instant meeting",
+   "source": "ui",
+   "ui": {
+    "path": "New meeting > menu > Start an instant meeting",
+    "role": "menuitem",
+    "name": "Start an instant meeting",
+    "region": "menu",
+    "view": "New meeting"
+   },
+   "params": [],
+   "effect": "点击「Start an instant meeting」（menuitem）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "New meeting",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Start an instant meeting",
+       "role": "menuitem"
+      }
+     }
+    ]
+   }
+  }
+ ]
+}

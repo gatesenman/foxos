@@ -1,0 +1,924 @@
+{
+ "app": "whiteboard",
+ "name": "Whiteboard",
+ "generated_by": "scripts/inventory_ops.py",
+ "commit": "0fbb88cdee2f54c94a9d2c975f43322888813c5d",
+ "title": "Your boards · Whiteboard",
+ "ops": [
+  {
+   "id": "board-library.select",
+   "resource": "board-library",
+   "verb": "select",
+   "summary": "all #（1 项，如 All boards0）",
+   "source": "ui-collection",
+   "ui": {
+    "path": "主界面 > Board library > all #",
+    "role": "button",
+    "region": "Board library",
+    "view": "主界面",
+    "examples": [
+     "All boards0"
+    ]
+   },
+   "params": [
+    {
+     "name": "target",
+     "type": "string",
+     "description": "要操作的项的名称（或其一部分），如 'All boards0'",
+     "required": true,
+     "positional": true
+    }
+   ],
+   "effect": "点击名称匹配的「all #」项（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "{{target}}",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "board-library-2.select",
+   "resource": "board-library-2",
+   "verb": "select",
+   "summary": "#（1 项，如 Favorites0）",
+   "source": "ui-collection",
+   "ui": {
+    "path": "主界面 > Board library > #",
+    "role": "button",
+    "region": "Board library",
+    "view": "主界面",
+    "examples": [
+     "Favorites0"
+    ]
+   },
+   "params": [
+    {
+     "name": "target",
+     "type": "string",
+     "description": "要操作的项的名称（或其一部分），如 'Favorites0'",
+     "required": true,
+     "positional": true
+    }
+   ],
+   "effect": "点击名称匹配的「#」项（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "{{target}}",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "main.select",
+   "resource": "main",
+   "verb": "select",
+   "summary": "crazy # eight ideas in eight minutes, then share and vote.（1 项，如 Crazy 8sSketch eight ideas in eight minutes, then share and vote.）",
+   "source": "ui-collection",
+   "ui": {
+    "path": "主界面 > main > crazy # eight ideas in eight minutes, then share and vote.",
+    "role": "button",
+    "region": "main",
+    "view": "主界面",
+    "examples": [
+     "Crazy 8sSketch eight ideas in eight minutes, then share and vote."
+    ]
+   },
+   "params": [
+    {
+     "name": "target",
+     "type": "string",
+     "description": "要操作的项的名称（或其一部分），如 'Crazy 8sSketch eight ideas in eight minutes, then share and vote.'",
+     "required": true,
+     "positional": true
+    }
+   ],
+   "effect": "点击名称匹配的「crazy # eight ideas in eight minutes, then share and vote.」项（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "{{target}}",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "whiteboard-home.show",
+   "resource": "whiteboard-home",
+   "verb": "show",
+   "summary": "Whiteboard home",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Whiteboard home",
+    "role": "link",
+    "name": "Whiteboard home",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Whiteboard home」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Whiteboard home",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "trash.delete",
+   "resource": "trash",
+   "verb": "delete",
+   "summary": "Trash",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Board library > Trash",
+    "role": "button",
+    "name": "Trash",
+    "region": "Board library",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Trash」（button）",
+   "permission": "delete",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Trash",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "organization.join",
+   "resource": "organization",
+   "verb": "join",
+   "summary": "Join an organization",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Organization > Join an organization",
+    "role": "button",
+    "name": "Join an organization",
+    "region": "Organization",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Join an organization」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Join an organization",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "set-up-organization.activate",
+   "resource": "set-up-organization",
+   "verb": "activate",
+   "summary": "Set up an organization",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Organization > Set up an organization",
+    "role": "button",
+    "name": "Set up an organization",
+    "region": "Organization",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Set up an organization」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Set up an organization",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "feedback.send",
+   "resource": "feedback",
+   "verb": "send",
+   "summary": "Send feedback",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > aside > Send feedback",
+    "role": "button",
+    "name": "Send feedback",
+    "region": "aside",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Send feedback」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Send feedback",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "language.set",
+   "resource": "language",
+   "verb": "set",
+   "summary": "Language",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Language",
+    "role": "combobox",
+    "name": "Language",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [
+    {
+     "name": "value",
+     "type": "string",
+     "description": "「Language」的新值",
+     "required": true,
+     "positional": true,
+     "enum": [
+      "en",
+      "fr"
+     ]
+    },
+    {
+     "name": "submit",
+     "type": "boolean",
+     "description": "设置后按 Enter 提交",
+     "default": false
+    }
+   ],
+   "effect": "把「Language」设为给定值（触发 input / change 事件）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "set": {
+       "name": "Language",
+       "role": "combobox",
+       "value": "{{value}}"
+      }
+     },
+     {
+      "press_if": "submit",
+      "press": {
+       "key": "Enter",
+       "name": "Language",
+       "role": "combobox"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "appearance.set",
+   "resource": "appearance",
+   "verb": "set",
+   "summary": "Appearance",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Appearance",
+    "role": "combobox",
+    "name": "Appearance",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [
+    {
+     "name": "value",
+     "type": "string",
+     "description": "「Appearance」的新值",
+     "required": true,
+     "positional": true,
+     "enum": [
+      "system",
+      "light",
+      "dark"
+     ]
+    },
+    {
+     "name": "submit",
+     "type": "boolean",
+     "description": "设置后按 Enter 提交",
+     "default": false
+    }
+   ],
+   "effect": "把「Appearance」设为给定值（触发 input / change 事件）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "set": {
+       "name": "Appearance",
+       "role": "combobox",
+       "value": "{{value}}"
+      }
+     },
+     {
+      "press_if": "submit",
+      "press": {
+       "key": "Enter",
+       "name": "Appearance",
+       "role": "combobox"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "powered-by-puter.show",
+   "resource": "powered-by-puter",
+   "verb": "show",
+   "summary": "Powered by Puter",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > aside > Powered by Puter",
+    "role": "link",
+    "name": "Powered by Puter",
+    "region": "aside",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Powered by Puter」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Powered by Puter",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "command-palette-ctrl-cmd-k.activate",
+   "resource": "command-palette-ctrl-cmd-k",
+   "verb": "activate",
+   "summary": "Command palette (Ctrl/Cmd K)",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Command palette (Ctrl/Cmd K)",
+    "role": "button",
+    "name": "Command palette (Ctrl/Cmd K)",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Command palette (Ctrl/Cmd K)」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Command palette (Ctrl/Cmd K)",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "shared-board.join",
+   "resource": "shared-board",
+   "verb": "join",
+   "summary": "Join shared board",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Join shared board",
+    "role": "button",
+    "name": "Join shared board",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Join shared board」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Join shared board",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "training.show",
+   "resource": "training",
+   "verb": "show",
+   "summary": "Help and training",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Help and training",
+    "role": "button",
+    "name": "Help and training",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Help and training」（button），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Help and training",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "keyboard-shortcuts.activate",
+   "resource": "keyboard-shortcuts",
+   "verb": "activate",
+   "summary": "Keyboard shortcuts",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Keyboard shortcuts",
+    "role": "button",
+    "name": "Keyboard shortcuts",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Keyboard shortcuts」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Keyboard shortcuts",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "account-menu-local.activate",
+   "resource": "account-menu-local",
+   "verb": "activate",
+   "summary": "Account menu · local",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Account menu · local",
+    "role": "button",
+    "name": "Account menu · local",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Account menu · local」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Account menu · local",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "browse-templates.activate",
+   "resource": "browse-templates",
+   "verb": "activate",
+   "summary": "Browse all templates",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > main > Browse all templates",
+    "role": "button",
+    "name": "Browse all templates",
+    "region": "main",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Browse all templates」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Browse all templates",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "blank-boarda-fresh-start.activate",
+   "resource": "blank-boarda-fresh-start",
+   "verb": "activate",
+   "summary": "Blank boardA fresh start",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > main > Blank boardA fresh start",
+    "role": "button",
+    "name": "Blank boardA fresh start",
+    "region": "main",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Blank boardA fresh start」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Blank boardA fresh start",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "board.create",
+   "resource": "board",
+   "verb": "create",
+   "summary": "New board",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > main > New board",
+    "role": "button",
+    "name": "New board",
+    "region": "main",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「New board」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "New board",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "search-boards.set",
+   "resource": "search-boards",
+   "verb": "set",
+   "summary": "Search boards",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Search boards",
+    "role": "textbox",
+    "name": "Search boards",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [
+    {
+     "name": "value",
+     "type": "string",
+     "description": "「Search boards」的新值",
+     "required": true,
+     "positional": true
+    },
+    {
+     "name": "submit",
+     "type": "boolean",
+     "description": "设置后按 Enter 提交",
+     "default": false
+    }
+   ],
+   "effect": "把「Search boards」设为给定值（触发 input / change 事件）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "set": {
+       "name": "Search boards",
+       "role": "textbox",
+       "value": "{{value}}"
+      }
+     },
+     {
+      "press_if": "submit",
+      "press": {
+       "key": "Enter",
+       "name": "Search boards",
+       "role": "textbox"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "sort-boards.set",
+   "resource": "sort-boards",
+   "verb": "set",
+   "summary": "Sort boards",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Sort boards",
+    "role": "combobox",
+    "name": "Sort boards",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [
+    {
+     "name": "value",
+     "type": "string",
+     "description": "「Sort boards」的新值",
+     "required": true,
+     "positional": true,
+     "enum": [
+      "recent",
+      "name"
+     ]
+    },
+    {
+     "name": "submit",
+     "type": "boolean",
+     "description": "设置后按 Enter 提交",
+     "default": false
+    }
+   ],
+   "effect": "把「Sort boards」设为给定值（触发 input / change 事件）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "set": {
+       "name": "Sort boards",
+       "role": "combobox",
+       "value": "{{value}}"
+      }
+     },
+     {
+      "press_if": "submit",
+      "press": {
+       "key": "Enter",
+       "name": "Sort boards",
+       "role": "combobox"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "board-file.import",
+   "resource": "board-file",
+   "verb": "import",
+   "summary": "Import board file",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Import board file",
+    "role": "button",
+    "name": "Import board file",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Import board file」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Import board file",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "migrate-from-miro.activate",
+   "resource": "migrate-from-miro",
+   "verb": "activate",
+   "summary": "Migrate from Miro",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Migrate from Miro",
+    "role": "button",
+    "name": "Migrate from Miro",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Migrate from Miro」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Migrate from Miro",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "grid-view.activate",
+   "resource": "grid-view",
+   "verb": "activate",
+   "summary": "Grid view",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Grid view",
+    "role": "button",
+    "name": "Grid view",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Grid view」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Grid view",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "list-view.activate",
+   "resource": "list-view",
+   "verb": "activate",
+   "summary": "List view",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > List view",
+    "role": "button",
+    "name": "List view",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「List view」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "List view",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "keyboard-shortcuts-2.activate",
+   "resource": "keyboard-shortcuts-2",
+   "verb": "activate",
+   "summary": "Keyboard shortcuts",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > footer > Keyboard shortcuts",
+    "role": "button",
+    "name": "Keyboard shortcuts",
+    "region": "footer",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Keyboard shortcuts」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Keyboard shortcuts",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  }
+ ]
+}

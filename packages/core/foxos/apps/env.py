@@ -217,6 +217,11 @@ def env_start(ctx: Context, name: str) -> dict:
             (d / "run" / f).unlink()
         except FileNotFoundError:
             pass
+    # 系统挂载：狐狸OS 安装的 ACP 智能体只读挂到 /opt/foxos/agents，供“在环境中运行智能体”使用
+    from ..desktop_client import foxos_home
+    agents = foxos_home() / "agents"
+    cfg["system_mounts"] = [{"source": str(agents), "target": "/opt/foxos/agents", "readonly": True}] if agents.is_dir() else []
+    _save(cfg)
     log = open(d / "logs" / "init.log", "ab")
     env = {**os.environ, "PYTHONPATH": str(Path(__file__).resolve().parents[2])}
     subprocess.Popen([sys.executable, "-m", "foxos.envs.linux", "supervise", str(d)], stdout=log, stderr=log, stdin=subprocess.DEVNULL, start_new_session=True, env=env)

@@ -142,8 +142,17 @@ def build_parser() -> argparse.ArgumentParser:
     t = apps.add_parser("tools", help="导出工具定义（MCP / OpenAI function 格式的 JSON Schema）", parents=parents)
     t.add_argument("--format", choices=["mcp", "openai"], default="mcp")
     t.set_defaults(_special="tools")
-    m = apps.add_parser("mcp", help="以 stdio MCP 服务器方式运行，向智能体暴露全部命令", parents=parents)
+    m = apps.add_parser("mcp", help="以 MCP 服务器方式运行（默认 stdio；--http 为 Streamable HTTP）", parents=parents)
+    m.add_argument("--http", metavar="HOST:PORT", help="改用 Streamable HTTP，监听地址，如 127.0.0.1:8765（端口 0 表示随机）")
+    m.add_argument("--token", help="HTTP 模式要求的 Bearer 令牌（也可用环境变量 FOXOS_MCP_TOKEN）")
+    m.add_argument("--profile", choices=["compact", "full"], default=os.environ.get("FOXOS_MCP_PROFILE", "compact"),
+                   help="compact：内置应用全部工具 + Everything 元工具（默认）；full：全部工具")
+    m.add_argument("--apps", help="额外暴露这些 Everything 应用的全部工具，逗号分隔，如 tasks,chess")
+    m.add_argument("--tool-names", choices=["underscore", "dotted"], default="underscore",
+                   help="工具名格式：underscore（tasks_task_create，兼容所有客户端，默认）或 dotted（tasks.task.create）")
     m.set_defaults(_special="mcp")
+    t2 = apps.add_parser("agent-guide", help="输出智能体使用指南（docs/agent-guide.md），--json 输出连接配置片段", parents=parents)
+    t2.set_defaults(_special="agent-guide")
 
     for app, meta in APPS.items():
         cmds = [c for c in REGISTRY.values() if c.app == app]
@@ -281,6 +290,14 @@ def main(argv: list[str] | None = None) -> int:
                         print(f"  {c['usage']}\n      {c['summary']}")
                 print("\n运行 foxos <app> --help 查看详情；foxos help --json 输出机器可读能力目录。")
             return 0
+        if special == "agent-guide":
+            from .agent_guide import guide
+            g = guide()
+            if as_json:
+                print(json.dumps(g, ensure_ascii=False, indent=2))
+            else:
+                print(g["markdown"])
+            return 0
         if special == "tools":
             tools = catalog.mcp_tools() if ns.format == "mcp" else catalog.openai_tools()
             print(json.dumps(tools, ensure_ascii=False, indent=2))
@@ -289,8 +306,13 @@ def main(argv: list[str] | None = None) -> int:
         agent = ns.agent or os.environ.get("FOXOS_AGENT") or "human"
         task = ns.task or os.environ.get("FOXOS_TASK")
         if special == "mcp":
-            from .mcp_server import serve
-            return serve(ws, agent_default=ns.agent or os.environ.get("FOXOS_AGENT"), task=task)
+            from .mcp_server import serve, serve_http
+            kw = dict(agent_default=ns.agent or os.environ.get("FOXOS_AGENT"), task=task, profile=ns.profile,
+                      apps=[a.strip() for a in (ns.apps or "").split(",") if a.strip()] or None, names=ns.tool_names)
+            if ns.http:
+                host, _, port = ns.http.rpartition(":")
+                return serve_http(ws, host or "127.0.0.1", int(port or 0), token=ns.token or os.environ.get("FOXOS_MCP_TOKEN"), **kw)
+            return serve(ws, **kw)
         cmd_id = getattr(ns, "_cmd", None)
         if not cmd_id:
             sub = [a for a in argv if not a.startswith("-")][:2]
@@ -318,6 +340,11 @@ def main(argv: list[str] | None = None) -> int:
                 v = sys.stdin.buffer.read().decode("utf-8")
             if v is None or (p.positional and p.type == "array" and v == []):
                 continue
+            if isinstance(v, str) and (p.type == "object" or (p.type == "array" and v.lstrip().startswith("["))):
+                try:
+                    v = json.loads(v)
+                except ValueError as e:
+                    raise FoxError("USAGE", f"参数 {p.name} 需要 JSON：{e}") from e
             if p.type == "array" and isinstance(v, str):
                 v = [s.strip() for s in v.split(",") if s.strip()]
             if p.type == "array" and p.items and p.items.get("type") in ("number", "integer"):

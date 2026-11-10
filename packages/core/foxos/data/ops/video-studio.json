@@ -1,0 +1,1262 @@
+{
+ "app": "video-studio",
+ "name": "Video Studio",
+ "generated_by": "scripts/inventory_ops.py",
+ "commit": "0fbb88cdee2f54c94a9d2c975f43322888813c5d",
+ "title": "Video Studio",
+ "ops": [
+  {
+   "id": "account.select",
+   "resource": "account",
+   "verb": "select",
+   "summary": "account: *（1 项，如 Account: local）",
+   "source": "ui-collection",
+   "ui": {
+    "path": "主界面 > account: *",
+    "role": "button",
+    "region": null,
+    "view": "主界面",
+    "examples": [
+     "Account: local"
+    ]
+   },
+   "params": [
+    {
+     "name": "target",
+     "type": "string",
+     "description": "要操作的项的名称（或其一部分），如 'Account: local'",
+     "required": true,
+     "positional": true
+    }
+   ],
+   "effect": "点击名称匹配的「account: *」项（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "{{target}}",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "browse-ready-made-projects-make-own.select",
+   "resource": "browse-ready-made-projects-make-own",
+   "verb": "select",
+   "summary": "browse # ready-made projects to make your own（1 项，如 Browse templates10 ready-made projects to make your own）",
+   "source": "ui-collection",
+   "ui": {
+    "path": "主界面 > Quick start > browse # ready-made projects to make your own",
+    "role": "button",
+    "region": "Quick start",
+    "view": "主界面",
+    "examples": [
+     "Browse templates10 ready-made projects to make your own"
+    ]
+   },
+   "params": [
+    {
+     "name": "target",
+     "type": "string",
+     "description": "要操作的项的名称（或其一部分），如 'Browse templates10 ready-made projects to make your own'",
+     "required": true,
+     "positional": true
+    }
+   ],
+   "effect": "点击名称匹配的「browse # ready-made projects to make your own」项（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "{{target}}",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "youtube-project.select",
+   "resource": "youtube-project",
+   "verb": "select",
+   "summary": "# youtube, new project（1 项，如 16:9 YouTube, new project）",
+   "source": "ui-collection",
+   "ui": {
+    "path": "主界面 > # youtube, new project",
+    "role": "button",
+    "region": null,
+    "view": "主界面",
+    "examples": [
+     "16:9 YouTube, new project"
+    ]
+   },
+   "params": [
+    {
+     "name": "target",
+     "type": "string",
+     "description": "要操作的项的名称（或其一部分），如 '16:9 YouTube, new project'",
+     "required": true,
+     "positional": true
+    }
+   ],
+   "effect": "点击名称匹配的「# youtube, new project」项（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "{{target}}",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "vertical-project.select",
+   "resource": "vertical-project",
+   "verb": "select",
+   "summary": "# vertical, new project（1 项，如 9:16 Vertical, new project）",
+   "source": "ui-collection",
+   "ui": {
+    "path": "主界面 > # vertical, new project",
+    "role": "button",
+    "region": null,
+    "view": "主界面",
+    "examples": [
+     "9:16 Vertical, new project"
+    ]
+   },
+   "params": [
+    {
+     "name": "target",
+     "type": "string",
+     "description": "要操作的项的名称（或其一部分），如 '9:16 Vertical, new project'",
+     "required": true,
+     "positional": true
+    }
+   ],
+   "effect": "点击名称匹配的「# vertical, new project」项（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "{{target}}",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "square-project.select",
+   "resource": "square-project",
+   "verb": "select",
+   "summary": "# square, new project（1 项，如 1:1 Square, new project）",
+   "source": "ui-collection",
+   "ui": {
+    "path": "主界面 > # square, new project",
+    "role": "button",
+    "region": null,
+    "view": "主界面",
+    "examples": [
+     "1:1 Square, new project"
+    ]
+   },
+   "params": [
+    {
+     "name": "target",
+     "type": "string",
+     "description": "要操作的项的名称（或其一部分），如 '1:1 Square, new project'",
+     "required": true,
+     "positional": true
+    }
+   ],
+   "effect": "点击名称匹配的「# square, new project」项（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "{{target}}",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "classic-project.select",
+   "resource": "classic-project",
+   "verb": "select",
+   "summary": "# classic, new project（1 项，如 4:3 Classic, new project）",
+   "source": "ui-collection",
+   "ui": {
+    "path": "主界面 > # classic, new project",
+    "role": "button",
+    "region": null,
+    "view": "主界面",
+    "examples": [
+     "4:3 Classic, new project"
+    ]
+   },
+   "params": [
+    {
+     "name": "target",
+     "type": "string",
+     "description": "要操作的项的名称（或其一部分），如 '4:3 Classic, new project'",
+     "required": true,
+     "positional": true
+    }
+   ],
+   "effect": "点击名称匹配的「# classic, new project」项（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "{{target}}",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "portrait-project.select",
+   "resource": "portrait-project",
+   "verb": "select",
+   "summary": "# portrait, new project（1 项，如 3:4 Portrait, new project）",
+   "source": "ui-collection",
+   "ui": {
+    "path": "主界面 > # portrait, new project",
+    "role": "button",
+    "region": null,
+    "view": "主界面",
+    "examples": [
+     "3:4 Portrait, new project"
+    ]
+   },
+   "params": [
+    {
+     "name": "target",
+     "type": "string",
+     "description": "要操作的项的名称（或其一部分），如 '3:4 Portrait, new project'",
+     "required": true,
+     "positional": true
+    }
+   ],
+   "effect": "点击名称匹配的「# portrait, new project」项（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "{{target}}",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "feed-post-project.select",
+   "resource": "feed-post-project",
+   "verb": "select",
+   "summary": "# feed post, new project（1 项，如 4:5 Feed post, new project）",
+   "source": "ui-collection",
+   "ui": {
+    "path": "主界面 > # feed post, new project",
+    "role": "button",
+    "region": null,
+    "view": "主界面",
+    "examples": [
+     "4:5 Feed post, new project"
+    ]
+   },
+   "params": [
+    {
+     "name": "target",
+     "type": "string",
+     "description": "要操作的项的名称（或其一部分），如 '4:5 Feed post, new project'",
+     "required": true,
+     "positional": true
+    }
+   ],
+   "effect": "点击名称匹配的「# feed post, new project」项（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "{{target}}",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "cinema-project.select",
+   "resource": "cinema-project",
+   "verb": "select",
+   "summary": "# cinema, new project（1 项，如 21:9 Cinema, new project）",
+   "source": "ui-collection",
+   "ui": {
+    "path": "主界面 > # cinema, new project",
+    "role": "button",
+    "region": null,
+    "view": "主界面",
+    "examples": [
+     "21:9 Cinema, new project"
+    ]
+   },
+   "params": [
+    {
+     "name": "target",
+     "type": "string",
+     "description": "要操作的项的名称（或其一部分），如 '21:9 Cinema, new project'",
+     "required": true,
+     "positional": true
+    }
+   ],
+   "effect": "点击名称匹配的「# cinema, new project」项（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "{{target}}",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "item.select",
+   "resource": "item",
+   "verb": "select",
+   "summary": "# title intro, intros and outros, # a bold title over a glowing backdrop with a slow push in.（1 项，如 16:9 Title intro, Intros and outros, 00:06. A bold title over a glowing backdrop with a slow push in.）",
+   "source": "ui-collection",
+   "ui": {
+    "path": "主界面 > # title intro, intros and outros, # a bold title over a glowing backdrop with a slow push in.",
+    "role": "button",
+    "region": null,
+    "view": "主界面",
+    "examples": [
+     "16:9 Title intro, Intros and outros, 00:06. A bold title over a glowing backdrop with a slow push in."
+    ]
+   },
+   "params": [
+    {
+     "name": "target",
+     "type": "string",
+     "description": "要操作的项的名称（或其一部分），如 '16:9 Title intro, Intros and outros, 00:06. A bold title over a glowing backdrop with a slow push in.'",
+     "required": true,
+     "positional": true
+    }
+   ],
+   "effect": "点击名称匹配的「# title intro, intros and outros, # a bold title over a glowing backdrop with a slow push in.」项（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "{{target}}",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "item-2.select",
+   "resource": "item-2",
+   "verb": "select",
+   "summary": "# photo slideshow, slideshows, # slots. four photo slots with gentle motion, soft transitions and captions.（1 项，如 16:9 Photo slideshow, Slideshows, 00:14, 4 slots. Four photo slots with gentle motion, soft transitions and captions.）",
+   "source": "ui-collection",
+   "ui": {
+    "path": "主界面 > # photo slideshow, slideshows, # slots. four photo slots with gentle motion, soft transitions and captions.",
+    "role": "button",
+    "region": null,
+    "view": "主界面",
+    "examples": [
+     "16:9 Photo slideshow, Slideshows, 00:14, 4 slots. Four photo slots with gentle motion, soft transitions and captions."
+    ]
+   },
+   "params": [
+    {
+     "name": "target",
+     "type": "string",
+     "description": "要操作的项的名称（或其一部分），如 '16:9 Photo slideshow, Slideshows, 00:14, 4 slots. Four photo slots with gentle motion, soft transitions and captions.'",
+     "required": true,
+     "positional": true
+    }
+   ],
+   "effect": "点击名称匹配的「# photo slideshow, slideshows, # slots. four photo slots with gentle motion, soft transitions and captions.」项（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "{{target}}",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "item-3.select",
+   "resource": "item-3",
+   "verb": "select",
+   "summary": "# quote card, social, # a typed-out quote with an author line on a warm paper backdrop.（1 项，如 1:1 Quote card, Social, 00:08. A typed-out quote with an author line on a warm paper backdrop.）",
+   "source": "ui-collection",
+   "ui": {
+    "path": "主界面 > # quote card, social, # a typed-out quote with an author line on a warm paper backdrop.",
+    "role": "button",
+    "region": null,
+    "view": "主界面",
+    "examples": [
+     "1:1 Quote card, Social, 00:08. A typed-out quote with an author line on a warm paper backdrop."
+    ]
+   },
+   "params": [
+    {
+     "name": "target",
+     "type": "string",
+     "description": "要操作的项的名称（或其一部分），如 '1:1 Quote card, Social, 00:08. A typed-out quote with an author line on a warm paper backdrop.'",
+     "required": true,
+     "positional": true
+    }
+   ],
+   "effect": "点击名称匹配的「# quote card, social, # a typed-out quote with an author line on a warm paper backdrop.」项（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "{{target}}",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "item-4.select",
+   "resource": "item-4",
+   "verb": "select",
+   "summary": "# countdown, intros and outros, # five, four, three, two, one with a pulsing ring and a flash at go.（1 项，如 16:9 Countdown, Intros and outros, 00:07. Five, four, three, two, one with a pulsing ring and a flash at go.）",
+   "source": "ui-collection",
+   "ui": {
+    "path": "主界面 > # countdown, intros and outros, # five, four, three, two, one with a pulsing ring and a flash at go.",
+    "role": "button",
+    "region": null,
+    "view": "主界面",
+    "examples": [
+     "16:9 Countdown, Intros and outros, 00:07. Five, four, three, two, one with a pulsing ring and a flash at go."
+    ]
+   },
+   "params": [
+    {
+     "name": "target",
+     "type": "string",
+     "description": "要操作的项的名称（或其一部分），如 '16:9 Countdown, Intros and outros, 00:07. Five, four, three, two, one with a pulsing ring and a flash at go.'",
+     "required": true,
+     "positional": true
+    }
+   ],
+   "effect": "点击名称匹配的「# countdown, intros and outros, # five, four, three, two, one with a pulsing ring and a flash at go.」项（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "{{target}}",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "item-5.select",
+   "resource": "item-5",
+   "verb": "select",
+   "summary": "# product promo, business, # slot. show off a product with a price burst and a call to action.（1 项，如 4:5 Product promo, Business, 00:09, 1 slot. Show off a product with a price burst and a call to action.）",
+   "source": "ui-collection",
+   "ui": {
+    "path": "主界面 > # product promo, business, # slot. show off a product with a price burst and a call to action.",
+    "role": "button",
+    "region": null,
+    "view": "主界面",
+    "examples": [
+     "4:5 Product promo, Business, 00:09, 1 slot. Show off a product with a price burst and a call to action."
+    ]
+   },
+   "params": [
+    {
+     "name": "target",
+     "type": "string",
+     "description": "要操作的项的名称（或其一部分），如 '4:5 Product promo, Business, 00:09, 1 slot. Show off a product with a price burst and a call to action.'",
+     "required": true,
+     "positional": true
+    }
+   ],
+   "effect": "点击名称匹配的「# product promo, business, # slot. show off a product with a price burst and a call to action.」项（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "{{target}}",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "item-6.select",
+   "resource": "item-6",
+   "verb": "select",
+   "summary": "# vertical story, social, # slots. three tall photo slots that push up, with neon and script titles.（1 项，如 9:16 Vertical story, Social, 00:09, 3 slots. Three tall photo slots that push up, with neon and script titles.）",
+   "source": "ui-collection",
+   "ui": {
+    "path": "主界面 > # vertical story, social, # slots. three tall photo slots that push up, with neon and script titles.",
+    "role": "button",
+    "region": null,
+    "view": "主界面",
+    "examples": [
+     "9:16 Vertical story, Social, 00:09, 3 slots. Three tall photo slots that push up, with neon and script titles."
+    ]
+   },
+   "params": [
+    {
+     "name": "target",
+     "type": "string",
+     "description": "要操作的项的名称（或其一部分），如 '9:16 Vertical story, Social, 00:09, 3 slots. Three tall photo slots that push up, with neon and script titles.'",
+     "required": true,
+     "positional": true
+    }
+   ],
+   "effect": "点击名称匹配的「# vertical story, social, # slots. three tall photo slots that push up, with neon and script titles.」项（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "{{target}}",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "editor.dismiss",
+   "resource": "editor",
+   "verb": "dismiss",
+   "summary": "Skip to editor",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Skip to editor",
+    "role": "link",
+    "name": "Skip to editor",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Skip to editor」（link）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Skip to editor",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "home.show",
+   "resource": "home",
+   "verb": "show",
+   "summary": "Home",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Home sections > Home",
+    "role": "link",
+    "name": "Home",
+    "region": "Home sections",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Home」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Home",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "templates.show",
+   "resource": "templates",
+   "verb": "show",
+   "summary": "Templates",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Home sections > Templates",
+    "role": "link",
+    "name": "Templates",
+    "region": "Home sections",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Templates」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Templates",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "trash.delete",
+   "resource": "trash",
+   "verb": "delete",
+   "summary": "Trash",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Home sections > Trash",
+    "role": "link",
+    "name": "Trash",
+    "region": "Home sections",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Trash」（link）",
+   "permission": "delete",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Trash",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "editopen-media-project.import",
+   "resource": "editopen-media-project",
+   "verb": "import",
+   "summary": "Import and editOpen media in a new project",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Quick start > Import and editOpen media in a new project",
+    "role": "button",
+    "name": "Import and editOpen media in a new project",
+    "region": "Quick start",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Import and editOpen media in a new project」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Import and editOpen media in a new project",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "see.show",
+   "resource": "see",
+   "verb": "show",
+   "summary": "See all",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > main > See all",
+    "role": "link",
+    "name": "See all",
+    "region": "main",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「See all」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "See all",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "search-projects.set",
+   "resource": "search-projects",
+   "verb": "set",
+   "summary": "Search projects",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Search projects",
+    "role": "textbox",
+    "name": "Search projects",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [
+    {
+     "name": "value",
+     "type": "string",
+     "description": "「Search projects」的新值",
+     "required": true,
+     "positional": true
+    },
+    {
+     "name": "submit",
+     "type": "boolean",
+     "description": "设置后按 Enter 提交",
+     "default": false
+    }
+   ],
+   "effect": "把「Search projects」设为给定值（触发 input / change 事件）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "set": {
+       "name": "Search projects",
+       "role": "textbox",
+       "value": "{{value}}"
+      }
+     },
+     {
+      "press_if": "submit",
+      "press": {
+       "key": "Enter",
+       "name": "Search projects",
+       "role": "textbox"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "sort.sort",
+   "resource": "sort",
+   "verb": "sort",
+   "summary": "Sort",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > main > Sort",
+    "role": "button",
+    "name": "Sort",
+    "region": "main",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Sort」（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Sort",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "as-list.show",
+   "resource": "as-list",
+   "verb": "show",
+   "summary": "Show as list",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Show as list",
+    "role": "button",
+    "name": "Show as list",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Show as list」（button），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Show as list",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "project-actions.show",
+   "resource": "project-actions",
+   "verb": "show",
+   "summary": "More project actions",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > More project actions",
+    "role": "button",
+    "name": "More project actions",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「More project actions」（button），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "More project actions",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "powered-by-puter.show",
+   "resource": "powered-by-puter",
+   "verb": "show",
+   "summary": "Powered by Puter",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > footer > Powered by Puter",
+    "role": "link",
+    "name": "Powered by Puter",
+    "region": "footer",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Powered by Puter」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Powered by Puter",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "theme.activate",
+   "resource": "theme",
+   "verb": "activate",
+   "summary": "Theme",
+   "source": "ui",
+   "ui": {
+    "path": "Account: local > Account > Theme",
+    "role": "menuitem",
+    "name": "Theme",
+    "region": "Account",
+    "view": "Account: local"
+   },
+   "params": [],
+   "effect": "点击「Theme」（menuitem）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Account: local",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Theme",
+       "role": "menuitem"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "last-modified.activate",
+   "resource": "last-modified",
+   "verb": "activate",
+   "summary": "Last modified",
+   "source": "ui",
+   "ui": {
+    "path": "Sort > Sort projects > Last modified",
+    "role": "menuitemradio",
+    "name": "Last modified",
+    "region": "Sort projects",
+    "view": "Sort"
+   },
+   "params": [],
+   "effect": "点击「Last modified」（menuitemradio）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Sort",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Last modified",
+       "role": "menuitemradio"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "date-created.activate",
+   "resource": "date-created",
+   "verb": "activate",
+   "summary": "Date created",
+   "source": "ui",
+   "ui": {
+    "path": "Sort > Sort projects > Date created",
+    "role": "menuitemradio",
+    "name": "Date created",
+    "region": "Sort projects",
+    "view": "Sort"
+   },
+   "params": [],
+   "effect": "点击「Date created」（menuitemradio）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Sort",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Date created",
+       "role": "menuitemradio"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "name.activate",
+   "resource": "name",
+   "verb": "activate",
+   "summary": "Name",
+   "source": "ui",
+   "ui": {
+    "path": "Sort > Sort projects > Name",
+    "role": "menuitemradio",
+    "name": "Name",
+    "region": "Sort projects",
+    "view": "Sort"
+   },
+   "params": [],
+   "effect": "点击「Name」（menuitemradio）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Sort",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Name",
+       "role": "menuitemradio"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "project-file.open",
+   "resource": "project-file",
+   "verb": "open",
+   "summary": "Open project file...",
+   "source": "ui",
+   "ui": {
+    "path": "More project actions > More project actions > Open project file...",
+    "role": "menuitem",
+    "name": "Open project file...",
+    "region": "More project actions",
+    "view": "More project actions"
+   },
+   "params": [],
+   "effect": "点击「Open project file...」（menuitem）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "More project actions",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Open project file...",
+       "role": "menuitem"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "media.import",
+   "resource": "media",
+   "verb": "import",
+   "summary": "Import media...",
+   "source": "ui",
+   "ui": {
+    "path": "More project actions > More project actions > Import media...",
+    "role": "menuitem",
+    "name": "Import media...",
+    "region": "More project actions",
+    "view": "More project actions"
+   },
+   "params": [],
+   "effect": "点击「Import media...」（menuitem）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "More project actions",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Import media...",
+       "role": "menuitem"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "more-project-actions-trash.delete",
+   "resource": "more-project-actions-trash",
+   "verb": "delete",
+   "summary": "Trash",
+   "source": "ui",
+   "ui": {
+    "path": "More project actions > More project actions > Trash",
+    "role": "menuitem",
+    "name": "Trash",
+    "region": "More project actions",
+    "view": "More project actions"
+   },
+   "params": [],
+   "effect": "点击「Trash」（menuitem）",
+   "permission": "delete",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "More project actions",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Trash",
+       "role": "menuitem"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "selection.select-all",
+   "resource": "selection",
+   "verb": "select-all",
+   "summary": "快捷键 mod+a",
+   "source": "shortcut",
+   "ui": {
+    "path": "键盘 mod+a",
+    "shortcut": "mod+a",
+    "defined_in": "src/ui/panels/media.js"
+   },
+   "params": [],
+   "effect": "在当前焦点上按 mod+a（src/ui/panels/media.js 中定义）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "press": {
+       "key": "mod+a"
+      }
+     }
+    ]
+   }
+  }
+ ]
+}

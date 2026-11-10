@@ -1,0 +1,555 @@
+{
+ "app": "records",
+ "name": "Records",
+ "generated_by": "scripts/inventory_ops.py",
+ "commit": "0fbb88cdee2f54c94a9d2c975f43322888813c5d",
+ "title": "Records",
+ "ops": [
+  {
+   "id": "account.select",
+   "resource": "account",
+   "verb": "select",
+   "summary": "account: *（1 项，如 Account: local）",
+   "source": "ui-collection",
+   "ui": {
+    "path": "主界面 > account: *",
+    "role": "button",
+    "region": null,
+    "view": "主界面",
+    "examples": [
+     "Account: local"
+    ]
+   },
+   "params": [
+    {
+     "name": "target",
+     "type": "string",
+     "description": "要操作的项的名称（或其一部分），如 'Account: local'",
+     "required": true,
+     "positional": true
+    }
+   ],
+   "effect": "点击名称匹配的「account: *」项（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "{{target}}",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "content.dismiss",
+   "resource": "content",
+   "verb": "dismiss",
+   "summary": "Skip to content",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Skip to content",
+    "role": "link",
+    "name": "Skip to content",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Skip to content」（link）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Skip to content",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "home.show",
+   "resource": "home",
+   "verb": "show",
+   "summary": "Home",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Main > Home",
+    "role": "link",
+    "name": "Home",
+    "region": "Main",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Home」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Home",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "trash.delete",
+   "resource": "trash",
+   "verb": "delete",
+   "summary": "Trash",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Main > Trash",
+    "role": "link",
+    "name": "Trash",
+    "region": "Main",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Trash」（link）",
+   "permission": "delete",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Trash",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "base.create",
+   "resource": "base",
+   "verb": "create",
+   "summary": "Create base",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Main > Create base",
+    "role": "button",
+    "name": "Create base",
+    "region": "Main",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Create base」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Create base",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "source-code-github-opens-tab.show",
+   "resource": "source-code-github-opens-tab",
+   "verb": "show",
+   "summary": "Source code on GitHub (opens in a new tab)",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Source code on GitHub (opens in a new tab)",
+    "role": "link",
+    "name": "Source code on GitHub (opens in a new tab)",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Source code on GitHub (opens in a new tab)」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Source code on GitHub (opens in a new tab)",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "search-bases.set",
+   "resource": "search-bases",
+   "verb": "set",
+   "summary": "Search bases",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Search bases",
+    "role": "textbox",
+    "name": "Search bases",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [
+    {
+     "name": "value",
+     "type": "string",
+     "description": "「Search bases」的新值",
+     "required": true,
+     "positional": true
+    },
+    {
+     "name": "submit",
+     "type": "boolean",
+     "description": "设置后按 Enter 提交",
+     "default": false
+    }
+   ],
+   "effect": "把「Search bases」设为给定值（触发 input / change 事件）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "set": {
+       "name": "Search bases",
+       "role": "textbox",
+       "value": "{{value}}"
+      }
+     },
+     {
+      "press_if": "submit",
+      "press": {
+       "key": "Enter",
+       "name": "Search bases",
+       "role": "textbox"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "from-scratcha-blank-base-one-table.start",
+   "resource": "from-scratcha-blank-base-one-table",
+   "verb": "start",
+   "summary": "Start from scratchA blank base with one table.",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > main > Start from scratchA blank base with one table.",
+    "role": "button",
+    "name": "Start from scratchA blank base with one table.",
+    "region": "main",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Start from scratchA blank base with one table.」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Start from scratchA blank base with one table.",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "base-2.create",
+   "resource": "base-2",
+   "verb": "create",
+   "summary": "Create base",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > main > Create base",
+    "role": "button",
+    "name": "Create base",
+    "region": "main",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Create base」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Create base",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "notice.dismiss",
+   "resource": "notice",
+   "verb": "dismiss",
+   "summary": "Dismiss notice",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Dismiss notice",
+    "role": "button",
+    "name": "Dismiss notice",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Dismiss notice」（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Dismiss notice",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "it.dismiss",
+   "resource": "it",
+   "verb": "dismiss",
+   "summary": "Got it",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Preview notice > Got it",
+    "role": "button",
+    "name": "Got it",
+    "region": "Preview notice",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Got it」（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Got it",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "appearance.activate",
+   "resource": "appearance",
+   "verb": "activate",
+   "summary": "Appearance",
+   "source": "ui",
+   "ui": {
+    "path": "Account: local > Account > Appearance",
+    "role": "menuitem",
+    "name": "Appearance",
+    "region": "Account",
+    "view": "Account: local"
+   },
+   "params": [],
+   "effect": "点击「Appearance」（menuitem）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Account: local",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Appearance",
+       "role": "menuitem"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "keyboard-shortcuts.activate",
+   "resource": "keyboard-shortcuts",
+   "verb": "activate",
+   "summary": "Keyboard shortcuts?",
+   "source": "ui",
+   "ui": {
+    "path": "Account: local > Account > Keyboard shortcuts?",
+    "role": "menuitem",
+    "name": "Keyboard shortcuts?",
+    "region": "Account",
+    "view": "Account: local"
+   },
+   "params": [],
+   "effect": "点击「Keyboard shortcuts?」（menuitem）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Account: local",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Keyboard shortcuts?",
+       "role": "menuitem"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "preview.show",
+   "resource": "preview",
+   "verb": "show",
+   "summary": "About this preview",
+   "source": "ui",
+   "ui": {
+    "path": "Account: local > Account > About this preview",
+    "role": "menuitem",
+    "name": "About this preview",
+    "region": "Account",
+    "view": "Account: local"
+   },
+   "params": [],
+   "effect": "点击「About this preview」（menuitem），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Account: local",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "About this preview",
+       "role": "menuitem"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "source-code-github.activate",
+   "resource": "source-code-github",
+   "verb": "activate",
+   "summary": "Source code on GitHub↗",
+   "source": "ui",
+   "ui": {
+    "path": "Account: local > Account > Source code on GitHub↗",
+    "role": "menuitem",
+    "name": "Source code on GitHub↗",
+    "region": "Account",
+    "view": "Account: local"
+   },
+   "params": [],
+   "effect": "点击「Source code on GitHub↗」（menuitem）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Account: local",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Source code on GitHub↗",
+       "role": "menuitem"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "command-palette.show",
+   "resource": "command-palette",
+   "verb": "show",
+   "summary": "快捷键 mod+k",
+   "source": "shortcut",
+   "ui": {
+    "path": "键盘 mod+k",
+    "shortcut": "mod+k",
+    "defined_in": "src/ui/app.js"
+   },
+   "params": [],
+   "effect": "在当前焦点上按 mod+k（src/ui/app.js 中定义）",
+   "permission": "read",
+   "undoable": "不适用",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "press": {
+       "key": "mod+k"
+      }
+     }
+    ]
+   }
+  }
+ ]
+}

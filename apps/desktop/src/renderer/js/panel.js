@@ -17,14 +17,23 @@
   // ---------------------------------------------------------------- 会话
   const sessionTab = $('#tab-session');
   const picker = el('select', { class: 'input', id: 'agent-picker' });
-  const startBtn = el('button', { class: 'btn primary sm', id: 'agent-start', onclick: () => picker.value && FX.startAgentSession(picker.value) }, icon('player-play'), '启动');
+  // 运行位置：宿主（默认）或某个运行中的狐狸OS 环境
+  const where = el('select', { class: 'input', id: 'agent-where', title: '智能体运行位置', onfocus: () => loadEnvs() }, el('option', { value: '', text: '宿主' }));
+  async function loadEnvs() {
+    const cur = where.value;
+    let envs = [];
+    try { envs = (await FX.k(['env', 'list'])).envs.filter((e) => e.state === 'running' && e.backend === 'linux-ns'); } catch { /* 无环境后端 */ }
+    where.replaceChildren(el('option', { value: '', text: '宿主' }), ...envs.map((e) => el('option', { value: e.name, text: `环境 ${e.name}` })));
+    where.value = envs.find((e) => e.name === cur) ? cur : '';
+  }
+  const startBtn = el('button', { class: 'btn primary sm', id: 'agent-start', onclick: () => picker.value && FX.startAgentSession(picker.value, { env: where.value || null }) }, icon('player-play'), '启动');
   const sessList = el('div', { class: 'sess-tabs' });
   const transcript = el('div', { class: 'transcript scroll', id: 'transcript' });
   const input = el('textarea', { class: 'input composer-input', id: 'composer', rows: '3', placeholder: '给智能体布置任务（Enter 发送，Shift+Enter 换行）' });
   const sendBtn = el('button', { class: 'btn primary', id: 'composer-send', onclick: () => send() }, icon('send'), '发送');
   const stopBtn = el('button', { class: 'btn ghost', id: 'composer-stop', onclick: () => active && cancel(active) }, icon('player-stop'), '停止');
   sessionTab.append(
-    el('div', { class: 'panel-head' }, picker, startBtn),
+    el('div', { class: 'panel-head' }, picker, where, startBtn),
     sessList, transcript,
     el('div', { class: 'composer' }, input, el('div', { class: 'row' }, el('span', { class: 'muted small grow', id: 'composer-hint' }), stopBtn, sendBtn)));
   input.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } });
@@ -40,17 +49,17 @@
 
   function push(c, item) { c.log.push(item); if (c === conns.get(active)) render(); }
 
-  FX.startAgentSession = async (agentId) => {
+  FX.startAgentSession = async (agentId, opts = {}) => {
     const c = { agentId, name: agentId, sessionId: null, log: [], status: '启动中', busy: false };
     const tmpId = `pending-${Date.now()}`;
     conns.set(tmpId, c); active = tmpId; render();
     try {
-      const r = await window.foxos.acp.start(agentId);
+      const r = await window.foxos.acp.start(agentId, opts);
       conns.delete(tmpId); conns.set(r.connId, c); active = r.connId; c.connId = r.connId;
       c.init = r.init; c.identity = r.identity;
       const ai = r.init.agentInfo || {};
       c.name = ai.title || ai.name || agentId;
-      push(c, { kind: 'sys', text: `已连接 ${c.name}${ai.version ? ` ${ai.version}` : ''}（ACP 协议 v${r.init.protocolVersion}）。身份：${r.identity}` });
+      push(c, { kind: 'sys', text: `已连接 ${c.name}${ai.version ? ` ${ai.version}` : ''}（ACP 协议 v${r.init.protocolVersion}）。身份：${r.identity}${opts.env ? `；运行在环境 ${opts.env}（工作空间 /workspace）` : ''}` });
       c.authMethods = r.init.authMethods || [];
       await newSession(c);
     } catch (e) {

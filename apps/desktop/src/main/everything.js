@@ -31,7 +31,7 @@ function distDir(id) { return path.join(foxosHome(), 'everything', id, 'dist'); 
 function manifest(id) { try { return JSON.parse(fs.readFileSync(path.join(foxosHome(), 'everything', id, 'manifest.json'), 'utf8')); } catch { return null; } }
 function list() {
   const c = catalog();
-  return { ...c, home: foxosHome(), apps: c.apps.map((a) => ({ ...a, installed: fs.existsSync(path.join(distDir(a.id), 'index.html')), manifest: manifest(a.id) })) };
+  return { ...c, home: foxosHome(), apps: c.apps.map((a) => ({ ...a, partition: partitionFor(a.id), installed: fs.existsSync(path.join(distDir(a.id), 'index.html')), manifest: manifest(a.id) })) };
 }
 
 // ---------------------------------------------------------------- 路径映射（Puter 虚拟路径 → 工作空间）
@@ -158,8 +158,13 @@ const hooks = {};
 const sessions = new Map(); // partition session -> appId
 const instances = new Map(); // appId -> { wc, hidden, win, launchItems }
 
+// 每个工作空间一套浏览器存储（localStorage / IndexedDB / Cookie），与工作空间里的文件一样互不串用
+function partitionFor(appId) {
+  const h = require('node:crypto').createHash('sha1').update(path.resolve(kernel.getWorkspace())).digest('hex').slice(0, 8);
+  return `persist:ev-${appId}--${h}`;
+}
 function setupSession(appId) {
-  const part = `persist:ev-${appId}`;
+  const part = partitionFor(appId);
   const ses = session.fromPartition(part);
   if (sessions.has(ses)) return part;
   sessions.set(ses, appId);
@@ -274,6 +279,14 @@ function status(appId) {
   const inst = instances.get(appId);
   return { app: appId, installed: fs.existsSync(path.join(distDir(appId), 'index.html')), running: Boolean(inst && !inst.wc.isDestroyed()), mode: inst ? (inst.hidden ? 'headless' : 'window') : null, url: inst ? inst.wc.getURL() : null };
 }
+// 重置应用：关闭实例、清空该工作空间下的浏览器存储与 AppData/<应用>（用于测试与操作清单生成，回到首次打开的状态）
+async function reset(appId) {
+  close(appId);
+  await session.fromPartition(partitionFor(appId)).clearStorageData();
+  fs.rmSync(path.join(kernel.getWorkspace(), 'AppData', appId), { recursive: true, force: true });
+  kvInvalidate(appId);
+  return { reset: appId };
+}
 function close(appId) { const inst = instances.get(appId); if (!inst) return false; if (inst.hidden) inst.win.destroy(); else hooks.onClose && hooks.onClose(appId); instances.delete(appId); return true; }
 
-module.exports = { list, catalog, setupSession, registerWebview, ensureInstance, bridge, status, close, openFile, hooks, PRELOAD, SCHEME, foxosHome, distDir, kvInvalidate, instances, waitReady, toRel };
+module.exports = { list, catalog, setupSession, partitionFor, reset, registerWebview, ensureInstance, bridge, status, close, openFile, hooks, PRELOAD, SCHEME, foxosHome, distDir, kvInvalidate, instances, waitReady, toRel };

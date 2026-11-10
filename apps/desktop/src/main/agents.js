@@ -10,8 +10,9 @@ const { IS_WIN, which } = require('./paths');
 const REGISTRY_URL = 'https://cdn.agentclientprotocol.com/registry/v1/latest/registry.json';
 const SNAPSHOT = path.join(__dirname, 'registry-snapshot.json');
 
+// 智能体装在 FOXOS_HOME/agents（与 Everything 应用、环境同一目录树），环境启动时只读挂载到 /opt/foxos/agents
 function agentsDir() {
-  const d = path.join(app.getPath('userData'), 'agents');
+  const d = path.join(require('./everything').foxosHome(), 'agents');
   fs.mkdirSync(d, { recursive: true });
   return d;
 }
@@ -161,4 +162,4 @@ function installed() {
   return fs.readdirSync(agentsDir()).map(installedInfo).filter((i) => i && fs.existsSync(i.command));
 }
 
-module.exports = { list, install, uninstall, installed, installedInfo, fetchRegistry, platformKey };
+module.exports = { list, install, uninstall, installed, installedInfo, fetchRegistry, platformKey, agentsDir };

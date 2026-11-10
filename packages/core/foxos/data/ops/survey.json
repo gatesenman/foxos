@@ -1,0 +1,1031 @@
+{
+ "app": "survey",
+ "name": "Surveys",
+ "generated_by": "scripts/inventory_ops.py",
+ "commit": "0fbb88cdee2f54c94a9d2c975f43322888813c5d",
+ "title": "Surveys",
+ "ops": [
+  {
+   "id": "folders.select",
+   "resource": "folders",
+   "verb": "select",
+   "summary": "all #（1 项，如 All surveys0）",
+   "source": "ui-collection",
+   "ui": {
+    "path": "主界面 > Folders > all #",
+    "role": "link",
+    "region": "Folders",
+    "view": "主界面",
+    "examples": [
+     "All surveys0"
+    ]
+   },
+   "params": [
+    {
+     "name": "target",
+     "type": "string",
+     "description": "要操作的项的名称（或其一部分），如 'All surveys0'",
+     "required": true,
+     "positional": true
+    }
+   ],
+   "effect": "点击名称匹配的「all #」项（link）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "{{target}}",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "describe-survey.select",
+   "resource": "describe-survey",
+   "verb": "select",
+   "summary": "describe your survey for *（1 项，如 Describe your survey for AI）",
+   "source": "ui-collection",
+   "ui": {
+    "path": "主界面 > describe your survey for *",
+    "role": "textbox",
+    "region": null,
+    "view": "主界面",
+    "examples": [
+     "Describe your survey for AI"
+    ]
+   },
+   "params": [
+    {
+     "name": "target",
+     "type": "string",
+     "description": "要操作的项的名称（或其一部分），如 'Describe your survey for AI'",
+     "required": true,
+     "positional": true
+    }
+   ],
+   "effect": "点击名称匹配的「describe your survey for *」项（textbox）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "{{target}}",
+       "role": "textbox"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "content.dismiss",
+   "resource": "content",
+   "verb": "dismiss",
+   "summary": "Skip to content",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Skip to content",
+    "role": "link",
+    "name": "Skip to content",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Skip to content」（link）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Skip to content",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "surveys-home.show",
+   "resource": "surveys-home",
+   "verb": "show",
+   "summary": "Surveys home",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Surveys home",
+    "role": "link",
+    "name": "Surveys home",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Surveys home」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Surveys home",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "source-code-github-opens-tab.show",
+   "resource": "source-code-github-opens-tab",
+   "verb": "show",
+   "summary": "Source code on GitHub (opens in a new tab)",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Source code on GitHub (opens in a new tab)",
+    "role": "link",
+    "name": "Source code on GitHub (opens in a new tab)",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Source code on GitHub (opens in a new tab)」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Source code on GitHub (opens in a new tab)",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "account-settings.activate",
+   "resource": "account-settings",
+   "verb": "activate",
+   "summary": "Account and settings",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Account and settings",
+    "role": "button",
+    "name": "Account and settings",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Account and settings」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Account and settings",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "folder.create",
+   "resource": "folder",
+   "verb": "create",
+   "summary": "New folder",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > New folder",
+    "role": "button",
+    "name": "New folder",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「New folder」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "New folder",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "source-github.open",
+   "resource": "source-github",
+   "verb": "open",
+   "summary": "Open source on GitHub",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Folders > Open source on GitHub",
+    "role": "link",
+    "name": "Open source on GitHub",
+    "region": "Folders",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Open source on GitHub」（link）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Open source on GitHub",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "powered-by-puter.show",
+   "resource": "powered-by-puter",
+   "verb": "show",
+   "summary": "Powered by Puter",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Folders > Powered by Puter",
+    "role": "link",
+    "name": "Powered by Puter",
+    "region": "Folders",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Powered by Puter」（link），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Powered by Puter",
+       "role": "link"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "survey.create",
+   "resource": "survey",
+   "verb": "create",
+   "summary": "Create survey",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > main > Create survey",
+    "role": "button",
+    "name": "Create survey",
+    "region": "main",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Create survey」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Create survey",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "from-scratcha-blank-survey.start",
+   "resource": "from-scratcha-blank-survey",
+   "verb": "start",
+   "summary": "Start from scratchA blank survey",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > main > Start from scratchA blank survey",
+    "role": "button",
+    "name": "Start from scratchA blank survey",
+    "region": "main",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Start from scratchA blank survey」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Start from scratchA blank survey",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "use-templateready-made-fully-editable.activate",
+   "resource": "use-templateready-made-fully-editable",
+   "verb": "activate",
+   "summary": "Use a templateReady-made, fully editable",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > main > Use a templateReady-made, fully editable",
+    "role": "button",
+    "name": "Use a templateReady-made, fully editable",
+    "region": "main",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Use a templateReady-made, fully editable」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Use a templateReady-made, fully editable",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "questionspaste-list-or-open-file.import",
+   "resource": "questionspaste-list-or-open-file",
+   "verb": "import",
+   "summary": "Import questionsPaste a list or open a file",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > main > Import questionsPaste a list or open a file",
+    "role": "button",
+    "name": "Import questionsPaste a list or open a file",
+    "region": "main",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Import questionsPaste a list or open a file」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Import questionsPaste a list or open a file",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "generate.run",
+   "resource": "generate",
+   "verb": "run",
+   "summary": "Generate",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > main > Generate",
+    "role": "button",
+    "name": "Generate",
+    "region": "main",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Generate」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Generate",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "search-surveys.set",
+   "resource": "search-surveys",
+   "verb": "set",
+   "summary": "Search surveys",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Search surveys",
+    "role": "textbox",
+    "name": "Search surveys",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [
+    {
+     "name": "value",
+     "type": "string",
+     "description": "「Search surveys」的新值",
+     "required": true,
+     "positional": true
+    },
+    {
+     "name": "submit",
+     "type": "boolean",
+     "description": "设置后按 Enter 提交",
+     "default": false
+    }
+   ],
+   "effect": "把「Search surveys」设为给定值（触发 input / change 事件）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "set": {
+       "name": "Search surveys",
+       "role": "textbox",
+       "value": "{{value}}"
+      }
+     },
+     {
+      "press_if": "submit",
+      "press": {
+       "key": "Enter",
+       "name": "Search surveys",
+       "role": "textbox"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "filter-by-status.set",
+   "resource": "filter-by-status",
+   "verb": "set",
+   "summary": "Filter by status",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Filter by status",
+    "role": "combobox",
+    "name": "Filter by status",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [
+    {
+     "name": "value",
+     "type": "string",
+     "description": "「Filter by status」的新值",
+     "required": true,
+     "positional": true,
+     "enum": [
+      "all",
+      "draft",
+      "open",
+      "closed"
+     ]
+    },
+    {
+     "name": "submit",
+     "type": "boolean",
+     "description": "设置后按 Enter 提交",
+     "default": false
+    }
+   ],
+   "effect": "把「Filter by status」设为给定值（触发 input / change 事件）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "set": {
+       "name": "Filter by status",
+       "role": "combobox",
+       "value": "{{value}}"
+      }
+     },
+     {
+      "press_if": "submit",
+      "press": {
+       "key": "Enter",
+       "name": "Filter by status",
+       "role": "combobox"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "sort-by.set",
+   "resource": "sort-by",
+   "verb": "set",
+   "summary": "Sort by",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Sort by",
+    "role": "combobox",
+    "name": "Sort by",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [
+    {
+     "name": "value",
+     "type": "string",
+     "description": "「Sort by」的新值",
+     "required": true,
+     "positional": true,
+     "enum": [
+      "updated",
+      "created",
+      "title",
+      "responses"
+     ]
+    },
+    {
+     "name": "submit",
+     "type": "boolean",
+     "description": "设置后按 Enter 提交",
+     "default": false
+    }
+   ],
+   "effect": "把「Sort by」设为给定值（触发 input / change 事件）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "set": {
+       "name": "Sort by",
+       "role": "combobox",
+       "value": "{{value}}"
+      }
+     },
+     {
+      "press_if": "submit",
+      "press": {
+       "key": "Enter",
+       "name": "Sort by",
+       "role": "combobox"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "survey-2.create",
+   "resource": "survey-2",
+   "verb": "create",
+   "summary": "Create a survey",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > main > Create a survey",
+    "role": "button",
+    "name": "Create a survey",
+    "region": "main",
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Create a survey」（button）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Create a survey",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "it.dismiss",
+   "resource": "it",
+   "verb": "dismiss",
+   "summary": "Got it",
+   "source": "ui",
+   "ui": {
+    "path": "主界面 > Got it",
+    "role": "button",
+    "name": "Got it",
+    "region": null,
+    "view": "主界面"
+   },
+   "params": [],
+   "effect": "点击「Got it」（button）",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Got it",
+       "role": "button"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "system.activate",
+   "resource": "system",
+   "verb": "activate",
+   "summary": "System",
+   "source": "ui",
+   "ui": {
+    "path": "Account and settings > Account > System",
+    "role": "menuitemradio",
+    "name": "System",
+    "region": "Account",
+    "view": "Account and settings"
+   },
+   "params": [],
+   "effect": "点击「System」（menuitemradio）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Account and settings",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "System",
+       "role": "menuitemradio"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "light.activate",
+   "resource": "light",
+   "verb": "activate",
+   "summary": "Light",
+   "source": "ui",
+   "ui": {
+    "path": "Account and settings > Account > Light",
+    "role": "menuitemradio",
+    "name": "Light",
+    "region": "Account",
+    "view": "Account and settings"
+   },
+   "params": [],
+   "effect": "点击「Light」（menuitemradio）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Account and settings",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Light",
+       "role": "menuitemradio"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "dark.activate",
+   "resource": "dark",
+   "verb": "activate",
+   "summary": "Dark",
+   "source": "ui",
+   "ui": {
+    "path": "Account and settings > Account > Dark",
+    "role": "menuitemradio",
+    "name": "Dark",
+    "region": "Account",
+    "view": "Account and settings"
+   },
+   "params": [],
+   "effect": "点击「Dark」（menuitemradio）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Account and settings",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Dark",
+       "role": "menuitemradio"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "keyboard-shortcuts.activate",
+   "resource": "keyboard-shortcuts",
+   "verb": "activate",
+   "summary": "Keyboard shortcuts?",
+   "source": "ui",
+   "ui": {
+    "path": "Account and settings > Account > Keyboard shortcuts?",
+    "role": "menuitem",
+    "name": "Keyboard shortcuts?",
+    "region": "Account",
+    "view": "Account and settings"
+   },
+   "params": [],
+   "effect": "点击「Keyboard shortcuts?」（menuitem）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Account and settings",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Keyboard shortcuts?",
+       "role": "menuitem"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "surveys.show",
+   "resource": "surveys",
+   "verb": "show",
+   "summary": "About Surveys",
+   "source": "ui",
+   "ui": {
+    "path": "Account and settings > Account > About Surveys",
+    "role": "menuitem",
+    "name": "About Surveys",
+    "region": "Account",
+    "view": "Account and settings"
+   },
+   "params": [],
+   "effect": "点击「About Surveys」（menuitem），切换到该视图",
+   "permission": "read",
+   "undoable": "不适用（只读）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Account and settings",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "About Surveys",
+       "role": "menuitem"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "from-scratch.start",
+   "resource": "from-scratch",
+   "verb": "start",
+   "summary": "Start from scratch",
+   "source": "ui",
+   "ui": {
+    "path": "Create survey > Create survey > Start from scratch",
+    "role": "menuitem",
+    "name": "Start from scratch",
+    "region": "Create survey",
+    "view": "Create survey"
+   },
+   "params": [],
+   "effect": "点击「Start from scratch」（menuitem）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Create survey",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Start from scratch",
+       "role": "menuitem"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "use-template.activate",
+   "resource": "use-template",
+   "verb": "activate",
+   "summary": "Use a template",
+   "source": "ui",
+   "ui": {
+    "path": "Create survey > Create survey > Use a template",
+    "role": "menuitem",
+    "name": "Use a template",
+    "region": "Create survey",
+    "view": "Create survey"
+   },
+   "params": [],
+   "effect": "点击「Use a template」（menuitem）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Create survey",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Use a template",
+       "role": "menuitem"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "ai.run",
+   "resource": "ai",
+   "verb": "run",
+   "summary": "Generate with AI",
+   "source": "ui",
+   "ui": {
+    "path": "Create survey > Create survey > Generate with AI",
+    "role": "menuitem",
+    "name": "Generate with AI",
+    "region": "Create survey",
+    "view": "Create survey"
+   },
+   "params": [],
+   "effect": "点击「Generate with AI」（menuitem）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Create survey",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Generate with AI",
+       "role": "menuitem"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "questions.import",
+   "resource": "questions",
+   "verb": "import",
+   "summary": "Import questions",
+   "source": "ui",
+   "ui": {
+    "path": "Create survey > Create survey > Import questions",
+    "role": "menuitem",
+    "name": "Import questions",
+    "region": "Create survey",
+    "view": "Create survey"
+   },
+   "params": [],
+   "effect": "点击「Import questions」（menuitem）",
+   "permission": "modify",
+   "undoable": "否（应用没有撤销入口）",
+   "binding": {
+    "kind": "ui",
+    "open": true,
+    "steps": [
+     {
+      "click": {
+       "name": "Create survey",
+       "role": "button"
+      }
+     },
+     {
+      "wait": 400
+     },
+     {
+      "click": {
+       "name": "Import questions",
+       "role": "menuitem"
+      }
+     }
+    ]
+   }
+  }
+ ]
+}
