@@ -15,7 +15,7 @@ from ..workspace import RESERVED_DIR
 register_app("workspace", "工作空间信息", "当前工作空间根目录与基本信息。")
 register_app("files", "文件：列出、读写文本、新建、重命名、删除与恢复", "所有操作限定在工作空间内，删除进入回收站；.foxos 保留目录不可见。")
 register_app("audit", "审计日志", "查询 .foxos/audit.jsonl：谁在什么时候对什么文件执行了什么命令。")
-register_app("tasks", "任务队列", "记录任务目标与状态；由桌面的 ACP 智能体会话执行。")
+register_app("queue", "任务队列", "记录任务目标与状态；由桌面的 ACP 智能体会话执行。")
 
 
 def workspace_info(ctx: Context) -> dict:
@@ -256,13 +256,13 @@ register(Command("audit", "tail", "查看最近的审计记录", audit_tail,
                  ],
                  examples=["foxos audit tail -n 50", "foxos audit tail --filter-agent data-agent --json"],
                  limits=["查询本身不写入审计日志"], audited=False))
-register(Command("tasks", "create", "把一个任务目标加入队列", tasks_create,
+register(Command("queue", "create", "把一个任务目标加入队列", tasks_create,
                  params=[Param("goal", "string", "任务目标（自然语言）", required=True, positional=True, metavar="GOAL")],
-                 examples=["foxos tasks create '根据 sales.xlsx 制作分析报告'"],
+                 examples=["foxos queue create '根据 sales.xlsx 制作分析报告'"],
                  limits=["只记录任务；执行由 ACP 智能体会话完成"], permission="create"))
-register(Command("tasks", "list", "列出任务队列", tasks_list,
+register(Command("queue", "list", "列出任务队列", tasks_list,
                  params=[Param("limit", "integer", "返回条数", default=20, cli_short="-n")],
-                 examples=["foxos tasks list --json"]))
+                 examples=["foxos queue list --json"]))
 
 
 # ----------------------------------------------------------------------

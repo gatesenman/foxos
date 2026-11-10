@@ -199,6 +199,14 @@ def print_human(cmd_id: str, result: dict) -> None:
         for c in result["charts"]:
             print(f"chart[{c['index']}] {c.get('sheet', '')} {c['type']} @ {c['anchor']} 「{c.get('title') or ''}」 "
                   + ", ".join(s["values"] or "" for s in c["series"]), file=out)
+    if cmd_id == "everything.list":
+        for a in result["apps"]:
+            print(f"{'已安装' if a['installed'] else '未安装'}  {a['group_name']:<4} {a['id']:<20} {a['name']:<22} {a['license']:<20} 操作 {a['ops']}", file=out)
+        print(f"共 {result['count']} 个，已安装 {result['installed']} 个（上游 {result['commit'][:8]}）", file=out)
+    if cmd_id.endswith(".ui.snapshot"):
+        print(f"# {result['title']}  {result['url']}", file=out)
+        for e in result["elements"]:
+            print(f"[{e['ref']}] {e['role']:<10} {e['name']}" + (f" = {e['value']!r}" if e.get("value") not in (None, "") else "") + (" (禁用)" if e.get("disabled") else ""), file=out)
     if cmd_id == "files.list":
         for f in result["entries"]:
             print(f"{'<DIR>' if f['type'] == 'dir' else f['bytes']:>10}  {f['path']}{'/' if f['type'] == 'dir' else ''}", file=out)

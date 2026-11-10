@@ -1,6 +1,6 @@
 'use strict';
 // 狐狸OS 桌面（Electron 主进程）
-const { app, BrowserWindow, ipcMain, nativeImage, session, shell, dialog } = require('electron');
+const { app, BrowserWindow, ipcMain, nativeImage, session, shell, dialog, webContents } = require('electron');
 const fs = require('node:fs');
 const path = require('node:path');
 const paths = require('./paths');
@@ -17,10 +17,13 @@ const agents = require('./agents');
 const setup = require('./setup');
 const { watchWorkspace } = require('./fswatch');
 const { AcpConnection } = require('./acp');
+const everything = require('./everything');
+const control = require('./control');
 
 const s0 = settings.load();
 kernel.setWorkspace(paths.argValue('workspace') || s0.workspace || paths.defaultWorkspace());
 const SCREENSHOT = paths.argValue('screenshot');
+const HEADLESS = process.argv.includes('--headless');
 
 let win = null;
 let stopWatch = null;
@@ -66,10 +69,12 @@ function createWindow() {
 app.on('web-contents-created', (_e, contents) => {
   contents.on('will-attach-webview', (_ev, webPreferences, params) => {
     delete webPreferences.preload;
+    const evApp = /^persist:ev-([a-z0-9-]+)$/.exec(params.partition || '');
+    if (evApp) { everything.setupSession(evApp[1]); webPreferences.preload = everything.PRELOAD; }
     webPreferences.nodeIntegration = false;
     webPreferences.contextIsolation = true;
     webPreferences.sandbox = true;
-    if (!/^(https?:|about:blank|file:)/.test(params.src || 'about:blank')) _ev.preventDefault();
+    if (!/^(https?:|about:blank|file:|foxapp:)/.test(params.src || 'about:blank')) _ev.preventDefault();
   });
   contents.setWindowOpenHandler(({ url }) => {
     if (contents.getType() === 'webview') { contents.loadURL(url); return { action: 'deny' }; }
@@ -99,6 +104,32 @@ handle('env', () => ({
 }));
 
 handle('apps:detect', () => apps.detect());
+
+// Everything 应用
+handle('ev:list', () => everything.list());
+handle('ev:attach', (appId, wcId) => { const wc = webContents.fromId(wcId); if (!wc) throw new Error('webview 不存在'); everything.registerWebview(appId, wc); return true; });
+handle('ev:openFile', (appId, rel) => everything.openFile(appId, rel));
+everything.hooks.onTitle = (appId, t) => send('ev:title', appId, t);
+everything.hooks.onLaunchApp = (name, args) => send('ev:launchApp', name, args);
+everything.hooks.onClose = (appId) => send('ev:close', appId);
+
+// 控制通道：CLI / MCP → 桌面
+async function controlHandler(msg) {
+  const { op, app: appId, params = {}, agent = 'agent' } = msg;
+  if (op === 'ping') return { pid: process.pid, headless: HEADLESS, workspace: kernel.getWorkspace() };
+  if (op === 'ev.status') return everything.status(appId);
+  if (op === 'ev.open') {
+    if (win && !HEADLESS && params.window !== false) { send('ev:open', appId, params.file || null, agent); for (let i = 0; i < 100 && !everything.instances.get(appId); i++) await new Promise((r) => setTimeout(r, 100)); }
+    const inst = await everything.ensureInstance(appId, { launchRel: params.file || null });
+    await everything.waitReady(inst.wc);
+    if (params.file) everything.openFile(appId, params.file);
+    return everything.status(appId);
+  }
+  if (op === 'ev.close') return { closed: everything.close(appId) };
+  if (op === 'ev.bridge') return everything.bridge(appId, params.method, params.args || {});
+  if (op === 'ev.reloadData') { everything.kvInvalidate(appId); const inst = everything.instances.get(appId); if (inst) { inst.wc.reload(); await everything.waitReady(inst.wc); } return everything.status(appId); }
+  throw Object.assign(new Error(`未知操作 ${op}`), { code: 'USAGE' });
+}
 handle('office:launch', (appId, file) => apps.launchOffice(appId, file));
 handle('office:list', async () => ({ processes: apps.processList(), windows: await apps.nativeWindows() }));
 handle('office:focus', (wid) => apps.focusNative(wid));
@@ -183,13 +214,17 @@ ipcMain.on('ui:log', (_e, msg) => console.error(`[界面] ${msg}`));
 
 app.whenReady().then(() => {
   session.defaultSession.setPermissionRequestHandler((_wc, _perm, cb) => cb(false));
-  createWindow();
+  const launch = { exec: process.execPath, args: [...(app.isPackaged ? [] : [app.getAppPath()]), ...process.argv.filter((a) => a === '--no-sandbox' || a.startsWith('--user-data-dir='))] };
+  control.start(controlHandler, { launch });
+  try { fs.mkdirSync(everything.foxosHome(), { recursive: true }); fs.writeFileSync(path.join(everything.foxosHome(), 'desktop-launch.json'), JSON.stringify(launch)); } catch { /* 忽略 */ }
+  if (!HEADLESS) createWindow();
   app.on('activate', () => { if (BrowserWindow.getAllWindows().length === 0) createWindow(); });
 });
 
 app.on('before-quit', () => {
   for (const c of conns.values()) c.stop();
   if (stopWatch) stopWatch();
+  control.stop();
   if (process.env.FOXOS_CLOSE_NATIVE_ON_EXIT === '1') apps.killAll();
 });
-app.on('window-all-closed', () => { if (process.platform !== 'darwin') app.quit(); });
+app.on('window-all-closed', () => { if (!HEADLESS && process.platform !== 'darwin') app.quit(); });
