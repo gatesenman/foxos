@@ -102,6 +102,8 @@ def serve_http(ws: Workspace, host: str = "127.0.0.1", port: int = 8765, token: 
 
     sessions: dict[str, dict] = {}
 
+    MAX_BODY = 64 * 1024 * 1024
+
     class H(BaseHTTPRequestHandler):
         protocol_version = "HTTP/1.1"
 
@@ -133,13 +135,18 @@ def serve_http(ws: Workspace, host: str = "127.0.0.1", port: int = 8765, token: 
             self._send(200, {})
 
         def do_POST(self):  # noqa: N802
+            # 先读完请求体：连接是 keep-alive，提前返回（404 / 401）时未读的请求体会被当成下一个请求
+            n = int(self.headers.get("Content-Length") or 0)
+            if n > MAX_BODY:
+                self.close_connection = True
+                return self._send(413, {"error": "request too large"})
+            body = self.rfile.read(n)
             if self.path.split("?")[0] not in ("/mcp", "/"):
                 return self._send(404, {"error": "not found"})
             if not self._auth():
                 return self._send(401, {"error": "unauthorized"}, {"WWW-Authenticate": "Bearer"})
-            n = int(self.headers.get("Content-Length") or 0)
             try:
-                msg = json.loads(self.rfile.read(n).decode("utf-8"))
+                msg = json.loads(body.decode("utf-8"))
             except (ValueError, UnicodeDecodeError):
                 return self._send(400, _resp(None, error={"code": -32700, "message": "Parse error"}))
             sid = self.headers.get("Mcp-Session-Id")

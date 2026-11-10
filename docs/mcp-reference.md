@@ -16,7 +16,7 @@
 
 错误码：USAGE(2) NOT_FOUND(3) PERMISSION_DENIED(4) LOCKED(5) DEPENDENCY_MISSING(6) CONFLICT(7) PAUSED(8) ERROR(1)。
 
-共 4317 个工具。
+共 4320 个工具。
 
 ## docs（5 个工具）
 
@@ -7276,6 +7276,66 @@ RGBA。CLI：foxos 3d rgba activate。界面：Compositing > main > RGBA。效�
 | `sudoku_done_confirm` |  | — |
 | `sudoku_edit_redo-shift` |  | — |
 | `sudoku_edit_undo` |  | — |
+
+## sandbox（3 个工具）
+
+### `sandbox_check`
+
+本机可用的轻量隔离能力（机制、Landlock ABI、网络 / 信号隔离）。CLI：foxos sandbox check。示例：foxos sandbox check --json
+
+只读：是 · 破坏性：否 · CLI：`foxos sandbox check`
+
+调用示例：
+
+```json
+{"name": "sandbox_check", "arguments": {}}
+```
+
+### `sandbox_run`
+
+在轻量沙箱中运行命令：只能读写工作空间，可选禁止联网。CLI：foxos sandbox run [CMD...] [--network {on,off}] [--read READ] [--write WRITE] [--home {private,read,write}] [--windows-mode {restricted,appcontainer}] [--max-processes MAX_PROCESSES] [--memory-mb MEMORY_MB] [--cwd CWD] [--timeout TIMEOUT]。示例：foxos sandbox run --json -- python3 build.py
+
+只读：否 · 破坏性：否 · CLI：`foxos sandbox run`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `command` | array |  | 命令及参数（放在 -- 之后） |
+| `network` | string |  | 是否允许联网 可选：on / off |
+| `read` | array |  | 额外只读路径（可重复） |
+| `write` | array |  | 额外可写路径（可重复） |
+| `home` | string |  | HOME：private 私有目录 / read 真实 HOME 只读 / write 真实 HOME 可写 可选：private / read / write |
+| `windows_mode` | string |  | Windows：restricted 受限令牌 / appcontainer 可选：restricted / appcontainer |
+| `max_processes` | integer |  | 最多进程数（Windows 作业对象） |
+| `memory_mb` | integer |  | 内存上限 MB（Windows 作业对象） |
+| `cwd` | string |  | 工作目录（工作空间内） |
+| `timeout` | number |  | 超时秒数 |
+
+调用示例：
+
+```json
+{"name": "sandbox_run", "arguments": {}}
+```
+
+### `sandbox_policy`
+
+显示将生效的沙箱规则（不执行）。CLI：foxos sandbox policy [CMD...] [--network {on,off}] [--read READ] [--write WRITE] [--home {private,read,write}] [--windows-mode {restricted,appcontainer}]。示例：foxos sandbox policy --network off --json -- node agent.js
+
+只读：是 · 破坏性：否 · CLI：`foxos sandbox policy`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `command` | array |  | 命令及参数（放在 -- 之后） |
+| `network` | string |  | 是否允许联网 可选：on / off |
+| `read` | array |  | 额外只读路径（可重复） |
+| `write` | array |  | 额外可写路径（可重复） |
+| `home` | string |  | HOME：private 私有目录 / read 真实 HOME 只读 / write 真实 HOME 可写 可选：private / read / write |
+| `windows_mode` | string |  | Windows：restricted 受限令牌 / appcontainer 可选：restricted / appcontainer |
+
+调用示例：
+
+```json
+{"name": "sandbox_policy", "arguments": {}}
+```
 
 ## sheets（6 个工具）
 

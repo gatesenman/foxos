@@ -31,6 +31,18 @@ class AcpConnection {
     const extra = { ...settings.secretEnv(), ...(this.agent.env || {}), FOXOS_WORKSPACE: kernel.getWorkspace(), FOXOS_AGENT: this.identity };
     if (!envName) {
       this.proc = spawn(this.agent.command, this.agent.args || [], { cwd: kernel.getWorkspace(), env: { ...process.env, ...extra }, stdio: ['pipe', 'pipe', 'pipe'], windowsHide: true });
+    } else if (envName === '@sandbox' || envName === '@sandbox-offline') {
+      // 轻量隔离：智能体直接运行在宿主上，但只能读写工作空间（foxos.sandbox：Landlock + seccomp / Seatbelt / 受限令牌 + 作业对象）。
+      // foxos MCP 运行在沙箱外（宿主 Streamable HTTP），这样 Everything 应用与桌面控制仍然可用；不联网时只放行到该端口的 TCP 连接。
+      const offline = envName === '@sandbox-offline';
+      await this._startHttpMcp();
+      const port = String(new URL(this.mcpHttp.url).port);
+      const args = ['-m', 'foxos.sandbox', 'wrap', '--workspace', kernel.getWorkspace(), '--profile', this.agent.id, '--network', offline ? 'off' : 'on',
+        '--connect-port', port, '--read', require('./agents').agentsDir()];
+      for (const [k, v] of Object.entries(extra)) args.push('--env', `${k}=${v}`);
+      args.push('--', this.agent.command, ...(this.agent.args || []));
+      this.sandbox = { network: !offline };
+      this.proc = spawn(kernel.pythonPath(), args, { cwd: kernel.getWorkspace(), env: { ...process.env, PYTHONPATH: corePath() }, stdio: ['pipe', 'pipe', 'pipe'], windowsHide: true });
     } else {
       const info = await kernel.run(['env', 'info', envName]);
       if (!info.ok) throw new Error(info.data?.error?.message || `环境 ${envName} 不可用`);
@@ -187,6 +199,11 @@ class AcpConnection {
   }
 
   mcpServers() {
+    if (this.sandbox) {
+      const caps = (this.init && this.init.agentCapabilities && this.init.agentCapabilities.mcpCapabilities) || {};
+      if (caps.http) return [{ type: 'http', name: 'foxos', url: this.mcpHttp.url, headers: [{ name: 'Authorization', value: `Bearer ${this.mcpHttp.token}` }] }];
+      // 不支持 HTTP MCP 的智能体：stdio MCP 跟智能体一起运行在沙箱里（文件与办公命令可用；不联网时 Everything 应用与桌面控制不可用）
+    }
     if (this.envName) {
       const caps = (this.init && this.init.agentCapabilities && this.init.agentCapabilities.mcpCapabilities) || {};
       if (!this.mcpHttp || !caps.http) {

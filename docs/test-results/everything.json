@@ -3,10 +3,10 @@
   "app": "tasks",
   "group": "productivity",
   "boot": "ok",
-  "parity": "different",
+  "parity": "equal",
   "op": "first-task.create",
   "cli": "foxos tasks first-task create",
-  "note": "{\"onlyGui\":[],\"onlyCli\":[],\"kvEqual\":false}"
+  "note": null
  },
  "chess": {
   "app": "chess",
@@ -30,9 +30,433 @@
   "app": "crm",
   "group": "business",
   "boot": "ok",
-  "parity": "no-op",
+  "parity": "equal",
+  "op": "set-up-pipeline.activate",
+  "cli": "foxos crm set-up-pipeline activate",
+  "note": null
+ },
+ "documents": {
+  "app": "documents",
+  "group": "office",
+  "boot": "ok",
+  "parity": "equal",
+  "op": "document-name.set",
+  "cli": "foxos documents document-name set foxos parity",
+  "note": null
+ },
+ "presentation": {
+  "app": "presentation",
+  "group": "office",
+  "boot": "ok",
+  "parity": "equal",
+  "op": "speaker-notes.set",
+  "cli": "foxos presentation speaker-notes set foxos parity",
+  "note": null
+ },
+ "whiteboard": {
+  "app": "whiteboard",
+  "group": "office",
+  "boot": "ok",
+  "parity": "equal",
+  "op": "search-boards.set",
+  "cli": "foxos whiteboard search-boards set foxos parity",
+  "note": null
+ },
+ "pdf": {
+  "app": "pdf",
+  "group": "office",
+  "boot": "ok",
+  "parity": "equal",
+  "op": "page-number.set",
+  "cli": "foxos pdf page-number set 2",
+  "note": null
+ },
+ "notes": {
+  "app": "notes",
+  "group": "office",
+  "boot": "ok",
+  "parity": "equal",
+  "op": "insert.create",
+  "cli": "foxos notes insert create",
+  "note": null
+ },
+ "records": {
+  "app": "records",
+  "group": "office",
+  "boot": "ok",
+  "parity": "equal",
+  "op": "search-bases.set",
+  "cli": "foxos records search-bases set foxos parity",
+  "note": null
+ },
+ "meetings": {
+  "app": "meetings",
+  "group": "collaboration",
+  "boot": "ok",
+  "parity": "equal",
+  "op": "meeting-code-or-link.set",
+  "cli": "foxos meetings meeting-code-or-link set foxos parity",
+  "note": null
+ },
+ "teamchat": {
+  "app": "teamchat",
+  "group": "collaboration",
+  "boot": "ok",
+  "parity": "equal",
+  "op": "close.close",
+  "cli": "foxos teamchat close close",
+  "note": null
+ },
+ "email": {
+  "app": "email",
+  "group": "collaboration",
+  "boot": "ok",
+  "parity": "equal",
+  "op": "grant-read-access.activate",
+  "cli": "foxos email grant-read-access activate",
+  "note": null
+ },
+ "contacts": {
+  "app": "contacts",
+  "group": "collaboration",
+  "boot": "ok",
+  "parity": "equal",
+  "op": "contact.create",
+  "cli": "foxos contacts contact create",
+  "note": null
+ },
+ "calendar": {
+  "app": "calendar",
+  "group": "collaboration",
+  "boot": "ok",
+  "parity": "equal",
+  "op": "create.create",
+  "cli": "foxos calendar create create",
+  "note": null
+ },
+ "signatures": {
+  "app": "signatures",
+  "group": "collaboration",
+  "boot": "ok",
+  "parity": "equal",
+  "op": "set-up-account.activate",
+  "cli": "foxos signatures set-up-account activate",
+  "note": null
+ },
+ "photo-studio": {
+  "app": "photo-studio",
+  "group": "creative",
+  "boot": "ok",
+  "parity": "different",
+  "op": "describe-edit.set",
+  "cli": "foxos photo-studio describe-edit set foxos parity",
+  "note": "{\"onlyGui\":[\"textbox|Describe an edit||\"],\"onlyCli\":[\"textbox|Describe an edit|foxos parity|\"],\"kvEqual\":true}",
+  "known": "上游缺陷：src/app/pointer.ts 中 #viewport 的 pointerdown 处理只排除 button / input / .canvas-ui，开始页的“Describe an edit”文本框（textarea）被鼠标点击时焦点被抢到画布，用鼠标无法输入；CLI 的 set 不经过指针事件，所以结果不同"
+ },
+ "video-studio": {
+  "app": "video-studio",
+  "group": "creative",
+  "boot": "ok",
+  "parity": "equal",
+  "op": "search-projects.set",
+  "cli": "foxos video-studio search-projects set foxos parity",
+  "note": null
+ },
+ "vector-studio": {
+  "app": "vector-studio",
+  "group": "creative",
+  "boot": "ok",
+  "parity": "equal",
+  "op": "single-or-double-column-tools.toggle",
+  "cli": "foxos vector-studio single-or-double-column-tools toggle",
+  "note": null
+ },
+ "audio-studio": {
+  "app": "audio-studio",
+  "group": "creative",
+  "boot": "ok",
+  "parity": "equal",
+  "op": "search-commands.set",
+  "cli": "foxos audio-studio search-commands set foxos parity",
+  "note": null
+ },
+ "music-studio": {
+  "app": "music-studio",
+  "group": "creative",
+  "boot": "ok",
+  "parity": "equal",
+  "op": "add.create",
+  "cli": "foxos music-studio add create",
+  "note": null
+ },
+ "3d": {
+  "app": "3d",
+  "group": "creative",
+  "boot": "ok",
+  "parity": "equal",
+  "op": "default.activate",
+  "cli": "foxos 3d default activate",
+  "note": null
+ },
+ "cad": {
+  "app": "cad",
+  "group": "engineering",
+  "boot": "ok",
+  "parity": "equal",
+  "op": "drawing.create",
+  "cli": "foxos cad drawing create",
+  "note": null
+ },
+ "parametric": {
+  "app": "parametric",
+  "group": "engineering",
+  "boot": "ok",
+  "parity": "equal",
+  "op": "insert.create",
+  "cli": "foxos parametric insert create",
+  "note": null
+ },
+ "circuits": {
+  "app": "circuits",
+  "group": "engineering",
+  "boot": "ok",
+  "parity": "equal",
+  "op": "project.create",
+  "cli": "foxos circuits project create",
+  "note": null
+ },
+ "building-design": {
+  "app": "building-design",
+  "group": "engineering",
+  "boot": "ok",
+  "parity": "equal",
+  "op": "it.dismiss",
+  "cli": "foxos building-design it dismiss",
+  "note": null
+ },
+ "projects": {
+  "app": "projects",
+  "group": "productivity",
+  "boot": "ok",
+  "parity": "equal",
+  "op": "first-project.create",
+  "cli": "foxos projects first-project create",
+  "note": null
+ },
+ "wiki": {
+  "app": "wiki",
+  "group": "productivity",
+  "boot": "ok",
+  "parity": "equal",
+  "op": "getting-started.set",
+  "cli": "foxos wiki getting-started set foxos parity",
+  "note": null
+ },
+ "time-tracking": {
+  "app": "time-tracking",
+  "group": "productivity",
+  "boot": "ok",
+  "parity": "equal",
+  "op": "set-up-tracking.activate",
+  "cli": "foxos time-tracking set-up-tracking activate",
+  "note": null
+ },
+ "survey": {
+  "app": "survey",
+  "group": "productivity",
+  "boot": "ok",
+  "parity": "equal",
+  "op": "search-surveys.set",
+  "cli": "foxos survey search-surveys set foxos parity",
+  "note": null
+ },
+ "accounting": {
+  "app": "accounting",
+  "group": "finance",
+  "boot": "ok",
+  "parity": "equal",
+  "op": "books.create",
+  "cli": "foxos accounting books create",
+  "note": null
+ },
+ "invoicing": {
+  "app": "invoicing",
+  "group": "finance",
+  "boot": "ok",
+  "parity": "equal",
+  "op": "set-up-business.activate",
+  "cli": "foxos invoicing set-up-business activate",
+  "note": null
+ },
+ "expense": {
+  "app": "expense",
+  "group": "finance",
+  "boot": "ok",
+  "parity": "equal",
+  "op": "set-up-expenses.activate",
+  "cli": "foxos expense set-up-expenses activate",
+  "note": null
+ },
+ "cap-table": {
+  "app": "cap-table",
+  "group": "finance",
+  "boot": "ok",
+  "parity": "equal",
+  "op": "set-up-company.activate",
+  "cli": "foxos cap-table set-up-company activate",
+  "note": null
+ },
+ "help-desk": {
+  "app": "help-desk",
+  "group": "business",
+  "boot": "ok",
+  "parity": "equal",
+  "op": "help-desk-name.set",
+  "cli": "foxos help-desk help-desk-name set foxos parity",
+  "note": null
+ },
+ "contracts": {
+  "app": "contracts",
+  "group": "business",
+  "boot": "ok",
+  "parity": "equal",
+  "op": "first-contract.create",
+  "cli": "foxos contracts first-contract create",
+  "note": null
+ },
+ "pos": {
+  "app": "pos",
+  "group": "business",
+  "boot": "ok",
+  "parity": "equal",
+  "op": "set-up-store.activate",
+  "cli": "foxos pos set-up-store activate",
+  "note": null
+ },
+ "inventory": {
+  "app": "inventory",
+  "group": "business",
+  "boot": "ok",
+  "parity": "equal",
+  "op": "set-up-inventory.activate",
+  "cli": "foxos inventory set-up-inventory activate",
+  "note": null
+ },
+ "assets": {
+  "app": "assets",
+  "group": "business",
+  "boot": null,
+  "parity": null,
   "op": null,
   "cli": null,
-  "note": "主界面没有适合做等价检查的操作"
+  "note": "上游提交 0fbb88cd 的 src/assets 只有 index.html/package.json/vite.config.js，缺少 index.html 引用的 /src/main.js（GitHub contents API 对 src/assets/src 返回 404），因此无法构建。"
+ },
+ "hiring": {
+  "app": "hiring",
+  "group": "business",
+  "boot": "ok",
+  "parity": "equal",
+  "op": "set-up-hiring.activate",
+  "cli": "foxos hiring set-up-hiring activate",
+  "note": null
+ },
+ "shifts": {
+  "app": "shifts",
+  "group": "business",
+  "boot": "ok",
+  "parity": "equal",
+  "op": "set-up-team.activate",
+  "cli": "foxos shifts set-up-team activate",
+  "note": null
+ },
+ "childcare": {
+  "app": "childcare",
+  "group": "business",
+  "boot": "ok",
+  "parity": "equal",
+  "op": "school-name.set",
+  "cli": "foxos childcare school-name set foxos parity",
+  "note": null
+ },
+ "field-service": {
+  "app": "field-service",
+  "group": "business",
+  "boot": "ok",
+  "parity": "equal",
+  "op": "business-name.set",
+  "cli": "foxos field-service business-name set foxos parity",
+  "note": null
+ },
+ "legal": {
+  "app": "legal",
+  "group": "business",
+  "boot": "ok",
+  "parity": "equal",
+  "op": "explore-sample-data.activate",
+  "cli": "foxos legal explore-sample-data activate",
+  "note": null
+ },
+ "fleet": {
+  "app": "fleet",
+  "group": "business",
+  "boot": "ok",
+  "parity": "equal",
+  "op": "fleet-or-company-name.set",
+  "cli": "foxos fleet fleet-or-company-name set foxos parity",
+  "note": null
+ },
+ "property-management": {
+  "app": "property-management",
+  "group": "business",
+  "boot": "ok",
+  "parity": "equal",
+  "op": "company-name.set",
+  "cli": "foxos property-management company-name set foxos parity",
+  "note": null
+ },
+ "api-client": {
+  "app": "api-client",
+  "group": "developer",
+  "boot": "ok",
+  "parity": "equal",
+  "op": "filter.set",
+  "cli": "foxos api-client filter set foxos parity",
+  "note": null
+ },
+ "backgammon": {
+  "app": "backgammon",
+  "group": "games",
+  "boot": "ok",
+  "parity": "equal",
+  "op": "game.create",
+  "cli": "foxos backgammon game create",
+  "note": null
+ },
+ "checkers": {
+  "app": "checkers",
+  "group": "games",
+  "boot": "ok",
+  "parity": "equal",
+  "op": "game.create",
+  "cli": "foxos checkers game create",
+  "note": null
+ },
+ "solitaire": {
+  "app": "solitaire",
+  "group": "games",
+  "boot": "ok",
+  "parity": "equal",
+  "op": "powered-by-puter.show",
+  "cli": "foxos solitaire powered-by-puter show",
+  "note": null
+ },
+ "sudoku": {
+  "app": "sudoku",
+  "group": "games",
+  "boot": "ok",
+  "parity": "equal",
+  "op": "puzzle.create",
+  "cli": "foxos sudoku puzzle create",
+  "note": null
  }
 }

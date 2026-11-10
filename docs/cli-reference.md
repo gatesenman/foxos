@@ -915,6 +915,91 @@ foxos everything uninstall APP
 foxos everything uninstall chess
 ```
 
+## sandbox — 轻量隔离
+
+进程级沙箱：直接运行宿主上的程序，只能读写工作空间，可选禁止联网（Linux Landlock + seccomp、macOS Seatbelt、Windows 受限令牌 / AppContainer + 作业对象）。
+
+限制：
+
+- Linux 需要内核启用 Landlock（5.13+）；TCP 网络限制需 ABI 4（6.7+），信号隔离需 ABI 6（6.12+）
+- Windows restricted 模式只限制写入（读取不受限）；appcontainer 模式读写与网络都受限，但很多程序在 AppContainer 中无法运行
+- macOS 与 Windows 实现尚未在实机上验证
+
+### `foxos sandbox check`
+
+本机可用的轻量隔离能力（机制、Landlock ABI、网络 / 信号隔离）
+
+```text
+foxos sandbox check
+```
+
+工具接口名：`sandbox_check` · 权限：`read`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| — | | | | 无参数 |
+
+示例：
+
+```bash
+foxos sandbox check --json
+```
+
+### `foxos sandbox run`
+
+在轻量沙箱中运行命令：只能读写工作空间，可选禁止联网
+
+```text
+foxos sandbox run [CMD...] [--network {on,off}] [--read READ] [--write WRITE] [--home {private,read,write}] [--windows-mode {restricted,appcontainer}] [--max-processes MAX_PROCESSES] [--memory-mb MEMORY_MB] [--cwd CWD] [--timeout TIMEOUT]
+```
+
+工具接口名：`sandbox_run` · 权限：`run`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `command` | `CMD` | array |  | 命令及参数（放在 -- 之后） |
+| `network` | `--network` | string |  | 是否允许联网；可选：on / off；默认 on |
+| `read` | `--read` | array |  | 额外只读路径（可重复） |
+| `write` | `--write` | array |  | 额外可写路径（可重复） |
+| `home` | `--home` | string |  | HOME：private 私有目录 / read 真实 HOME 只读 / write 真实 HOME 可写；可选：private / read / write；默认 private |
+| `windows_mode` | `--windows-mode` | string |  | Windows：restricted 受限令牌 / appcontainer；可选：restricted / appcontainer；默认 restricted |
+| `max_processes` | `--max-processes` | integer |  | 最多进程数（Windows 作业对象） |
+| `memory_mb` | `--memory-mb` | integer |  | 内存上限 MB（Windows 作业对象） |
+| `cwd` | `--cwd` | string |  | 工作目录（工作空间内） |
+| `timeout` | `--timeout` | number |  | 超时秒数；默认 600 |
+
+示例：
+
+```bash
+foxos sandbox run --json -- python3 build.py
+foxos sandbox run --network off -- sh -c 'curl -sI https://example.com'
+```
+
+### `foxos sandbox policy`
+
+显示将生效的沙箱规则（不执行）
+
+```text
+foxos sandbox policy [CMD...] [--network {on,off}] [--read READ] [--write WRITE] [--home {private,read,write}] [--windows-mode {restricted,appcontainer}]
+```
+
+工具接口名：`sandbox_policy` · 权限：`read`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `command` | `CMD` | array |  | 命令及参数（放在 -- 之后） |
+| `network` | `--network` | string |  | 是否允许联网；可选：on / off；默认 on |
+| `read` | `--read` | array |  | 额外只读路径（可重复） |
+| `write` | `--write` | array |  | 额外可写路径（可重复） |
+| `home` | `--home` | string |  | HOME：private 私有目录 / read 真实 HOME 只读 / write 真实 HOME 可写；可选：private / read / write；默认 private |
+| `windows_mode` | `--windows-mode` | string |  | Windows：restricted 受限令牌 / appcontainer；可选：restricted / appcontainer；默认 restricted |
+
+示例：
+
+```bash
+foxos sandbox policy --network off --json -- node agent.js
+```
+
 ## sheets — 表格：读写标准 .xlsx 工作簿、公式、图表与导出
 
 基于 openpyxl 读写 Excel 2007+ (.xlsx) 文件；公式按 Excel 语法写入（以 = 开头），用 LibreOffice 无头模式求值与导出 PDF/ODS。

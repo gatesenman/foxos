@@ -18,13 +18,15 @@
   const sessionTab = $('#tab-session');
   const picker = el('select', { class: 'input', id: 'agent-picker' });
   // 运行位置：宿主（默认）或某个运行中的狐狸OS 环境
-  const where = el('select', { class: 'input', id: 'agent-where', title: '智能体运行位置', onfocus: () => loadEnvs() }, el('option', { value: '', text: '宿主' }));
+  // 轻量沙箱：宿主上运行，但只能读写工作空间（见 docs/sandbox.md）
+  const baseWhere = () => [el('option', { value: '', text: '宿主' }), el('option', { value: '@sandbox', text: '轻量沙箱' }), el('option', { value: '@sandbox-offline', text: '轻量沙箱（不联网）' })];
+  const where = el('select', { class: 'input', id: 'agent-where', title: '智能体运行位置', onfocus: () => loadEnvs() }, ...baseWhere());
   async function loadEnvs() {
     const cur = where.value;
     let envs = [];
     try { envs = (await FX.k(['env', 'list'])).envs.filter((e) => e.state === 'running' && e.backend === 'linux-ns'); } catch { /* 无环境后端 */ }
-    where.replaceChildren(el('option', { value: '', text: '宿主' }), ...envs.map((e) => el('option', { value: e.name, text: `环境 ${e.name}` })));
-    where.value = envs.find((e) => e.name === cur) ? cur : '';
+    where.replaceChildren(...baseWhere(), ...envs.map((e) => el('option', { value: e.name, text: `环境 ${e.name}` })));
+    where.value = cur.startsWith('@') || envs.find((e) => e.name === cur) ? cur : '';
   }
   const startBtn = el('button', { class: 'btn primary sm', id: 'agent-start', onclick: () => picker.value && FX.startAgentSession(picker.value, { env: where.value || null }) }, icon('player-play'), '启动');
   const sessList = el('div', { class: 'sess-tabs' });
@@ -59,7 +61,7 @@
       c.init = r.init; c.identity = r.identity;
       const ai = r.init.agentInfo || {};
       c.name = ai.title || ai.name || agentId;
-      push(c, { kind: 'sys', text: `已连接 ${c.name}${ai.version ? ` ${ai.version}` : ''}（ACP 协议 v${r.init.protocolVersion}）。身份：${r.identity}${opts.env ? `；运行在环境 ${opts.env}（工作空间 /workspace）` : ''}` });
+      push(c, { kind: 'sys', text: `已连接 ${c.name}${ai.version ? ` ${ai.version}` : ''}（ACP 协议 v${r.init.protocolVersion}）。身份：${r.identity}${opts.env ? (opts.env.startsWith('@sandbox') ? `；运行在轻量沙箱${opts.env === '@sandbox-offline' ? '（不联网）' : ''}：只能读写工作空间` : `；运行在环境 ${opts.env}（工作空间 /workspace）`) : ''}` });
       c.authMethods = r.init.authMethods || [];
       await newSession(c);
     } catch (e) {

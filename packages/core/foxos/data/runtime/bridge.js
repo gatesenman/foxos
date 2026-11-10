@@ -62,6 +62,8 @@
   function click({ ref, name, role, region: reg, force }) {
     const el = ref ? find(ref) : byName(name, role, reg);
     assertHittable(el, force);
+    // 点击前记下控件信息：很多按钮（如欢迎页的“开始”）点击后会从页面上移除
+    const before = describe(refOf(el));
     el.scrollIntoView({ block: 'center', inline: 'center' });
     const r = el.getBoundingClientRect(); const x = r.left + r.width / 2; const y = r.top + r.height / 2;
     const opts = { bubbles: true, cancelable: true, composed: true, clientX: x, clientY: y, button: 0, view: window };
@@ -71,7 +73,7 @@
     el.dispatchEvent(new PointerEvent('pointerup', { ...opts, pointerId: 1, isPrimary: true }));
     el.dispatchEvent(new MouseEvent('mouseup', opts));
     el.click();
-    return describe(refOf(el));
+    return el.isConnected ? describe(refOf(el)) : { ...before, removed: true };
   }
   function focus(ref, clear) {
     const el = ref ? find(ref) : document.activeElement;
@@ -85,12 +87,19 @@
     if (!ref) ref = refOf(byName(name, role, reg));
     const el = find(ref);
     assertHittable(el, force);
-    if (el.tagName === 'SELECT') { el.value = value; el.dispatchEvent(new Event('input', { bubbles: true })); el.dispatchEvent(new Event('change', { bubbles: true })); return describe(ref); }
-    if (el.type === 'checkbox' || el.type === 'radio') { if (Boolean(value) !== el.checked) el.click(); return describe(ref); }
+    if (el.tagName === 'SELECT') { el.value = value; el.dispatchEvent(new Event('input', { bubbles: true })); el.dispatchEvent(new Event('change', { bubbles: true })); return el.isConnected ? describe(refOf(el)) : { ref, removed: true }; }
+    if (el.type === 'checkbox' || el.type === 'radio') { if (Boolean(value) !== el.checked) el.click(); return el.isConnected ? describe(refOf(el)) : { ref, removed: true }; }
+    if (el.isContentEditable && !('value' in el)) {
+      // 富文本 / contenteditable：像人一样全选后输入（触发 beforeinput / input，编辑器的撤销栈也会记录）
+      el.focus();
+      const sel = window.getSelection(); const range = document.createRange(); range.selectNodeContents(el); sel.removeAllRanges(); sel.addRange(range);
+      if (!document.execCommand('insertText', false, value)) { el.textContent = value; el.dispatchEvent(new InputEvent('input', { bubbles: true, inputType: 'insertText', data: value })); }
+      return el.isConnected ? describe(refOf(el)) : { ref, removed: true };
+    }
     const proto = Object.getPrototypeOf(el); const setter = Object.getOwnPropertyDescriptor(proto, 'value')?.set;
     if (setter) setter.call(el, value); else el.value = value;
     el.dispatchEvent(new Event('input', { bubbles: true })); el.dispatchEvent(new Event('change', { bubbles: true }));
-    return describe(ref);
+    return el.isConnected ? describe(refOf(el)) : { ref, removed: true };
   }
   const mods = () => globalThis.__foxosModules || {};
   function modules() { return Object.fromEntries(Object.entries(mods()).map(([k, ns]) => [k, Object.keys(ns).map((n) => `${n}:${typeof ns[n]}`)])); }
@@ -127,7 +136,7 @@
     const ok = t.dispatchEvent(new KeyboardEvent('keydown', init));
     if (ok && init.key === 'Enter' && t.form && !init.ctrlKey && !init.metaKey) t.form.requestSubmit ? t.form.requestSubmit() : t.form.submit();
     t.dispatchEvent(new KeyboardEvent('keyup', init));
-    return { key, target: describe(refOf(t)) };
+    return { key, target: t.isConnected ? describe(refOf(t)) : { ref: t.dataset.foxosRef || null, removed: true } };
   }
   async function run({ steps = [] }) {
     const results = [];

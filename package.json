@@ -1,0 +1,10 @@
+{
+  "name": "foxos-workspace",
+  "private": true,
+  "description": "狐狸OS 仓库根目录：测试入口",
+  "author": "gaosichun",
+  "scripts": {
+    "test:all": "python3 scripts/test_all.py",
+    "test:report": "python3 scripts/test_all.py --report-only"
+  }
+}

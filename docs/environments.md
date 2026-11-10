@@ -81,13 +81,13 @@
 
 | 档位 | 含义 | Linux | Windows | macOS |
 | --- | --- | --- | --- | --- |
-| **轻量**（进程级沙箱） | 启动快、与宿主共享系统与已装工具；限制文件写入范围、网络与危险系统调用 | 用户命名空间 + 只读宿主根 + Landlock 文件规则 + seccomp | 受限令牌 + Job Object（后续 AppContainer） | Seatbelt（sandbox-exec，按会话生成策略） |
+| **轻量**（进程级沙箱，[`foxos sandbox`](sandbox.md)） | 启动快、与宿主共享系统与已装工具；限制文件读写范围、网络与危险系统调用 | Landlock（文件、TCP、信号作用域）+ seccomp | 受限令牌（低完整性）或 AppContainer + 作业对象 | Seatbelt（sandbox-exec，按会话生成策略） |
 | **完整**（独立系统） | 独立根文件系统 / 虚拟机，可随意装软件、快照、导出 | `linux-ns` 提供者（本文前面各节） | `wsl2`（Linux 发行版）、`windows-sandbox`、`hyperv` | `macos-vz`（Virtualization.framework Linux 虚拟机） |
 
-- 每个智能体会话在面板“运行位置”里选：宿主、某个完整环境，或（计划中）轻量沙箱。
+- 每个智能体会话在面板“运行位置”里选：宿主、轻量沙箱、轻量沙箱（不联网），或某个运行中的完整环境。
 - 不依赖 Docker / Podman / LXC / VirtualBox / QEMU；只用操作系统自带机制。GPL / LGPL / AGPL 项目只借鉴思路，不复制代码。
 - **状态**：完整档的 Linux 后端已实现并端到端测试；Windows 三个提供者有代码与单元测试，未在 Windows 硬件上验证；
-  轻量档尚未实现（Linux 的 Landlock + seccomp、macOS 的 Seatbelt 策略生成、Windows 受限令牌都在待办中）。
+  轻量档的 Linux 实现已完成并端到端测试（US-52）；macOS（Seatbelt）与 Windows（受限令牌 / AppContainer + 作业对象）有代码与单元测试，未在实机上验证。详见 [sandbox.md](sandbox.md)。
 
 ## 一键安装系统（Windows 重点）
 

@@ -1,0 +1,387 @@
+{
+ "http": {
+  "sdk": "1.32.2",
+  "transport": "streamable-http",
+  "tools": 66
+ },
+ "stdio": {
+  "sdk": "1.32.2",
+  "transport": "stdio",
+  "tools": 4317,
+  "apps": 61,
+  "calls": [
+   {
+    "app": "docs",
+    "tool": "docs_create",
+    "ok": true,
+    "error": null
+   },
+   {
+    "app": "env",
+    "tool": "env_list",
+    "ok": true,
+    "error": null
+   },
+   {
+    "app": "everything",
+    "tool": "everything_list",
+    "ok": true,
+    "error": null
+   },
+   {
+    "app": "spreadsheet",
+    "tool": "spreadsheet_app_status",
+    "ok": true,
+    "error": null
+   },
+   {
+    "app": "documents",
+    "tool": "documents_app_status",
+    "ok": true,
+    "error": null
+   },
+   {
+    "app": "presentation",
+    "tool": "presentation_app_status",
+    "ok": true,
+    "error": null
+   },
+   {
+    "app": "whiteboard",
+    "tool": "whiteboard_app_status",
+    "ok": true,
+    "error": null
+   },
+   {
+    "app": "pdf",
+    "tool": "pdf_app_status",
+    "ok": true,
+    "error": null
+   },
+   {
+    "app": "notes",
+    "tool": "notes_app_status",
+    "ok": true,
+    "error": null
+   },
+   {
+    "app": "records",
+    "tool": "records_app_status",
+    "ok": true,
+    "error": null
+   },
+   {
+    "app": "meetings",
+    "tool": "meetings_app_status",
+    "ok": true,
+    "error": null
+   },
+   {
+    "app": "teamchat",
+    "tool": "teamchat_app_status",
+    "ok": true,
+    "error": null
+   },
+   {
+    "app": "email",
+    "tool": "email_app_status",
+    "ok": true,
+    "error": null
+   },
+   {
+    "app": "contacts",
+    "tool": "contacts_app_status",
+    "ok": true,
+    "error": null
+   },
+   {
+    "app": "calendar",
+    "tool": "calendar_app_status",
+    "ok": true,
+    "error": null
+   },
+   {
+    "app": "signatures",
+    "tool": "signatures_app_status",
+    "ok": true,
+    "error": null
+   },
+   {
+    "app": "photo-studio",
+    "tool": "photo-studio_app_status",
+    "ok": true,
+    "error": null
+   },
+   {
+    "app": "video-studio",
+    "tool": "video-studio_app_status",
+    "ok": true,
+    "error": null
+   },
+   {
+    "app": "vector-studio",
+    "tool": "vector-studio_app_status",
+    "ok": true,
+    "error": null
+   },
+   {
+    "app": "audio-studio",
+    "tool": "audio-studio_app_status",
+    "ok": true,
+    "error": null
+   },
+   {
+    "app": "music-studio",
+    "tool": "music-studio_app_status",
+    "ok": true,
+    "error": null
+   },
+   {
+    "app": "3d",
+    "tool": "3d_app_status",
+    "ok": true,
+    "error": null
+   },
+   {
+    "app": "cad",
+    "tool": "cad_app_status",
+    "ok": true,
+    "error": null
+   },
+   {
+    "app": "parametric",
+    "tool": "parametric_app_status",
+    "ok": true,
+    "error": null
+   },
+   {
+    "app": "circuits",
+    "tool": "circuits_app_status",
+    "ok": true,
+    "error": null
+   },
+   {
+    "app": "building-design",
+    "tool": "building-design_app_status",
+    "ok": true,
+    "error": null
+   },
+   {
+    "app": "tasks",
+    "tool": "tasks_app_status",
+    "ok": true,
+    "error": null
+   },
+   {
+    "app": "projects",
+    "tool": "projects_app_status",
+    "ok": true,
+    "error": null
+   },
+   {
+    "app": "wiki",
+    "tool": "wiki_app_status",
+    "ok": true,
+    "error": null
+   },
+   {
+    "app": "time-tracking",
+    "tool": "time-tracking_app_status",
+    "ok": true,
+    "error": null
+   },
+   {
+    "app": "survey",
+    "tool": "survey_app_status",
+    "ok": true,
+    "error": null
+   },
+   {
+    "app": "accounting",
+    "tool": "accounting_app_status",
+    "ok": true,
+    "error": null
+   },
+   {
+    "app": "invoicing",
+    "tool": "invoicing_app_status",
+    "ok": true,
+    "error": null
+   },
+   {
+    "app": "expense",
+    "tool": "expense_app_status",
+    "ok": true,
+    "error": null
+   },
+   {
+    "app": "cap-table",
+    "tool": "cap-table_app_status",
+    "ok": true,
+    "error": null
+   },
+   {
+    "app": "crm",
+    "tool": "crm_app_status",
+    "ok": true,
+    "error": null
+   },
+   {
+    "app": "help-desk",
+    "tool": "help-desk_app_status",
+    "ok": true,
+    "error": null
+   },
+   {
+    "app": "contracts",
+    "tool": "contracts_app_status",
+    "ok": true,
+    "error": null
+   },
+   {
+    "app": "pos",
+    "tool": "pos_app_status",
+    "ok": true,
+    "error": null
+   },
+   {
+    "app": "inventory",
+    "tool": "inventory_app_status",
+    "ok": true,
+    "error": null
+   },
+   {
+    "app": "assets",
+    "tool": "assets_app_status",
+    "ok": true,
+    "error": null
+   },
+   {
+    "app": "hiring",
+    "tool": "hiring_app_status",
+    "ok": true,
+    "error": null
+   },
+   {
+    "app": "shifts",
+    "tool": "shifts_app_status",
+    "ok": true,
+    "error": null
+   },
+   {
+    "app": "childcare",
+    "tool": "childcare_app_status",
+    "ok": true,
+    "error": null
+   },
+   {
+    "app": "field-service",
+    "tool": "field-service_app_status",
+    "ok": true,
+    "error": null
+   },
+   {
+    "app": "legal",
+    "tool": "legal_app_status",
+    "ok": true,
+    "error": null
+   },
+   {
+    "app": "fleet",
+    "tool": "fleet_app_status",
+    "ok": true,
+    "error": null
+   },
+   {
+    "app": "property-management",
+    "tool": "property-management_app_status",
+    "ok": true,
+    "error": null
+   },
+   {
+    "app": "api-client",
+    "tool": "api-client_app_status",
+    "ok": true,
+    "error": null
+   },
+   {
+    "app": "chess",
+    "tool": "chess_app_status",
+    "ok": true,
+    "error": null
+   },
+   {
+    "app": "backgammon",
+    "tool": "backgammon_app_status",
+    "ok": true,
+    "error": null
+   },
+   {
+    "app": "checkers",
+    "tool": "checkers_app_status",
+    "ok": true,
+    "error": null
+   },
+   {
+    "app": "solitaire",
+    "tool": "solitaire_app_status",
+    "ok": true,
+    "error": null
+   },
+   {
+    "app": "sudoku",
+    "tool": "sudoku_app_status",
+    "ok": true,
+    "error": null
+   },
+   {
+    "app": "sheets",
+    "tool": "sheets_create",
+    "ok": true,
+    "error": null
+   },
+   {
+    "app": "slides",
+    "tool": "slides_create",
+    "ok": true,
+    "error": null
+   },
+   {
+    "app": "workspace",
+    "tool": "workspace_info",
+    "ok": true,
+    "error": null
+   },
+   {
+    "app": "files",
+    "tool": "files_list",
+    "ok": true,
+    "error": null
+   },
+   {
+    "app": "audit",
+    "tool": "audit_tail",
+    "ok": true,
+    "error": null
+   },
+   {
+    "app": "queue",
+    "tool": "queue_list",
+    "ok": true,
+    "error": null
+   },
+   {
+    "app": "control",
+    "tool": "control_status",
+    "ok": true,
+    "error": null
+   },
+   {
+    "app": "tasks",
+    "tool": "tasks_task-title_set",
+    "ok": true,
+    "note": "写操作，store 中可读到新任务"
+   }
+  ]
+ }
+}

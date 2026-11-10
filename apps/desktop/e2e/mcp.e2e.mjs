@@ -20,7 +20,7 @@ const env = { ...process.env, PYTHONPATH: path.join(ROOT, 'packages', 'core'), P
 function parse(r) { return r.structuredContent || JSON.parse(r.content[0].text); }
 
 // 每个应用选一个调用：优先无必填参数的只读工具
-const PREFERRED = { files: ['files_list', {}], sheets: ['sheets_create', { path: 'mcp.xlsx' }], docs: ['docs_create', { path: 'mcp.docx' }], slides: ['slides_create', { path: 'mcp.pptx' }],
+const PREFERRED = { files: ['files_list', {}], sheets: ['sheets_create', { file: 'mcp.xlsx' }], docs: ['docs_create', { file: 'mcp.docx' }], slides: ['slides_create', { file: 'mcp.pptx' }],
   env: ['env_list', {}], everything: ['everything_list', {}], audit: ['audit_tail', {}], control: ['control_status', {}] };
 
 test('US-10 官方 MCP SDK 通过 stdio 列出工具并逐个应用调用', async () => {
@@ -28,6 +28,10 @@ test('US-10 官方 MCP SDK 通过 stdio 列出工具并逐个应用调用', asyn
   const transport = new StdioClientTransport({ command: PY, args: ['-m', 'foxos', '--workspace', ws, 'mcp', '--profile', 'full'], env: { ...env, FOXOS_AGENT: 'mcp-sdk-e2e' }, stderr: 'pipe' });
   const client = new Client({ name: 'foxos-e2e', version: '1.0.0' });
   await client.connect(transport);
+  try { await us10(client, ws); } finally { await client.close().catch(() => {}); }
+});
+
+async function us10(client, ws) {
   const info = client.getServerVersion();
   assert.equal(info.name, 'foxos');
   const { tools } = await client.listTools();
@@ -57,11 +61,16 @@ test('US-10 官方 MCP SDK 通过 stdio 列出工具并逐个应用调用', asyn
   // 一个真实的写操作：在 Everything 的 Tasks 里加任务（应用界面实时更新，数据写入工作空间）
   if (installed.has('tasks')) {
     await client.callTool({ name: 'tasks_app_reset', arguments: {} });
-    const r = parse(await client.callTool({ name: 'tasks_add-task_set', arguments: { value: '从 MCP 添加', submit: true } }));
+    // 重置后是首次使用：先关掉欢迎对话框，再打开新建任务输入框（与人的操作相同）
+    for (const n of ['Skip for now', 'New task']) {
+      const c = parse(await client.callTool({ name: 'tasks_ui_click', arguments: { name: n } }));
+      assert.equal(c.ok, true, `${n}：${JSON.stringify(c.error)}`);
+    }
+    const r = parse(await client.callTool({ name: 'tasks_task-title_set', arguments: { value: '从 MCP 添加', submit: true } }));
     assert.equal(r.ok, true, JSON.stringify(r.error));
     const store = parse(await client.callTool({ name: 'tasks_module_read', arguments: { target: 'src/lib/store.js#store.tasks' } }));
     assert.ok(JSON.stringify(store.result).includes('从 MCP 添加'));
-    calls.push({ app: 'tasks', tool: 'tasks_add-task_set', ok: true, note: '写操作，store 中可读到新任务' });
+    calls.push({ app: 'tasks', tool: 'tasks_task-title_set', ok: true, note: '写操作，store 中可读到新任务' });
   }
   // 错误码通过 isError + structuredContent 返回
   const bad = await client.callTool({ name: 'files_read', arguments: { path: '../etc/passwd' } });
@@ -69,12 +78,11 @@ test('US-10 官方 MCP SDK 通过 stdio 列出工具并逐个应用调用', asyn
   assert.equal(parse(bad).error.code, 'PERMISSION_DENIED');
   const audit = readAudit(ws).filter((a) => a.agent === 'mcp-sdk-e2e');
   assert.ok(audit.some((a) => a.interface === 'mcp'));
-  await client.close();
   const out = { sdk: SDK_VERSION, transport: 'stdio', tools: tools.length, apps: byApp.size, calls };
   fs.mkdirSync(path.dirname(RESULTS), { recursive: true });
   let prev = {}; try { prev = JSON.parse(fs.readFileSync(RESULTS, 'utf8')); } catch { /* 首次 */ }
   fs.writeFileSync(RESULTS, `${JSON.stringify({ ...prev, stdio: out }, null, 1)}\n`);
-});
+}
 
 test('US-11 官方 MCP SDK 通过 Streamable HTTP 连接（令牌认证、compact 工具集、everything_run）', async () => {
   const ws = fs.mkdtempSync(path.join(os.tmpdir(), 'foxos-mcph-'));

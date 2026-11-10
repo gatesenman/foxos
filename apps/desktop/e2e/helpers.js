@@ -8,7 +8,7 @@ const { _electron } = require('playwright');
 
 const ROOT = path.resolve(__dirname, '..', '..', '..');
 const PY = process.env.FOXOS_PYTHON || path.join(ROOT, '.venv', 'bin', 'python');
-const SHOTS = process.env.FOXOS_SHOTS || path.join(ROOT, 'docs', 'screenshots', 'e2e');
+const SHOTS = process.env.FOXOS_SHOTS || path.join(ROOT, 'build', 'screenshots', 'e2e'); // 每次运行都会重写，不放进仓库（仓库里的 docs/screenshots 由 scripts/screenshots.js 生成）
 
 function tmpWorkspace(tag) {
   return fs.mkdtempSync(path.join(os.tmpdir(), `foxos-e2e-${tag}-`));

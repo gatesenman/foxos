@@ -139,6 +139,8 @@ foxos mcp --profile compact                                                # 精
 - **macOS**：Virtualization.framework 后端（代码与单元测试，未在硬件验证）；macOS 来宾按 Apple 许可禁用
 - 提供者协议与系统目录：[docs/environment-provider-protocol.md](docs/environment-provider-protocol.md)；参考项目与许可证核对：[docs/virtualization-references.md](docs/virtualization-references.md)
 
+轻量隔离（`foxos sandbox`）：不建独立系统，直接用宿主上的工具运行，但只能读写工作空间、可选不联网（Linux Landlock + seccomp，macOS Seatbelt，Windows 受限令牌 / AppContainer + 作业对象）。会话面板“运行位置”可选“轻量沙箱”。见 [docs/sandbox.md](docs/sandbox.md)。
+
 ## 架构
 
 ```mermaid
@@ -195,7 +197,7 @@ npm run test:all      # 仓库根目录：pytest + 桌面端到端测试（Playw
 - [x] Linux 环境运行时；Windows 环境目录与提供者协议
 - [x] Windows x64 预览版安装包
 - [ ] Windows 实机验收（进行中）
-- [ ] 轻量沙箱档：Linux Landlock + seccomp、macOS Seatbelt、Windows 受限令牌 + Job Object
+- [x] 轻量沙箱档：Linux Landlock + seccomp（已测试）；macOS Seatbelt、Windows 受限令牌 / AppContainer + 作业对象（代码与单元测试，待实机验证）
 - [ ] Linux 安装包与发布、macOS 构建
 - [ ] 代码签名、自动更新
 
