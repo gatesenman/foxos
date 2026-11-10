@@ -2,13 +2,13 @@
  "http": {
   "sdk": "1.32.2",
   "transport": "streamable-http",
-  "tools": 66
+  "tools": 69
  },
  "stdio": {
   "sdk": "1.32.2",
   "transport": "stdio",
-  "tools": 4317,
-  "apps": 61,
+  "tools": 4320,
+  "apps": 62,
   "calls": [
    {
     "app": "docs",
@@ -331,6 +331,12 @@
    {
     "app": "sudoku",
     "tool": "sudoku_app_status",
+    "ok": true,
+    "error": null
+   },
+   {
+    "app": "sandbox",
+    "tool": "sandbox_check",
     "ok": true,
     "error": null
    },
