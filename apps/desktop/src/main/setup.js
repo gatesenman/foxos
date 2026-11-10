@@ -16,7 +16,7 @@ function plan() {
   const r = planBase();
   // Everything 应用：每个分组一条安装命令（从上游源码在本机构建）
   const py = kernel.pythonPath();
-  const q = IS_WIN ? `"${py}"` : `'${py.replace(/'/g, "'\\''")}'`;
+  const q = IS_WIN ? `& "${py}"` : `'${py.replace(/'/g, "'\\''")}'`;
   for (const g of ['office', 'collaboration', 'creative', 'engineering', 'productivity', 'finance', 'business', 'developer', 'games']) r.components[`everything:${g}`] = `${q} -m foxos everything install --group ${g}`;
   return r;
 }
@@ -24,20 +24,27 @@ function plan() {
 function planBase() {
   const py = kernel.pythonPath();
   const quote = (s) => (IS_WIN ? `"${s}"` : `'${s.replace(/'/g, "'\\''")}'`);
-  const pyDeps = `${quote(py)} -m pip install --upgrade "openpyxl>=3.1,<4" "python-docx>=1.1,<2" "python-pptx>=1.0,<2" "zstandard>=0.22"`;
-  const fx = `${quote(py)} -m foxos`;
+  // Windows 的命令在 PowerShell 里执行：带引号的程序路径前要加调用运算符 &
+  const exe = (s) => (IS_WIN ? `& ${quote(s)}` : quote(s));
+  const pyDeps = `${exe(py)} -m pip install --upgrade "openpyxl>=3.1,<4" "python-docx>=1.1,<2" "python-pptx>=1.0,<2" "zstandard>=0.22"`;
+  const fx = `${exe(py)} -m foxos`;
   // 环境组件：Linux 检查用户命名空间并预下载 Alpine 镜像；Windows 启用 WSL2；macOS 编译 Virtualization.framework 辅助程序
   const envLinux = `unshare -U true && ${fx} env pull alpine-3.20`;
   const vz = require('node:path').join(require('./paths').corePath(), 'foxos', 'data', 'macos', 'FoxVZ.swift');
   const envMac = `mkdir -p "$HOME/Library/Application Support/FoxOS/bin" && swiftc -O ${quote(vz)} -framework Virtualization -o "$HOME/Library/Application Support/FoxOS/bin/foxvz"`;
   if (IS_WIN) {
     const wg = (id) => `winget install --id ${id} -e --accept-package-agreements --accept-source-agreements`;
+    const path = require('node:path');
+    const loPs = path.join(require('./paths').corePath(), 'foxos', 'data', 'windows', 'install-libreoffice.ps1');
+    // 安装包自带 Python（embeddable 版 + 办公库）；只有开发模式下才需要单独安装
+    const bundled = kernel.bundledPython && kernel.bundledPython();
+    const check = `${exe(py)} -c "import foxos, openpyxl, docx, pptx, zstandard; print('Python', __import__('sys').version.split()[0], '与办公库已就绪（狐狸OS', foxos.__version__, '）')"`;
     return {
       platform: 'windows', packageManager: which('winget') ? 'winget' : null,
       components: {
-        libreoffice: wg('TheDocumentFoundation.LibreOffice'),
-        python: wg('Python.Python.3.12'),
-        'python-deps': pyDeps,
+        libreoffice: `powershell.exe -NoProfile -ExecutionPolicy Bypass -File ${quote(loPs)}`,
+        python: bundled ? check : wg('Python.Python.3.12'),
+        'python-deps': bundled ? check : pyDeps,
         node: wg('OpenJS.NodeJS.LTS'),
         git: wg('Git.Git'),
         environments: 'wsl --install --no-distribution',

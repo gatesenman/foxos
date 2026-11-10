@@ -10,6 +10,7 @@ const on = (ch, cb) => ipcRenderer.on(ch, (_e, ...a) => cb(...a));
 
 contextBridge.exposeInMainWorld('foxos', {
   run: (args, opts) => ipcRenderer.invoke('foxos:run', args, opts),
+  openExternal: (url) => ipcRenderer.invoke('foxos:openExternal', url),
   env: () => call('env'),
   detectApps: () => call('apps:detect'),
   office: {

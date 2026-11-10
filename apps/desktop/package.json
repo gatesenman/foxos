@@ -1,6 +1,6 @@
 {
   "name": "foxos-desktop",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "description": "狐狸OS（FoxOS）桌面",
   "main": "src/main/index.js",
@@ -9,8 +9,10 @@
     "start": "electron .",
     "dist:linux": "electron-builder --linux dir",
     "dist:linux:appimage": "electron-builder --linux AppImage",
-    "dist:win": "electron-builder --win nsis",
-    "test:smoke": "bash scripts/smoke.sh"
+    "dist:win": "npm run prepare:win-pty && npm run prepare:win-python && electron-builder --win --x64",
+    "test:smoke": "bash scripts/smoke.sh",
+    "prepare:win-python": "bash scripts/prepare-win-python.sh",
+    "prepare:win-pty": "npm install --no-save --force @lydell/node-pty-win32-x64@1.2.0-beta.18"
   },
   "devDependencies": {
     "@modelcontextprotocol/sdk": "^1.32.2",
@@ -28,14 +30,17 @@
     },
     "files": [
       "src/**/*",
-      "package.json"
+      "package.json",
+      "!**/node_modules/@lydell/node-pty-linux-*/**"
     ],
     "extraResources": [
       {
         "from": "../../packages/core/foxos",
         "to": "core/foxos",
         "filter": [
-          "**/*.py"
+          "**/*",
+          "!**/__pycache__/**",
+          "!**/*.pyc"
         ]
       },
       {
@@ -50,10 +55,30 @@
           "arch": [
             "x64"
           ]
+        },
+        {
+          "target": "zip",
+          "arch": [
+            "x64"
+          ]
         }
       ],
       "icon": "../../assets/icon.ico",
-      "executableName": "FoxOS"
+      "executableName": "FoxOS",
+      "signExecutable": false,
+      "artifactName": "FoxOS-${version}-win-x64.${ext}",
+      "extraResources": [
+        {
+          "from": "../../build/win-python",
+          "to": "python",
+          "filter": [
+            "**/*"
+          ]
+        }
+      ],
+      "files": [
+        "!**/node_modules/@lydell/node-pty-linux-*/**"
+      ]
     },
     "nsis": {
       "oneClick": false,
@@ -62,7 +87,7 @@
       "shortcutName": "狐狸OS",
       "installerIcon": "../../assets/icon.ico",
       "uninstallerIcon": "../../assets/icon.ico",
-      "artifactName": "FoxOS-Setup-${version}.${ext}"
+      "artifactName": "FoxOS-Setup-${version}-x64.${ext}"
     },
     "linux": {
       "target": [
@@ -72,7 +97,10 @@
       "icon": "../../assets/icon.png",
       "category": "Office",
       "executableName": "foxos-desktop",
-      "maintainer": "gaosichun"
+      "maintainer": "gaosichun",
+      "files": [
+        "!**/node_modules/@lydell/node-pty-win32-*/**"
+      ]
     },
     "mac": {
       "target": [
@@ -80,7 +108,11 @@
       ],
       "icon": "../../assets/icon.png",
       "category": "public.app-category.productivity"
-    }
+    },
+    "npmRebuild": false,
+    "asarUnpack": [
+      "node_modules/@lydell/**"
+    ]
   },
   "dependencies": {
     "@lydell/node-pty": "^1.2.0-beta.18",

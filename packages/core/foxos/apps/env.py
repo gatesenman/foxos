@@ -87,7 +87,12 @@ def _pid(name: str) -> int | None:
 def _state(name: str) -> str:
     if not IS_LINUX:
         from ..envs import wsl
-        return wsl.state(name) if os.name == "nt" else "unknown"
+        if os.name != "nt":
+            return "unknown"
+        try:
+            return wsl.state(_cfg(name))
+        except FoxError:
+            return "unknown"
     return "running" if _pid(name) else "stopped"
 
 
@@ -149,7 +154,8 @@ def _stats(name: str) -> dict:
 def _summary(cfg: dict) -> dict:
     return {"name": cfg["name"], "image": cfg["image"], "backend": cfg.get("backend", BACKEND), "state": _state(cfg["name"]), "network": cfg.get("network"),
             "workspace": cfg.get("workspace"), "limits": cfg.get("limits"), "mounts": cfg.get("mounts", []), "created": cfg.get("created"),
-            "snapshots": len(cfg.get("snapshots", [])), "actions": list((cfg.get("actions") or {}).keys())}
+            "snapshots": len(cfg.get("snapshots", [])), "actions": list((cfg.get("actions") or {}).keys()),
+            "catalog_id": cfg.get("catalog_id"), "guest_os": cfg.get("guest_os", "linux"), "provider": cfg.get("provider", cfg.get("backend", BACKEND))}
 
 
 # ---------------------------------------------------------------- 命令实现
@@ -173,7 +179,11 @@ def env_create(ctx: Context, name: str, image: str = "alpine-3.20", network: str
         raise FoxError("CONFLICT", f"环境 {name} 已存在")
     if BACKEND == "wsl2":
         from ..envs import wsl
-        return wsl.create(name, image, ctx.workspace.root, home())
+        r = wsl.create(name, image, ctx.workspace.root, home())
+        _save({"name": name, "image": r.get("image", image), "backend": "wsl2", "wsl_distro": wsl.distro(name), "network": "host",
+               "workspace": {"path": str(ctx.workspace.root), "mode": "rw"}, "limits": {}, "mounts": [], "snapshots": [], "actions": {}, "shell": "/bin/sh",
+               "created": datetime.now(timezone.utc).isoformat(timespec="seconds"), "created_by": ctx.agent})
+        return r
     m = images.pull(image, images_dir()) if not (images_dir() / image / "manifest.json").exists() else json.loads((images_dir() / image / "manifest.json").read_text())
     cfg = {"name": name, "image": m["id"], "backend": BACKEND, "lower": str(images_dir() / m["id"] / "rootfs"), "hostname": name, "network": network,
            "workspace": {"path": str(ctx.workspace.root), "mode": workspace_mode}, "limits": {k: v for k, v in {"memory_mb": memory_mb, "cpus": cpus, "pids": pids}.items() if v},
@@ -204,9 +214,14 @@ def env_info(ctx: Context, name: str) -> dict:
 
 def env_start(ctx: Context, name: str) -> dict:
     cfg = _cfg(name)
+    if cfg.get("start_steps"):
+        from ..envs import providers
+        providers.execute(cfg["start_steps"])
+        _log(name, f"started by {ctx.agent}")
+        return {"message": f"已启动 {name}（{cfg.get('provider')}）", "env": _summary(cfg)}
     if BACKEND == "wsl2":
         from ..envs import wsl
-        return wsl.start(name)
+        return wsl.start(cfg)
     _need_linux()
     if _pid(name):
         return {"message": f"{name} 已在运行", "env": _summary(cfg)}
@@ -237,10 +252,10 @@ def env_start(ctx: Context, name: str) -> dict:
 
 
 def env_stop(ctx: Context, name: str, timeout: float = 5.0) -> dict:
-    _cfg(name)
+    cfg = _cfg(name)
     if BACKEND == "wsl2":
         from ..envs import wsl
-        return wsl.stop(name)
+        return wsl.stop(cfg)
     pid = _pid(name)
     if not pid:
         return {"message": f"{name} 没有运行"}
@@ -264,7 +279,7 @@ def _exec(name: str, argv: list[str], cwd: str = "/workspace", capture: bool = T
     cfg = _cfg(name)
     if BACKEND == "wsl2":
         from ..envs import wsl
-        return wsl.exec_(name, argv, cwd)
+        return wsl.exec_(cfg, argv, cwd, capture=capture, timeout=timeout)
     if not _pid(name):
         raise FoxError("LOCKED" if False else "DEPENDENCY_MISSING", f"环境 {name} 没有运行", hint=f"foxos env start {name}")
     cmd = [sys.executable, "-m", "foxos.envs.linux", "exec", str(env_dir(name)), "--cwd", cwd]
@@ -375,6 +390,10 @@ def env_restore(ctx: Context, name: str, snapshot: str) -> dict:
 
 def env_export(ctx: Context, name: str, out: Path) -> dict:
     cfg = _cfg(name)
+    if cfg.get("backend") == "wsl2":
+        from ..envs import wsl
+        wsl.export(cfg, str(out))
+        return {"message": f"已导出 {name} → {ctx.rel(out)}（WSL tar 格式，可用 wsl --import 或 foxos env install custom-rootfs 导入）", "path": ctx.rel(out)}
     if _pid(name):
         raise FoxError("LOCKED", f"{name} 正在运行，先停止再导出", hint=f"foxos env stop {name}")
     # 下层（镜像）在前、可写层在后：tar 解包时后者覆盖前者；overlay 的删除标记（字符设备 0/0）在无特权导出时会被跳过
@@ -388,7 +407,15 @@ def env_import(ctx: Context, file: Path, name: str) -> dict:
 
 
 def env_delete(ctx: Context, name: str) -> dict:
-    _cfg(name)
+    cfg = _cfg(name)
+    if cfg.get("backend") == "wsl2":
+        from ..envs import wsl
+        wsl.unregister(cfg)
+        _rmtree(env_dir(name))
+        return {"message": f"已删除环境 {name}（已注销 WSL 发行版 {wsl.dname(cfg)}）"}
+    if cfg.get("backend") in ("windows-sandbox", "hyperv"):
+        _rmtree(env_dir(name))
+        return {"message": f"已从列表移除 {name}" + ("（Hyper-V 虚拟机本身请在 Hyper-V 管理器中删除，或运行 Remove-VM）" if cfg.get("backend") == "hyperv" else "")}
     if _pid(name):
         env_stop(ctx, name)
     _rmtree(env_dir(name))
@@ -462,6 +489,129 @@ def env_action_run(ctx: Context, name: str, action: str) -> dict:
     return env_exec(ctx, name, ["/bin/sh", "-c", _subst(cmd, cfg, ctx)])
 
 
+
+# ---------------------------------------------------------------- 系统目录与提供者（一键安装系统）
+def env_providers(ctx: Context) -> dict:
+    from ..envs import providers
+    out = []
+    for p in providers.providers().values():
+        d = p.describe()
+        try:
+            d["doctor"] = p.doctor()
+        except FoxError as e:
+            d["doctor"] = {"available": False, "reason": e.message, "checks": [], "actions": []}
+        out.append(d)
+    return {"host": providers.host_os(), "protocol": providers.PROTOCOL, "providers": out}
+
+
+def env_doctor(ctx: Context, provider: str | None = None) -> dict:
+    from ..envs import providers
+    ids = [provider] if provider else [p.id for p in providers.providers().values() if providers.host_os() in p.platforms]
+    res = {i: providers.get(i).doctor() for i in ids}
+    return {"host": providers.host_os(), "results": res, "ok": all(r.get("available") for r in res.values()) if res else False}
+
+
+def env_fix(ctx: Context, provider: str, action: str) -> dict:
+    """执行 doctor 给出的修复操作（如启用 WSL / Windows Sandbox / Hyper-V，会弹出管理员确认）。"""
+    from ..envs import providers
+    d = providers.get(provider).doctor()
+    act = next((a for a in d.get("actions", []) if a["id"] == action), None)
+    if not act:
+        raise FoxError("NOT_FOUND", f"{provider} 当前没有修复操作 {action}", hint=f"foxos env doctor --provider {provider}")
+    if act.get("manual"):
+        return {"message": act["label"], "manual": True, "reboot_required": False, "results": []}
+    res = providers.execute([act])
+    reboot = any(r.get("reboot_required") for r in res) or action.startswith("enable-")
+    return {"message": f"已执行：{act['label']}" + ("。需要重启电脑后生效" if reboot else ""), "reboot_required": reboot, "results": res}
+
+
+def env_catalog(ctx: Context, guest: str | None = None, provider: str | None = None, available: bool = False) -> dict:
+    from ..envs import providers
+    c = providers.catalog()
+    host = providers.host_os()
+    provs = providers.providers()
+    items = []
+    for e in c["entries"]:
+        if guest and e.get("guest_os") != guest:
+            continue
+        if provider and provider not in e["providers"]:
+            continue
+        usable = [p for p in e["providers"] if p in provs and host in provs[p].platforms]
+        it = {**e, "host_providers": usable, "installable": bool(usable) and not e.get("disabled")}
+        if not it["installable"] and not e.get("disabled"):
+            it["reason"] = f"当前宿主（{host}）没有可用的提供者：需要 {'/'.join(e['providers'])}"
+        if available and not it["installable"]:
+            continue
+        items.append(it)
+    return {"format": c["format"], "version": c["version"], "host": host, "count": len(items), "entries": items}
+
+
+def _install_status(name: str, **kw) -> None:
+    d = env_dir(name)
+    d.mkdir(parents=True, exist_ok=True)
+    f = d / "install.json"
+    cur = json.loads(f.read_text(encoding="utf-8")) if f.exists() else {}
+    cur.update(kw, updated=time.time())
+    f.write_text(json.dumps(cur, ensure_ascii=False), encoding="utf-8")
+
+
+def env_install(ctx: Context, entry: str, name: str, provider: str | None = None, url: str | None = None, sha256: str | None = None, iso: str | None = None,
+                location: str | None = None, memory_mb: int | None = None, cpus: int | None = None, disk_gb: int | None = None, dry_run: bool = False) -> dict:
+    from ..envs import providers
+    _valid(name)
+    e = providers.entry(entry)
+    if e.get("disabled"):
+        raise FoxError("DEPENDENCY_MISSING", f"{e['name']} 不可用：{e.get('reason')}")
+    host = providers.host_os()
+    provs = providers.providers()
+    cands = [provider] if provider else [p for p in e["providers"] if p in provs and host in provs[p].platforms] or e["providers"][:1]
+    p = providers.get(cands[0])
+    opts = {"url": url, "sha256": sha256, "iso": iso, "location": location, "memory_mb": memory_mb, "cpus": cpus, "disk_gb": disk_gb, "workspace": str(ctx.workspace.root)}
+    if not dry_run and (env_dir(name) / "env.json").exists():
+        raise FoxError("CONFLICT", f"环境 {name} 已存在")
+    src = providers.resolve_source(e, opts) if e["source"]["kind"] in ("rootfs", "alpine", "lxc", "custom") else dict(e["source"])
+    opts["_resolved"] = src
+    steps = p.plan_install(e, name, opts)
+    plan = {"entry": e["id"], "name": name, "provider": p.id, "source": src, "steps": steps}
+    if dry_run:
+        return {"message": f"安装计划：{e['name']} → {name}（{p.id}，{len(steps)} 步）", "plan": plan, "dry_run": True}
+    if host not in p.platforms:
+        raise FoxError("DEPENDENCY_MISSING", f"{p.name} 需要 {'/'.join(p.platforms)} 宿主（当前 {host}）", hint="加 --dry-run 查看安装计划")
+    doc = p.doctor()
+    if not doc.get("available"):
+        acts = "；".join(f"foxos env fix --provider {p.id} --action {a['id']}（{a['label']}）" for a in doc.get("actions", []))
+        raise FoxError("DEPENDENCY_MISSING", f"{p.name} 不可用：{doc.get('reason')}", hint=acts or None)
+    _install_status(name, state="running", entry=e["id"], provider=p.id, steps=len(steps), step=0)
+    try:
+        res = providers.execute(steps, report=lambda **k: _install_status(name, **k))
+    except FoxError as ex:
+        _install_status(name, state="error", error=ex.message)
+        raise
+    if p.id != "linux-ns":  # linux-ns 由 env create 自己写配置
+        reg = next((s.get("registers") for s in steps if s.get("registers")), None)
+        cfg = {"name": name, "image": e["id"], "catalog_id": e["id"], "backend": p.id, "provider": p.id, "guest_os": e.get("guest_os", "linux"),
+               "network": "host", "workspace": {"path": str(ctx.workspace.root), "mode": "rw"}, "limits": {k: v for k, v in {"memory_mb": memory_mb, "cpus": cpus}.items() if v},
+               "mounts": [], "snapshots": [], "actions": {}, "shell": "/bin/bash" if e.get("family") not in ("alpine",) else "/bin/sh",
+               "created": datetime.now(timezone.utc).isoformat(timespec="seconds"), "created_by": ctx.agent, "source": src}
+        if p.id == "wsl2":
+            cfg["wsl_distro"] = reg
+        else:
+            cfg["start_steps"] = [s for s in steps if "argv" in s or "powershell" in s][-1:]
+            if p.id == "hyperv":
+                cfg["start_steps"] = [{"powershell": f"Start-VM -Name {providers.ps_quote(providers.wsl_name(name))}", "elevate": True}, {"argv": ["vmconnect.exe", "localhost", providers.wsl_name(name)]}]
+        _save(cfg)
+    _install_status(name, state="done")
+    _log(name, f"installed {e['id']} via {p.id} by {ctx.agent}")
+    return {"message": f"已安装 {e['name']} 为环境 {name}（{p.id}）", "plan": plan, "results": res}
+
+
+def env_install_status(ctx: Context, name: str) -> dict:
+    f = env_dir(_valid(name)) / "install.json"
+    if not f.exists():
+        raise FoxError("NOT_FOUND", f"{name} 没有安装记录")
+    return json.loads(f.read_text(encoding="utf-8"))
+
+
 register_app("env", "狐狸OS 环境", "自研隔离环境：每个环境有自己的根文件系统、进程、主机名和资源限制；工作空间按规则挂载到 /workspace。",
              limits=["Linux 后端无特权运行（用户命名空间）；cgroup 不可委派时用 rlimit 限制", "Windows 使用系统自带 WSL2；macOS 使用 Virtualization.framework"])
 NAME = Param("name", "string", "环境名", required=True, positional=True, metavar="NAME")
@@ -511,3 +661,21 @@ register(Command("env", "action add", "添加自定义操作（支持 ${env} ${i
                  examples=["foxos env action add dev test --command 'cd ${workspace} && make test'"], permission="modify"))
 register(Command("env", "action run", "运行自定义操作", env_action_run, params=[NAME, Param("action", "string", "操作名", required=True, positional=True, metavar="ACTION")],
                  examples=["foxos env action run dev test --json"], permission="run"))
+register(Command("env", "providers", "列出环境提供者（内置与第三方）及其能力、可用性", env_providers, examples=["foxos env providers --json"], audited=False))
+register(Command("env", "doctor", "检查本机虚拟化能力（WSL、Windows Sandbox、Hyper-V、用户命名空间…）并给出修复操作", env_doctor,
+                 params=[Param("provider", "string", "只检查某个提供者")], examples=["foxos env doctor --json", "foxos env doctor --provider wsl2"], audited=False))
+register(Command("env", "fix", "执行 doctor 给出的修复操作（启用 WSL 等，需要管理员确认，可能需要重启）", env_fix,
+                 params=[Param("provider", "string", "提供者", required=True), Param("action", "string", "修复操作 ID（见 doctor 输出）", required=True)],
+                 examples=["foxos env fix --provider wsl2 --action enable-wsl"], permission="run"))
+register(Command("env", "catalog", "可一键安装的系统目录（WSL 发行版、LXC/官方根文件系统、Windows Sandbox、Hyper-V、macOS）", env_catalog,
+                 params=[Param("guest", "string", "来宾系统", enum=["linux", "windows", "macos", "any"]), Param("provider", "string", "只看某个提供者"),
+                         Param("available", "boolean", "只显示本机可安装的")], examples=["foxos env catalog --json", "foxos env catalog --guest windows"], audited=False))
+register(Command("env", "install", "从目录一键安装一个系统为新环境（下载、校验 sha256、导入）", env_install,
+                 params=[Param("entry", "string", "目录条目 ID（foxos env catalog）", required=True, positional=True, metavar="ENTRY"), NAME,
+                         Param("provider", "string", "指定提供者"), Param("url", "string", "自定义根文件系统地址（custom-rootfs）"), Param("sha256", "string", "自定义来源的 sha256"),
+                         Param("iso", "string", "安装介质 ISO 路径（Hyper-V）"), Param("location", "string", "安装位置（Windows 目录）"),
+                         Param("memory_mb", "integer", "内存 MB（Hyper-V / Sandbox）"), Param("cpus", "integer", "CPU 数（Hyper-V）"), Param("disk_gb", "integer", "磁盘 GB（Hyper-V）"),
+                         Param("dry_run", "boolean", "只输出安装计划，不执行")],
+                 examples=["foxos env install wsl-ubuntu-24.04 ubuntu", "foxos env install alpine tiny --dry-run --json", "foxos env install hyperv-windows-11-eval win11 --iso D:\\iso\\win11.iso"],
+                 permission="create"))
+register(Command("env", "progress", "查看安装进度", env_install_status, params=[NAME], examples=["foxos env progress ubuntu --json"], audited=False))

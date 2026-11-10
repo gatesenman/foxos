@@ -16,7 +16,7 @@
 
 错误码：USAGE(2) NOT_FOUND(3) PERMISSION_DENIED(4) LOCKED(5) DEPENDENCY_MISSING(6) CONFLICT(7) PAUSED(8) ERROR(1)。
 
-共 4311 个工具。
+共 4317 个工具。
 
 ## docs（5 个工具）
 
@@ -110,7 +110,7 @@
 {"name": "docs_export", "arguments": {"file": "…", "output": "…"}}
 ```
 
-## env（22 个工具）
+## env（28 个工具）
 
 ### `env_images`
 
@@ -483,6 +483,111 @@
 
 ```json
 {"name": "env_action_run", "arguments": {"name": "…", "action": "…"}}
+```
+
+### `env_providers`
+
+列出环境提供者（内置与第三方）及其能力、可用性。CLI：foxos env providers。示例：foxos env providers --json
+
+只读：是 · 破坏性：否 · CLI：`foxos env providers`
+
+调用示例：
+
+```json
+{"name": "env_providers", "arguments": {}}
+```
+
+### `env_doctor`
+
+检查本机虚拟化能力（WSL、Windows Sandbox、Hyper-V、用户命名空间…）并给出修复操作。CLI：foxos env doctor [--provider PROVIDER]。示例：foxos env doctor --json
+
+只读：是 · 破坏性：否 · CLI：`foxos env doctor`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `provider` | string |  | 只检查某个提供者 |
+
+调用示例：
+
+```json
+{"name": "env_doctor", "arguments": {}}
+```
+
+### `env_fix`
+
+执行 doctor 给出的修复操作（启用 WSL 等，需要管理员确认，可能需要重启）。CLI：foxos env fix --provider PROVIDER --action ACTION。示例：foxos env fix --provider wsl2 --action enable-wsl
+
+只读：否 · 破坏性：否 · CLI：`foxos env fix`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `provider` | string | 是 | 提供者 |
+| `action` | string | 是 | 修复操作 ID（见 doctor 输出） |
+
+调用示例：
+
+```json
+{"name": "env_fix", "arguments": {"provider": "…", "action": "…"}}
+```
+
+### `env_catalog`
+
+可一键安装的系统目录（WSL 发行版、LXC/官方根文件系统、Windows Sandbox、Hyper-V、macOS）。CLI：foxos env catalog [--guest {linux,windows,macos,any}] [--provider PROVIDER] [--available]。示例：foxos env catalog --json
+
+只读：是 · 破坏性：否 · CLI：`foxos env catalog`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `guest` | string |  | 来宾系统 可选：linux / windows / macos / any |
+| `provider` | string |  | 只看某个提供者 |
+| `available` | boolean |  | 只显示本机可安装的 |
+
+调用示例：
+
+```json
+{"name": "env_catalog", "arguments": {}}
+```
+
+### `env_install`
+
+从目录一键安装一个系统为新环境（下载、校验 sha256、导入）。CLI：foxos env install ENTRY NAME [--provider PROVIDER] [--url URL] [--sha256 SHA256] [--iso ISO] [--location LOCATION] [--memory-mb MEMORY_MB] [--cpus CPUS] [--disk-gb DISK_GB] [--dry-run]。示例：foxos env install wsl-ubuntu-24.04 ubuntu
+
+只读：否 · 破坏性：否 · CLI：`foxos env install`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `entry` | string | 是 | 目录条目 ID（foxos env catalog） |
+| `name` | string | 是 | 环境名 |
+| `provider` | string |  | 指定提供者 |
+| `url` | string |  | 自定义根文件系统地址（custom-rootfs） |
+| `sha256` | string |  | 自定义来源的 sha256 |
+| `iso` | string |  | 安装介质 ISO 路径（Hyper-V） |
+| `location` | string |  | 安装位置（Windows 目录） |
+| `memory_mb` | integer |  | 内存 MB（Hyper-V / Sandbox） |
+| `cpus` | integer |  | CPU 数（Hyper-V） |
+| `disk_gb` | integer |  | 磁盘 GB（Hyper-V） |
+| `dry_run` | boolean |  | 只输出安装计划，不执行 |
+
+调用示例：
+
+```json
+{"name": "env_install", "arguments": {"entry": "…", "name": "…"}}
+```
+
+### `env_progress`
+
+查看安装进度。CLI：foxos env progress NAME。示例：foxos env progress ubuntu --json
+
+只读：是 · 破坏性：否 · CLI：`foxos env progress`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `name` | string | 是 | 环境名 |
+
+调用示例：
+
+```json
+{"name": "env_progress", "arguments": {"name": "…"}}
 ```
 
 ## everything（6 个工具）

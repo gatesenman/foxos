@@ -1,0 +1,51 @@
+{
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "$id": "https://foxos.dev/schemas/env-catalog/1",
+ "title": "狐狸OS 系统目录（foxos-env-catalog/1）",
+ "type": "object",
+ "required": ["format", "version", "entries"],
+ "properties": {
+  "format": {"const": "foxos-env-catalog/1"},
+  "version": {"type": "string", "description": "目录版本（日期，YYYY.MM.DD）"},
+  "generated_from": {"type": "array", "items": {"type": "string"}},
+  "entries": {"type": "array", "items": {"$ref": "#/$defs/entry"}}
+ },
+ "$defs": {
+  "sha256": {"type": ["string", "null"], "pattern": "^[0-9a-f]{64}$"},
+  "entry": {
+   "type": "object",
+   "required": ["id", "name", "family", "guest_os", "providers", "source"],
+   "properties": {
+    "id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9.-]*$"},
+    "name": {"type": "string"},
+    "family": {"type": "string"},
+    "guest_os": {"enum": ["linux", "windows", "macos", "any"]},
+    "arch": {"type": "array", "items": {"enum": ["x86_64", "aarch64"]}},
+    "providers": {"type": "array", "minItems": 1, "items": {"type": "string"}, "description": "按优先级排列的提供者 ID"},
+    "default": {"type": "boolean"},
+    "disabled": {"type": "boolean"},
+    "reason": {"type": "string"},
+    "tpm": {"type": "boolean"},
+    "secure_boot": {"type": "boolean"},
+    "requires": {"type": "object"},
+    "source": {
+     "type": "object",
+     "required": ["kind"],
+     "properties": {
+      "kind": {"enum": ["rootfs", "wsl-store", "alpine", "lxc", "custom", "host", "iso", "none"]},
+      "url": {"type": ["string", "null"]},
+      "sha256": {"$ref": "#/$defs/sha256"},
+      "sha256_url": {"type": "string"},
+      "wsl_name": {"type": "string", "description": "wsl --install -d 使用的名字"},
+      "arm64": {"type": "object", "properties": {"url": {"type": "string"}, "sha256": {"$ref": "#/$defs/sha256"}}},
+      "server": {"type": "string"}, "distro": {"type": "string"}, "release": {"type": "string"}, "variant": {"type": "string"},
+      "branch": {"type": "string"},
+      "needs": {"type": "array", "items": {"enum": ["url", "iso"]}},
+      "download_page": {"type": "string"},
+      "origin": {"type": "string"}
+     }
+    }
+   }
+  }
+ }
+}

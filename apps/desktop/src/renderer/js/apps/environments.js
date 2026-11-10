@@ -47,12 +47,92 @@
               icon(e.state === 'running' ? 'player-play' : 'box'), el('span', { class: 'grow', text: e.name }), el('span', { class: `badge ${kind}`, text: label }));
           }),
           el('div', { class: 'row pad' },
+            el('button', { class: 'btn ghost sm', 'data-act': 'env-install', onclick: () => { selected = null; renderInstall(); } }, icon('apps'), '安装系统'),
             el('button', { class: 'btn ghost sm', 'data-act': 'env-images', onclick: () => { selected = null; renderImages(); } }, icon('download'), '镜像'),
             el('button', { class: 'btn ghost sm', 'data-act': 'env-import', onclick: importDialog }, icon('file-import'), '导入')));
       }
 
       function renderEmpty() {
         main.replaceChildren(el('div', { class: 'empty' }, icon('box-multiple'), el('div', { text: envs.length ? '选择左侧的环境查看详情' : '还没有环境。点“新建”从官方发行版镜像创建一个隔离环境。' })));
+      }
+
+      // ---------------------------------------------------------------- 安装系统（一键目录）
+      const GUEST = [['linux', 'Linux', 'brand-ubuntu'], ['windows', 'Windows', 'brand-windows'], ['any', '从 ISO / 自定义', 'disc'], ['macos', 'macOS', 'brand-apple']];
+      async function renderInstall() {
+        clearInterval(timer);
+        main.replaceChildren(el('div', { class: 'muted pad', text: '检查本机虚拟化能力…' }));
+        let cat; let doc;
+        try { [cat, doc] = await Promise.all([FX.k(['env', 'catalog']), FX.k(['env', 'doctor'])]); }
+        catch (e) { main.replaceChildren(el('div', { class: 'pad', text: e.message })); return; }
+        const banner = el('div', { class: 'env-doctor' });
+        Object.entries(doc.results || {}).forEach(([pid, r]) => {
+          banner.append(el('div', { class: `env-doc-row ${r.available ? 'ok' : 'warn'}`, 'data-provider': pid },
+            icon(r.available ? 'circle-check' : 'alert-triangle'), el('b', { text: pid }), el('span', { class: 'grow muted small', text: r.available ? '可用' : (r.reason || '不可用') }),
+            ...(r.actions || []).map((a) => el('button', { class: 'btn sm', 'data-fix': a.id, onclick: async () => {
+              if (a.manual) { FX.confirm('需要手动操作', a.label); return; }
+              if (!await FX.confirm('修复', `${a.label}？将弹出 Windows 管理员确认。`, { okText: '继续' })) return;
+              const res = await act(a.label, ['env', 'fix', '--provider', pid, '--action', a.id]);
+              if (res && res.reboot_required) FX.confirm('需要重启', '已完成。请重启电脑，然后回到“环境 → 安装系统”继续安装。');
+              renderInstall();
+            } }, icon('tool'), a.label.split('（')[0]))));
+        });
+        const sections = GUEST.map(([g, title, ic]) => {
+          const items = cat.entries.filter((e) => e.guest_os === g);
+          if (!items.length) return null;
+          return el('div', { class: 'env-cat-sec' }, el('h3', {}, icon(ic), ` ${title}`),
+            el('div', { class: 'env-cat-grid' }, items.map((e) => el('div', { class: `env-cat ${e.installable ? '' : 'disabled'}`, 'data-entry': e.id },
+              el('div', { class: 'row' }, el('b', { class: 'grow', text: e.name }), e.default ? el('span', { class: 'badge ok', text: '推荐' }) : null),
+              el('div', { class: 'muted small', text: e.source.origin || '' }),
+              el('div', { class: 'muted small mono', text: e.providers.join(' / ') }),
+              e.installable ? el('button', { class: 'btn primary sm', 'data-install': e.id, onclick: () => installDialog(e) }, icon('download'), '安装')
+                : el('div', { class: 'small warn-text', text: e.reason || '不可用' })))));
+        });
+        main.replaceChildren(el('h2', { text: '安装系统' }),
+          el('div', { class: 'muted small', text: `目录版本 ${cat.version} · 宿主 ${cat.host} · 每个系统都从官方来源下载并校验 sha256` }), banner, ...sections.filter(Boolean));
+      }
+
+      function installDialog(e) {
+        const base = e.id.replace(/^(wsl|lxc|hyperv)-/, '').replace(/[^a-z0-9-]+/g, '-').slice(0, 30).replace(/-+$/, '');
+        const name = el('input', { class: 'input', name: 'env-name', value: base });
+        const needs = e.source.needs || [];
+        const url = needs.includes('url') ? el('input', { class: 'input mono', name: 'env-url', placeholder: 'https://… 或 D:\\images\\rootfs.tar.gz' }) : null;
+        const sha = needs.includes('url') ? el('input', { class: 'input mono', name: 'env-sha', placeholder: 'sha256（可选，建议填写）' }) : null;
+        const iso = needs.includes('iso') ? el('input', { class: 'input mono', name: 'env-iso', placeholder: 'ISO 文件完整路径，如 D:\\iso\\Win11_Eval.iso' }) : null;
+        const mem = e.providers.includes('hyperv') || e.providers.includes('windows-sandbox') ? el('input', { class: 'input', name: 'env-mem', type: 'number', placeholder: '内存 MB（默认 4096）' }) : null;
+        const page = e.source.download_page ? el('a', { href: '#', class: 'small', onclick: (ev) => { ev.preventDefault(); window.foxos.openExternal ? window.foxos.openExternal(e.source.download_page) : FX.toast(e.source.download_page); } }, '打开微软官方下载页') : null;
+        const overlay = el('div', { class: 'overlay' });
+        const close = () => overlay.remove();
+        overlay.append(el('form', { class: 'dialog', onsubmit: async (ev) => {
+          ev.preventDefault(); const nm = name.value.trim(); if (!nm) return;
+          const args = ['env', 'install', e.id, nm];
+          if (url) { if (!url.value.trim()) return; args.push('--url', url.value.trim()); if (sha.value.trim()) args.push('--sha256', sha.value.trim()); }
+          if (iso) { if (!iso.value.trim()) return; args.push('--iso', iso.value.trim()); }
+          if (mem && mem.value) args.push('--memory-mb', mem.value);
+          close();
+          runInstall(e, nm, args);
+        } }, el('div', { class: 'dialog-title', text: `安装 ${e.name}` }), el('div', { class: 'muted small', text: '环境名（小写字母、数字、连字符）' }), name, url, sha, iso, page, mem,
+          el('div', { class: 'dialog-actions' }, el('button', { type: 'button', class: 'btn ghost', onclick: close }, '取消'), el('button', { type: 'submit', class: 'btn primary' }, '开始安装'))));
+        document.body.append(overlay); name.focus();
+      }
+
+      async function runInstall(e, nm, args) {
+        const bar = el('div', { class: 'progress' }, el('div', { class: 'progress-bar', style: 'width:2%' }));
+        const status = el('div', { class: 'muted small', 'data-install-status': nm, text: '准备…' });
+        main.replaceChildren(el('h2', { text: `正在安装 ${e.name}` }), el('div', { class: 'muted small', text: `环境名 ${nm}` }), bar, status);
+        const poll = setInterval(async () => {
+          let p; try { p = await FX.k(['env', 'progress', nm]); } catch { return; }
+          const frac = p.bytes_total ? p.bytes / p.bytes_total : 0;
+          const pct = Math.max(2, Math.round(((p.step || 0) + (p.state === 'done' ? 1 : frac)) / Math.max(1, p.total || p.steps || 1) * 100));
+          bar.firstChild.style.width = `${Math.min(100, pct)}%`;
+          status.textContent = `${p.why || ''}${p.bytes_total ? `（${fmtMB(p.bytes / 1048576)} / ${fmtMB(p.bytes_total / 1048576)}）` : ''}`;
+        }, 1000);
+        try {
+          await FX.k(args, { timeoutMs: 4 * 3600 * 1000 });
+          FX.toast(`${e.name} 安装完成`, 'ok'); selected = nm; await refresh();
+        } catch (err) {
+          status.textContent = `安装失败：${err.message}${err.hint ? `（${err.hint}）` : ''}`;
+          main.append(el('button', { class: 'btn sm', onclick: renderInstall }, icon('arrow-left'), '返回目录'));
+        } finally { clearInterval(poll); }
       }
 
       async function renderImages() {

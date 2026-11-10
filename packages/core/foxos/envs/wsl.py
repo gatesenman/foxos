@@ -71,13 +71,45 @@ def _run(cmd: list[str], **kw):
     try:
         return subprocess.run(cmd, capture_output=True, **kw)
     except FileNotFoundError as e:
-        raise FoxError("DEPENDENCY_MISSING", "没有找到 wsl.exe：请启用“适用于 Linux 的 Windows 子系统”", hint="管理员 PowerShell 运行 wsl --install") from e
+        raise FoxError("DEPENDENCY_MISSING", "没有找到 wsl.exe：请启用“适用于 Linux 的 Windows 子系统”", hint="环境 → 安装系统 → 启用 WSL，或管理员 PowerShell 运行 wsl --install --no-distribution") from e
 
 
-def state(name: str) -> str:
+def _text(raw: bytes) -> str:
+    from .providers import decode_wsl
+    return decode_wsl(raw or b"")
+
+
+def dname(cfg: dict) -> str:
+    """环境对应的 WSL 发行版名：通过 --import 安装的为 foxos-<名>；应用商店发行版用其自身名字。"""
+    return cfg.get("wsl_distro") or distro(cfg["name"])
+
+
+def list_verbose() -> dict[str, dict]:
     r = _run(["wsl.exe", "--list", "--verbose"])
-    info = parse_list_verbose(r.stdout.decode("utf-16-le", "replace"))
-    return info.get(distro(name), {}).get("state", "missing")
+    return parse_list_verbose(_text(r.stdout))
+
+
+def state(cfg_or_name) -> str:
+    d = dname(cfg_or_name) if isinstance(cfg_or_name, dict) else distro(cfg_or_name)
+    return list_verbose().get(d, {}).get("state", "missing")
+
+
+def cmd_exec_d(d: str, argv: list[str], cwd: str | None = None) -> list[str]:
+    c = ["wsl.exe", "-d", d]
+    if cwd:
+        c += ["--cd", cwd]
+    return [*c, "--exec", *argv]
+
+
+def map_cwd(cwd: str, cfg: dict) -> str:
+    """/workspace 映射到工作空间在 WSL 里的 /mnt/<盘符>/… 路径。"""
+    ws = (cfg.get("workspace") or {}).get("path")
+    if ws and (cwd == "/workspace" or cwd.startswith("/workspace/")):
+        try:
+            return win_to_wsl_path(ws) + cwd[len("/workspace"):]
+        except FoxError:
+            return cwd
+    return cwd
 
 
 def create(name, image, workspace, home):
@@ -90,21 +122,36 @@ def create(name, image, workspace, home):
     inst.mkdir(parents=True, exist_ok=True)
     r = _run(cmd_import(name, str(inst / "disk"), str(tar)))
     if r.returncode:
-        raise FoxError("ERROR", r.stderr.decode("utf-16-le", "replace") or "wsl --import 失败")
-    return {"message": f"已创建 WSL2 环境 {distro(name)}", "workspace_in_env": win_to_wsl_path(str(workspace))}
+        raise FoxError("ERROR", _text(r.stdout + r.stderr).strip() or "wsl --import 失败")
+    return {"message": f"已创建 WSL2 环境 {distro(name)}", "workspace_in_env": win_to_wsl_path(str(workspace)), "image": m["id"]}
 
 
-def start(name):
-    r = _run(cmd_exec(name, ["/bin/true"]))
+def start(cfg):
+    r = _run(cmd_exec_d(dname(cfg), ["/bin/sh", "-c", "true"]))
     if r.returncode:
-        raise FoxError("ERROR", "WSL 启动失败")
-    return {"message": f"已启动 {distro(name)}"}
+        raise FoxError("ERROR", "WSL 启动失败：" + _text(r.stdout + r.stderr).strip()[-500:])
+    return {"message": f"已启动 {dname(cfg)}"}
 
 
-def stop(name):
-    _run(cmd_terminate(name))
-    return {"message": f"已停止 {distro(name)}"}
+def stop(cfg):
+    _run(["wsl.exe", "--terminate", dname(cfg)])
+    return {"message": f"已停止 {dname(cfg)}"}
 
 
-def exec_(name, argv, cwd):
-    return _run(cmd_exec(name, argv, cwd))
+def exec_(cfg, argv, cwd, capture=True, timeout=None):
+    cmd = cmd_exec_d(dname(cfg), argv, map_cwd(cwd, cfg))
+    if not capture:
+        return subprocess.call(cmd)
+    return _run(cmd, timeout=timeout)
+
+
+def export(cfg, out: str):
+    r = _run(["wsl.exe", "--export", dname(cfg), out])
+    if r.returncode:
+        raise FoxError("ERROR", _text(r.stdout + r.stderr).strip()[-500:] or "wsl --export 失败")
+
+
+def unregister(cfg):
+    r = _run(["wsl.exe", "--unregister", dname(cfg)])
+    if r.returncode and "not found" not in _text(r.stdout + r.stderr).lower():
+        raise FoxError("ERROR", _text(r.stdout + r.stderr).strip()[-500:] or "wsl --unregister 失败")

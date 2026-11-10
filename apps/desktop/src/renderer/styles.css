@@ -256,3 +256,17 @@ body.paused .desktop { box-shadow: inset 0 0 0 2px var(--warn); }
 .start-ev-apps { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
 .start-ev-app { background: rgba(255,255,255,.05); border: 0; color: inherit; border-radius: 6px; padding: 4px 8px; cursor: pointer; font-size: 12px; }
 .start-ev-app:hover { background: rgba(255,138,61,.2); }
+
+/* 环境 → 安装系统 */
+.envs .env-doctor { display: flex; flex-direction: column; gap: 4px; margin: 10px 0; }
+.envs .env-doc-row { display: flex; align-items: center; gap: 8px; padding: 6px 10px; border-radius: 8px; background: rgba(255,255,255,.04); }
+.envs .env-doc-row.ok .ti { color: #3ecf8e; }
+.envs .env-doc-row.warn .ti { color: #f5a524; }
+.envs .env-cat-sec h3 { margin: 14px 0 6px; display: flex; align-items: center; gap: 6px; }
+.envs .env-cat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 8px; }
+.envs .env-cat { display: flex; flex-direction: column; gap: 4px; padding: 10px; border: 1px solid var(--line, #232838); border-radius: 10px; }
+.envs .env-cat.disabled { opacity: .55; }
+.envs .env-cat .btn { align-self: flex-start; margin-top: 4px; }
+.envs .warn-text { color: #f5a524; }
+.envs .progress { height: 8px; border-radius: 4px; background: rgba(255,255,255,.08); overflow: hidden; margin: 12px 0 6px; }
+.envs .progress-bar { height: 100%; background: #ff8a3d; transition: width .4s; }

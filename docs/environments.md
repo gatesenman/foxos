@@ -75,6 +75,35 @@
 - **镜像里的设备文件**：解包时跳过 `./dev/*`，不保留属主（`--no-same-owner`）
 - **在环境里执行 `reboot`**：seccomp 拒绝 reboot 系统调用；busybox 的 `reboot` 会改为向 1 号进程发 SIGTERM，效果是环境停止
 
+## 隔离级别与平台选择（决策记录）
+
+研究过程与许可证核对见 [virtualization-references.md](virtualization-references.md)。决定：
+
+| 档位 | 含义 | Linux | Windows | macOS |
+| --- | --- | --- | --- | --- |
+| **轻量**（进程级沙箱） | 启动快、与宿主共享系统与已装工具；限制文件写入范围、网络与危险系统调用 | 用户命名空间 + 只读宿主根 + Landlock 文件规则 + seccomp | 受限令牌 + Job Object（后续 AppContainer） | Seatbelt（sandbox-exec，按会话生成策略） |
+| **完整**（独立系统） | 独立根文件系统 / 虚拟机，可随意装软件、快照、导出 | `linux-ns` 提供者（本文前面各节） | `wsl2`（Linux 发行版）、`windows-sandbox`、`hyperv` | `macos-vz`（Virtualization.framework Linux 虚拟机） |
+
+- 每个智能体会话在面板“运行位置”里选：宿主、某个完整环境，或（计划中）轻量沙箱。
+- 不依赖 Docker / Podman / LXC / VirtualBox / QEMU；只用操作系统自带机制。GPL / LGPL / AGPL 项目只借鉴思路，不复制代码。
+- **状态**：完整档的 Linux 后端已实现并端到端测试；Windows 三个提供者有代码与单元测试，未在 Windows 硬件上验证；
+  轻量档尚未实现（Linux 的 Landlock + seccomp、macOS 的 Seatbelt 策略生成、Windows 受限令牌都在待办中）。
+
+## 一键安装系统（Windows 重点）
+
+“环境”应用左下角 **安装系统**，或 `foxos env catalog` / `foxos env install`。详见 [environment-provider-protocol.md](environment-provider-protocol.md)。
+
+- **Linux 发行版（WSL2）**：Ubuntu 20.04 / 22.04 / 24.04 / 26.04、Debian、Kali、openSUSE Leap / Tumbleweed、SUSE Linux Enterprise、Fedora、AlmaLinux、
+  Rocky Linux（官方 WSL 镜像与 CIQ 版）、Oracle Linux（应用商店包，或 LXC 构建）、Arch、Alpine、eLxr、Azure Linux，以及 LXC 镜像服务器的每日构建和自定义 URL / 本地 tar。
+  默认安装方式：下载官方根文件系统 → 校验 sha256 → `wsl.exe --import foxos-<名> <目录> <文件> --version 2`；只有应用商店包的发行版用 `wsl.exe --install -d <名> --no-launch`。
+  LXC 构建是 .tar.xz，导入前自动转成 .tar.gz。
+- **WSL 未启用时**：`doctor` 检测（解析 `wsl.exe --status`，兼容 UTF-16 输出与中英文消息），一键“启用 WSL”执行
+  `wsl.exe --install --no-distribution`（UAC 确认），需要重启时明确提示；BIOS 未开启虚拟化时给出手动步骤。
+- **Windows 来宾**：Windows Sandbox（生成 .wsb，把工作空间映射到沙箱桌面，可设网络 / 内存 / 只读）；Hyper-V 虚拟机（用户 ISO，或从微软评估中心下载的
+  Windows 11 企业版 / Windows Server 2025 评估版 ISO；`New-VM` 第 2 代、vTPM、DVD 引导、`vmconnect`）。两者都检测 Windows 版本（家庭版不支持）与可选功能，可一键启用。
+- **macOS 来宾**：列出但禁用，说明原因（Apple 许可只允许在 Apple 硬件上的 macOS 中虚拟化 macOS）。
+- 在 Linux 宿主上，同一目录中的 Linux 条目由 `linux-ns` 提供者安装（端到端测试 US-50 真实安装 Alpine）。
+
 ## 在环境里运行智能体
 
 桌面右侧面板的“运行位置”可以选一个运行中的环境（Linux 后端）。启动后：

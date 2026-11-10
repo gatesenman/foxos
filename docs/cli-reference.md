@@ -636,6 +636,143 @@ foxos env action run NAME ACTION
 foxos env action run dev test --json
 ```
 
+### `foxos env providers`
+
+列出环境提供者（内置与第三方）及其能力、可用性
+
+```text
+foxos env providers
+```
+
+工具接口名：`env_providers` · 权限：`read`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| — | | | | 无参数 |
+
+示例：
+
+```bash
+foxos env providers --json
+```
+
+### `foxos env doctor`
+
+检查本机虚拟化能力（WSL、Windows Sandbox、Hyper-V、用户命名空间…）并给出修复操作
+
+```text
+foxos env doctor [--provider PROVIDER]
+```
+
+工具接口名：`env_doctor` · 权限：`read`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `provider` | `--provider` | string |  | 只检查某个提供者 |
+
+示例：
+
+```bash
+foxos env doctor --json
+foxos env doctor --provider wsl2
+```
+
+### `foxos env fix`
+
+执行 doctor 给出的修复操作（启用 WSL 等，需要管理员确认，可能需要重启）
+
+```text
+foxos env fix --provider PROVIDER --action ACTION
+```
+
+工具接口名：`env_fix` · 权限：`run`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `provider` | `--provider` | string | 是 | 提供者 |
+| `action` | `--action` | string | 是 | 修复操作 ID（见 doctor 输出） |
+
+示例：
+
+```bash
+foxos env fix --provider wsl2 --action enable-wsl
+```
+
+### `foxos env catalog`
+
+可一键安装的系统目录（WSL 发行版、LXC/官方根文件系统、Windows Sandbox、Hyper-V、macOS）
+
+```text
+foxos env catalog [--guest {linux,windows,macos,any}] [--provider PROVIDER] [--available]
+```
+
+工具接口名：`env_catalog` · 权限：`read`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `guest` | `--guest` | string |  | 来宾系统；可选：linux / windows / macos / any |
+| `provider` | `--provider` | string |  | 只看某个提供者 |
+| `available` | `--available` | boolean |  | 只显示本机可安装的 |
+
+示例：
+
+```bash
+foxos env catalog --json
+foxos env catalog --guest windows
+```
+
+### `foxos env install`
+
+从目录一键安装一个系统为新环境（下载、校验 sha256、导入）
+
+```text
+foxos env install ENTRY NAME [--provider PROVIDER] [--url URL] [--sha256 SHA256] [--iso ISO] [--location LOCATION] [--memory-mb MEMORY_MB] [--cpus CPUS] [--disk-gb DISK_GB] [--dry-run]
+```
+
+工具接口名：`env_install` · 权限：`create`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `entry` | `ENTRY` | string | 是 | 目录条目 ID（foxos env catalog） |
+| `name` | `NAME` | string | 是 | 环境名 |
+| `provider` | `--provider` | string |  | 指定提供者 |
+| `url` | `--url` | string |  | 自定义根文件系统地址（custom-rootfs） |
+| `sha256` | `--sha256` | string |  | 自定义来源的 sha256 |
+| `iso` | `--iso` | string |  | 安装介质 ISO 路径（Hyper-V） |
+| `location` | `--location` | string |  | 安装位置（Windows 目录） |
+| `memory_mb` | `--memory-mb` | integer |  | 内存 MB（Hyper-V / Sandbox） |
+| `cpus` | `--cpus` | integer |  | CPU 数（Hyper-V） |
+| `disk_gb` | `--disk-gb` | integer |  | 磁盘 GB（Hyper-V） |
+| `dry_run` | `--dry-run` | boolean |  | 只输出安装计划，不执行 |
+
+示例：
+
+```bash
+foxos env install wsl-ubuntu-24.04 ubuntu
+foxos env install alpine tiny --dry-run --json
+foxos env install hyperv-windows-11-eval win11 --iso D:\iso\win11.iso
+```
+
+### `foxos env progress`
+
+查看安装进度
+
+```text
+foxos env progress NAME
+```
+
+工具接口名：`env_progress` · 权限：`read`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `name` | `NAME` | string | 是 | 环境名 |
+
+示例：
+
+```bash
+foxos env progress ubuntu --json
+```
+
 ## everything — Everything 应用
 
 上游 HeyPuter/everything 的 51 个应用：从上游源码在本机构建安装，在狐狸OS 中本地运行（不连接 puter.com）。

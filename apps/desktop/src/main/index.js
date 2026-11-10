@@ -87,7 +87,8 @@ const handle = (ch, fn) => ipcMain.handle(ch, async (_e, ...a) => {
   try { return { ok: true, value: await fn(...a) }; } catch (err) { return { ok: false, error: String(err && err.message || err) }; }
 });
 
-ipcMain.handle('foxos:run', (_e, args, opts = {}) => kernel.run(args, { json: opts.json !== false, stdin: opts.stdin ?? null }));
+ipcMain.handle('foxos:openExternal', (_e, url) => (/^https:\/\//.test(String(url)) ? shell.openExternal(String(url)).then(() => true) : false));
+ipcMain.handle('foxos:run', (_e, args, opts = {}) => kernel.run(args, { json: opts.json !== false, stdin: opts.stdin ?? null, ...(opts.timeoutMs ? { timeoutMs: Math.min(+opts.timeoutMs || 0, 4 * 3600 * 1000) } : {}) }));
 
 handle('env', () => ({
   workspace: kernel.getWorkspace(),

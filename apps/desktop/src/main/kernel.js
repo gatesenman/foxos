@@ -15,10 +15,19 @@ function setWorkspace(ws) {
 }
 function getWorkspace() { return workspace; }
 
+// Windows 安装包自带的 Python（resources/python，embeddable 版 + 办公库，内核通过 ._pth 加入搜索路径）
+function bundledPython() {
+  if (!IS_WIN || !app.isPackaged) return null;
+  const p = path.join(process.resourcesPath, 'python', 'python.exe');
+  return fs.existsSync(p) ? p : null;
+}
+
 function pythonPath() {
   if (process.env.FOXOS_PYTHON) return process.env.FOXOS_PYTHON;
   const s = settings.load();
   if (s.python && fs.existsSync(s.python)) return s.python;
+  const b = bundledPython();
+  if (b) return b;
   if (!app.isPackaged) {
     const venv = IS_WIN ? path.join(REPO_ROOT, '.venv', 'Scripts', 'python.exe') : path.join(REPO_ROOT, '.venv', 'bin', 'python');
     if (fs.existsSync(venv)) return venv;
@@ -31,6 +40,7 @@ function coreEnv(extra = {}) {
     ...process.env,
     PYTHONPATH: [corePath(), process.env.PYTHONPATH].filter(Boolean).join(path.delimiter),
     PYTHONIOENCODING: 'utf-8',
+    PYTHONUTF8: '1',
     ...extra,
   };
 }
@@ -41,7 +51,7 @@ function ensureShim() {
   fs.mkdirSync(dir, { recursive: true });
   const py = pythonPath();
   if (IS_WIN) {
-    fs.writeFileSync(path.join(dir, 'foxos.cmd'), `@echo off\r\nset "PYTHONPATH=${corePath()};%PYTHONPATH%"\r\n"${py}" -m foxos %*\r\n`);
+    fs.writeFileSync(path.join(dir, 'foxos.cmd'), `@echo off\r\nset "PYTHONPATH=${corePath()};%PYTHONPATH%"\r\nset PYTHONUTF8=1\r\n"${py}" -m foxos %*\r\n`);
   } else {
     const p = path.join(dir, 'foxos');
     fs.writeFileSync(p, `#!/bin/sh\nPYTHONPATH="${corePath()}\${PYTHONPATH:+:$PYTHONPATH}" exec "${py}" -m foxos "$@"\n`);
@@ -77,4 +87,4 @@ function run(args, { json = true, stdin = null, agent = 'human:desktop', timeout
   });
 }
 
-module.exports = { run, setWorkspace, getWorkspace, pythonPath, coreEnv, ensureShim };
+module.exports = { run, setWorkspace, getWorkspace, pythonPath, bundledPython, coreEnv, ensureShim };
