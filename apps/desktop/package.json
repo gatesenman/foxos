@@ -1,14 +1,12 @@
 {
   "name": "foxos-desktop",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "private": true,
-  "description": "狐狸OS（FoxOS）桌面外壳 · 阶段 0 原型",
-  "main": "src/main.js",
+  "description": "狐狸OS（FoxOS）桌面",
+  "main": "src/main/index.js",
   "author": "gaosichun",
   "scripts": {
     "start": "electron .",
-    "start:demo": "electron . --workspace=../../demo-workspace",
-    "screenshot": "electron . --workspace=../../demo-workspace --screenshot=../../docs/screenshots/desktop.png",
     "dist:linux": "electron-builder --linux dir",
     "dist:linux:appimage": "electron-builder --linux AppImage",
     "dist:win": "electron-builder --win nsis",
@@ -16,7 +14,8 @@
   },
   "devDependencies": {
     "electron": "^45.2.3",
-    "electron-builder": "^26.18.0"
+    "electron-builder": "^26.18.0",
+    "playwright": "^1.65.0"
   },
   "homepage": "https://github.com/gatesenman/foxos",
   "build": {
@@ -81,5 +80,12 @@
       "icon": "../../assets/icon.png",
       "category": "public.app-category.productivity"
     }
+  },
+  "dependencies": {
+    "@lydell/node-pty": "^1.2.0-beta.18",
+    "@tabler/icons-webfont": "^3.51.0",
+    "@xterm/addon-fit": "^0.11.0",
+    "@xterm/xterm": "^6.0.0",
+    "monaco-editor": "^0.57.0"
   }
 }

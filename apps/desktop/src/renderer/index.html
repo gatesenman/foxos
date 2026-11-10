@@ -2,62 +2,64 @@
 <html lang="zh-CN">
 <head>
   <meta charset="utf-8">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; style-src 'self'; script-src 'self'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data: file: https:; worker-src 'self' blob: file:; connect-src 'self'">
   <title>狐狸OS</title>
+  <link rel="stylesheet" href="../../node_modules/@tabler/icons-webfont/dist/tabler-icons.min.css">
+  <link rel="stylesheet" href="../../node_modules/@xterm/xterm/css/xterm.css">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <header class="topbar">
-    <div class="brand"><img src="icon-64.png" alt=""><span>狐狸OS</span><small>FoxOS · 阶段 0</small></div>
-    <input id="search" class="search" type="search" placeholder="搜索文件与命令…">
-    <div class="top-actions">
-      <span id="ws-path" class="ws-path" title="工作空间"></span>
-      <button class="icon-btn" title="通知">🔔</button>
-      <button class="icon-btn" title="设置">⚙</button>
-    </div>
+    <div class="brand"><img src="icon-64.png" alt=""><span>狐狸OS</span></div>
+    <button id="ws-chip" class="chip" title="工作空间"><i class="ti ti-folder"></i><span id="ws-path"></span></button>
+    <div class="spacer"></div>
+    <div class="palette"><i class="ti ti-search"></i><input id="palette" type="search" placeholder="搜索应用与文件"></div>
+    <div class="spacer"></div>
+    <button id="takeover" class="btn ghost" title="暂停所有智能体的写操作"><i class="ti ti-hand-stop"></i><span>人工接管</span></button>
+    <button id="open-settings" class="icon-btn" title="设置"><i class="ti ti-settings"></i></button>
+    <button id="toggle-panel" class="icon-btn" title="智能体面板"><i class="ti ti-layout-sidebar-right"></i></button>
   </header>
 
-  <nav class="sidebar" id="nav">
-    <div class="nav-title">导航</div>
-    <button data-open="apps" class="nav-item">🧩 应用中心</button>
-    <button data-open="tasks" class="nav-item">📋 任务中心</button>
-    <button data-open="agents" class="nav-item">🤖 智能体中心</button>
-    <button data-open="files" class="nav-item">📁 文件中心</button>
-    <button data-open="terminal" class="nav-item">⌨ 命令终端</button>
-    <button data-open="activity" class="nav-item">🕘 活动记录</button>
-    <div class="nav-title">接管</div>
-    <button id="takeover" class="nav-item takeover">✋ 人工接管</button>
-    <div class="nav-foot" id="versions"></div>
-  </nav>
-
-  <main class="desktop" id="desktop">
-    <div class="desktop-icons" id="desktop-icons"></div>
-  </main>
-
-  <aside class="rightpanel">
-    <section>
-      <h3>智能体团队</h3>
-      <ul id="agents" class="agents"></ul>
-    </section>
-    <section class="grow">
-      <h3>操作记录 <small id="audit-count"></small></h3>
-      <ul id="activity" class="activity"></ul>
-    </section>
-  </aside>
+  <div class="workarea">
+    <main id="desktop" class="desktop">
+      <div id="desktop-icons" class="desktop-icons"></div>
+      <div id="palette-results" class="palette-results hidden"></div>
+    </main>
+    <aside id="panel" class="panel">
+      <div class="panel-tabs">
+        <button data-tab="session" class="active"><i class="ti ti-messages"></i>会话</button>
+        <button data-tab="activity"><i class="ti ti-history"></i>活动</button>
+      </div>
+      <section id="tab-session" class="tab active"></section>
+      <section id="tab-activity" class="tab"></section>
+    </aside>
+  </div>
 
   <footer class="taskbar">
-    <form id="task-form">
-      <input id="task-input" autocomplete="off" placeholder="输入任务：根据销售数据制作一份分析报告……  或直接输入命令：foxos sheets read sales.xlsx">
-      <button type="submit">开始</button>
-    </form>
-  </footer>
-
-  <template id="window-tpl">
-    <div class="window">
-      <div class="win-title"><span class="win-name"></span><span class="win-buttons"><button class="win-close" title="关闭">✕</button></span></div>
-      <div class="win-body"></div>
+    <button id="start" class="start" title="开始"><img src="icon-64.png" alt=""><span>开始</span></button>
+    <div id="task-items" class="task-items"></div>
+    <div class="tray">
+      <span id="tray-agents" class="tray-item" title="正在运行的智能体会话"><i class="ti ti-robot"></i><b>0</b></span>
+      <span id="tray-paused" class="tray-item hidden" title="人工接管中"><i class="ti ti-hand-stop"></i></span>
+      <span id="clock" class="clock"></span>
     </div>
-  </template>
-  <script src="renderer.js"></script>
+  </footer>
+  <div id="start-menu" class="start-menu hidden"></div>
+  <div id="modal-root"></div>
+
+  <script src="../../node_modules/@xterm/xterm/lib/xterm.js"></script>
+  <script src="../../node_modules/@xterm/addon-fit/lib/addon-fit.js"></script>
+  <script src="js/util.js"></script>
+  <script src="js/wm.js"></script>
+  <script src="js/apps/terminal.js"></script>
+  <script src="js/apps/files.js"></script>
+  <script src="js/apps/editor.js"></script>
+  <script src="js/apps/browser.js"></script>
+  <script src="js/apps/office.js"></script>
+  <script src="js/apps/appcenter.js"></script>
+  <script src="js/apps/setup.js"></script>
+  <script src="js/apps/settings.js"></script>
+  <script src="js/panel.js"></script>
+  <script src="js/boot.js"></script>
 </body>
 </html>
