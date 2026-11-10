@@ -22,6 +22,7 @@
     { id: 'writer', name: 'Writer', icon: 'file-text', office: true, run: () => FX.launchOffice('writer') },
     { id: 'calc', name: 'Calc', icon: 'file-spreadsheet', office: true, run: () => FX.launchOffice('calc') },
     { id: 'impress', name: 'Impress', icon: 'presentation', office: true, run: () => FX.launchOffice('impress') },
+    { id: 'environments', name: '环境', icon: 'box-multiple', run: () => FX.openWindow('environments', {}) },
     { id: 'appcenter', name: '应用中心', icon: 'apps', run: () => FX.openWindow('appcenter', {}) },
     { id: 'settings', name: '设置', icon: 'settings', run: () => FX.openWindow('settings', {}) },
   ];

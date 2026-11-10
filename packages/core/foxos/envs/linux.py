@@ -191,10 +191,45 @@ def setup_root(env_dir: Path, cfg: dict) -> Path:
 CONTAINER_ENV = {"PATH": "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin", "HOME": "/root", "TERM": "xterm-256color", "LANG": "C.UTF-8", "FOXOS_ENV": "1"}
 
 
+def cgroup_setup(name: str, limits: dict) -> str:
+    """尝试为环境建立 cgroup v2 子组（需要当前 cgroup 已委派给本用户）。返回状态说明。
+
+    成功时把监督进程移入子组，之后环境内所有进程都在其中，限制按整个环境计算。
+    失败（例如 cgroup 目录属于 root）时返回原因，调用方回退到 rlimit。
+    """
+    try:
+        line = next(l for l in Path("/proc/self/cgroup").read_text().splitlines() if l.startswith("0::"))
+    except (OSError, StopIteration):
+        return "unavailable: 不是 cgroup v2"
+    base = Path("/sys/fs/cgroup") / line[3:].lstrip("/")
+    if not os.access(base, os.W_OK):
+        return f"unavailable: {base} 不可写（cgroup 未委派给当前用户）"
+    want = [c for c, k in (("memory", "memory_mb"), ("pids", "pids"), ("cpu", "cpus")) if limits.get(k)]
+    try:
+        avail = (base / "cgroup.controllers").read_text().split()
+        sub = (base / "cgroup.subtree_control").read_text().split()
+        for c in want:
+            if c in avail and c not in sub:
+                (base / "cgroup.subtree_control").write_text(f"+{c}")
+        cg = base / f"foxos-{name}"
+        cg.mkdir(exist_ok=True)
+        if limits.get("memory_mb") and (cg / "memory.max").exists():
+            (cg / "memory.max").write_text(str(int(limits["memory_mb"]) * 1024 * 1024))
+        if limits.get("pids") and (cg / "pids.max").exists():
+            (cg / "pids.max").write_text(str(int(limits["pids"])))
+        if limits.get("cpus") and (cg / "cpu.max").exists():
+            (cg / "cpu.max").write_text(f"{int(float(limits['cpus']) * 100000)} 100000")
+        (cg / "cgroup.procs").write_text(str(os.getpid()))
+        return f"on: {cg}"
+    except OSError as e:
+        return f"unavailable: {e}"
+
+
 def supervise(env_dir: Path) -> int:
     cfg = load(env_dir)
     run = env_dir / "run"
     run.mkdir(exist_ok=True)
+    (run / "cgroup").write_text(cgroup_setup(cfg["name"], cfg.get("limits") or {}))
     uid, gid = os.getuid(), os.getgid()  # 必须在 unshare 之前读取
     os.unshare(os.CLONE_NEWUSER)
     write_maps(uid, gid)

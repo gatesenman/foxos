@@ -193,7 +193,13 @@ def env_list(ctx: Context) -> dict:
 
 def env_info(ctx: Context, name: str) -> dict:
     cfg = _cfg(name)
-    return {**_summary(cfg), "stats": _stats(name) if IS_LINUX else None, "path": str(env_dir(name)), "snapshots_detail": cfg.get("snapshots", [])}
+    cg = env_dir(name) / "run" / "cgroup"
+    cgs = cg.read_text() if cg.exists() else "未启动过"
+    note = ("cgroup v2 已启用，限制按整个环境计算" if cgs.startswith("on")
+            else f"cgroup v2 不可用（{cgs}）；内存（RLIMIT_AS，每进程）与进程数（RLIMIT_NPROC，按用户）以 rlimit 生效，CPU 上限不生效")
+    return {**_summary(cfg), "stats": _stats(name) if IS_LINUX else None, "path": str(env_dir(name)),
+            "snapshots_detail": cfg.get("snapshots", []), "actions_detail": [{"name": k, "command": v} for k, v in (cfg.get("actions") or {}).items()],
+            "cgroup": cgs, "limits_note": note}
 
 
 def env_start(ctx: Context, name: str) -> dict:
