@@ -32,11 +32,19 @@ def test_app_help_text(fox):
 
 
 def test_examples_parse(fox):
-    """能力目录里的每个示例都能被 CLI 解析（--help 方式不执行）。"""
+    """能力目录里的每个示例都能被 CLI 真实解析成对应命令（只解析，不执行）。"""
+    import shlex
+
+    from foxos.cli import build_parser
+
     load_apps()
+    parser = build_parser()
     for c in REGISTRY.values():
         for ex in c.examples:
-            assert ex.startswith(c.cli), ex
+            line = ex.split("|")[-1].strip()
+            assert line.startswith(c.cli), ex
+            ns = parser.parse_args(shlex.split(line)[1:])
+            assert ns._cmd == c.id, ex
 
 
 def test_tools_export(fox):

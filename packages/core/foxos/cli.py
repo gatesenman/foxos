@@ -38,6 +38,13 @@ def coerce_cell_value(raw: str):
     return raw
 
 
+def _json_arg(raw: str):
+    try:
+        return json.loads(raw)
+    except json.JSONDecodeError as e:
+        raise FoxError("USAGE", f"不是合法 JSON：{e}") from e
+
+
 def parse_kv(items: list[str]) -> dict:
     out = {}
     for it in items or []:
@@ -86,7 +93,9 @@ def _add_command(sub, cmd, parents):
                 p.add_argument(f"--{prm.name.replace('_', '-')}-json", dest=f"{DEST}{prm.name}__json", metavar="JSON",
                                help=f"以 JSON 对象传入 {prm.name}")
                 continue
-            if not prm.required:
+            if prm.type == "array":
+                kw["nargs"] = "*" if not prm.required else "+"
+            elif not prm.required:
                 kw["nargs"] = "?"
             p.add_argument(DEST + prm.name, metavar=prm.metavar or prm.name.upper(), **kw)
             continue
@@ -94,7 +103,16 @@ def _add_command(sub, cmd, parents):
         kw["dest"] = DEST + prm.name
         if prm.type == "boolean":
             p.add_argument(*flags, action="store_true", default=None, **kw)
+        elif prm.type == "array" and (prm.items or {}).get("type") in ("array", "object"):
+            p.add_argument(f"--{prm.name.replace('_', '-')}-json", dest=DEST + prm.name, metavar="JSON",
+                           type=_json_arg, help=prm.description)
+        elif prm.type == "array" and prm.cli_repeat:
+            kw["metavar"] = prm.metavar or prm.name.upper()
+            p.add_argument(*flags, action="append", **kw)
         else:
+            if prm.cli_stdin:
+                p.add_argument(f"--{prm.name.replace('_', '-')}-stdin", dest=f"{DEST}{prm.name}__stdin",
+                               action="store_true", help=f"从标准输入读取 {prm.name}")
             if prm.type == "integer":
                 kw["type"] = int
             elif prm.type == "number":
@@ -181,10 +199,17 @@ def print_human(cmd_id: str, result: dict) -> None:
         for c in result["charts"]:
             print(f"chart[{c['index']}] {c.get('sheet', '')} {c['type']} @ {c['anchor']} 「{c.get('title') or ''}」 "
                   + ", ".join(s["values"] or "" for s in c["series"]), file=out)
-    if "files" in result and isinstance(result["files"], list):
-        for f in result["files"]:
-            print(f"{f['bytes']:>10}  {f['path']}", file=out)
-    if "entries" in result:
+    if cmd_id == "files.list":
+        for f in result["entries"]:
+            print(f"{'<DIR>' if f['type'] == 'dir' else f['bytes']:>10}  {f['path']}{'/' if f['type'] == 'dir' else ''}", file=out)
+    if cmd_id == "files.read":
+        sys.stdout.write(result["content"])
+    if cmd_id == "files.trash":
+        for t in result["items"]:
+            print(f"{t['trash_id']}  {t['path']}  ({t['deleted_by']})", file=out)
+    if cmd_id in ("docs.read", "slides.read"):
+        print(json.dumps({k: v for k, v in result.items() if k != "file"}, ensure_ascii=False, indent=2), file=out)
+    if cmd_id == "audit.tail":
         for e in result["entries"]:
             tgt = ",".join(t["path"] for t in e.get("targets") or [])
             err = f" {e['error']['code']}" if e.get("error") else ""
@@ -192,8 +217,10 @@ def print_human(cmd_id: str, result: dict) -> None:
     if "tasks" in result and isinstance(result["tasks"], list):
         for t in result["tasks"]:
             print(f"{t['id']}  {t['status']:<8} {t['goal']}", file=out)
-    skip = {"message", "rows", "values", "charts", "files", "entries", "tasks", "note"}
-    if cmd_id.startswith(("workspace", "sheets.create", "sheets.write", "sheets.chart.create", "sheets.export")):
+    skip = {"message", "rows", "values", "charts", "files", "entries", "tasks", "note", "content"}
+    if cmd_id.startswith(("workspace", "sheets.create", "sheets.write", "sheets.chart.create", "sheets.export",
+                          "docs.create", "docs.append", "docs.replace", "docs.export", "slides.create", "slides.add",
+                          "slides.replace", "slides.export", "slides.chart", "files.write", "files.delete", "files.rename")):
         for k, v in result.items():
             if k in skip or v in (None, [], {}):
                 continue
@@ -271,10 +298,17 @@ def main(argv: list[str] | None = None) -> int:
                     params[p.name] = merged
                 continue
             v = getattr(ns, DEST + p.name, None)
-            if v is None:
+            if p.cli_stdin and getattr(ns, f"{DEST}{p.name}__stdin", False):
+                v = sys.stdin.buffer.read().decode("utf-8")
+            if v is None or (p.positional and p.type == "array" and v == []):
                 continue
             if p.type == "array" and isinstance(v, str):
                 v = [s.strip() for s in v.split(",") if s.strip()]
+            if p.type == "array" and p.items and p.items.get("type") in ("number", "integer"):
+                try:
+                    v = [float(x) if p.items["type"] == "number" else int(x) for x in v]
+                except ValueError as e:
+                    raise FoxError("USAGE", f"参数 {p.name} 的元素必须是数字：{e}") from e
             params[p.name] = v
         ctx = Context(ws, agent=agent, task=task, lock_wait=ns.lock_wait, interface="cli")
         result = invoke(cmd.id, params, ctx)

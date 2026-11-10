@@ -26,6 +26,134 @@
 - **audit**：每次调用（含失败与拒绝）都追加到 <workspace>/.foxos/audit.jsonl；只读自省命令 audit tail、control status 成功时不记录
 - **tool_names**：工具接口名 = 命令 ID 把 . 换成 _，如 sheets.chart.create → sheets_chart_create
 
+## docs — 文档：读写标准 .docx（段落、标题、列表、表格），替换文本与导出
+
+基于 python-docx 读写 Word 2007+ (.docx)。样式名使用 Word 内置英文样式名，如 Heading 1、List Bullet。
+
+限制：
+
+- 只读写 .docx；.doc / .odt 输入暂不支持
+- 图片、页眉页脚、批注暂不可编辑
+- 替换在段落内进行，跨段落的文本不会匹配
+
+### `foxos docs create`
+
+新建一个 .docx 文档
+
+```text
+foxos docs create FILE [--title TITLE] [--force]
+```
+
+工具接口名：`docs_create` · 权限：`create`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `file` | `FILE` | string | 是 | 文档路径（.docx）；工作空间路径（write） |
+| `title` | `--title` | string |  | 文档标题（写成 Title 样式的第一段，并写入文档属性） |
+| `force` | `--force / -f` | boolean |  | 已存在时覆盖 |
+
+示例：
+
+```bash
+foxos docs create report.docx --title '2026 年销售分析'
+```
+
+### `foxos docs read`
+
+读取文档段落（含样式名）、表格与字数统计
+
+```text
+foxos docs read FILE
+```
+
+工具接口名：`docs_read` · 权限：`read`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `file` | `FILE` | string | 是 | 文档路径（.docx）；工作空间路径（read） |
+
+示例：
+
+```bash
+foxos docs read report.docx --json
+```
+
+### `foxos docs append`
+
+在文档末尾追加段落、标题或表格
+
+```text
+foxos docs append FILE [TEXT...] [--style STYLE] [--heading HEADING] [--table TABLE]
+```
+
+工具接口名：`docs_append` · 权限：`modify`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `file` | `FILE` | string | 是 | 文档路径（.docx）；工作空间路径（write） |
+| `text` | `TEXT` | array |  | 要追加的段落，每个参数一段 |
+| `style` | `--style` | string |  | 段落样式（Word 内置英文名），如 List Bullet、Quote |
+| `heading` | `--heading` | integer |  | 作为标题追加：0=Title，1–9=Heading 1–9 |
+| `table` | `--table` | array |  | 追加表格：二维数组；CLI 中用 --table-json |
+
+示例：
+
+```bash
+foxos docs append report.docx '一、总体情况' --heading 1
+foxos docs append report.docx '全年销售额 2013 万元。' '同比增长 12%。'
+foxos docs append report.docx '要点一' '要点二' --style 'List Bullet'
+foxos docs append report.docx --table-json '[["月份","销售额"],["1月",120]]'
+```
+
+### `foxos docs replace`
+
+查找并替换文本（正文与表格）
+
+```text
+foxos docs replace FILE --find FIND --replace REPLACE
+```
+
+工具接口名：`docs_replace` · 权限：`modify`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `file` | `FILE` | string | 是 | 文档路径（.docx）；工作空间路径（write） |
+| `find` | `--find` | string | 是 | 要查找的文本 |
+| `replace` | `--replace` | string | 是 | 替换为 |
+
+示例：
+
+```bash
+foxos docs replace report.docx --find 2025 --replace 2026
+```
+
+### `foxos docs export`
+
+导出为 pdf / odt / html / txt / md（由扩展名决定）
+
+```text
+foxos docs export FILE OUTPUT [--force]
+```
+
+工具接口名：`docs_export` · 权限：`create`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `file` | `FILE` | string | 是 | 文档路径（.docx）；工作空间路径（read） |
+| `output` | `OUTPUT` | string | 是 | 输出路径；工作空间路径（write） |
+| `force` | `--force / -f` | boolean |  | 输出已存在时覆盖 |
+
+示例：
+
+```bash
+foxos docs export report.docx report.pdf
+foxos docs export report.docx report.md
+```
+
+限制：
+
+- pdf / odt / html 需要 LibreOffice
+
 ## sheets — 表格：读写标准 .xlsx 工作簿、公式、图表与导出
 
 基于 openpyxl 读写 Excel 2007+ (.xlsx) 文件；公式按 Excel 语法写入（以 = 开头），用 LibreOffice 无头模式求值与导出 PDF/ODS。
@@ -210,6 +338,164 @@ foxos sheets export sales.xlsx out/sales.pdf --force --json
 - csv 只导出一个工作表，公式导出为求值结果（需 LibreOffice，否则导出公式文本）
 - pdf / ods 需要 LibreOffice
 
+## slides — 演示：读写标准 .pptx（标题页、要点页、图片、原生图表、备注），替换文本与导出
+
+基于 python-pptx 读写 PowerPoint 2007+ (.pptx)，使用默认模板的标准版式。
+
+限制：
+
+- 只读写 .pptx；.ppt / .odp 输入暂不支持
+- 版式来自默认模板：title / title-content / section / two-content / title-only / blank
+- 图表仅 bar / line / pie，数据直接给出（不链接外部 xlsx）
+
+### `foxos slides create`
+
+新建一个 .pptx 演示文稿（可带标题页）
+
+```text
+foxos slides create FILE [--title TITLE] [--subtitle SUBTITLE] [--aspect {16:9,4:3}] [--force]
+```
+
+工具接口名：`slides_create` · 权限：`create`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `file` | `FILE` | string | 是 | 演示文稿路径（.pptx）；工作空间路径（write） |
+| `title` | `--title` | string |  | 标题页标题 |
+| `subtitle` | `--subtitle` | string |  | 标题页副标题 |
+| `aspect` | `--aspect` | string |  | 页面比例；可选：16:9 / 4:3；默认 16:9 |
+| `force` | `--force / -f` | boolean |  | 已存在时覆盖 |
+
+示例：
+
+```bash
+foxos slides create deck.pptx --title '2026 年销售分析' --subtitle '数据组'
+```
+
+### `foxos slides read`
+
+读取每页的版式、标题、文本、图表数据与备注
+
+```text
+foxos slides read FILE
+```
+
+工具接口名：`slides_read` · 权限：`read`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `file` | `FILE` | string | 是 | 演示文稿路径（.pptx）；工作空间路径（read） |
+
+示例：
+
+```bash
+foxos slides read deck.pptx --json
+```
+
+### `foxos slides add`
+
+追加一页（标题 + 要点 / 图片 / 备注）
+
+```text
+foxos slides add FILE [--title TITLE] [--bullet BULLET] [--layout {title,title-content,section,two-content,title-only,blank}] [--image IMAGE] [--notes NOTES]
+```
+
+工具接口名：`slides_add` · 权限：`modify`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `file` | `FILE` | string | 是 | 演示文稿路径（.pptx）；工作空间路径（write） |
+| `title` | `--title / -t` | string |  | 页面标题 |
+| `bullet` | `--bullet / -b` | array |  | 要点，可重复：--bullet 一 --bullet 二 |
+| `layout` | `--layout` | string |  | 版式；可选：title / title-content / section / two-content / title-only / blank |
+| `image` | `--image` | string |  | 插入图片（工作空间内 png/jpg）；工作空间路径（read） |
+| `notes` | `--notes` | string |  | 演讲者备注 |
+
+示例：
+
+```bash
+foxos slides add deck.pptx -t 全年概况 -b '销售额 2013 万元' -b '同比增长 12%'
+foxos slides add deck.pptx -t 趋势 --image charts/trend.png
+```
+
+### `foxos slides chart add`
+
+插入原生 PowerPoint 图表（默认新建一页）
+
+```text
+foxos slides chart add FILE --type {bar,line,pie} --categories CATEGORIES --values VALUES [--slide SLIDE] [--series-name SERIES_NAME] [--title TITLE]
+```
+
+工具接口名：`slides_chart_add` · 权限：`modify`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `file` | `FILE` | string | 是 | 演示文稿路径（.pptx）；工作空间路径（write） |
+| `type` | `--type / -T` | string | 是 | 图表类型；可选：bar / line / pie |
+| `categories` | `--categories / -c` | array | 是 | 分类，逗号分隔 |
+| `values` | `--values / -v` | array | 是 | 数值，逗号分隔，与分类一一对应 |
+| `slide` | `--slide` | integer |  | 插入到已有的第 N 页（从 1 开始）；不填则新建一页 |
+| `series_name` | `--series-name` | string |  | 系列名称；默认 Series 1 |
+| `title` | `--title` | string |  | 新建页时的页面标题 |
+
+示例：
+
+```bash
+foxos slides chart add deck.pptx --type bar -c Q1,Q2,Q3,Q4 -v 405,428,547,633 --title 季度销售额
+```
+
+### `foxos slides replace`
+
+查找并替换所有页中的文本
+
+```text
+foxos slides replace FILE --find FIND --replace REPLACE
+```
+
+工具接口名：`slides_replace` · 权限：`modify`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `file` | `FILE` | string | 是 | 演示文稿路径（.pptx）；工作空间路径（write） |
+| `find` | `--find` | string | 是 | 要查找的文本 |
+| `replace` | `--replace` | string | 是 | 替换为 |
+
+示例：
+
+```bash
+foxos slides replace deck.pptx --find 2025 --replace 2026
+```
+
+限制：
+
+- 只在同一个文本 run 内匹配
+
+### `foxos slides export`
+
+导出为 pdf / odp
+
+```text
+foxos slides export FILE OUTPUT [--force]
+```
+
+工具接口名：`slides_export` · 权限：`create`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `file` | `FILE` | string | 是 | 演示文稿路径（.pptx）；工作空间路径（read） |
+| `output` | `OUTPUT` | string | 是 | 输出路径；工作空间路径（write） |
+| `force` | `--force / -f` | boolean |  | 输出已存在时覆盖 |
+
+示例：
+
+```bash
+foxos slides export deck.pptx deck.pdf
+```
+
+限制：
+
+- 需要 LibreOffice
+
 ## workspace — 工作空间信息
 
 当前工作空间根目录与基本信息。
@@ -234,29 +520,189 @@ foxos workspace info
 foxos workspace info --json
 ```
 
-## files — 列出工作空间文件
+## files — 文件：列出、读写文本、新建、重命名、删除与恢复
 
-只读列出工作空间内的文件，忽略 .foxos 保留目录。
+所有操作限定在工作空间内，删除进入回收站；.foxos 保留目录不可见。
 
 ### `foxos files list`
 
-列出工作空间内的文件
+列出目录内容（默认工作空间根目录）
 
 ```text
-foxos files list [PATH]
+foxos files list [PATH] [--recursive] [--hidden]
 ```
 
 工具接口名：`files_list` · 权限：`read`
 
 | 参数 | CLI | 类型 | 必填 | 说明 |
 |---|---|---|---|---|
-| `path` | `PATH` | string |  | 子目录（工作空间内），默认根目录；工作空间路径（read） |
+| `path` | `PATH` | string |  | 目录（工作空间内），默认根目录；工作空间路径（read） |
+| `recursive` | `--recursive / -r` | boolean |  | 递归列出所有文件 |
+| `hidden` | `--hidden / -a` | boolean |  | 包含以 . 开头的文件 |
 
 示例：
 
 ```bash
 foxos files list
 foxos files list reports --json
+foxos files list -r
+```
+
+### `foxos files read`
+
+读取 UTF-8 文本文件
+
+```text
+foxos files read PATH
+```
+
+工具接口名：`files_read` · 权限：`read`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `path` | `PATH` | string | 是 | 文件路径；工作空间路径（read） |
+
+示例：
+
+```bash
+foxos files read notes.md
+foxos files read src/app.py --json
+```
+
+限制：
+
+- 上限 5 MB；二进制与办公文件请用对应应用命令
+
+### `foxos files write`
+
+写入 UTF-8 文本文件（原子保存，覆盖前保留上一版）
+
+```text
+foxos files write PATH --content CONTENT [--expect-mtime EXPECT_MTIME] [--force]
+```
+
+工具接口名：`files_write` · 权限：`modify`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `path` | `PATH` | string | 是 | 文件路径；工作空间路径（write） |
+| `content` | `--content` | string | 是 | 文件内容；CLI 可用 --content-stdin 从标准输入读取 |
+| `expect_mtime` | `--expect-mtime` | number |  | 乐观并发检查：文件当前修改时间必须等于该值，否则 CONFLICT |
+| `force` | `--force / -f` | boolean |  | 目标已存在时覆盖 |
+
+示例：
+
+```bash
+foxos files write notes.md --content '# 标题'
+cat a.py | foxos files write src/a.py --content-stdin
+```
+
+### `foxos files mkdir`
+
+新建文件夹（含父目录）
+
+```text
+foxos files mkdir PATH
+```
+
+工具接口名：`files_mkdir` · 权限：`create`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `path` | `PATH` | string | 是 | 文件夹路径；工作空间路径（write） |
+
+示例：
+
+```bash
+foxos files mkdir reports/2026
+```
+
+### `foxos files rename`
+
+重命名或移动文件 / 文件夹
+
+```text
+foxos files rename SOURCE TARGET [--force]
+```
+
+工具接口名：`files_rename` · 权限：`modify`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `source` | `SOURCE` | string | 是 | 原路径；工作空间路径（write） |
+| `target` | `TARGET` | string | 是 | 新路径；工作空间路径（write） |
+| `force` | `--force / -f` | boolean |  | 目标已存在时覆盖 |
+
+示例：
+
+```bash
+foxos files rename draft.md final.md
+foxos files rename a.xlsx archive/a.xlsx
+```
+
+### `foxos files delete`
+
+删除文件或文件夹（移入回收站，可恢复）
+
+```text
+foxos files delete PATH
+```
+
+工具接口名：`files_delete` · 权限：`delete`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `path` | `PATH` | string | 是 | 要删除的路径；工作空间路径（write） |
+
+示例：
+
+```bash
+foxos files delete old.csv
+```
+
+限制：
+
+- 移入 .foxos/trash/，用 foxos files restore 恢复
+
+### `foxos files restore`
+
+从回收站恢复
+
+```text
+foxos files restore TRASH_ID [--force]
+```
+
+工具接口名：`files_restore` · 权限：`create`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `trash_id` | `TRASH_ID` | string | 是 | 回收站条目 ID（files delete 返回，或 files trash 查看） |
+| `force` | `--force / -f` | boolean |  | 目标已存在时覆盖 |
+
+示例：
+
+```bash
+foxos files restore 20261110T2051-ab12cd
+```
+
+### `foxos files trash`
+
+列出回收站
+
+```text
+foxos files trash
+```
+
+工具接口名：`files_trash` · 权限：`read`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| — | | | | 无参数 |
+
+示例：
+
+```bash
+foxos files trash --json
 ```
 
 ## audit — 审计日志
@@ -292,7 +738,7 @@ foxos audit tail --filter-agent data-agent --json
 
 ## tasks — 任务队列
 
-阶段 0 只记录任务，尚未接入模型自动执行。
+记录任务目标与状态；由桌面的 ACP 智能体会话执行。
 
 ### `foxos tasks create`
 
@@ -316,7 +762,7 @@ foxos tasks create '根据 sales.xlsx 制作分析报告'
 
 限制：
 
-- 阶段 0 只记录任务，不会自动调用模型执行
+- 只记录任务；执行由 ACP 智能体会话完成
 
 ### `foxos tasks list`
 

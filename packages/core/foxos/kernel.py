@@ -37,6 +37,8 @@ class Param:
     cli_kv: bool = False
     cli_flag: str | None = None  # 默认 --name（下划线转连字符）
     cli_short: str | None = None
+    cli_repeat: bool = False  # array 参数在 CLI 中以重复选项传入（--bullet a --bullet b），否则逗号分隔
+    cli_stdin: bool = False  # string 参数可用 --<name>-stdin 从标准输入读取（大文本，如编辑器保存）
     metavar: str | None = None
 
     def __post_init__(self):
@@ -178,7 +180,7 @@ def register(cmd: Command) -> Command:
 
 def load_apps() -> None:
     # 导入即注册
-    from .apps import sheets, system  # noqa: F401
+    from .apps import docs, sheets, slides, system  # noqa: F401
 
 
 def find(command_id: str) -> Command:
