@@ -1,0 +1,16 @@
+# 依赖与构建产物
+node_modules/
+apps/desktop/dist/
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+.pytest_cache/
+
+# 本地演示工作空间（scripts/seed_demo.py 生成）
+demo-workspace/
+
+# 系统文件
+.DS_Store
+Thumbs.db
