@@ -1,0 +1,92 @@
+[
+ {
+  "name": "libreoffice-writer",
+  "caption": "LibreOffice Writer：打开工作空间里由智能体生成的 .docx",
+  "file": "docs/screenshots/libreoffice-writer.png"
+ },
+ {
+  "name": "libreoffice-calc",
+  "caption": "LibreOffice Calc：公式与原生图表（由 foxos sheets 命令写入）",
+  "file": "docs/screenshots/libreoffice-calc.png"
+ },
+ {
+  "name": "desktop",
+  "caption": "桌面：开始菜单按 9 个分组列出已安装的 Everything 应用，右侧是智能体会话面板",
+  "file": "docs/screenshots/desktop.png"
+ },
+ {
+  "name": "app-center",
+  "caption": "应用中心：内置应用、LibreOffice、开发工具、ACP 智能体与 51 个 Everything 应用（9 个分组）",
+  "file": "docs/screenshots/app-center.png"
+ },
+ {
+  "name": "setup-wizard",
+  "caption": "首次运行安装向导：检测并在线安装 LibreOffice、Python 办公库、Node.js、git、环境与 Everything 分组",
+  "file": "docs/screenshots/setup-wizard.png"
+ },
+ {
+  "name": "terminal",
+  "caption": "终端：真实 PTY，foxos 命令可直接读写工作空间里的表格与文档",
+  "file": "docs/screenshots/terminal.png"
+ },
+ {
+  "name": "files",
+  "caption": "文件管理器：工作空间实时同步（CLI、MCP、智能体的修改立即出现）",
+  "file": "docs/screenshots/files.png"
+ },
+ {
+  "name": "editor",
+  "caption": "Monaco 编辑器：语法高亮、保存到工作空间",
+  "file": "docs/screenshots/editor.png"
+ },
+ {
+  "name": "browser",
+  "caption": "浏览器：内置网页浏览器",
+  "file": "docs/screenshots/browser.png"
+ },
+ {
+  "name": "everything-spreadsheet",
+  "caption": "Everything 应用：表格（打开工作空间里的 2026年销售.xlsx），本机构建运行，CLI / MCP 可操作",
+  "file": "docs/screenshots/everything-spreadsheet.png"
+ },
+ {
+  "name": "everything-documents",
+  "caption": "Everything 应用：文档（打开工作空间里的 项目周报.docx），本机构建运行，CLI / MCP 可操作",
+  "file": "docs/screenshots/everything-documents.png"
+ },
+ {
+  "name": "everything-whiteboard",
+  "caption": "Everything 应用：白板，本机构建运行，CLI / MCP 可操作",
+  "file": "docs/screenshots/everything-whiteboard.png"
+ },
+ {
+  "name": "everything-crm",
+  "caption": "Everything 应用：客户管理 CRM，本机构建运行，CLI / MCP 可操作",
+  "file": "docs/screenshots/everything-crm.png"
+ },
+ {
+  "name": "everything-chess",
+  "caption": "Everything 应用：国际象棋，本机构建运行，CLI / MCP 可操作",
+  "file": "docs/screenshots/everything-chess.png"
+ },
+ {
+  "name": "environments-catalog",
+  "caption": "环境 → 安装系统：一键安装 WSL2 发行版、LXC / 官方根文件系统、Windows Sandbox、Hyper-V；本机能力检查",
+  "file": "docs/screenshots/environments-catalog.png"
+ },
+ {
+  "name": "environments-alpine",
+  "caption": "环境：已安装并运行的 Alpine 环境，实时资源、快捷操作、快照与自定义操作",
+  "file": "docs/screenshots/environments-alpine.png"
+ },
+ {
+  "name": "audit-takeover",
+  "caption": "活动与人工接管：所有智能体操作写入审计日志；人工接管后智能体写操作被拒绝（PAUSED）",
+  "file": "docs/screenshots/audit-takeover.png"
+ },
+ {
+  "name": "acp-agent-install",
+  "caption": "ACP 智能体一键安装：从 ACP Registry 安装，过程在真实终端中可见",
+  "file": "docs/screenshots/acp-agent-install.png"
+ }
+]
