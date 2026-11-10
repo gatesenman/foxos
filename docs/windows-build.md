@@ -23,5 +23,5 @@ cd dist && sha256sum FoxOS-Setup-*-x64.exe FoxOS-*-win-x64.zip ../../../scripts/
 - 安装包未做代码签名（`signExecutable: false`），首次运行会有 SmartScreen 提示
 - LibreOffice 不随包：首次运行向导在线安装（winget；没有 winget 时用 `foxos/data/windows/install-libreoffice.ps1` 从官方站下载 MSI 并校验 SHA-256）
 
-用户侧在线安装：`scripts/install.ps1`（从 GitHub Release 下载、校验 `SHA256SUMS`、运行安装程序或解压便携版；私有仓库需 `GITHUB_TOKEN`）。
+用户侧在线安装：`scripts/install.ps1`（从 GitHub Release 匿名下载、校验 `SHA256SUMS`、运行安装程序或解压便携版；`GITHUB_TOKEN` 可选，仅用于避开 API 频率限制）。脚本保持纯 ASCII，保证 Windows PowerShell 5.1 下 `irm … | iex` 可用。
 实机验收清单见 [windows-test-guide.md](windows-test-guide.md)。

@@ -15,15 +15,20 @@
 
 任选一种方式（建议两种都测）：
 
-**A. 在线安装脚本**（管理员不是必须）
+**A. 在线安装脚本**（匿名下载，不需要令牌；管理员不是必须）
 
 ```powershell
-$env:GITHUB_TOKEN = '<能读取 gatesenman/foxos 的令牌>'   # 仓库私有；公开后可省略
-powershell -ExecutionPolicy Bypass -File install.ps1          # 安装程序
-powershell -ExecutionPolicy Bypass -File install.ps1 -Portable  # 便携版
+# 一行安装（安装程序）
+irm https://github.com/gatesenman/foxos/releases/download/v0.2.0-windows-preview/install.ps1 | iex
+# 一行安装便携版
+$env:FOXOS_PORTABLE = '1'; irm https://github.com/gatesenman/foxos/releases/download/v0.2.0-windows-preview/install.ps1 | iex
+# 或下载 install.ps1 后带参数运行
+powershell -ExecutionPolicy Bypass -File install.ps1 -Portable
 ```
 
-- [ ] 脚本打印“SHA-256 校验通过”
+`$env:GITHUB_TOKEN` 可选，只在遇到 GitHub 匿名 API 频率限制（每小时 60 次）时设置。
+
+- [ ] 脚本打印 `SHA-256 OK`
 - [ ] 安装程序可选择安装目录，完成后开始菜单出现“狐狸OS”
 - [ ] 便携版解压到 `%LOCALAPPDATA%\FoxOS-Portable`，开始菜单出现“狐狸OS（便携版）”
 

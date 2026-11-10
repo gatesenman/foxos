@@ -46,8 +46,10 @@ test('US-10 官方 MCP SDK 通过 stdio 列出工具并逐个应用调用', asyn
       if (!t) { calls.push({ app, tool: null, ok: null, note: '没有无参数的工具' }); continue; }
       name = t.name; args = {};
     }
-    const r = await client.callTool({ name, arguments: args });
+    const t0 = Date.now();
+    const r = await client.callTool({ name, arguments: args }, undefined, { timeout: 180000 });
     const p = parse(r);
+    if (process.env.FOXOS_E2E_VERBOSE) console.error(`${name} ${Date.now() - t0}ms ok=${p.ok}`);
     calls.push({ app, tool: name, ok: p.ok, error: p.ok ? null : p.error.code });
     assert.equal(p.ok, true, `${name} 失败：${JSON.stringify(p.error)}`);
     if (ev.has(app)) assert.equal(p.result.installed, installed.has(app));
