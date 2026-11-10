@@ -125,6 +125,12 @@ def install_app(app: str, source: str | None = None, log=lambda s: None, keep_bu
         adir = work / "src" / app
         if not (adir / "package.json").exists():
             raise FoxError("NOT_FOUND", f"上游源码里没有 src/{app}")
+        html = (adir / "index.html").read_text(encoding="utf-8", errors="replace") if (adir / "index.html").exists() else ""
+        import re as _re
+        for ref in _re.findall(r'<script[^>]+type="module"[^>]+src="/([^"]+)"', html):
+            if not (adir / ref).exists():
+                raise FoxError("DEPENDENCY_MISSING", f"上游 src/{app} 缺少 index.html 引用的 /{ref}，无法构建",
+                               hint=a.get("upstreamIssue") or "这是上游仓库的问题，等待上游修复后重新安装")
         env = {**os.environ, "npm_config_fund": "false", "npm_config_audit": "false", "CI": "1"}
         _run([npm, "ci", "--no-audit", "--no-fund", "--loglevel=error"] if (adir / "package-lock.json").exists() else [npm, "install", "--no-audit", "--no-fund"], adir, log, env=env)
         out = app_dir(app)
@@ -205,7 +211,7 @@ register(Command("everything", "install", "从上游源码在本机构建并安�
                          Param("all", "boolean", "安装全部 51 个"), Param("group", "string", "安装整个分组", enum=list(GROUPS)),
                          Param("source", "string", "使用本地上游仓库目录（离线 / 镜像），默认从 GitHub 获取"),
                          Param("force", "boolean", "已安装也重新构建", cli_short="-f")],
-                 examples=["foxos everything install tasks chess", "foxos everything install --group games", "FOXOS_PROGRESS=1 foxos everything install --all"],
+                 examples=["foxos everything install tasks chess", "foxos everything install --group games", "foxos everything install --all"],
                  limits=["需要 git、Node.js 22.12+ 与 npm；每个应用构建约 2–20 秒（不含下载）"], permission="run"))
 register(Command("everything", "uninstall", "卸载应用（保留工作空间中的数据）", ev_uninstall, params=[APPP], permission="delete",
                  examples=["foxos everything uninstall chess"]))

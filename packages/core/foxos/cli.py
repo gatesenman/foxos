@@ -199,6 +199,14 @@ def print_human(cmd_id: str, result: dict) -> None:
         for c in result["charts"]:
             print(f"chart[{c['index']}] {c.get('sheet', '')} {c['type']} @ {c['anchor']} 「{c.get('title') or ''}」 "
                   + ", ".join(s["values"] or "" for s in c["series"]), file=out)
+    if cmd_id in ("env.exec", "env.action.run"):
+        sys.stdout.write(result["stdout"])
+        sys.stderr.write(result["stderr"])
+        if result["exit_code"]:
+            print(f"# 退出码 {result['exit_code']}", file=sys.stderr)
+    if cmd_id == "env.list":
+        for e in result["envs"]:
+            print(f"{e['state']:<8} {e['name']:<20} {e['image']:<16} 网络 {e['network']:<5} 工作空间 {e['workspace']['mode']}", file=out)
     if cmd_id == "everything.list":
         for a in result["apps"]:
             print(f"{'已安装' if a['installed'] else '未安装'}  {a['group_name']:<4} {a['id']:<20} {a['name']:<22} {a['license']:<20} 操作 {a['ops']}", file=out)
@@ -225,7 +233,7 @@ def print_human(cmd_id: str, result: dict) -> None:
     if "tasks" in result and isinstance(result["tasks"], list):
         for t in result["tasks"]:
             print(f"{t['id']}  {t['status']:<8} {t['goal']}", file=out)
-    skip = {"message", "rows", "values", "charts", "files", "entries", "tasks", "note", "content"}
+    skip = {"message", "rows", "values", "charts", "files", "entries", "tasks", "note", "content", "stdout", "stderr", "apps", "envs", "elements"}
     if cmd_id.startswith(("workspace", "sheets.create", "sheets.write", "sheets.chart.create", "sheets.export",
                           "docs.create", "docs.append", "docs.replace", "docs.export", "slides.create", "slides.add",
                           "slides.replace", "slides.export", "slides.chart", "files.write", "files.delete", "files.rename")):
