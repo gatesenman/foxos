@@ -2,7 +2,7 @@
 
 由 `npm run test:all`（[scripts/test_all.py](../scripts/test_all.py)）生成，不使用模拟：pytest 调用真实 CLI / 内核，桌面端到端测试用 Playwright 驱动真实的 Electron 桌面，MCP 测试使用官方 MCP SDK 作为客户端。
 
-- 时间：2026-11-11 00:16（UTC+8）　提交：`1f9afc0`　用时：16 分 59 秒
+- 时间：2026-11-11 00:44（UTC+8）　提交：`b38474c`　用时：15 分 10 秒
 - 环境：Linux 6.12.113+（x86_64），Python 3.13.5，Node v24.22.1，Landlock ABI 6
 - 未覆盖：Windows 与 macOS 实机（本报告在 Linux 上生成；Windows 代码路径另有 wine 下的测试，见 [sandbox.md](sandbox.md)、[windows-test-guide.md](windows-test-guide.md)）
 
@@ -13,7 +13,7 @@
 | 测试用例（139） | 133 | 1 | 4 | 1 |
 | 用户故事（31） | 28 | 1 | 1 | 1 |
 
-- Everything 应用：**50/51** 在桌面里本地启动，**49/51** 通过“界面操作与 CLI 等价”检查，**51/51** 通过 MCP（官方 SDK）调用成功；0 个失败，1 个跳过，1 个为已知上游缺陷。
+- Everything 应用：**50/51** 在桌面里本地启动，**48/51** 通过“界面操作与 CLI 等价”检查，**51/51** 通过 MCP（官方 SDK）调用成功；1 个失败，1 个跳过，1 个为已知上游缺陷。
 - 操作清单：51 个应用共 **3350** 项操作，其中 **3350** 项有 CLI / MCP 绑定；测试中实际执行并比对结果的有 **50** 项（每个应用一项等价检查）。
 - MCP：stdio 列出 4320 个工具（62 个应用），逐应用调用 63/63 成功；Streamable HTTP（compact）69 个工具；SDK 1.32.2。
 
@@ -29,7 +29,7 @@
 | US-06 | 文档（docx）与演示文稿（pptx）：创建、编辑、导出 PDF | 通过 | 3 | 0 | 0 |
 | US-07 | 命令目录：help --json、示例可解析、工具导出、参考文档与注册表一致 | 通过 | 6 | 0 | 0 |
 | US-08 | 桌面冒烟：空工作空间启动桌面并渲染 | 通过 | 1 | 0 | 0 |
-| US-10 | MCP（stdio）：官方 SDK 列出工具并对每个应用调用一次，与 CLI 同一内核 | 失败 | 1 | 1 | 0 |
+| US-10 | MCP（stdio）：官方 SDK 列出工具并对每个应用调用一次，与 CLI 同一内核 | 通过 | 2 | 0 | 0 |
 | US-11 | MCP（Streamable HTTP）：令牌认证、compact 工具集、everything_run | 通过 | 1 | 0 | 0 |
 | US-30 | 环境：创建、启动、执行、停止 | 通过 | 1 | 0 | 0 |
 | US-31 | 环境隔离规则（文件系统、进程、网络、主机名） | 通过 | 1 | 0 | 0 |
@@ -45,7 +45,7 @@
 | US-41 | Everything 协作类应用 | 通过 | 6 | 0 | 0 |
 | US-42 | Everything 创作类应用 | 通过（含已知上游缺陷） | 6 | 0 | 0 |
 | US-43 | Everything 工程类应用 | 通过 | 4 | 0 | 0 |
-| US-44 | Everything 效率类应用 | 通过 | 5 | 0 | 0 |
+| US-44 | Everything 效率类应用 | 失败 | 4 | 1 | 0 |
 | US-45 | Everything 财务类应用 | 通过 | 4 | 0 | 0 |
 | US-46 | Everything 商务类应用 | 通过 | 12 | 0 | 1 |
 | US-47 | Everything 开发类应用 | 通过 | 1 | 0 | 0 |
@@ -57,10 +57,10 @@
 
 | 故事 | 用例 | 结果 | 说明 |
 | --- | --- | --- | --- |
-| US-10 | `mcp.e2e.mjs` US-10 官方 MCP SDK 通过 stdio 列出工具并逐个应用调用 | 失败 | {"code":"CONFLICT","exit_code":7,"message":"「New task」被div挡住，先关闭弹窗（或加 force）"} |
 | US-39 | `test_env_windows.py` test_hw_wsl_install_ubuntu | 跳过 | pending：需要 Windows 实机（见 docs/windows-test-guide.md） |
 | US-39 | `test_env_windows.py` test_hw_doctor | 跳过 | pending：需要 Windows 实机（见 docs/windows-test-guide.md） |
 | US-42 | `everything.e2e.js` US-42 photo-studio：本地打开，界面操作与 CLI 等价 | 通过（含已知上游缺陷） | 上游缺陷：src/app/pointer.ts 中 #viewport 的 pointerdown 处理只排除 button / input / .canvas-ui，开始页的“Describe an edit”文本框（textarea）被鼠标点击时焦点被抢到画布，用鼠标无法输入；CLI 的 set 不经过指针事件，所以结果不同 |
+| US-44 | `everything.e2e.js` US-44 tasks：本地打开，界面操作与 CLI 等价 | 失败 | 只在 CLI 结果中出现：combobox/List/<id>/ |
 | US-46 | `everything.e2e.js` US-46 assets：本地打开，界面操作与 CLI 等价 | 跳过 | 上游提交 0fbb88cd 的 src/assets 只有 index.html/package.json/vite.config.js，缺少 index.html 引用的 /src/main.js（GitHub contents API 对 src/assets/src 返回 404），因此无法构建。 |
 | US-52 | `test_sandbox.py` test_windows_code_path_under_wine | 跳过 | 设置 FOXOS_TEST_WINE / FOXOS_TEST_WINE_PYTHON 后在 wine 中运行 Windows 代码路径 |
 
@@ -93,7 +93,7 @@
 | Parametric (`parametric`) | 工程 | 通过 | 一致 | `foxos parametric insert create` | 33 | 33 | 1 | 通过 |  |
 | Circuits (`circuits`) | 工程 | 通过 | 一致 | `foxos circuits project create` | 39 | 39 | 1 | 通过 |  |
 | Building Design (`building-design`) | 工程 | 通过 | 一致 | `foxos building-design it dismiss` | 1 | 1 | 1 | 通过 |  |
-| Tasks (`tasks`) | 效率 | 通过 | 一致 | `foxos tasks first-task create` | 58 | 58 | 1 | 通过 |  |
+| Tasks (`tasks`) | 效率 | 通过 | 不一致 | `foxos tasks first-task create` | 58 | 58 | 1 | 通过 | {"onlyGui":[],"onlyCli":["combobox/List/<id>/"],"kvEqual":true} |
 | Projects (`projects`) | 效率 | 通过 | 一致 | `foxos projects first-project create` | 50 | 50 | 1 | 通过 |  |
 | Wiki (`wiki`) | 效率 | 通过 | 一致 | `foxos wiki getting-started set foxos parity` | 60 | 60 | 1 | 通过 |  |
 | Time Tracking (`time-tracking`) | 效率 | 通过 | 一致 | `foxos time-tracking set-up-tracking activate` | 71 | 71 | 1 | 通过 |  |

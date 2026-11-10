@@ -186,6 +186,7 @@ npm run test:all      # 仓库根目录：pytest + 桌面端到端测试（Playw
 ```
 
 - 测试不使用模拟：真实文件、真实 LibreOffice、真实 Electron、真实环境运行时、官方 MCP SDK 客户端
+- 最近一次全量运行（Linux）：139 个用例 133 通过、1 失败、4 跳过、1 个已知上游缺陷；31 个用户故事 28 通过；Everything 应用 50/51 本地启动、48/51 界面与 CLI 等价、51/51 MCP 调用成功。详见 [测试报告](docs/test-report.md)
 - 用户故事与测试一一对应（US-编号），报告列出每个故事的通过 / 失败 / 跳过、51 个应用的覆盖与每个应用的操作覆盖：[docs/test-report.md](docs/test-report.md)
 - Windows 专用测试：命令行契约单元测试在 Linux 上运行；实机测试见 [docs/windows-test-guide.md](docs/windows-test-guide.md)
 

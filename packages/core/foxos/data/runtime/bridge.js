@@ -42,7 +42,11 @@
   function byName(name, role, reg) {
     const want = String(name || '').toLowerCase();
     const pool = [...document.querySelectorAll(INTERACTIVE)].filter(visible).filter((e) => (!role || roleOf(e) === role) && (!reg || region(e) === reg));
-    const el = pool.find((e) => nameOf(e).toLowerCase() === want) || pool.find((e) => nameOf(e).toLowerCase().includes(want));
+    // 同名控件有多个时（如侧栏与悬浮按钮都叫 New task），优先选人此刻能点到的那个
+    const exact = pool.filter((e) => nameOf(e).toLowerCase() === want);
+    const part = exact.length ? [] : pool.filter((e) => nameOf(e).toLowerCase().includes(want));
+    const cands = exact.length ? exact : part;
+    const el = (cands.length > 1 && cands.find((e) => hittable(e))) || cands[0];
     if (!el) throw Object.assign(new Error(`没有找到名为「${name}」的控件`), { code: 'NOT_FOUND' });
     return el;
   }
@@ -138,11 +142,26 @@
     t.dispatchEvent(new KeyboardEvent('keyup', init));
     return { key, target: t.isConnected ? describe(refOf(t)) : { ref: t.dataset.foxosRef || null, removed: true } };
   }
+  // 弹窗 / 遮罩正在关闭（CSS 过渡、动画）时，像人一样等它消失再操作：最多等 2 秒，期间页面没有动画且仍被挡住才报 CONFLICT
+  async function settled(p) {
+    if (p.force) return;
+    const target = () => (p.ref ? find(p.ref) : byName(p.name, p.role, p.region));
+    for (let t = 0; t < 2000; t += 100) {
+      let el;
+      try { el = target(); } catch { el = null; }
+      if (el && hittable(el)) return;
+      const animating = document.getAnimations ? document.getAnimations().some((a) => a.playState === 'running') : false;
+      if (!animating && t >= 400 && el) return;
+      await new Promise((r) => setTimeout(r, 100));
+    }
+  }
+  const clickSettled = async (p) => { await settled(p); return click(p); };
+  const setSettled = async (p) => { await settled(p); return setValue(p); };
   async function run({ steps = [] }) {
     const results = [];
     for (const s of steps) {
-      if (s.click) results.push(click(s.click));
-      else if (s.set) results.push(setValue(s.set));
+      if (s.click) results.push(await clickSettled(s.click));
+      else if (s.set) results.push(await setSettled(s.set));
       else if (s.invoke) results.push(await invoke(s.invoke));
       else if (s.press) results.push(press(s.press));
       else if (s.wait) await new Promise((r) => setTimeout(r, Math.min(5000, s.wait)));
@@ -150,7 +169,7 @@
     }
     return results;
   }
-  const api = { snapshot, click, focus, describe, setValue, press, hittable: ({ ref }) => hittable(find(ref)), modules, invoke, read, run, text: () => document.body.innerText.slice(0, 20000) };
+  const api = { snapshot, click: clickSettled, focus, describe, setValue: setSettled, press, hittable: ({ ref }) => hittable(find(ref)), modules, invoke, read, run, text: () => document.body.innerText.slice(0, 20000) };
   window.__foxosBridge = {
     ...api,
     call: async (m, p) => { if (!api[m]) throw new Error(`未知桥方法 ${m}`); return api[m](p || {}); },

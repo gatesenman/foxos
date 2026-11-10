@@ -61,16 +61,14 @@ async function us10(client, ws) {
   // 一个真实的写操作：在 Everything 的 Tasks 里加任务（应用界面实时更新，数据写入工作空间）
   if (installed.has('tasks')) {
     await client.callTool({ name: 'tasks_app_reset', arguments: {} });
-    // 重置后是首次使用：先关掉欢迎对话框，再打开新建任务输入框（与人的操作相同）
-    for (const n of ['Skip for now', 'New task']) {
-      // 欢迎对话框关闭有动画：被挡住（CONFLICT）时稍等再点，和人等动画结束一样
-      let c;
-      for (let i = 0; i < 10; i++) {
-        c = parse(await client.callTool({ name: 'tasks_ui_click', arguments: { name: n } }));
-        if (c.ok || c.error.code !== 'CONFLICT') break;
-        await new Promise((r) => setTimeout(r, 300));
+    // 重置后是首次使用：先关掉欢迎对话框（Skip for now；关闭动画由应用桥等待结束）。
+    // task-title set 的绑定自己会点“New task”打开新建对话框，这里不能先打开，否则侧栏按钮会被对话框挡住
+    for (const n of ['Skip for now']) {
+      const c = parse(await client.callTool({ name: 'tasks_ui_click', arguments: { name: n } }));
+      if (!c.ok) {
+        const snap = parse(await client.callTool({ name: 'tasks_ui_snapshot', arguments: {} }));
+        assert.fail(`${n}：${JSON.stringify(c.error)}；界面对话框 ${JSON.stringify(snap.result && snap.result.dialogs)}`);
       }
-      assert.equal(c.ok, true, `${n}：${JSON.stringify(c.error)}`);
     }
     const r = parse(await client.callTool({ name: 'tasks_task-title_set', arguments: { value: '从 MCP 添加', submit: true } }));
     assert.equal(r.ok, true, JSON.stringify(r.error));

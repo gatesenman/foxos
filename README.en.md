@@ -91,6 +91,8 @@ Desktop (Electron: window manager, built-in apps, Everything runtime, ACP client
 
 `npm run test:all` at the repo root runs pytest, the Playwright + Electron end-to-end tests under xvfb and the official-MCP-SDK tests, and writes [docs/test-report.md](docs/test-report.md) (pass/fail/skip per user story, per-app coverage). No mocks.
 
+Latest full run (Linux): 139 cases — 133 passed, 1 failed, 4 skipped, 1 known upstream defect; 28/31 user stories passed; Everything apps 50/51 boot locally, 48/51 GUI/CLI parity, 51/51 MCP calls succeed. See the [test report](docs/test-report.md).
+
 ## Roadmap
 
 Done: kernel, audit, locks, takeover, MCP; desktop and real apps; 51 Everything apps (50 run); Linux environment runtime; Windows environment catalog; Windows x64 preview.

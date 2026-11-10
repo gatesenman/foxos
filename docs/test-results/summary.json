@@ -1,6 +1,6 @@
 {
- "generated": "2026-11-11T00:16:20+08:00",
- "commit": "1f9afc0",
+ "generated": "2026-11-11T00:44:14+08:00",
+ "commit": "b38474c",
  "cases": {
   "pass": 133,
   "fail": 1,
@@ -90,9 +90,9 @@
   {
    "id": "US-10",
    "title": "MCP（stdio）：官方 SDK 列出工具并对每个应用调用一次，与 CLI 同一内核",
-   "status": "fail",
-   "pass": 1,
-   "fail": 1,
+   "status": "pass",
+   "pass": 2,
+   "fail": 0,
    "skip": 0,
    "known": 0
   },
@@ -234,9 +234,9 @@
   {
    "id": "US-44",
    "title": "Everything 效率类应用",
-   "status": "pass",
-   "pass": 5,
-   "fail": 0,
+   "status": "fail",
+   "pass": 4,
+   "fail": 1,
    "skip": 0,
    "known": 0
   },
@@ -298,9 +298,9 @@
  "everything": {
   "catalog": 51,
   "boot_ok": 50,
-  "parity_equal": 49,
-  "test_pass": 50,
-  "test_fail": 0,
+  "parity_equal": 48,
+  "test_pass": 49,
+  "test_fail": 1,
   "test_skip": 1,
   "known": 1,
   "ops": 3350,
