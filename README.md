@@ -123,7 +123,7 @@ Linux：请使用上面的可引导 ISO，或从源码运行伴侣程序。我�
 
 ## Windows 伴侣程序（在现有 Windows 桌面上运行，v0.2.0） / Windows companion app
 
-这一节是 **Windows 伴侣程序**（`v0.2.0-windows-preview`，Electron）的截图。它运行在你现有的 Windows（或 Linux）桌面上，提供终端、编辑器、Everything 应用、环境和智能体会话；**它不是狐狸OS 操作系统的桌面**，狐狸OS 的样子见上面的[截图](#截图狐狸os-031-真实系统)。截图来自 xvfb 1600×1000，脚本：[`apps/desktop/scripts/screenshots.js`](apps/desktop/scripts/screenshots.js)。
+这一节是 **Windows 伴侣程序**（`v0.2.0-windows-preview`，Electron）的截图。它运行在你现有的 Windows（或 Linux）桌面上，提供终端、编辑器、Everything 应用、环境和智能体会话；**它不是狐狸OS 操作系统的桌面**，狐狸OS 的样子见上面的[截图](#截图狐狸os-032--031-真实系统)。截图来自 xvfb 1600×1000，脚本：[`apps/desktop/scripts/screenshots.js`](apps/desktop/scripts/screenshots.js)。本节截图均按当前代码重新实拍：本机构建安装了 48 个 Everything 应用，并运行一个真实的 Alpine 环境；英文界面的同一组截图见 [README.en.md](README.en.md)。上面一节的 Live ISO 截图来自在 QEMU 中引导 ISO，这次没有重拍。
 
 | | |
 | --- | --- |

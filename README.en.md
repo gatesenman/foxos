@@ -104,20 +104,20 @@ The setup program offers Simplified Chinese (default) and English and picks the 
 
 ## Windows 伴侣程序（在现有 Windows 桌面上运行，v0.2.0） / Windows companion app
 
-These are screenshots of the **Windows companion app** (`v0.2.0-windows-preview`, Electron). It runs on your existing Windows (or Linux) desktop and provides a terminal, editor, Everything apps, environments and agent sessions. **It is not the FoxOS operating system desktop**; see the [screenshots](#screenshots-the-real-foxos-031-system) above for that. Captured with xvfb at 1600×1000 by [`apps/desktop/scripts/screenshots.js`](apps/desktop/scripts/screenshots.js).
+These are screenshots of the **Windows companion app** (`v0.2.0-windows-preview`, Electron). It runs on your existing Windows (or Linux) desktop and provides a terminal, editor, Everything apps, environments and agent sessions. **It is not the FoxOS operating system desktop**; see the [screenshots](#screenshots-the-real-foxos-032--031-system) above for that. Captured with xvfb at 1600×1000 by [`apps/desktop/scripts/screenshots.js`](apps/desktop/scripts/screenshots.js) with the UI set to English (`FOXOS_SHOT_LANG=en-US`); the Chinese README shows the same screens in Chinese. All of them were re-captured from the current code with 48 Everything apps built and installed locally and a running Alpine environment. The ACP install shot is the Chinese one (the English run had Gemini CLI already installed). The Live ISO screenshots above come from booting the ISO in QEMU and were not re-captured here.
 
 | | |
 | --- | --- |
-| ![Start menu](docs/screenshots/start-menu.png)<br>Start menu: built-ins and installed Everything apps in 9 groups, each with its project's own icon | ![App center](docs/screenshots/app-center.png)<br>App center: 51 Everything apps with their upstream icons, plus built-ins, LibreOffice, tools, ACP agents |
-| ![Setup wizard](docs/screenshots/setup-wizard.png)<br>First-run wizard with component picker | ![Terminal](docs/screenshots/terminal.png)<br>Terminal running `foxos` commands |
-| ![Files](docs/screenshots/files.png)<br>File manager, live-synced workspace | ![Editor](docs/screenshots/editor.png)<br>Monaco editor |
-| ![Browser](docs/screenshots/browser.png)<br>Browser | ![Settings → Language](docs/screenshots/settings-language-en.png)<br>Settings → Language: 简体中文 (default) / English, applies immediately |
-| ![App center (English)](docs/screenshots/app-center-en.png)<br>App center in English: group names and app descriptions follow the language | ![Writer](docs/screenshots/libreoffice-writer.png)<br>LibreOffice Writer with a generated .docx |
-| ![Calc](docs/screenshots/libreoffice-calc.png)<br>LibreOffice Calc: formulas and a native chart | ![Spreadsheet](docs/screenshots/everything-spreadsheet.png)<br>Everything Spreadsheet opening a workspace .xlsx (Chinese UI, shipped upstream, follows the FoxOS language) |
-| ![Documents](docs/screenshots/everything-documents.png)<br>Everything Documents opening a workspace .docx | ![Whiteboard](docs/screenshots/everything-whiteboard.png)<br>Everything Whiteboard |
-| ![CRM](docs/screenshots/everything-crm.png)<br>Everything CRM | ![Chess](docs/screenshots/everything-chess.png)<br>Everything Chess |
-| ![ACP install](docs/screenshots/acp-agent-install.png)<br>One-click ACP agent install from the official registry | ![Install a system](docs/screenshots/environments-catalog.png)<br>Environments → Install a system (WSL2 distros, rootfs, Windows Sandbox, Hyper-V) |
-| ![Alpine](docs/screenshots/environments-alpine.png)<br>A running Alpine environment with live stats | ![Audit and takeover](docs/screenshots/audit-takeover.png)<br>Activity log and human takeover (`PAUSED`) |
+| ![Start menu](docs/screenshots/start-menu-en.png)<br>Start menu: built-ins and installed Everything apps in 9 groups, each with its project's own icon | ![App center](docs/screenshots/app-center.png)<br>App center: 51 Everything apps with their upstream icons, plus built-ins, LibreOffice, tools, ACP agents |
+| ![Setup wizard](docs/screenshots/setup-wizard-en.png)<br>First-run wizard with component picker | ![Terminal](docs/screenshots/terminal-en.png)<br>Terminal running `foxos` commands |
+| ![Files](docs/screenshots/files-en.png)<br>File manager, live-synced workspace | ![Editor](docs/screenshots/editor-en.png)<br>Monaco editor |
+| ![Browser](docs/screenshots/browser-en.png)<br>Browser | ![Settings → Language](docs/screenshots/settings-language-en.png)<br>Settings → Language: 简体中文 (default) / English, applies immediately |
+| ![App center (English)](docs/screenshots/app-center-en.png)<br>App center in English: group names and app descriptions follow the language | ![Writer](docs/screenshots/libreoffice-writer-en.png)<br>LibreOffice Writer with a generated .docx |
+| ![Calc](docs/screenshots/libreoffice-calc-en.png)<br>LibreOffice Calc: formulas and a native chart | ![Spreadsheet](docs/screenshots/everything-spreadsheet-en.png)<br>Everything Spreadsheet opening a workspace .xlsx (Chinese UI, shipped upstream, follows the FoxOS language) |
+| ![Documents](docs/screenshots/everything-documents-en.png)<br>Everything Documents opening a workspace .docx | ![Whiteboard](docs/screenshots/everything-whiteboard-en.png)<br>Everything Whiteboard |
+| ![CRM](docs/screenshots/everything-crm-en.png)<br>Everything CRM | ![Chess](docs/screenshots/everything-chess-en.png)<br>Everything Chess |
+| ![ACP install](docs/screenshots/acp-agent-install.png)<br>One-click ACP agent install from the official registry | ![Install a system](docs/screenshots/environments-catalog-en.png)<br>Environments → Install a system (WSL2 distros, rootfs, Windows Sandbox, Hyper-V) |
+| ![Alpine](docs/screenshots/environments-alpine-en.png)<br>A running Alpine environment with live stats | ![Audit and takeover](docs/screenshots/audit-takeover-en.png)<br>Activity log and human takeover (`PAUSED`) |
 
 ## Quick start (from source)
 
