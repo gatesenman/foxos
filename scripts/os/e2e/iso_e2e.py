@@ -500,17 +500,39 @@ def case_win_client() -> str:
     assert act[:2] == ["active", "enabled"], act
     # foxos acp stdio：经 SSH 的标准输入输出说 ACP（initialize 握手）
     init = {"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": {"protocolVersion": 1, "clientCapabilities": {"fs": {"readTextFile": True, "writeTextFile": True}, "terminal": True}}}
-    p = subprocess.run(ssh_base() + ["-T", "bash", "-lc", shlex.quote("timeout 600 foxos acp stdio opencode")], input=json.dumps(init) + "\n",
-                       capture_output=True, text=True, timeout=900)
-    rep = next((json.loads(l) for l in p.stdout.splitlines() if l.strip().startswith("{") and '"id":1' in l.replace(" ", "")), None)
-    assert rep and "result" in rep and rep["result"].get("protocolVersion") == 1, (p.stdout[-500:], scrub(p.stderr[-500:]))
+    # 标准输入要一直开着，直到读到回答（客户端就是这样用的；EOF 会让智能体直接退出）
+    pr = subprocess.Popen(ssh_base() + ["-T", "bash", "-lc", shlex.quote("timeout 900 foxos acp stdio opencode")],
+                          stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    pr.stdin.write(json.dumps(init) + "\n"); pr.stdin.flush()
+    import selectors
+    sel = selectors.DefaultSelector(); sel.register(pr.stdout, selectors.EVENT_READ)
+    rep, t0, seen_lines = None, time.time(), []
+    while time.time() - t0 < 900 and rep is None:
+        if not sel.select(timeout=10):
+            if pr.poll() is not None:
+                break
+            continue
+        line = pr.stdout.readline()
+        if not line:
+            break
+        seen_lines.append(line)
+        try:
+            m = json.loads(line)
+        except ValueError:
+            continue
+        if m.get("id") == 1:
+            rep = m
+    took = time.time() - t0
+    pr.stdin.close(); pr.terminate()
+    err = pr.stderr.read()[-500:] if pr.poll() is not None else ""
+    assert rep and "result" in rep and rep["result"].get("protocolVersion") == 1, ("".join(seen_lines)[-500:], scrub(err))
     # x11vnc：按需起在来宾回环，ssh -W 转发后能读到 RFB 握手
     ssh("pkill -x x11vnc; (x11vnc -display :0 -localhost -shared -rfbport 5917 -nopw -once -quiet >/tmp/x11vnc-e2e.log 2>&1 &); sleep 20", timeout=300)
     w = subprocess.run(ssh_base(extra=["-W", "127.0.0.1:5917"]), input="", capture_output=True, timeout=120)
     banner = w.stdout[:12].decode("latin1", "replace")
     assert banner.startswith("RFB "), (banner, w.stderr[-300:])
     ver = ssh("x11vnc -version 2>/dev/null | head -1").stdout.strip()
-    return (f"sshd active/enabled；foxos acp stdio initialize 返回 protocolVersion=1（agentInfo={json.dumps(rep['result'].get('agentInfo'), ensure_ascii=False)}）；"
+    return (f"sshd active/enabled；foxos acp stdio opencode 经 SSH {took:.0f}s 内 initialize 返回 protocolVersion=1（agentInfo={json.dumps(rep['result'].get('agentInfo'), ensure_ascii=False)}）；"
             f"x11vnc（{ver}）-localhost 经 ssh -W 转发读到 {banner.strip()} 握手")
 
 
