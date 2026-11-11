@@ -1,9 +1,9 @@
 NAME="狐狸OS"
-VERSION="0.3.2"
+VERSION="0.3.3"
 ID=foxos
 ID_LIKE="ubuntu debian"
-PRETTY_NAME="狐狸OS 0.3.2"
-VERSION_ID="0.3.2"
+PRETTY_NAME="狐狸OS 0.3.3"
+VERSION_ID="0.3.3"
 VERSION_CODENAME=foxos
 HOME_URL="https://github.com/gatesenman/foxos"
 SUPPORT_URL="https://github.com/gatesenman/foxos/issues"

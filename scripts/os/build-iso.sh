@@ -12,7 +12,7 @@ set -euo pipefail
 
 SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
 ROOT=$(cd "$SCRIPT_DIR/../.." && pwd)
-VERSION=0.3.2
+VERSION=0.3.3
 SUITE=noble
 ARCH=${FOXOS_OS_ARCH:-amd64}
 case "$ARCH" in amd64|arm64) ;; *) echo "FOXOS_OS_ARCH 只支持 amd64 / arm64" >&2; exit 2 ;; esac

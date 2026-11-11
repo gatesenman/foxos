@@ -4,7 +4,7 @@
 #                                [--install-disk /path/to.img] [--serial-log PATH]
 set -euo pipefail
 ROOT=$(cd "$(dirname "$0")/../.." && pwd)
-ISO=${1:-"$ROOT/build/os/FoxOS-0.3.2-amd64.iso"}
+ISO=${1:-"$ROOT/build/os/FoxOS-0.3.3-amd64.iso"}
 if [ "${1:-}" != "" ] && [ "${1:0:2}" != "--" ]; then
   shift || true
 fi
