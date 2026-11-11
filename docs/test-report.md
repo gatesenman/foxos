@@ -90,6 +90,12 @@
 
 没有用真实模型账号跑过回答。Gemini CLI、codex-acp、Qwen Code、Cursor CLI 的握手结果是「需要登录」；opencode 和 claude-agent-acp 能建立会话。详见 [agent-runtime.md](agent-runtime.md)。截图在 `docs/screenshots/bots-*.png`，是 overlay 里真实 XFCE 会话中的「智能体」窗口（Firefox 后备浏览器）。
 
+## 合并主线后的完整回归（2026-11-12 05:20，Asia/Shanghai）
+
+合并主线（`41f6920`）后在构建盒上跑 `packages/core` 全部 pytest：**152 通过、0 失败、18 跳过**（12 分 27 秒）。之前 US-32 / US-33 的失败是因为构建盒的系统 Python 缺 `zstandard`（`pyproject.toml`、ISO 的 venv、打包脚本都已声明这个依赖，仓库不缺）；装上 Debian 的 `python3-zstandard` 后通过。跳过的 18 个：电脑操控真实端到端 7 个（需要 `FOXOS_CU_E2E=1`，另跑，见下）、预设真实下载 1、Windows 实机 2、镜像 overlay 2、安装包产物 4、缺 `yaml` 模块 1、wine 1。
+
+随后在同一提交上单独跑真实电脑操控端到端（`FOXOS_CU_E2E=1`，XFCE 会话 :55，真实 Jev / DeepSeek）：**7 通过、0 失败**（162.4 秒）。
+
 ## 电脑、浏览器、命令行操控（2026-11-12 03:01，Asia/Shanghai）
 
 默认栈：agent-desktop 1.2.0 读界面并执行（AT-SPI），Jev（TypeSafe）选每一步，DeepSeek v4 pro 做规划；读不到界面时自动退到截图操控（scrot + xdotool + 视觉定位）或浏览器操控（Chrome CDP + agent-browser 0.42.0）。所有动作在狐狸OS 机器里的 XFCE 会话（Xvfb :55）里执行，不碰宿主。删除、发送、支付等动作要求批准，每一步写审计。
