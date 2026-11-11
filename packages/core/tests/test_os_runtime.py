@@ -32,7 +32,7 @@ def as_foxos(cmd: str, timeout=300) -> str:
     return p.stdout
 
 
-def test_US79_iso_runtime_versions_as_user_foxos():
+def test_US117_iso_runtime_versions_as_user_foxos():
     m = json.loads((ROOT / "packages/core/foxos/data/runtime-manifest.json").read_text())
     tools = {t["name"]: t for t in m["tools"]}
     out = as_foxos("foxos runtime doctor --json")
@@ -58,7 +58,7 @@ def test_US79_iso_runtime_versions_as_user_foxos():
     assert "ok" in as_foxos("/usr/lib/foxos/venv/bin/python -c 'import pptx, zstandard; print(\"ok\")'")
 
 
-def test_US80_iso_acp_agents_registered_and_handshake_as_foxos():
+def test_US118_iso_acp_agents_registered_and_handshake_as_foxos():
     d = json.loads(as_foxos("foxos acp agent list --json"))["result"]["agents"]
     ids = {a["id"] for a in d}
     assert {"gemini", "codex-acp", "qwen-code", "opencode"} <= ids, ids

@@ -39,7 +39,7 @@ def peer(tmp_path):
     p.kill()
 
 
-def test_US71_catalog_and_stdio_mcp_connector_with_per_bot_grant(bot, tmp_path):
+def test_US109_catalog_and_stdio_mcp_connector_with_per_bot_grant(bot, tmp_path):
     cat = bot.ok("connector", "catalog")["catalog"]
     keys = {c["key"] for c in cat}
     assert {"exa", "parallel", "firecrawl", "notion", "google-drive", "github"} <= keys
@@ -68,7 +68,7 @@ def test_US71_catalog_and_stdio_mcp_connector_with_per_bot_grant(bot, tmp_path):
     assert bot.ok("connector", "list")["count"] == 0
 
 
-def test_US72_oauth_pkce_dynamic_registration_refresh_and_write_approval(bot, peer):
+def test_US110_oauth_pkce_dynamic_registration_refresh_and_write_approval(bot, peer):
     bot.ok("connector", "add", "--id", "notes", "--title", "Notes", "--url", peer + "/mcp", "--auth", "oauth")
     c = [x for x in bot.ok("connector", "list")["connectors"] if x["id"] == "notes"][0]
     assert c["auth"]["authorization_url"] == peer + "/authorize" and c["auth"]["registration_url"] == peer + "/register"
@@ -110,7 +110,7 @@ def test_US72_oauth_pkce_dynamic_registration_refresh_and_write_approval(bot, pe
     assert rc == 4
 
 
-def test_US73_bearer_token_connector_secret_never_logged(bot, peer):
+def test_US111_bearer_token_connector_secret_never_logged(bot, peer):
     # 同一个对端用 bearer 方式：令牌由 stdin 传入，存本地密钥库，输出与审计里看不到
     bot.ok("connector", "add", "--id", "notes-key", "--url", peer + "/mcp", "--auth", "bearer")
     rc, d, p = bot.run("connector", "connect", "notes-key", "--token-stdin", stdin="wrong-token-value")
@@ -129,7 +129,7 @@ def _online(url):
 
 
 @pytest.mark.skipif(not _online("https://mcp.exa.ai/mcp"), reason="mcp.exa.ai not reachable from this machine")
-def test_US74_hosted_keyless_connector_live(bot):
+def test_US112_hosted_keyless_connector_live(bot):
     bot.ok("connector", "add", "--key", "exa")
     t = bot.ok("connector", "tools", "exa", "--refresh")
     names = [x["name"] for x in t["tools"]]
