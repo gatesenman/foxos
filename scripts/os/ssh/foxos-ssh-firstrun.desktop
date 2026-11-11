@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=SSH 远程登录设置
+Exec=/usr/lib/foxos/foxos-ssh-setup --firstrun
+OnlyShowIn=XFCE;
+NoDisplay=true
+X-XFCE-Autostart-Override=true

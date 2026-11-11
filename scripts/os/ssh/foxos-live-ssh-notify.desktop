@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=SSH 远程登录（Live）
+Exec=/usr/lib/foxos/foxos-live-ssh-notify
+OnlyShowIn=XFCE;
+X-XFCE-Autostart-Override=true
+NoDisplay=true

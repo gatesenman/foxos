@@ -16,9 +16,9 @@
 
 错误码：USAGE(2) NOT_FOUND(3) PERMISSION_DENIED(4) LOCKED(5) DEPENDENCY_MISSING(6) CONFLICT(7) PAUSED(8) ERROR(1)。
 
-共 4423 个工具。
+共 4432 个工具。
 
-## acp（11 个工具）
+## acp（12 个工具）
 
 ### `acp_agent_list`
 
@@ -35,6 +35,23 @@
 
 ```json
 {"name": "acp_agent_list", "arguments": {}}
+```
+
+### `acp_list`
+
+列出已安装的 ACP 智能体（--available 列出注册表）。CLI：foxos acp list [--available]。示例：foxos acp list
+
+只读：是 · 破坏性：否 · CLI：`foxos acp list`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `available` | boolean |  | 列出注册表中全部可安装的智能体 |
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "acp_list", "arguments": {}}
 ```
 
 ### `acp_agent_install`
@@ -1750,7 +1767,7 @@ Chrome 是否安装、版本、CDP 开关与端口。CLI：foxos browser status�
 {"name": "docs_export", "arguments": {"file": "…", "output": "…"}}
 ```
 
-## env（30 个工具）
+## env（31 个工具）
 
 ### `env_images`
 
@@ -2158,6 +2175,25 @@ Chrome 是否安装、版本、CDP 开关与端口。CLI：foxos browser status�
 
 ```json
 {"name": "env_logs", "arguments": {"name": "…"}}
+```
+
+### `env_expose`
+
+把虚拟机的 SSH 端口转发开放到主机的所有地址，或收回到本机。CLI：foxos env expose NAME --ssh on|off [--port PORT]。限制：开放只有人能执行；下次启动生效；主机防火墙需放行该端口。示例：foxos env expose dev --ssh on --port 2222
+
+只读：否 · 破坏性：否 · CLI：`foxos env expose`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `name` | string | 是 | 环境名 |
+| `ssh` | string | 是 | on（对外开放）或 off（只在本机） |
+| `port` | integer |  | 主机上的固定端口（默认自动挑一个） |
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "env_expose", "arguments": {"name": "…", "ssh": "…"}}
 ```
 
 ### `env_action_add`
@@ -10445,6 +10481,130 @@ RGBA。CLI：foxos 3d rgba activate。界面：Compositing > main > RGBA。效�
 
 ```json
 {"name": "slides_export", "arguments": {"file": "…", "output": "…"}}
+```
+
+## ssh（7 个工具）
+
+### `ssh_status`
+
+SSH 是否开启、地址、端口、密码登录、root 登录、防火墙、公钥数量与连接命令。CLI：foxos ssh status [--user USER]。示例：foxos ssh status
+
+只读：是 · 破坏性：否 · CLI：`foxos ssh status`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `user` | string |  | 用户（默认当前用户） |
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "ssh_status", "arguments": {}}
+```
+
+### `ssh_enable`
+
+开启 SSH（只允许密钥登录，防火墙放行 22）。CLI：foxos ssh enable。限制：只有人（human 身份）能执行。示例：foxos ssh enable
+
+只读：否 · 破坏性：否 · CLI：`foxos ssh enable`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "ssh_enable", "arguments": {}}
+```
+
+### `ssh_disable`
+
+关闭 SSH 服务。CLI：foxos ssh disable。示例：foxos ssh disable
+
+只读：否 · 破坏性：否 · CLI：`foxos ssh disable`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "ssh_disable", "arguments": {}}
+```
+
+### `ssh_keys_add`
+
+添加 SSH 公钥到 authorized_keys：粘贴、文件或 GitHub 用户名。CLI：foxos ssh keys add [--key KEY] [--file FILE] [--github GITHUB] [--user USER]。限制：只有人（human 身份）能执行。示例：foxos ssh keys add --github octocat
+
+只读：否 · 破坏性：否 · CLI：`foxos ssh keys add`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `key` | string |  | 公钥文本（一行或多行） |
+| `file` | string |  | 公钥文件路径 |
+| `github` | string |  | 从 https://github.com/<用户名>.keys 导入 |
+| `user` | string |  | 用户（默认当前用户） |
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "ssh_keys_add", "arguments": {}}
+```
+
+### `ssh_keys_list`
+
+列出 authorized_keys 里的公钥（类型、注释、指纹）。CLI：foxos ssh keys list [--user USER]。示例：foxos ssh keys list
+
+只读：是 · 破坏性：否 · CLI：`foxos ssh keys list`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `user` | string |  | 用户（默认当前用户） |
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "ssh_keys_list", "arguments": {}}
+```
+
+### `ssh_keys_remove`
+
+按序号或指纹删除一个公钥。CLI：foxos ssh keys remove INDEX|SHA256:... [--user USER]。示例：foxos ssh keys remove 2
+
+只读：否 · 破坏性：否 · CLI：`foxos ssh keys remove`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `key` | string | 是 | 序号、指纹（SHA256:…）或注释 |
+| `user` | string |  | 用户（默认当前用户） |
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "ssh_keys_remove", "arguments": {"key": "…"}}
+```
+
+### `ssh_password`
+
+打开或关闭 SSH 密码登录（打开时可同时设置一个足够强的新密码）。CLI：foxos ssh password on|off [--new-password NEW_PASSWORD]。限制：打开密码登录只有人能执行，并需要 sudo 密码；关闭任何人都可以。示例：foxos ssh password off
+
+只读：否 · 破坏性：否 · CLI：`foxos ssh password`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `state` | string | 是 | on 或 off |
+| `new_password` | string |  | 新密码（至少 12 位，三类字符） |
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "ssh_password", "arguments": {"state": "…"}}
 ```
 
 ## workspace（1 个工具）

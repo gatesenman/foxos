@@ -474,6 +474,10 @@ register_app("acp", tr("acp.app_summary"), tr("acp.app_description"))
 register(Command("acp", "agent list", tr("acp.c_list"), cmd_agent_list,
                  params=[Param("available", "boolean", tr("acp.p_available"), default=False)],
                  examples=["foxos acp agent list --json", "foxos acp agent list --available --json"], audited=False))
+# 简写：foxos acp list = foxos acp agent list
+register(Command("acp", "list", tr("acp.c_list"), cmd_agent_list,
+                 params=[Param("available", "boolean", tr("acp.p_available"), default=False)],
+                 examples=["foxos acp list", "foxos acp list --json"], audited=False))
 register(Command("acp", "agent install", tr("acp.c_install"), cmd_agent_install, params=[AG],
                  examples=["foxos acp agent install codex-acp", "foxos acp agent install gemini"], permission="run",
                  limits=[tr("acp.l_install")]))

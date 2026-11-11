@@ -1,0 +1,46 @@
+#!/bin/sh
+# 狐狸OS SSH 管理助手（root 执行；foxos ssh 经 sudo -n 调用，sudoers 只放行本脚本）。
+# 用法：foxos-ssh-admin enable|disable|password-on|password-off|set-password USER（新密码从标准输入读）|status
+set -eu
+CONF=/etc/ssh/sshd_config.d/10-foxos.conf
+write_conf() {  # $1 = yes|no（密码登录）
+  install -d /etc/ssh/sshd_config.d
+  cat > "$CONF" <<C
+# 由狐狸OS 管理（foxos ssh password on|off）。默认只允许密钥登录，禁止 root 登录。
+PubkeyAuthentication yes
+PasswordAuthentication $1
+KbdInteractiveAuthentication no
+PermitRootLogin no
+PermitEmptyPasswords no
+MaxAuthTries 4
+LoginGraceTime 30
+X11Forwarding no
+C
+}
+reload() { systemctl reload ssh 2>/dev/null || systemctl reload sshd 2>/dev/null || true; }
+fw() {  # $1 = allow|delete
+  command -v ufw >/dev/null 2>&1 || return 0
+  if [ "$1" = allow ]; then ufw allow 22/tcp >/dev/null 2>&1 || true; ufw --force enable >/dev/null 2>&1 || true
+  else ufw delete allow 22/tcp >/dev/null 2>&1 || true; fi
+}
+case "${1:-}" in
+  enable)  ssh-keygen -A >/dev/null 2>&1 || true; [ -f "$CONF" ] || write_conf no
+           systemctl enable --now ssh.service >/dev/null 2>&1 || systemctl enable --now sshd.service; fw allow ;;
+  disable) systemctl disable --now ssh.service ssh.socket >/dev/null 2>&1 || systemctl disable --now sshd.service || true; fw delete ;;
+  password-on)  write_conf yes; reload ;;
+  password-off) write_conf no; reload ;;
+  set-password)
+    u="${2:?user}"; case "$u" in root|"") echo "refusing" >&2; exit 2;; esac
+    id "$u" >/dev/null 2>&1 || { echo "no such user" >&2; exit 2; }
+    IFS= read -r pw; printf '%s:%s\n' "$u" "$pw" | chpasswd ;;
+  status)
+    a=$(systemctl is-active ssh.service 2>/dev/null || systemctl is-active sshd.service 2>/dev/null || true)
+    e=$(systemctl is-enabled ssh.service 2>/dev/null || systemctl is-enabled sshd.service 2>/dev/null || true)
+    pw=$(sshd -T 2>/dev/null | awk '/^passwordauthentication /{print $2}')
+    rl=$(sshd -T 2>/dev/null | awk '/^permitrootlogin /{print $2}')
+    port=$(sshd -T 2>/dev/null | awk '/^port /{print $2; exit}')
+    ufw=$(command -v ufw >/dev/null 2>&1 && ufw status 2>/dev/null | head -1 | awk '{print $2}' || echo none)
+    ufw22=$(command -v ufw >/dev/null 2>&1 && ufw status 2>/dev/null | grep -Eq '^22(/tcp)? +ALLOW' && echo yes || echo no)
+    printf '{"active":"%s","enabled":"%s","password":"%s","root_login":"%s","port":"%s","ufw":"%s","ufw_22":"%s"}\n' "$a" "$e" "$pw" "$rl" "${port:-22}" "$ufw" "$ufw22" ;;
+  *) echo "usage: $0 enable|disable|password-on|password-off|set-password USER|status" >&2; exit 2 ;;
+esac

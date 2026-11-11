@@ -165,7 +165,24 @@ def _summary(cfg: dict) -> dict:
     return {"name": cfg["name"], "image": cfg["image"], "backend": cfg.get("backend", BACKEND), "state": _state(cfg["name"]), "network": cfg.get("network"),
             "workspace": cfg.get("workspace"), "limits": cfg.get("limits"), "mounts": cfg.get("mounts", []), "created": cfg.get("created"),
             "snapshots": len(cfg.get("snapshots", [])), "actions": list((cfg.get("actions") or {}).keys()),
-            "catalog_id": cfg.get("catalog_id"), "guest_os": cfg.get("guest_os", "linux"), "provider": cfg.get("provider", cfg.get("backend", BACKEND))}
+            "catalog_id": cfg.get("catalog_id"), "guest_os": cfg.get("guest_os", "linux"), "provider": cfg.get("provider", cfg.get("backend", BACKEND)),
+            "ssh": _ssh_summary(cfg)}
+
+
+def _ssh_summary(cfg: dict) -> dict | None:
+    """虚拟机的 SSH 入口（端口转发）：本机命令，以及 env expose --ssh on 之后的对外地址。"""
+    f = env_dir(cfg["name"]) / "run" / "ssh.json"
+    try:
+        s = json.loads(f.read_text(encoding="utf-8")) if _state(cfg["name"]) == "running" else None
+    except (OSError, ValueError):
+        s = None
+    if not s and not cfg.get("ssh_expose"):
+        return None
+    port = (s or {}).get("port") or cfg.get("ssh_port")
+    key = (cfg.get("ssh") or {}).get("key")
+    user = (cfg.get("ssh") or {}).get("user") or "foxos"
+    return {"port": port, "user": user, "exposed": bool(cfg.get("ssh_expose")), "bind": (s or {}).get("bind") or "127.0.0.1",
+            "command": f"ssh -p {port} {('-i ' + key + ' ') if key else ''}{user}@127.0.0.1" if port else None}
 
 
 # ---------------------------------------------------------------- 命令实现
@@ -874,7 +891,7 @@ register(Command("env", "run", tr("env.pull_if_needed_create_and_start"), env_ru
                          Param("workspace_mode", "string", tr("env.how_the_workspace_is_mounted"), enum=["rw", "ro", "none"], default="rw", cli_flag="--workspace-mode"),
                          Param("memory_mb", "integer", tr("env.memory_limit_mb")), Param("cpus", "number", tr("env.cpu_limit_cores_needs_cgroup")), Param("pids", "integer", tr("env.process_limit")),
                          Param("desktop_attach", "boolean", tr("env.attach_the_guest_desktop_after_start"), cli_flag="--desktop-attach"),
-                         Param("no_start", "boolean", tr("env.only_create_do_not_start"), cli_flag="--no-start")],
+                         Param("no_start", "boolean", tr("env.only_create_do_not_start"), default=False, cli_flag="--no-start")],
                  examples=["foxos env run dev --image alpine-3.20", "foxos env run live --provider linux-kvm --iso FoxOS-0.3.0-amd64.iso --desktop-attach"],
                  permission="run"))
 register(Command("env", "desktop-attach", tr("env.open_the_guest_desktop_as_a_display"), env_desktop_attach,
@@ -916,6 +933,35 @@ register(Command("env", "limits", tr("env.set_resource_limits_network_and"), env
 register(Command("env", "stats", tr("env.resource_usage_processes_cpu_time"), env_stats, params=[Param("name", "string", tr("env.environment_name_all_by_default"), positional=True, metavar="NAME")],
                  examples=["foxos env stats --json"], audited=False))
 register(Command("env", "logs", tr("env.environment_logs"), env_logs, params=[NAME, Param("lines", "integer", tr("env.lines"), default=100, cli_short="-n")], examples=["foxos env logs dev -n 50"]))
+def env_expose(ctx: Context, name: str, ssh: str, port: int | None = None) -> dict:
+    """把虚拟机的 SSH 端口转发开放到主机的所有地址（默认只在 127.0.0.1）。下次启动生效。"""
+    from ..kernel import is_human
+    cfg = _cfg(name)
+    on = str(ssh).strip().lower() in ("on", "true", "1", "yes")
+    if on and not is_human(ctx.agent):
+        raise FoxError("PERMISSION_DENIED", tr("env.expose_human_only"))
+    cfg["ssh_expose"] = on
+    if on:
+        cfg["ssh_port"] = int(port or cfg.get("ssh_port") or 0) or _free_tcp_port()
+    elif port is None:
+        cfg.pop("ssh_port", None)
+    _save(cfg)
+    return {"message": tr("env.expose_ssh_on", name, cfg["ssh_port"]) if on else tr("env.expose_ssh_off", name),
+            "ssh_expose": on, "ssh_port": cfg.get("ssh_port"), "restart_needed": _state(name) == "running"}
+
+
+def _free_tcp_port() -> int:
+    import socket as _s
+    with _s.socket() as s:
+        s.bind(("", 0))
+        return s.getsockname()[1]
+
+
+register(Command("env", "expose", tr("env.expose_summary"), env_expose,
+                 params=[NAME, Param("ssh", "string", tr("env.expose_ssh_param"), required=True, metavar="on|off"),
+                         Param("port", "integer", tr("env.expose_port_param"))],
+                 examples=["foxos env expose dev --ssh on --port 2222", "foxos env expose dev --ssh off"],
+                 limits=[tr("env.expose_limit")], permission="modify"))
 register(Command("env", "action add", tr("env.add_a_custom_action_supports_the"), env_action_add,
                  params=[NAME, Param("action", "string", tr("env.action_name"), required=True, positional=True, metavar="ACTION"), Param("command", "string", tr("env.shell_command_run_inside_the"), required=True)],
                  examples=["foxos env action add dev test --command 'cd ${workspace} && make test'"], permission="modify"))

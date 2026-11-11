@@ -713,6 +713,28 @@
           "^test_US63"
         ]
       ]
+    },
+    {
+      "id": "US-64",
+      "title": "SSH 远程访问：公钥增删查与 GitHub 导入、智能体不能开门、密码强度检查、MCP ssh_* 对等、虚拟机 SSH 对外开放只限人",
+      "match": [
+        [
+          "pytest",
+          "test_ssh.py",
+          "^test_US64"
+        ]
+      ]
+    },
+    {
+      "id": "US-65",
+      "title": "在真实启动的 ISO 上端到端：SSH 密钥登录 / 密码与 root 被拒 / 经 SSH 运行 foxos 与 MCP、Chrome 安装、在线预设下载并引导、bots 应用与真实 ACP（opencode）对话、runtime doctor、acp list、桌面会话控制、Calamares 装到虚拟磁盘并重启进入",
+      "match": [
+        [
+          "pytest",
+          "test_os_iso_e2e.py",
+          "^test_US65"
+        ]
+      ]
     }
   ]
 }

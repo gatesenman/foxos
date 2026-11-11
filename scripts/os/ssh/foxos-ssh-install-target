@@ -1,0 +1,29 @@
+#!/bin/sh
+# Calamares shellprocess@ssh（dontChroot）：把安装前在 foxos-ssh-setup --installer 里填的内容写进新系统。
+# 新系统默认：SSH 开启、只允许密钥、禁止 root、ufw 放行 22、主机密钥在首次开机时生成（每台机器不同）。
+set -u
+ROOT=${1:?target root}
+STATE=/run/foxos/ssh-install
+# 新系统的普通用户（Calamares 创建的第一个 uid ≥ 1000 的用户）
+U=$(awk -F: '$3>=1000 && $3<60000 {print $1; exit}' "$ROOT/etc/passwd")
+H=$(awk -F: -v u="$U" '$1==u {print $6}' "$ROOT/etc/passwd")
+rm -f "$ROOT"/etc/ssh/ssh_host_*            # 不沿用 Live 的主机密钥
+chroot "$ROOT" /usr/lib/foxos/foxos-ssh-admin password-off >/dev/null 2>&1 || true
+chroot "$ROOT" systemctl enable ssh.service foxos-ssh-hostkeys.service >/dev/null 2>&1 || true
+chroot "$ROOT" systemctl disable foxos-live-ssh.service >/dev/null 2>&1 || true
+if [ -n "$U" ] && [ -s "$STATE/authorized_keys" ]; then
+  install -d -m 700 "$ROOT$H/.ssh"
+  cat "$STATE/authorized_keys" >> "$ROOT$H/.ssh/authorized_keys"
+  chmod 600 "$ROOT$H/.ssh/authorized_keys"
+  chroot "$ROOT" chown -R "$U:$U" "$H/.ssh"
+fi
+if [ "$(cat "$STATE/password" 2>/dev/null)" = yes ] && [ -n "$U" ]; then
+  if [ -s "$STATE/password-value" ]; then
+    printf '%s:%s\n' "$U" "$(cat "$STATE/password-value")" | chroot "$ROOT" chpasswd
+  fi
+  chroot "$ROOT" /usr/lib/foxos/foxos-ssh-admin password-on >/dev/null 2>&1 || true
+fi
+rm -f "$STATE/password-value"
+# 新系统首次登录不再问一遍（安装前已经问过）
+[ -n "$U" ] && { install -d "$ROOT$H/.config/foxos"; touch "$ROOT$H/.config/foxos/ssh-setup-done"; chroot "$ROOT" chown -R "$U:$U" "$H/.config"; }
+exit 0

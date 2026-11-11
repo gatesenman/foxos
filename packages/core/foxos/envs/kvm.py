@@ -163,7 +163,8 @@ def start(cfg: dict, d: Path) -> dict:
     cpus = int(cfg.get("limits", {}).get("cpus") or cfg.get("cpus") or 2)
     vnc_port = _free_port()
     way_port = _free_port()
-    ssh_port = _free_port()
+    # SSH 端口转发：默认只在本机回环；env expose NAME --ssh on 后绑定所有地址并用固定端口（cfg["ssh_port"]）
+    ssh_port = int(cfg.get("ssh_port") or 0) or _free_port()
     log = open(d / "logs" / "vmm.log", "ab")
     serial = d / "logs" / "serial.log"
     serial.write_text("", encoding="utf-8")
@@ -187,7 +188,7 @@ def start(cfg: dict, d: Path) -> dict:
     (d / "run" / "vmm.argv.json").write_text(json.dumps(argv, ensure_ascii=False, indent=1), encoding="utf-8")
     _write_json(_display_file(d), display)
     if vmm["id"] != "cloud-hypervisor" and (cfg.get("network") or "user") != "none":
-        _write_json(d / "run" / "ssh.json", {"host": "127.0.0.1", "port": ssh_port})
+        _write_json(d / "run" / "ssh.json", {"host": "127.0.0.1", "port": ssh_port, "bind": "0.0.0.0" if cfg.get("ssh_expose") else "127.0.0.1"})
     time.sleep(0.3)
     if proc.poll() is not None:
         raise FoxError("ERROR", tr("env.vmm_exited_immediately", proc.returncode), hint=tr("common.see", d / "logs" / "vmm.log"))
@@ -263,7 +264,7 @@ def _argv_qemu_tcg(qemu: str, cfg: dict, d: Path, mem: int, cpus: int, vnc_port:
         argv += ["-drive", f"id=seed,if=none,file={cfg['seed']},media=cdrom,readonly=on", "-device", "ide-cd,drive=seed,bus=ide.1"]
     net = cfg.get("network") or "user"
     if net != "none":
-        fwd = f"hostfwd=tcp:127.0.0.1:{way_port}-:5900" + (f",hostfwd=tcp:127.0.0.1:{ssh_port}-:22" if ssh_port else "")
+        fwd = f"hostfwd=tcp:127.0.0.1:{way_port}-:5900" + (f",hostfwd=tcp:{'0.0.0.0' if cfg.get('ssh_expose') else '127.0.0.1'}:{ssh_port}-:22" if ssh_port else "")
         argv += ["-netdev", f"user,id=n0,{fwd}",
                  "-device", "virtio-net-pci,netdev=n0"]
     else:

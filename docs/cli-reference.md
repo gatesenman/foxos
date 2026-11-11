@@ -53,6 +53,27 @@ foxos acp agent list --json
 foxos acp agent list --available --json
 ```
 
+### `foxos acp list`
+
+列出已安装的 ACP 智能体（--available 列出注册表）
+
+```text
+foxos acp list [--available]
+```
+
+工具接口名：`acp_list` · 权限：`read`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `available` | `--available` | boolean |  | 列出注册表中全部可安装的智能体 |
+
+示例：
+
+```bash
+foxos acp list
+foxos acp list --json
+```
+
 ### `foxos acp agent install`
 
 从 ACP 官方注册表安装智能体（npm / 校验 sha256 的二进制 / uvx）
@@ -2666,6 +2687,33 @@ foxos env logs NAME [--lines LINES]
 foxos env logs dev -n 50
 ```
 
+### `foxos env expose`
+
+把虚拟机的 SSH 端口转发开放到主机的所有地址，或收回到本机
+
+```text
+foxos env expose NAME --ssh on|off [--port PORT]
+```
+
+工具接口名：`env_expose` · 权限：`modify`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `name` | `NAME` | string | 是 | 环境名 |
+| `ssh` | `--ssh` | string | 是 | on（对外开放）或 off（只在本机） |
+| `port` | `--port` | integer |  | 主机上的固定端口（默认自动挑一个） |
+
+示例：
+
+```bash
+foxos env expose dev --ssh on --port 2222
+foxos env expose dev --ssh off
+```
+
+限制：
+
+- 开放只有人能执行；下次启动生效；主机防火墙需放行该端口
+
 ### `foxos env action add`
 
 添加自定义操作（支持 ${env} ${image} ${workspace} ${host_workspace} ${hostname} 变量）
@@ -3744,6 +3792,172 @@ foxos slides export deck.pptx deck.pdf
 限制：
 
 - 需要 LibreOffice
+
+## ssh — SSH 远程访问
+
+OpenSSH：状态、开关、公钥（authorized_keys）、密码登录；默认只允许密钥登录、禁止 root
+
+### `foxos ssh status`
+
+SSH 是否开启、地址、端口、密码登录、root 登录、防火墙、公钥数量与连接命令
+
+```text
+foxos ssh status [--user USER]
+```
+
+工具接口名：`ssh_status` · 权限：`read`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `user` | `--user` | string |  | 用户（默认当前用户） |
+
+示例：
+
+```bash
+foxos ssh status
+foxos ssh status --json
+```
+
+### `foxos ssh enable`
+
+开启 SSH（只允许密钥登录，防火墙放行 22）
+
+```text
+foxos ssh enable
+```
+
+工具接口名：`ssh_enable` · 权限：`modify`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| — | | | | 无参数 |
+
+示例：
+
+```bash
+foxos ssh enable
+```
+
+限制：
+
+- 只有人（human 身份）能执行
+
+### `foxos ssh disable`
+
+关闭 SSH 服务
+
+```text
+foxos ssh disable
+```
+
+工具接口名：`ssh_disable` · 权限：`modify`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| — | | | | 无参数 |
+
+示例：
+
+```bash
+foxos ssh disable
+```
+
+### `foxos ssh keys add`
+
+添加 SSH 公钥到 authorized_keys：粘贴、文件或 GitHub 用户名
+
+```text
+foxos ssh keys add [--key KEY] [--file FILE] [--github GITHUB] [--user USER]
+```
+
+工具接口名：`ssh_keys_add` · 权限：`modify`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `key` | `--key` | string |  | 公钥文本（一行或多行） |
+| `file` | `--file` | string |  | 公钥文件路径 |
+| `github` | `--github` | string |  | 从 https://github.com/<用户名>.keys 导入 |
+| `user` | `--user` | string |  | 用户（默认当前用户） |
+
+示例：
+
+```bash
+foxos ssh keys add --github octocat
+foxos ssh keys add --file ~/id_ed25519.pub
+foxos ssh keys add --key "ssh-ed25519 AAAA... me@laptop"
+```
+
+限制：
+
+- 只有人（human 身份）能执行
+
+### `foxos ssh keys list`
+
+列出 authorized_keys 里的公钥（类型、注释、指纹）
+
+```text
+foxos ssh keys list [--user USER]
+```
+
+工具接口名：`ssh_keys_list` · 权限：`read`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `user` | `--user` | string |  | 用户（默认当前用户） |
+
+示例：
+
+```bash
+foxos ssh keys list
+```
+
+### `foxos ssh keys remove`
+
+按序号或指纹删除一个公钥
+
+```text
+foxos ssh keys remove INDEX|SHA256:... [--user USER]
+```
+
+工具接口名：`ssh_keys_remove` · 权限：`modify`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `key` | `INDEX|SHA256:...` | string | 是 | 序号、指纹（SHA256:…）或注释 |
+| `user` | `--user` | string |  | 用户（默认当前用户） |
+
+示例：
+
+```bash
+foxos ssh keys remove 2
+foxos ssh keys remove SHA256:abc...
+```
+
+### `foxos ssh password`
+
+打开或关闭 SSH 密码登录（打开时可同时设置一个足够强的新密码）
+
+```text
+foxos ssh password on|off [--new-password NEW_PASSWORD]
+```
+
+工具接口名：`ssh_password` · 权限：`modify`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `state` | `on|off` | string | 是 | on 或 off |
+| `new_password` | `--new-password` | string |  | 新密码（至少 12 位，三类字符） |
+
+示例：
+
+```bash
+foxos ssh password off
+foxos ssh password on --new-password '…'
+```
+
+限制：
+
+- 打开密码登录只有人能执行，并需要 sudo 密码；关闭任何人都可以
 
 ## workspace — 工作空间信息
 

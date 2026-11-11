@@ -1,0 +1,4 @@
+# 狐狸OS：foxos ssh 用这个助手管理 SSH。
+# 只有「收紧」方向的操作免密：查看状态、开启服务（仅密钥登录）、关闭服务、关闭密码登录。
+# 打开密码登录和改密码仍要 sudo 密码（等于人在场确认）；foxos 内核另外要求「人」身份。
+%sudo ALL=(root) NOPASSWD: /usr/lib/foxos/foxos-ssh-admin status, /usr/lib/foxos/foxos-ssh-admin enable, /usr/lib/foxos/foxos-ssh-admin disable, /usr/lib/foxos/foxos-ssh-admin password-off

@@ -162,6 +162,8 @@ FOXOS_MCP_TOKEN=<令牌> foxos --workspace ~/FoxOS/workspace mcp --http 127.0.0.
 foxos mcp --profile compact                                                # 精简工具集（通用 + everything_run）
 ```
 
+- SSH：系统默认开 OpenSSH，只认密钥（密码登录默认关、root 禁止、防火墙放行 22）。智能体从别的电脑 `ssh foxos@<地址> foxos …`，或 MCP over SSH：`ssh -T foxos@<地址> foxos mcp`。现场会话会在桌面和控制台显示地址与一次性密码。详见 [docs/ssh.md](docs/ssh.md)
+
 ## Everything 应用（51 个）
 
 来自 [HeyPuter/everything](https://github.com/HeyPuter/everything)（提交 `0fbb88cd`）。AGPL 应用在安装时从上游源码在本机构建，狐狸OS 不修改、不内置其源码。

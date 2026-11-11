@@ -114,7 +114,7 @@ def _add_command(sub, cmd, parents):
             continue
         if prm.type == "boolean":
             # 没有默认值的布尔参数是「三态」：--x 设为真，--no-x 设为假，不写则不改（如 bot config set --no-pinned）
-            p.add_argument(*flags, action=argparse.BooleanOptionalAction if prm.default is None else "store_true", default=None, **kw)
+            p.add_argument(*flags, action=argparse.BooleanOptionalAction if prm.default is None and not prm.flag.startswith("--no-") else "store_true", default=None, **kw)
         elif prm.type == "array" and (prm.items or {}).get("type") in ("array", "object"):
             p.add_argument(f"--{prm.name.replace('_', '-')}-json", dest=DEST + prm.name, metavar="JSON",
                            type=_json_arg, help=prm.description)
@@ -242,6 +242,8 @@ def print_human(cmd_id: str, result: dict) -> None:
     if cmd_id == "env.list":
         for e in result["envs"]:
             print(tr("cli.network_workspace", e['state'], e['name'], e['image'], e['network'], e['workspace']['mode']), file=out)
+            if e.get("ssh") and e["ssh"].get("command"):
+                print(f"      ssh: {e['ssh']['command']}" + ("  (0.0.0.0)" if e["ssh"].get("exposed") else ""), file=out)
     if cmd_id == "env.catalog":
         def _gb(n):
             return f"{(n or 0) / 1024 ** 3:.1f} GB"
@@ -255,6 +257,13 @@ def print_human(cmd_id: str, result: dict) -> None:
         for k in ("state", "phase", "step", "total", "part", "parts", "bytes", "bytes_total", "resumed", "why", "error"):
             if result.get(k) not in (None, ""):
                 print(f"  {k}: {result[k]}", file=out)
+    if cmd_id == "ssh.status":
+        for c in result.get("connect") or []:
+            print(f"  {c}", file=out)
+        print(f"  password_login={result.get('password_login')}  root_login={result.get('root_login')}  keys={result.get('authorized_keys')}  ufw={result.get('firewall', {}).get('ufw')}", file=out)
+    if cmd_id == "ssh.keys.list":
+        for k in result.get("keys") or []:
+            print(f"  {k['index']}  {k.get('type') or '?':<12} {k.get('fingerprint') or tr('ssh.invalid_key')}  {k.get('comment') or ''}", file=out)
     if cmd_id == "everything.list":
         for a in result["apps"]:
             print(tr("cli.ops", tr("cli.installed") if a['installed'] else tr("cli.not_installed"), a['group_name'], a['id'], a['name'], a['license'], a['ops']), file=out)

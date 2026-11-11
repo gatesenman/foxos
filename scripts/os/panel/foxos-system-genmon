@@ -1,7 +1,13 @@
 #!/bin/sh
-# xfce4-genmon-plugin：显示「系统」，点击打开注销/关机对话框。
+# xfce4-genmon-plugin：显示「系统」；悬停显示 SSH 地址，点击打开系统菜单（SSH 远程登录 / 注销关机）。
+ip=$(ip -4 -o addr show scope global 2>/dev/null | awk '{sub(/\/.*/,"",$4); print $4; exit}')
+if systemctl is-active -q ssh.service 2>/dev/null || systemctl is-active -q ssh.socket 2>/dev/null; then
+  ssh="SSH：ssh ${USER:-foxos}@${ip:-（无网络）}"
+else
+  ssh="SSH：未开启（foxos ssh enable）"
+fi
 printf '<icon>system-shutdown-symbolic</icon>\n'
-printf '<iconclick>xfce4-session-logout</iconclick>\n'
+printf '<iconclick>/usr/lib/foxos/panel/foxos-system-menu</iconclick>\n'
 printf '<txt> 系统</txt>\n'
-printf '<txtclick>xfce4-session-logout</txtclick>\n'
-printf '<tool>退出会话、锁定、关机或重新启动</tool>\n'
+printf '<txtclick>/usr/lib/foxos/panel/foxos-system-menu</txtclick>\n'
+printf '<tool>%s\n退出会话、锁定、关机或重新启动</tool>\n' "$ssh"

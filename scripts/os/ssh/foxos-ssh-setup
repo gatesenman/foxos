@@ -1,0 +1,62 @@
+#!/bin/sh
+# SSH 远程登录设置向导（zenity）。
+#   --installer   安装前（Live 会话里，Calamares 之前）：收集公钥与是否允许密码登录，写到 /run/foxos/ssh-install/，
+#                 Calamares 的 shellprocess@ssh 再写进新系统；
+#   --firstrun    新系统首次登录：同样的问题，直接写入本机（经 foxos ssh）。
+# 默认：只允许密钥登录、禁止 root。允许密码登录需要设置一个足够强的密码（至少 12 位、三类字符）。
+set -u
+MODE=${1:---firstrun}
+T="SSH 远程登录"
+STATE=/run/foxos/ssh-install
+[ "$MODE" = --firstrun ] && { grep -qw boot=casper /proc/cmdline && exit 0; [ -f "$HOME/.config/foxos/ssh-setup-done" ] && exit 0; }
+command -v zenity >/dev/null || exit 0
+keys=$(zenity --entry --title "$T" --width 640 --text "狐狸OS 默认开启 SSH，只允许用密钥登录，禁止 root 登录，防火墙放行 22 端口。
+
+粘贴一个或多个公钥（ssh-ed25519 … / ssh-rsa …），或输入 github:用户名 从 GitHub 导入，
+或输入公钥文件路径。留空就跳过（以后可用 foxos ssh keys add）。" 2>/dev/null) || keys=""
+pwon=no; pw=""
+if zenity --question --title "$T" --width 560 --default-cancel --ok-label "允许密码登录" --cancel-label "只用密钥（推荐）" \
+     --text "要允许用密码通过 SSH 登录吗？
+
+同一网络里的人都可以尝试猜密码。只有在没有密钥时才建议打开，并且需要一个足够强的密码。" 2>/dev/null; then
+  while :; do
+    pw=$(zenity --password --title "$T：设置一个强密码" 2>/dev/null) || { pw=""; break; }
+    pw2=$(zenity --password --title "$T：再输入一次" 2>/dev/null) || { pw=""; break; }
+    [ "$pw" = "$pw2" ] || { zenity --error --text "两次输入不一致" 2>/dev/null; continue; }
+    msg=$(printf '%s' "$pw" | python3 -c 'import sys
+sys.path.insert(0,"/usr/lib/foxos/python")
+from foxos.apps.ssh import password_strength
+p=password_strength(sys.stdin.read(),"foxos"); print("；".join(p))' 2>/dev/null)
+    [ -z "$msg" ] && { pwon=yes; break; }
+    zenity --error --title "$T" --text "密码不够强：$msg" 2>/dev/null
+  done
+fi
+if [ "$MODE" = --installer ]; then
+  install -d -m 700 "$STATE"
+  : > "$STATE/authorized_keys"
+  printf '%s\n' "$keys" | while IFS= read -r line; do
+    case "$line" in
+      github:*) u=${line#github:}; curl -fsSL "https://github.com/$u.keys" | sed "s/\$/ github:$u/" >> "$STATE/authorized_keys" || true ;;
+      /*|~*) f=$(eval echo "$line"); [ -f "$f" ] && cat "$f" >> "$STATE/authorized_keys" ;;
+      ssh-*|ecdsa-*|sk-*) printf '%s\n' "$line" >> "$STATE/authorized_keys" ;;
+    esac
+  done
+  echo "$pwon" > "$STATE/password"
+  [ "$pwon" = yes ] && { umask 077; printf '%s\n' "$pw" > "$STATE/password-value"; }
+  exit 0
+fi
+# --firstrun：写入本机
+printf '%s\n' "$keys" | while IFS= read -r line; do
+  case "$line" in
+    github:*) foxos --agent human ssh keys add --github "${line#github:}" ;;
+    /*|~*) foxos --agent human ssh keys add --file "$line" ;;
+    ssh-*|ecdsa-*|sk-*) foxos --agent human ssh keys add --key "$line" ;;
+  esac
+done
+if [ "$pwon" = yes ]; then
+  # pkexec 弹出管理员认证（人在场确认）；密码经标准输入传递，不出现在进程参数里
+  printf '%s\n' "$pw" | pkexec /usr/lib/foxos/foxos-ssh-admin set-password "$(id -un)" && pkexec /usr/lib/foxos/foxos-ssh-admin password-on \
+    && zenity --warning --title "$T" --text "已允许 SSH 密码登录。不需要时运行：foxos ssh password off" 2>/dev/null
+fi
+install -d "$HOME/.config/foxos"; touch "$HOME/.config/foxos/ssh-setup-done"
+exit 0

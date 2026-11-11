@@ -37,6 +37,15 @@ foxos --workspace <目录> mcp --profile compact       # 精简：通用工具 +
 FOXOS_MCP_TOKEN=<令牌> foxos --workspace <目录> mcp --http 127.0.0.1:8765   # Streamable HTTP，POST /mcp，Bearer 令牌
 ```
 
+从别的电脑经 SSH 连进来（默认开，只认密钥，见 [docs/ssh.md](docs/ssh.md)）：
+
+```bash
+ssh foxos@<地址> foxos runtime doctor --json                     # 直接跑命令
+ssh -T foxos@<地址> foxos --workspace ~/FoxOS/workspace mcp      # MCP over SSH（stdio）
+```
+
+智能体不能给自己开门：`ssh enable`、`ssh keys add`、`ssh password on`、`env expose --ssh on` 只有人能执行；`foxos ssh status` 看地址。
+
 工具的 `_meta` 里有 `foxos/id`、对应的 CLI、权限与示例；错误以 `isError: true` 加结构化内容返回。
 
 ## 智能体（bot）、多机与运行环境

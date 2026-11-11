@@ -120,6 +120,7 @@ cd apps/desktop && npm ci && npm start
 
 See [AGENTS.md](AGENTS.md), `foxos agent-guide`, [agent guide](docs/agent-guide.md), [CLI reference](docs/cli-reference.md), [MCP reference](docs/mcp-reference.md).
 Messages and command descriptions are Chinese by default; use `--lang en-US` or `FOXOS_LANG=en-US` for English (JSON field names, error codes and command names do not change).
+SSH is on by default (keys only; password login off, root login off, ufw allows 22). Agents connect with `ssh foxos@HOST foxos …` or MCP over SSH stdio `ssh -T foxos@HOST foxos mcp`; the live session shows its address and a one-time password. See [docs/ssh.md](docs/ssh.md).
 Grammar `foxos <app> <resource> <verb> --json`; MCP tool names `<app>_<resource>_<verb>`; exit codes 0 OK, 1 ERROR, 2 USAGE, 3 NOT_FOUND, 4 PERMISSION_DENIED, 5 LOCKED, 6 DEPENDENCY_MISSING, 7 CONFLICT, 8 PAUSED.
 
 ## Everything apps (51)

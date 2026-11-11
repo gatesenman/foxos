@@ -72,7 +72,7 @@ log "工作目录 $WORK"
 mkdir -p "$WORK" "$OUT" "$ISO/casper" "$ISO/boot/grub" "$ISO/.disk" "$STAGING"
 # 把脚本、品牌、面板、仓库里的 foxos 包、图标放到 staging，供 chroot hook 使用
 rsync -a --delete \
-  "$SCRIPT_DIR/branding" "$SCRIPT_DIR/panel" "$SCRIPT_DIR/calamares" "$SCRIPT_DIR/systemd" "$SCRIPT_DIR/hooks" "$SCRIPT_DIR/chrome" "$SCRIPT_DIR/bots" \
+  "$SCRIPT_DIR/branding" "$SCRIPT_DIR/panel" "$SCRIPT_DIR/calamares" "$SCRIPT_DIR/systemd" "$SCRIPT_DIR/hooks" "$SCRIPT_DIR/chrome" "$SCRIPT_DIR/ssh" "$SCRIPT_DIR/bots" \
   "$STAGING/"
 mkdir -p "$STAGING/icons" "$STAGING/foxos-pkg"
 cp -a "$ROOT/assets/icons/." "$STAGING/icons/"
@@ -108,6 +108,17 @@ REPACK=0
 if [ "${FOXOS_OS_REPACK:-0}" = 1 ] && [ -x "$CHROOT/usr/bin/startxfce4" ]; then
   REPACK=1
   log "FOXOS_OS_REPACK=1，跳过 apt / Firefox / VMM 下载，只重跑 hook 并打包"
+  # 清单里新增、chroot 里还没有的包仍然要装（否则复用旧 chroot 会漏掉新功能）
+  MISSING=""
+  for p in $(grep -vE '^\s*(#|$)' "$SCRIPT_DIR/config/packages.list"); do
+    chroot "$CHROOT" dpkg-query -W -f='${Status}' "$p" 2>/dev/null | grep -q 'install ok installed' || MISSING="$MISSING $p"
+  done
+  if [ -n "$MISSING" ]; then
+    log "补装清单里新增的包：$MISSING"
+    chroot_run apt-get update
+    # shellcheck disable=SC2086
+    chroot_run apt-get install -y --no-install-recommends -o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confold $MISSING
+  fi
 fi
 
 if [ "$REPACK" != 1 ]; then

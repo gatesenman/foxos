@@ -1,0 +1,11 @@
+[Unit]
+Description=FoxOS live session: SSH with a one-time password, shown on the console and desktop
+After=network-online.target foxos-ssh-hostkeys.service
+Wants=network-online.target
+ConditionKernelCommandLine=boot=casper
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/lib/foxos/foxos-live-ssh
+[Install]
+WantedBy=multi-user.target
