@@ -88,6 +88,11 @@ def _firefox_profile() -> Path:
         'user_pref("datareporting.policy.dataSubmissionEnabled", false);',
         'user_pref("browser.tabs.inTitlebar", 0);',
         'user_pref("trailhead.firstrun.didSeeAboutWelcome", true);',
+        'user_pref("browser.aboutwelcome.enabled", false);',
+        'user_pref("browser.preonboarding.enabled", false);',
+        'user_pref("termsofuse.bypassNotification", true);',
+        'user_pref("datareporting.policy.dataSubmissionPolicyBypassNotification", true);',
+        'user_pref("datareporting.policy.firstRunURL", "");',
     ]) + "\n", encoding="utf-8")
     # 应用模式：隐藏标签栏与地址栏
     (p / "chrome" / "userChrome.css").write_text("#TabsToolbar, #nav-bar, #PersonalToolbar, #titlebar { visibility: collapse !important; }\n", encoding="utf-8")
@@ -117,6 +122,8 @@ def main(argv=None) -> int:
     ap.add_argument("--url", default=None, help="use this server URL instead of finding or starting one")
     ap.add_argument("--print-url", action="store_true", help="only print the URL (starts the server if needed)")
     ap.add_argument("--bot", default=None, help="open this bot")
+    ap.add_argument("--page", default=None, help="open a page: approvals, connectors, agents, machines, skills, routines, runtime, "
+                                                 "or settings/<bot>/<tab>")
     a = ap.parse_args(argv)
     prefs = server.load_prefs()
     if a.dock or a.undock or a.side:
@@ -130,7 +137,9 @@ def main(argv=None) -> int:
         subprocess.run(["wmctrl", "-i", "-a", wins[0]])
         print(json.dumps({"url": url.split("?")[0], "reused_window": True, "window": server.apply_window_mode(prefs)}))
         return 0
-    if a.bot:
+    if a.page:
+        url += "#" + "/".join(urllib.parse.quote(x) for x in a.page.split("/"))
+    elif a.bot:
         url += "#bot/" + urllib.parse.quote(a.bot)
     cmd = browser_argv(url)
     if not cmd:
