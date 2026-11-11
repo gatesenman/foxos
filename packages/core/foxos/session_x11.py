@@ -153,6 +153,8 @@ class X11Backend:
             classes = _parse_wmctrl_classes(rx.stdout or "")
             for w in wins:
                 w["app_id"] = classes.get(w["id"], "")
+                if "foxos-bots" in w["app_id"].lower():
+                    w["role"] = "foxos-bots"  # 智能体聊天窗口本身（foxos-bots），智能体操作桌面时应避开它
         active = _active_id("xprop")
         if active:
             for w in wins:

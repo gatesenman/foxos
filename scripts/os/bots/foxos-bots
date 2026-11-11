@@ -1,0 +1,7 @@
+#!/bin/sh
+# 打开狐狸OS「智能体」窗口（独立窗口，或停靠到屏幕一侧：foxos-bots --dock / --undock）
+export PYTHONPATH="/usr/lib/foxos/python${PYTHONPATH:+:$PYTHONPATH}"
+export FOXOS_LANG="${FOXOS_LANG:-zh-CN}"
+PY=/usr/lib/foxos/venv/bin/python
+[ -x "$PY" ] || PY=/usr/bin/python3
+exec "$PY" -m foxos.botchat.launch "$@"

@@ -131,3 +131,16 @@ grub-efi-amd64-signed
 grub-pc-bin
 shim-signed
 grub-efi-amd64-bin
+# 智能体运行环境（scripts/os/hooks/35-agent-runtime.sh，docs/agent-runtime.md）
+python3-venv
+python3-full
+pipx
+git
+jq
+ripgrep
+fd-find
+build-essential
+sqlite3
+zenity
+x11-utils
+xz-utils

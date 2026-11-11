@@ -22,6 +22,7 @@
     { id: 'writer', name: 'Writer', icon: 'file-text', office: true, run: () => FX.launchOffice('writer') },
     { id: 'calc', name: 'Calc', icon: 'file-spreadsheet', office: true, run: () => FX.launchOffice('calc') },
     { id: 'impress', name: 'Impress', icon: 'presentation', office: true, run: () => FX.launchOffice('impress') },
+    { id: 'bots', name: FX.t('bots.title'), icon: 'sparkles', run: () => FX.openWindow('bots', {}) },
     { id: 'environments', name: FX.t('common.environments'), icon: 'box-multiple', run: () => FX.openWindow('environments', {}) },
     { id: 'appcenter', name: FX.t('common.app_center'), icon: 'apps', run: () => FX.openWindow('appcenter', {}) },
     { id: 'settings', name: FX.t('common.settings'), icon: 'settings', run: () => FX.openWindow('settings', {}) },

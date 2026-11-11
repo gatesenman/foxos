@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=FoxOS agent CLIs (first login)
+Name[zh_CN]=狐狸OS 智能体命令行（首次登录）
+Exec=foxos-runtime-firstboot
+NoDisplay=true
+OnlyShowIn=XFCE;
+X-XFCE-Autostart-Override=true

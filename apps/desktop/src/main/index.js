@@ -21,6 +21,7 @@ const { watchWorkspace } = require('./fswatch');
 const { AcpConnection } = require('./acp');
 const everything = require('./everything');
 const control = require('./control');
+const bots = require('./bots');
 
 const s0 = settings.load();
 // 界面语言：--lang= > 设置 > FOXOS_LANG > zh-CN；同时设置 Chromium 自身的界面语言（右键菜单、日期控件）
@@ -119,6 +120,7 @@ handle('env', () => ({
 }));
 
 handle('apps:detect', () => apps.detect());
+handle('bots:url', () => bots.ensure());
 
 // Everything 应用
 handle('ev:list', () => everything.list());
@@ -247,6 +249,7 @@ app.whenReady().then(() => {
 });
 
 app.on('before-quit', () => {
+  bots.stop();
   for (const c of conns.values()) c.stop();
   if (stopWatch) stopWatch();
   control.stop();
