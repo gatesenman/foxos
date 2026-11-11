@@ -1250,5 +1250,6 @@
   "connectors.oauth_discovery_failed": "No OAuth authorization server metadata found for {0} (RFC 9728 / RFC 8414)",
   "connectors.oauth_needs_url": "An OAuth connector needs an MCP URL (--url)",
   "connectors.oauth_no_pkce": "Authorization server {0} does not support PKCE S256; refusing",
-  "machines.client_cert_needed": "The pairing request is missing the controller certificate"
+  "machines.client_cert_needed": "The pairing request is missing the controller certificate",
+  "cli.catalog_summary": "{0} entries ({1} presets), host {2}; + installable, - unavailable (reason in brackets); sizes are download / disk needed"
 }

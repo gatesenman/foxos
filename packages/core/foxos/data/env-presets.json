@@ -112,25 +112,25 @@
    "artifacts": {
     "qcow2": {
      "name": "foxos-ubuntu-24.04.qcow2",
-     "size": 1159725056,
-     "sha256": "4f7e7fd6280639dd86be1c399d675854b3e4dda6045f24d2333a0be6284d685d",
+     "size": 1187512320,
+     "sha256": "b94547f82dcd87a0f1a422b79dd1d3d89505266adbbc5f01072b562737ccd289",
      "parts": [
       {
        "name": "foxos-ubuntu-24.04.qcow2.part1",
        "size": 943718400,
-       "sha256": "1030c0d834a49970b6d74cf8462e1fe41829e45c4f2e60e0877ba9981be6ce8d"
+       "sha256": "01446ddd3803b0cee367707272adeadbeafda3a56372f9670e1ec9155c240727"
       },
       {
        "name": "foxos-ubuntu-24.04.qcow2.part2",
-       "size": 216006656,
-       "sha256": "81d3d13d66145723102e48f3a607aa28b4b7e92b40b7b124f6a53ca69d929a5f"
+       "size": 243793920,
+       "sha256": "6dd9de202cbb323adb91a75467794f4074f8a96120a298809db9da57c28c1103"
       }
      ]
     },
     "wsl": {
      "name": "foxos-ubuntu-24.04-wsl.tar.gz",
-     "size": 600719431,
-     "sha256": "68cfcf8cb76e7b3704b2d4bbc08850f3b7b2fb6bfcbf590f177be5e3cd374f43"
+     "size": 600769278,
+     "sha256": "adc4fb753a428cdabec0fa40fb04b20d39957150481571f8be42f94f5e4d408f"
     }
    },
    "hosts": {
@@ -176,18 +176,18 @@
     "iso": {
      "name": "FoxOS-0.3.2-amd64.iso",
      "release": "v0.3.2-os-preview",
-     "size": 1563162624,
-     "sha256": "8e6a9e65f5e39f22170a23c9dde583056663e26c298e936bdbda4524f1110e39",
+     "size": 1564309504,
+     "sha256": "9ce810228b111cc9087e6a6667deae2096f57d7a3e464c128d73604c33bcec5b",
      "parts": [
       {
        "name": "FoxOS-0.3.2-amd64.iso.part1",
        "size": 838860800,
-       "sha256": "3025bed949e77664790e2a7eb33b4f3e934c864ef2b5dedef222ddd0ed2eb09a"
+       "sha256": "545efdcbc41b9227c908af35fe5cf719e03444b463cf84ca2b6735db7313a6c4"
       },
       {
        "name": "FoxOS-0.3.2-amd64.iso.part2",
-       "size": 724301824,
-       "sha256": "e354732912b3aaca87257afb7fb7185a88d8f88311224503efe2eb506798f178"
+       "size": 725448704,
+       "sha256": "79bf7b29cfe28f37bbe712985c0961dfc0868e7bdb4ce754268c40d40a5626d9"
       }
      ]
     }
