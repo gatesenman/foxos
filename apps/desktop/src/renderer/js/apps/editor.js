@@ -23,7 +23,7 @@
           resolve(window.monaco);
         }, reject);
       };
-      s.onerror = () => reject(new Error('无法加载 Monaco'));
+      s.onerror = () => reject(new Error(FX.t('editor.cannot_load_monaco')));
       document.head.append(s);
     });
     return monacoReady;
@@ -32,7 +32,7 @@
   const LANG = { js: 'javascript', mjs: 'javascript', cjs: 'javascript', jsx: 'javascript', ts: 'typescript', tsx: 'typescript', py: 'python', sh: 'shell', bash: 'shell', zsh: 'shell', ps1: 'powershell', json: 'json', jsonl: 'json', md: 'markdown', html: 'html', htm: 'html', css: 'css', scss: 'scss', xml: 'xml', yaml: 'yaml', yml: 'yaml', toml: 'ini', ini: 'ini', sql: 'sql', rs: 'rust', go: 'go', java: 'java', c: 'c', h: 'c', cpp: 'cpp', hpp: 'cpp', cs: 'csharp', rb: 'ruby', php: 'php', lua: 'lua', r: 'r', csv: 'plaintext', txt: 'plaintext' };
 
   FX.registerApp('editor', {
-    title: (p) => (p.path ? `编辑器 — ${FX.basename(p.path)}` : '编辑器'),
+    title: (p) => (p.path ? FX.t('editor.editor_2', FX.basename(p.path)) : FX.t('common.editor')),
     icon: 'code',
     geometry: { w: 860, h: 560 },
     key: (p) => (p.path ? `editor:${p.path}` : null),
@@ -40,20 +40,21 @@
       let path = params.path || null;
       let mtime = null;
       let dirty = false;
+      win.isDirty = () => dirty;
       let editor = null;
       let savedVersion = null;
-      const pathLabel = el('span', { class: 'muted mono', text: path || '未保存的新文件' });
-      const dirtyDot = el('span', { class: 'dirty-dot hidden', title: '有未保存的修改' });
+      const pathLabel = el('span', { class: 'muted mono', text: path || FX.t('editor.unsaved_new_file') });
+      const dirtyDot = el('span', { class: 'dirty-dot hidden', title: FX.t('editor.unsaved_changes') });
       const banner = el('div', { class: 'banner hidden' });
       const host = el('div', { class: 'editor-host' });
       const status = el('div', { class: 'statusbar' });
       body.append(
         el('div', { class: 'toolbar' }, icon('file-code'), pathLabel, dirtyDot, el('div', { class: 'spacer' }),
-          el('button', { class: 'btn ghost sm', 'data-action': 'reload', onclick: () => load(true) }, icon('refresh'), '重新载入'),
-          el('button', { class: 'btn primary sm', 'data-action': 'save', onclick: () => save() }, icon('device-floppy'), '保存')),
+          el('button', { class: 'btn ghost sm', 'data-action': 'reload', onclick: () => load(true) }, icon('refresh'), FX.t('editor.reload')),
+          el('button', { class: 'btn primary sm', 'data-action': 'save', onclick: () => save() }, icon('device-floppy'), FX.t('common.save'))),
         banner, host, status);
 
-      const setDirty = (d) => { dirty = d; dirtyDot.classList.toggle('hidden', !d); win.setTitle(`${d ? '* ' : ''}编辑器 — ${path ? FX.basename(path) : '新文件'}`); };
+      const setDirty = (d) => { dirty = d; dirtyDot.classList.toggle('hidden', !d); win.setTitle(FX.t('editor.editor', d ? '* ' : '', path ? FX.basename(path) : FX.t('editor.new_file'))); };
 
       function showBanner(text, actions) {
         banner.replaceChildren(icon('alert-triangle'), el('span', { text }), el('div', { class: 'spacer' }),
@@ -74,9 +75,9 @@
           savedVersion = model.getAlternativeVersionId();
           setDirty(false);
           banner.classList.add('hidden');
-          status.textContent = `${r.bytes} 字节 · ${LANG[FX.ext(path)] || 'plaintext'} · UTF-8`;
+          status.textContent = FX.t('editor.bytes_utf_8', r.bytes, LANG[FX.ext(path)] || 'plaintext');
         } catch (e) {
-          if (e.code === 'NOT_FOUND') showBanner('文件已不存在（可能被删除或重命名）。保存会重新创建。', [['知道了', () => {}]]);
+          if (e.code === 'NOT_FOUND') showBanner(FX.t('editor.the_file_no_longer_exists_it_may'), [[FX.t('editor.got_it'), () => {}]]);
           else FX.toast(e.message, 'error');
         }
       }
@@ -84,7 +85,7 @@
       async function save(force = false) {
         if (!editor) return;
         if (!path) {
-          const p = await FX.prompt('保存为', { placeholder: '工作空间内的相对路径，例如 notes/todo.md' });
+          const p = await FX.prompt(FX.t('editor.save_as'), { placeholder: FX.t('editor.path_relative_to_the_workspace_e_g') });
           if (!p) return;
           path = p; pathLabel.textContent = p; win.key = `editor:${p}`; win.params = { path: p };
         }
@@ -95,11 +96,11 @@
           mtime = r.modified;
           savedVersion = editor.getModel().getAlternativeVersionId();
           setDirty(false);
-          FX.toast(`已保存 ${path}`, 'ok');
+          FX.toast(FX.t('editor.saved', path), 'ok');
           FX.saveSession();
         } catch (e) {
-          if (e.code === 'CONFLICT') showBanner('文件在你编辑期间被其他人（智能体或终端）修改过。', [['载入磁盘版本', () => load(true)], ['覆盖保存', () => save(true), 'danger']]);
-          else FX.toast(`${e.message}${e.hint ? `（${e.hint}）` : ''}`, 'error');
+          if (e.code === 'CONFLICT') showBanner(FX.t('editor.someone_else_an_agent_or_the'), [[FX.t('editor.load_the_version_on_disk'), () => load(true)], [FX.t('editor.overwrite'), () => save(true), 'danger']]);
+          else FX.toast(`${e.message}${e.hint ? FX.t('editor.hint_paren', e.hint) : ''}`, 'error');
         }
       }
 
@@ -108,7 +109,7 @@
         editor.onDidChangeModelContent(() => setDirty(editor.getModel().getAlternativeVersionId() !== savedVersion));
         editor.addCommand(m.KeyMod.CtrlCmd | m.KeyCode.KeyS, () => save());
         win.editor = editor;
-        if (path) load(true); else { savedVersion = editor.getModel().getAlternativeVersionId(); status.textContent = '新文件'; }
+        if (path) load(true); else { savedVersion = editor.getModel().getAlternativeVersionId(); status.textContent = FX.t('editor.new_file'); }
       }).catch((e) => { host.append(el('div', { class: 'empty error', text: e.message })); });
 
       // 外部修改：干净时自动载入；有未保存修改时提示
@@ -117,14 +118,14 @@
         FX.k(['files', 'read', path]).then((r) => {
           if (r.modified === mtime) return;
           if (!dirty) load(true);
-          else showBanner('磁盘上的文件已被修改，而你有未保存的修改。', [['载入磁盘版本', () => load(true)], ['保留我的修改', () => {}]]);
+          else showBanner(FX.t('editor.the_file_changed_on_disk_and_you'), [[FX.t('editor.load_the_version_on_disk'), () => load(true)], [FX.t('editor.keep_my_changes'), () => {}]]);
         }).catch(() => {});
       });
 
       return {
         persistParams: () => (path ? { path } : null),
         save, load, value: () => editor && editor.getValue(), isDirty: () => dirty,
-        beforeClose: async () => !dirty || FX.confirm('关闭编辑器', `「${path || '新文件'}」有未保存的修改，确定放弃？`, { okText: '放弃修改', danger: true }),
+        beforeClose: async () => !dirty || FX.confirm(FX.t('editor.close_editor'), FX.t('editor.has_unsaved_changes_discard_them', path || FX.t('editor.new_file')), { okText: FX.t('editor.discard_changes'), danger: true }),
         dispose: () => { win.disposed = true; editor && editor.dispose(); },
       };
     },

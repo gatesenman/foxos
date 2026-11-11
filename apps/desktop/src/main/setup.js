@@ -1,4 +1,5 @@
 'use strict';
+const { t } = require('./i18n');
 // 在线安装向导：按平台给出真实的安装命令（在桌面的真实终端里执行，用户可见进度、可输入 sudo 密码）
 const { IS_WIN, which } = require('./paths');
 const kernel = require('./kernel');
@@ -38,7 +39,7 @@ function planBase() {
     const loPs = path.join(require('./paths').corePath(), 'foxos', 'data', 'windows', 'install-libreoffice.ps1');
     // 安装包自带 Python（embeddable 版 + 办公库）；只有开发模式下才需要单独安装
     const bundled = kernel.bundledPython && kernel.bundledPython();
-    const check = `${exe(py)} -c "import foxos, openpyxl, docx, pptx, zstandard; print('Python', __import__('sys').version.split()[0], '与办公库已就绪（狐狸OS', foxos.__version__, '）')"`;
+    const check = t('setup.c_import_foxos_openpyxl_docx_pptx', exe(py));
     return {
       platform: 'windows', packageManager: which('winget') ? 'winget' : null,
       components: {

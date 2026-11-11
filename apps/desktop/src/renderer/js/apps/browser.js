@@ -13,7 +13,7 @@
   }
 
   FX.registerApp('browser', {
-    title: () => '浏览器',
+    title: () => FX.t('common.browser'),
     icon: 'world',
     geometry: { w: 980, h: 620 },
     mount(body, params, win) {
@@ -23,18 +23,18 @@
       const progress = el('div', { class: 'loadbar hidden' });
       body.append(
         el('form', { class: 'toolbar', onsubmit: (e) => { e.preventDefault(); view.loadURL(normalize(url.value)); } },
-          nav('arrow-left', '后退', () => view.canGoBack() && view.goBack()),
-          nav('arrow-right', '前进', () => view.canGoForward() && view.goForward()),
-          nav('refresh', '刷新', () => view.reload()),
-          nav('home', '主页', () => view.loadURL(HOME)),
+          nav('arrow-left', FX.t('common.back'), () => view.canGoBack() && view.goBack()),
+          nav('arrow-right', FX.t('browser.forward'), () => view.canGoForward() && view.goForward()),
+          nav('refresh', FX.t('common.refresh'), () => view.reload()),
+          nav('home', FX.t('browser.home'), () => view.loadURL(HOME)),
           url),
         progress, view);
       view.addEventListener('did-start-loading', () => progress.classList.remove('hidden'));
       view.addEventListener('did-stop-loading', () => progress.classList.add('hidden'));
       view.addEventListener('did-navigate', (e) => { url.value = e.url; win.params = { url: e.url }; FX.saveSession(); });
       view.addEventListener('did-navigate-in-page', (e) => { if (e.isMainFrame) url.value = e.url; });
-      view.addEventListener('page-title-updated', (e) => win.setTitle(`浏览器 — ${e.title}`));
-      view.addEventListener('did-fail-load', (e) => { if (e.errorCode !== -3) FX.toast(`无法打开 ${e.validatedURL}：${e.errorDescription}`, 'error'); });
+      view.addEventListener('page-title-updated', (e) => win.setTitle(FX.t('browser.browser', e.title)));
+      view.addEventListener('did-fail-load', (e) => { if (e.errorCode !== -3) FX.toast(FX.t('browser.cannot_open', e.validatedURL, e.errorDescription), 'error'); });
       return { view, persistParams: () => ({ url: url.value }), navigate: (u) => view.loadURL(normalize(u)) };
     },
   });

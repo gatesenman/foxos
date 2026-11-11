@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data: file: https: foxicon:; worker-src 'self' blob: file:; connect-src 'self'">
-  <title>狐狸OS</title>
+  <title data-i18n="shell.product">狐狸OS</title>
   <link rel="stylesheet" href="../../node_modules/@tabler/icons-webfont/dist/tabler-icons.min.css">
   <link rel="stylesheet" href="../../node_modules/@xterm/xterm/css/xterm.css">
   <link rel="stylesheet" href="styles.css">
@@ -11,14 +11,14 @@
 </head>
 <body>
   <header class="topbar">
-    <div class="brand"><img src="icon-64.png" alt=""><span>狐狸OS</span></div>
-    <button id="ws-chip" class="chip" title="工作空间"><i class="ti ti-folder"></i><span id="ws-path"></span></button>
+    <div class="brand"><img src="icon-64.png" alt=""><span data-i18n="shell.product">狐狸OS</span></div>
+    <button id="ws-chip" class="chip" title="工作空间" data-i18n-title="shell.workspace"><i class="ti ti-folder"></i><span id="ws-path"></span></button>
     <div class="spacer"></div>
-    <div class="palette"><i class="ti ti-search"></i><input id="palette" type="search" placeholder="搜索应用与文件"></div>
+    <div class="palette"><i class="ti ti-search"></i><input id="palette" type="search" placeholder="搜索应用与文件" data-i18n-placeholder="shell.search"></div>
     <div class="spacer"></div>
-    <button id="takeover" class="btn ghost" title="暂停所有智能体的写操作"><i class="ti ti-hand-stop"></i><span>人工接管</span></button>
-    <button id="open-settings" class="icon-btn" title="设置"><i class="ti ti-settings"></i></button>
-    <button id="toggle-panel" class="icon-btn" title="智能体面板"><i class="ti ti-layout-sidebar-right"></i></button>
+    <button id="takeover" class="btn ghost" title="暂停所有智能体的写操作" data-i18n-title="shell.pause_all_agent_writes"><i class="ti ti-hand-stop"></i><span data-i18n="shell.take_over">人工接管</span></button>
+    <button id="open-settings" class="icon-btn" title="设置" data-i18n-title="shell.settings"><i class="ti ti-settings"></i></button>
+    <button id="toggle-panel" class="icon-btn" title="智能体面板" data-i18n-title="shell.agent_panel"><i class="ti ti-layout-sidebar-right"></i></button>
   </header>
 
   <div class="workarea">
@@ -28,8 +28,8 @@
     </main>
     <aside id="panel" class="panel">
       <div class="panel-tabs">
-        <button data-tab="session" class="active"><i class="ti ti-messages"></i>会话</button>
-        <button data-tab="activity"><i class="ti ti-history"></i>活动</button>
+        <button data-tab="session" class="active"><i class="ti ti-messages"></i><span data-i18n="shell.session">会话</span></button>
+        <button data-tab="activity"><i class="ti ti-history"></i><span data-i18n="shell.activity">活动</span></button>
       </div>
       <section id="tab-session" class="tab active"></section>
       <section id="tab-activity" class="tab"></section>
@@ -37,11 +37,11 @@
   </div>
 
   <footer class="taskbar">
-    <button id="start" class="start" title="开始"><img src="icon-64.png" alt=""><span>开始</span></button>
+    <button id="start" class="start" title="开始" data-i18n-title="shell.start"><img src="icon-64.png" alt=""><span data-i18n="shell.start">开始</span></button>
     <div id="task-items" class="task-items"></div>
     <div class="tray">
-      <span id="tray-agents" class="tray-item" title="正在运行的智能体会话"><i class="ti ti-robot"></i><b>0</b></span>
-      <span id="tray-paused" class="tray-item hidden" title="人工接管中"><i class="ti ti-hand-stop"></i></span>
+      <span id="tray-agents" class="tray-item" title="正在运行的智能体会话" data-i18n-title="shell.running_agent_sessions"><i class="ti ti-robot"></i><b>0</b></span>
+      <span id="tray-paused" class="tray-item hidden" title="人工接管中" data-i18n-title="shell.taken_over"><i class="ti ti-hand-stop"></i></span>
       <span id="clock" class="clock"></span>
     </div>
   </footer>

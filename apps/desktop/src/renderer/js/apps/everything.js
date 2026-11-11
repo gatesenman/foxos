@@ -17,9 +17,9 @@
       const a = appInfo(params.app);
       if (a) { win.iconSpec = FX.evIcon(a); win.node.querySelector('.win-icon').replaceChildren(FX.appIcon(win.iconSpec)); FX.renderTaskbar(); }
       if (!a || !a.installed) {
-        body.append(el('div', { class: 'empty' }, icon('package-off'), el('div', { text: `${a ? a.name : params.app} 尚未安装` }),
-          el('div', { class: 'muted small', text: '在应用中心或安装向导里安装（从上游源码在本机构建）。' }),
-          el('button', { class: 'btn primary sm', onclick: () => FX.openWindow('appcenter', {}) }, '打开应用中心')));
+        body.append(el('div', { class: 'empty' }, icon('package-off'), el('div', { text: FX.t('everything.is_not_installed', a ? a.name : params.app) }),
+          el('div', { class: 'muted small', text: FX.t('everything.install_it_from_the_app_center_or') }),
+          el('button', { class: 'btn primary sm', onclick: () => FX.openWindow('appcenter', {}) }, FX.t('common.open_app_center'))));
         return {};
       }
       const view = el('webview', { src: `foxapp://${params.app}/index.html`, partition: a.partition, class: 'webview', allowpopups: true });

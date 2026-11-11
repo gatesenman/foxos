@@ -2,6 +2,34 @@
 'use strict';
 window.FX = window.FX || {};
 
+// 界面语言：词条来自 src/locales/<语言>.json（预加载脚本同步提供），缺失时退回简体中文，再退回键名
+(() => {
+  const I = window.foxos.i18n;
+  FX.lang = I.lang;
+  FX.languages = I.supported;
+  FX.t = (key, ...args) => {
+    const s = I.messages[FX.lang][key] ?? I.messages['zh-CN'][key];
+    if (s === undefined) { window.foxos.log(`缺少词条 ${key}`); return key; }
+    return String(s).replace(/\{(\d+)\}/g, (m, i) => (args[i] === undefined ? m : String(args[i])));
+  };
+  FX.has = (key) => I.messages[FX.lang][key] !== undefined;
+  document.documentElement.lang = FX.lang;
+  // 静态 HTML：data-i18n（文本）、data-i18n-title / data-i18n-placeholder / data-i18n-aria（属性）
+  FX.applyI18n = (root = document) => {
+    for (const n of root.querySelectorAll('[data-i18n]')) n.textContent = FX.t(n.dataset.i18n);
+    for (const [a, attr] of [['i18nTitle', 'title'], ['i18nPlaceholder', 'placeholder'], ['i18nAria', 'aria-label']]) for (const n of root.querySelectorAll(`[data-${a.replace(/[A-Z]/g, (c) => `-${c.toLowerCase()}`)}]`)) n.setAttribute(attr, FX.t(n.dataset[a]));
+  };
+  // 切换语言：保存设置，重新载入界面（窗口按会话恢复；内核此后使用新语言）
+  FX.setLanguage = async (lang) => {
+    if (lang === FX.lang) return;
+    const dirty = (FX.windows ? FX.windows() : []).filter((w) => w.isDirty && w.isDirty());
+    if (dirty.length && !(await FX.confirm(FX.t('util.switch_language'), FX.t('util.unsaved_changes_will_be_lost', dirty.length), { okText: FX.t('util.switch') }))) return;
+    await I.set(lang);
+    if (FX.saveSession) await FX.saveSession(true);
+    location.reload();
+  };
+})();
+
 FX.$ = (sel, root = document) => root.querySelector(sel);
 FX.$$ = (sel, root = document) => [...root.querySelectorAll(sel)];
 
@@ -61,16 +89,16 @@ FX.dirname = (p) => String(p || '').split('/').slice(0, -1).join('/');
 
 const TEXT_EXT = new Set(['txt', 'md', 'json', 'jsonl', 'js', 'mjs', 'cjs', 'ts', 'tsx', 'jsx', 'py', 'sh', 'bash', 'zsh', 'ps1', 'yaml', 'yml', 'toml', 'ini', 'cfg', 'conf', 'html', 'htm', 'css', 'scss', 'xml', 'sql', 'rs', 'go', 'java', 'c', 'h', 'cpp', 'hpp', 'cs', 'rb', 'php', 'lua', 'r', 'log', 'env', 'gitignore', 'dockerfile', 'makefile', 'csv', 'tsv']);
 FX.fileKind = (name, type) => {
-  if (type === 'dir') return { icon: 'folder', opener: 'files', label: '文件夹' };
+  if (type === 'dir') return { icon: 'folder', opener: 'files', label: FX.t('util.folder') };
   const e = FX.ext(name);
-  if (['xlsx', 'xls', 'ods'].includes(e)) return { icon: 'file-spreadsheet', opener: 'calc', label: '表格' };
-  if (['docx', 'doc', 'odt', 'rtf'].includes(e)) return { icon: 'file-text', opener: 'writer', label: '文档' };
-  if (['pptx', 'ppt', 'odp'].includes(e)) return { icon: 'presentation', opener: 'impress', label: '演示' };
+  if (['xlsx', 'xls', 'ods'].includes(e)) return { icon: 'file-spreadsheet', opener: 'calc', label: FX.t('util.spreadsheet') };
+  if (['docx', 'doc', 'odt', 'rtf'].includes(e)) return { icon: 'file-text', opener: 'writer', label: FX.t('util.document') };
+  if (['pptx', 'ppt', 'odp'].includes(e)) return { icon: 'presentation', opener: 'impress', label: FX.t('util.presentation') };
   if (e === 'pdf') return { icon: 'file-type-pdf', opener: 'browser', label: 'PDF' };
-  if (['png', 'jpg', 'jpeg', 'gif', 'webp', 'svg', 'bmp'].includes(e)) return { icon: 'photo', opener: 'browser', label: '图片' };
-  if (['html', 'htm'].includes(e)) return { icon: 'file-code', opener: 'editor', label: '网页', alt: 'browser' };
+  if (['png', 'jpg', 'jpeg', 'gif', 'webp', 'svg', 'bmp'].includes(e)) return { icon: 'photo', opener: 'browser', label: FX.t('util.image') };
+  if (['html', 'htm'].includes(e)) return { icon: 'file-code', opener: 'editor', label: FX.t('util.web_page'), alt: 'browser' };
   if (e === 'csv' || e === 'tsv') return { icon: 'file-spreadsheet', opener: 'editor', label: 'CSV', alt: 'calc' };
-  if (TEXT_EXT.has(e) || !e) return { icon: e === 'md' ? 'markdown' : ['js', 'ts', 'py', 'sh', 'json', 'css', 'rs', 'go'].includes(e) ? 'file-code' : 'file', opener: 'editor', label: '文本' };
+  if (TEXT_EXT.has(e) || !e) return { icon: e === 'md' ? 'markdown' : ['js', 'ts', 'py', 'sh', 'json', 'css', 'rs', 'go'].includes(e) ? 'file-code' : 'file', opener: 'editor', label: FX.t('util.kind_text') };
   return { icon: 'file', opener: 'editor', label: e.toUpperCase() };
 };
 
@@ -79,7 +107,7 @@ FX.k = async (args, opts) => {
   const r = await window.foxos.run(args, opts);
   if (r.ok) return r.data ? r.data.result : r.stdout;
   const err = r.data && r.data.error;
-  const e = new Error(err ? err.message : (r.stderr || `退出码 ${r.exitCode}`));
+  const e = new Error(err ? err.message : (r.stderr || FX.t('util.exit_code', r.exitCode)));
   e.code = err ? err.code : 'ERROR';
   e.hint = err && err.hint;
   throw e;
@@ -95,27 +123,27 @@ FX.toast = (msg, kind = 'info') => {
 };
 
 // 输入弹窗（Electron 不支持 window.prompt）
-FX.prompt = (title, { value = '', placeholder = '', okText = '确定' } = {}) => new Promise((resolve) => {
+FX.prompt = (title, { value = '', placeholder = '', okText = FX.t('util.ok') } = {}) => new Promise((resolve) => {
   const input = FX.el('input', { class: 'input', value, placeholder });
   const close = (v) => { overlay.remove(); resolve(v); };
   const overlay = FX.el('div', { class: 'overlay' },
     FX.el('form', { class: 'dialog', onsubmit: (e) => { e.preventDefault(); close(input.value.trim() || null); } },
       FX.el('div', { class: 'dialog-title', text: title }), input,
       FX.el('div', { class: 'dialog-actions' },
-        FX.el('button', { type: 'button', class: 'btn ghost', onclick: () => close(null) }, '取消'),
+        FX.el('button', { type: 'button', class: 'btn ghost', onclick: () => close(null) }, FX.t('common.cancel')),
         FX.el('button', { type: 'submit', class: 'btn primary' }, okText))));
   FX.$('#modal-root').append(overlay);
   input.focus();
   input.select();
 });
 
-FX.confirm = (title, body, { okText = '确定', danger = false } = {}) => new Promise((resolve) => {
+FX.confirm = (title, body, { okText = FX.t('util.ok'), danger = false } = {}) => new Promise((resolve) => {
   const close = (v) => { overlay.remove(); resolve(v); };
   const overlay = FX.el('div', { class: 'overlay' },
     FX.el('div', { class: 'dialog' },
       FX.el('div', { class: 'dialog-title', text: title }), FX.el('div', { class: 'dialog-body', text: body }),
       FX.el('div', { class: 'dialog-actions' },
-        FX.el('button', { class: 'btn ghost', onclick: () => close(false) }, '取消'),
+        FX.el('button', { class: 'btn ghost', onclick: () => close(false) }, FX.t('common.cancel')),
         FX.el('button', { class: `btn ${danger ? 'danger' : 'primary'}`, onclick: () => close(true) }, okText))));
   FX.$('#modal-root').append(overlay);
 });
@@ -124,3 +152,4 @@ FX.confirm = (title, body, { okText = '确定', danger = false } = {}) => new Pr
 FX.bus = new EventTarget();
 FX.emit = (name, detail) => FX.bus.dispatchEvent(new CustomEvent(name, { detail }));
 FX.on = (name, fn) => FX.bus.addEventListener(name, (e) => fn(e.detail));
+FX.applyI18n();

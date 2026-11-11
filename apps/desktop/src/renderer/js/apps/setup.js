@@ -4,7 +4,7 @@
   const { el, icon } = FX;
 
   FX.registerApp('setup', {
-    title: () => '安装向导',
+    title: () => FX.t('common.setup_wizard'),
     icon: 'wand',
     geometry: { w: 760, h: 580 },
     key: () => 'setup',
@@ -21,87 +21,87 @@
       async function stepWelcome() {
         root.replaceChildren(
           el('div', { class: 'wizard-hero' }, el('img', { src: 'icon-64.png', alt: '' }), el('div', {},
-            el('h2', { text: '欢迎使用狐狸OS' }),
-            el('p', { class: 'muted', text: '智能体与人共用的桌面：真实的终端、文件、编辑器、浏览器与 LibreOffice。接下来检测本机组件，并按你的勾选在线安装缺少的部分。' }))),
-          el('div', { class: 'field' }, el('label', { text: '工作空间（智能体与你共享的文件夹）' }),
+            el('h2', { text: FX.t('setup.welcome_to_foxos') }),
+            el('p', { class: 'muted', text: FX.t('setup.a_desktop_shared_by_agents_and') }))),
+          el('div', { class: 'field' }, el('label', { text: FX.t('setup.workspace_the_folder_you_share_with') }),
             el('div', { class: 'row' }, el('code', { class: 'grow', text: FX.env.workspace }),
               el('button', { class: 'btn ghost sm', onclick: async () => {
                 const d = await window.foxos.chooseDir(); if (!d) return;
                 await window.foxos.settings.set({ workspace: d });
-                if (await FX.confirm('切换工作空间', `已设置为 ${d}，需要重启桌面生效。现在重启？`, { okText: '重启' })) window.foxos.relaunch();
-              } }, '更改…'))),
-          nav(null, () => go(1), '检测组件'));
+                if (await FX.confirm(FX.t('common.switch_workspace'), FX.t('setup.set_to_the_desktop_must_restart_for', d), { okText: FX.t('common.restart') })) window.foxos.relaunch();
+              } }, FX.t('common.change')))),
+          nav(null, () => go(1), FX.t('setup.detect_components')));
       }
 
-      function nav(back, next, nextText = '下一步') {
+      function nav(back, next, nextText = FX.t('setup.next')) {
         return el('div', { class: 'wizard-nav' },
-          back ? el('button', { class: 'btn ghost', onclick: back }, '上一步') : el('span'),
+          back ? el('button', { class: 'btn ghost', onclick: back }, FX.t('setup.back')) : el('span'),
           el('div', { class: 'spacer' }),
-          el('button', { class: 'btn ghost', 'data-action': 'skip', onclick: finish }, '跳过'),
+          el('button', { class: 'btn ghost', 'data-action': 'skip', onclick: finish }, FX.t('setup.skip')),
           next ? el('button', { class: 'btn primary', 'data-action': 'next', onclick: next }, nextText) : null);
       }
 
       async function stepComponents() {
-        root.replaceChildren(el('div', { class: 'muted', text: '正在检测…' }));
+        root.replaceChildren(el('div', { class: 'muted', text: FX.t('setup.detecting') }));
         [detected, plan] = await Promise.all([FX.detectApps(true), window.foxos.setup.plan()]);
         try { agentList = await window.foxos.agents.list(); } catch { agentList = { agents: [], npm: false } }
         const lo = detected.office[0];
         const tools = Object.fromEntries(detected.tools.map((t) => [t.id, t]));
         const comps = [
-          { id: 'libreoffice', name: 'LibreOffice（Writer / Calc / Impress）', installed: lo.installed, version: lo.version, cmd: plan.components.libreoffice },
+          { id: 'libreoffice', name: FX.t('setup.libreoffice_writer_calc_impress'), installed: lo.installed, version: lo.version, cmd: plan.components.libreoffice },
           { id: 'python', name: 'Python 3', installed: tools.python.installed, version: tools.python.version, cmd: plan.components.python },
-          { id: 'python-deps', name: 'Python 办公库 openpyxl / python-docx / python-pptx', installed: tools['python-deps'].installed, version: tools['python-deps'].version, cmd: plan.components['python-deps'] },
-          { id: 'node', name: 'Node.js 与 npm（npm 型 ACP 智能体需要）', installed: tools.node.installed && tools.npm.installed, version: tools.node.version, cmd: plan.components.node },
+          { id: 'python-deps', name: FX.t('setup.python_office_libraries_openpyxl'), installed: tools['python-deps'].installed, version: tools['python-deps'].version, cmd: plan.components['python-deps'] },
+          { id: 'node', name: FX.t('setup.node_js_and_npm_needed_by_npm_based'), installed: tools.node.installed && tools.npm.installed, version: tools.node.version, cmd: plan.components.node },
           { id: 'git', name: 'git', installed: tools.git.installed, version: tools.git.version, cmd: plan.components.git },
         ];
-        if (plan.components.wmctrl !== undefined) comps.push({ id: 'wmctrl', name: 'wmctrl（任务栏跟踪 LibreOffice 窗口）', installed: tools.wmctrl.installed, cmd: plan.components.wmctrl });
+        if (plan.components.wmctrl !== undefined) comps.push({ id: 'wmctrl', name: FX.t('setup.wmctrl_tracks_libreoffice_windows_in'), installed: tools.wmctrl.installed, cmd: plan.components.wmctrl });
         // 环境组件与 Everything 分组
         let envReady = false;
         try { const im = await FX.k(['env', 'images']); envReady = im.backend !== 'linux-ns' ? false : im.local.length > 0; } catch { envReady = false; }
-        if (plan.components.environments) comps.push({ id: 'environments', name: `环境（${{ linux: 'Linux 命名空间 + Alpine 镜像', windows: 'WSL2', macos: 'Virtualization.framework 辅助程序' }[plan.platform] || plan.platform}）`, installed: envReady, cmd: plan.components.environments });
+        if (plan.components.environments) comps.push({ id: 'environments', name: FX.t('common.environments_2', { linux: FX.t('setup.linux_namespaces_alpine_image'), windows: 'WSL2', macos: FX.t('setup.virtualization_framework_helper') }[plan.platform] || plan.platform), installed: envReady, cmd: plan.components.environments });
         let ev = null; try { ev = await FX.loadEverything(true); } catch { ev = null; }
         const evComps = ev ? ev.groups.map((g) => {
           const apps = ev.apps.filter((a) => a.group === g.id);
           const n = apps.filter((a) => a.installed).length;
-          return { id: `everything:${g.id}`, name: `${g.zh} ${g.en}（${apps.map((a) => a.name).join('、')}）`, installed: n === apps.filter((a) => !a.upstreamIssue).length, version: `${n}/${apps.length} 已安装`, cmd: plan.components[`everything:${g.id}`] };
+          return { id: `everything:${g.id}`, name: FX.t('setup.group_label', g.zh, g.en, apps.map((a) => a.name).join(FX.t('common.list_sep'))), installed: n === apps.filter((a) => !a.upstreamIssue).length, version: FX.t('setup.installed', n, apps.length), cmd: plan.components[`everything:${g.id}`] };
         }) : [];
         const featured = ['claude-acp', 'codex-acp', 'gemini', 'opencode', 'qwen-code', 'goose'];
         const agents = featured.map((id) => agentList.agents.find((a) => a.id === id)).filter(Boolean);
         if (!step || picks.size === 0) for (const c of comps) if (!c.installed && c.cmd) picks.add(c.id);
         const row = (c, cmdText) => el('label', { class: `comp ${c.installed ? 'ok' : ''}`, 'data-comp': c.id },
           el('input', { type: 'checkbox', checked: picks.has(c.id), disabled: c.installed || !cmdText, onchange: (e) => (e.target.checked ? picks.add(c.id) : picks.delete(c.id)) }),
-          el('div', { class: 'grow' }, el('div', {}, c.name, el('span', { class: `badge ${c.installed ? 'ok' : 'warn'}`, text: c.installed ? '已安装' : '未安装' })),
-            el('div', { class: 'muted small mono', text: c.installed ? (c.version || '') : (cmdText || '本平台没有可用的自动安装方式') })));
+          el('div', { class: 'grow' }, el('div', {}, c.name, el('span', { class: `badge ${c.installed ? 'ok' : 'warn'}`, text: c.installed ? FX.t('common.installed') : FX.t('common.not_installed') })),
+            el('div', { class: 'muted small mono', text: c.installed ? (c.version || '') : (cmdText || FX.t('setup.no_automatic_install_on_this')) })));
         root.replaceChildren(
-          el('h2', { text: '选择要安装的组件' }),
-          el('p', { class: 'muted small', text: `平台 ${plan.platform} · 包管理器 ${plan.packageManager || '未检测到'}。系统软件会在真实终端里安装，需要时在终端里输入 sudo 密码。` }),
+          el('h2', { text: FX.t('setup.choose_components_to_install') }),
+          el('p', { class: 'muted small', text: FX.t('setup.platform_package_manager_system', plan.platform, plan.packageManager || FX.t('setup.not_detected')) }),
           el('div', { class: 'comp-list' }, comps.map((c) => row(c, c.cmd))),
-          el('h3', { text: 'Everything 应用（可选，按上游的 9 个分组）' }),
-          el('p', { class: 'muted small', text: '从 HeyPuter/everything 固定提交的源码在本机构建，需要 Node.js 22.12+。AGPL-3.0 的应用作为独立组件安装，狐狸OS 不修改其源码。' }),
+          el('h3', { text: FX.t('setup.everything_apps_optional_in_upstream') }),
+          el('p', { class: 'muted small', text: FX.t('setup.built_locally_from_a_pinned_commit') }),
           el('div', { class: 'comp-list' }, evComps.map((c) => row(c, c.cmd))),
-          el('h3', { text: 'ACP 智能体（可选）' }),
-          el('p', { class: 'muted small', text: '从 ACP 官方注册表安装；使用时需要各自的账号或 API 密钥（在设置中填写）。' }),
+          el('h3', { text: FX.t('setup.acp_agents_optional') }),
+          el('p', { class: 'muted small', text: FX.t('setup.installed_from_the_official_acp') }),
           el('div', { class: 'comp-list' }, agents.map((a) => row({ id: `agent:${a.id}`, name: `${a.name} ${a.version}`, installed: a.installed, version: a.installedVersion },
-            a.methods.includes('binary') ? '官方二进制' : (a.methods.includes('npm') && agentList.npm ? `npm 安装` : null)))),
-          nav(() => go(0), () => go(2), '开始安装'));
+            a.methods.includes('binary') ? FX.t('setup.official_binary') : (a.methods.includes('npm') && agentList.npm ? FX.t('setup.npm') : null)))),
+          nav(() => go(0), () => go(2), FX.t('common.start_install')));
       }
 
       async function stepInstall() {
         const list = [...picks];
         const lines = el('div', { class: 'comp-list' });
-        root.replaceChildren(el('h2', { text: '正在安装' }), lines, el('div', { class: 'wizard-nav' }, el('div', { class: 'spacer' }), el('button', { class: 'btn primary', disabled: true, 'data-action': 'done' }, '完成')));
+        root.replaceChildren(el('h2', { text: FX.t('setup.installing_2') }), lines, el('div', { class: 'wizard-nav' }, el('div', { class: 'spacer' }), el('button', { class: 'btn primary', disabled: true, 'data-action': 'done' }, FX.t('setup.done'))));
         const doneBtn = root.querySelector('[data-action=done]');
-        if (!list.length) lines.append(el('div', { class: 'muted', text: '没有勾选任何组件。' }));
+        if (!list.length) lines.append(el('div', { class: 'muted', text: FX.t('setup.no_components_selected') }));
         for (const id of list) {
-          const state = el('span', { class: 'badge', text: '等待' });
+          const state = el('span', { class: 'badge', text: FX.t('setup.waiting') });
           const prog = el('progress', { class: 'hidden', max: '1' });
-          lines.append(el('div', { class: 'comp', 'data-install': id }, el('div', { class: 'grow', text: id.replace(/^agent:/, 'ACP 智能体 ') }), prog, state));
+          lines.append(el('div', { class: 'comp', 'data-install': id }, el('div', { class: 'grow', text: id.replace(/^agent:/, FX.t('setup.acp_agent')) }), prog, state));
         }
         for (const id of list) {
           const line = lines.querySelector(`[data-install="${CSS.escape(id)}"]`);
           const state = line.querySelector('.badge');
           const prog = line.querySelector('progress');
-          state.textContent = '安装中'; state.className = 'badge';
+          state.textContent = FX.t('setup.installing'); state.className = 'badge';
           let ok = false;
           try {
             if (id.startsWith('agent:')) {
@@ -112,12 +112,12 @@
               await FX.installAgent(aid);
               ok = true;
             } else {
-              const code = await FX.runInTerminal(`安装 ${id}`, plan.components[id]);
+              const code = await FX.runInTerminal(FX.t('common.install_2', id), plan.components[id]);
               ok = code === 0;
             }
           } catch { ok = false; }
           prog.classList.add('hidden');
-          state.textContent = ok ? '完成' : '失败'; state.className = `badge ${ok ? 'ok' : 'err'}`;
+          state.textContent = ok ? FX.t('setup.done') : FX.t('common.failed'); state.className = `badge ${ok ? 'ok' : 'err'}`;
         }
         await FX.detectApps(true);
         doneBtn.disabled = false;

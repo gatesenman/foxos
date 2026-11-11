@@ -1,4 +1,5 @@
 'use strict';
+const { t } = require('./i18n');
 // 调用 foxos 命令内核：桌面上的一切文件操作都经由内核（权限、写锁、审计与智能体一致）
 const { app } = require('electron');
 const { spawn } = require('node:child_process');
@@ -62,7 +63,7 @@ function ensureShim() {
 
 function run(args, { json = true, stdin = null, agent = 'human:desktop', timeoutMs = 180000 } = {}) {
   if (!Array.isArray(args) || args.some((a) => typeof a !== 'string')) {
-    return Promise.resolve({ ok: false, exitCode: 2, data: null, stdout: '', stderr: 'args 必须是字符串数组' });
+    return Promise.resolve({ ok: false, exitCode: 2, data: null, stdout: '', stderr: t('kernel.args_must_be_an_array_of_strings') });
   }
   return new Promise((resolve) => {
     const full = ['-m', 'foxos', '--workspace', workspace, '--agent', agent, ...args, ...(json ? ['--json'] : [])];
@@ -74,7 +75,7 @@ function run(args, { json = true, stdin = null, agent = 'human:desktop', timeout
     child.stderr.on('data', (d) => { stderr += d; });
     child.on('error', (err) => {
       clearTimeout(timer);
-      resolve({ ok: false, exitCode: -1, data: null, stdout: '', stderr: `无法启动 Python（${pythonPath()}）：${err.message}` });
+      resolve({ ok: false, exitCode: -1, data: null, stdout: '', stderr: t('kernel.cannot_start_python', pythonPath(), err.message) });
     });
     child.on('close', (code) => {
       clearTimeout(timer);

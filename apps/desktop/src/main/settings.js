@@ -1,4 +1,5 @@
 'use strict';
+const { t } = require('./i18n');
 // 设置与会话状态：保存在 userData 下的 JSON 文件；API 密钥用 Electron safeStorage 加密（可用时）
 const { app, safeStorage } = require('electron');
 const fs = require('node:fs');
@@ -30,7 +31,7 @@ function encryptionInfo() {
 }
 
 function setSecret(name, value) {
-  if (!/^[A-Z][A-Z0-9_]{1,63}$/.test(name)) throw new Error('环境变量名只能包含大写字母、数字和下划线');
+  if (!/^[A-Z][A-Z0-9_]{1,63}$/.test(name)) throw new Error(t('settings.environment_variable_names_may'));
   const s = load();
   if (!value) delete s.secrets[name];
   else if (safeStorage.isEncryptionAvailable()) s.secrets[name] = { enc: safeStorage.encryptString(value).toString('base64') };

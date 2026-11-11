@@ -14,11 +14,11 @@
     FX.emit('agent-install', { id });
     try {
       const r = await window.foxos.agents.install(id);
-      FX.toast(`已安装 ${r.name || id}`, 'ok');
+      FX.toast(FX.t('appcenter.installed_2', r.name || id), 'ok');
       return r;
     } catch (e) {
-      FX.toast(`安装 ${id} 失败：${e.message}`, 'error');
-      const s = installing.get(id); if (s) s.log += `\n失败：${e.message}\n`;
+      FX.toast(FX.t('appcenter.installing_failed', id, e.message), 'error');
+      const s = installing.get(id); if (s) s.log += FX.t('appcenter.failed', e.message);
       throw e;
     } finally {
       const s = installing.get(id); if (s) s.done = true;
@@ -29,22 +29,22 @@
   FX.installingState = (id) => installing.get(id);
 
   FX.registerApp('appcenter', {
-    title: () => '应用中心',
+    title: () => FX.t('common.app_center'),
     icon: 'apps',
     geometry: { w: 900, h: 600 },
     key: () => 'appcenter',
     mount(body, params, win) {
       const content = el('div', { class: 'appcenter scroll' });
-      const filter = el('input', { class: 'input', type: 'search', placeholder: '搜索智能体（名称、描述）' });
-      body.append(el('div', { class: 'toolbar' }, icon('apps'), el('b', { text: '应用中心' }), el('span', { class: 'muted', text: '检测结果来自本机，不是预设数据' }), el('div', { class: 'spacer' }),
-        el('button', { class: 'btn ghost sm', onclick: () => FX.openWindow('setup', {}) }, icon('wand'), '安装向导'),
-        el('button', { class: 'btn ghost sm', onclick: () => refresh() }, icon('refresh'), '重新检测')), content);
+      const filter = el('input', { class: 'input', type: 'search', placeholder: FX.t('appcenter.search_agents_name_description') });
+      body.append(el('div', { class: 'toolbar' }, icon('apps'), el('b', { text: FX.t('common.app_center') }), el('span', { class: 'muted', text: FX.t('appcenter.detected_on_this_machine_not_preset') }), el('div', { class: 'spacer' }),
+        el('button', { class: 'btn ghost sm', onclick: () => FX.openWindow('setup', {}) }, icon('wand'), FX.t('common.setup_wizard')),
+        el('button', { class: 'btn ghost sm', onclick: () => refresh() }, icon('refresh'), FX.t('appcenter.detect_again'))), content);
       let agentData = null;
 
       const card = (a, actions, extra) => el('div', { class: `app-card ${a.installed ? 'ok' : 'missing'}`, 'data-app-id': a.id },
         el('div', { class: 'app-card-icon' }, FX.appIcon(a.iconSpec || FX.programIcon(a.id, ICONS[a.id] || 'box'))),
         el('div', { class: 'app-card-main' },
-          el('div', { class: 'app-card-name' }, a.name, el('span', { class: `badge ${a.installed ? 'ok' : 'warn'}`, text: a.installed ? '已安装' : '未安装' })),
+          el('div', { class: 'app-card-name' }, a.name, el('span', { class: `badge ${a.installed ? 'ok' : 'warn'}`, text: a.installed ? FX.t('common.installed') : FX.t('common.not_installed') })),
           el('div', { class: 'muted small', text: a.version || a.hint || '' }), extra || null),
         el('div', { class: 'app-card-actions' }, actions));
 
@@ -53,33 +53,33 @@
       async function setupCmd(id) {
         const plan = await window.foxos.setup.plan();
         const cmd = plan.components[SETUP_KEY[id]];
-        if (!cmd) { FX.toast('本平台没有可用的自动安装方式，请手动安装', 'error'); return; }
-        const code = await FX.runInTerminal(`安装 ${id}`, cmd);
-        FX.toast(code === 0 ? '安装完成' : `安装命令退出码 ${code}`, code === 0 ? 'ok' : 'error');
+        if (!cmd) { FX.toast(FX.t('appcenter.no_automatic_install_on_this'), 'error'); return; }
+        const code = await FX.runInTerminal(FX.t('common.install_2', id), cmd);
+        FX.toast(code === 0 ? FX.t('appcenter.installed') : FX.t('appcenter.install_command_exited_with_code', code), code === 0 ? 'ok' : 'error');
         refresh();
       }
 
       function renderAgents(box) {
         box.replaceChildren();
-        if (!agentData) { box.append(el('div', { class: 'muted', text: '正在读取 ACP 注册表…' })); return; }
+        if (!agentData) { box.append(el('div', { class: 'muted', text: FX.t('appcenter.reading_the_acp_registry') })); return; }
         const q = filter.value.trim().toLowerCase();
         const list = agentData.agents.filter((a) => !q || `${a.id} ${a.name} ${a.description}`.toLowerCase().includes(q));
-        box.append(el('div', { class: 'muted small' }, `来源：${agentData.source === 'online' ? 'ACP 官方注册表（在线）' : agentData.source === 'cache' ? 'ACP 注册表（本地缓存）' : 'ACP 注册表（内置快照）'} · 平台 ${agentData.platform} · 共 ${agentData.agents.length} 个${agentData.npm ? '' : ' · 未检测到 npm，npm 型智能体无法安装'}`));
+        box.append(el('div', { class: 'muted small' }, FX.t('appcenter.source_platform_agents', agentData.source === 'online' ? FX.t('appcenter.official_acp_registry_online') : agentData.source === 'cache' ? FX.t('appcenter.acp_registry_local_cache') : FX.t('appcenter.acp_registry_built_in_snapshot'), agentData.platform, agentData.agents.length, agentData.npm ? '' : FX.t('appcenter.npm_not_found_npm_based_agents'))));
         const grid = el('div', { class: 'card-grid' });
         for (const a of list) {
           const st = installing.get(a.id);
           const busy = st && !st.done;
           const canInstall = a.methods.includes('binary') || (a.methods.includes('npm') && agentData.npm);
           const actions = a.installed
-            ? [el('button', { class: 'btn sm primary', onclick: () => { FX.openPanel(); FX.startAgentSession(a.id); } }, icon('player-play'), '启动会话'),
-              el('button', { class: 'btn sm ghost', onclick: async () => { if (await FX.confirm('卸载', `卸载 ${a.name}？`, { danger: true, okText: '卸载' })) { await window.foxos.agents.uninstall(a.id); FX.emit('agents-changed'); } } }, '卸载')]
-            : [el('button', { class: 'btn sm primary', 'data-action': 'install-agent', disabled: busy || !canInstall, title: canInstall ? `安装方式：${a.methods.join(' / ')}` : '本平台没有可用的安装方式', onclick: () => FX.installAgent(a.id).catch(() => {}) }, icon('download'), busy ? '安装中…' : '安装')];
+            ? [el('button', { class: 'btn sm primary', onclick: () => { FX.openPanel(); FX.startAgentSession(a.id); } }, icon('player-play'), FX.t('appcenter.start_session')),
+              el('button', { class: 'btn sm ghost', onclick: async () => { if (await FX.confirm(FX.t('appcenter.uninstall'), FX.t('appcenter.uninstall_2', a.name), { danger: true, okText: FX.t('appcenter.uninstall') })) { await window.foxos.agents.uninstall(a.id); FX.emit('agents-changed'); } } }, FX.t('appcenter.uninstall'))]
+            : [el('button', { class: 'btn sm primary', 'data-action': 'install-agent', disabled: busy || !canInstall, title: canInstall ? FX.t('appcenter.install_method', a.methods.join(' / ')) : FX.t('appcenter.no_install_method_for_this_platform'), onclick: () => FX.installAgent(a.id).catch(() => {}) }, icon('download'), busy ? FX.t('appcenter.installing') : FX.t('common.install'))];
           const extra = el('div', {},
             el('div', { class: 'small', text: a.description || '' }),
-            el('div', { class: 'muted small', text: `${a.version} · ${a.license || '许可证未注明'} · ${a.methods.join(' / ') || '无可用安装方式'}` }),
+            el('div', { class: 'muted small', text: `${a.version} · ${a.license || FX.t('appcenter.license_not_stated')} · ${a.methods.join(' / ') || FX.t('appcenter.no_install_method')}` }),
             st ? el('div', { class: 'install-state' },
               st.ratio != null && !st.done ? el('progress', { max: '1', value: String(st.ratio) }) : null,
-              el('pre', { class: 'install-log', text: st.log.slice(-1200) || '准备中…' })) : null);
+              el('pre', { class: 'install-log', text: st.log.slice(-1200) || FX.t('appcenter.preparing') })) : null);
           grid.append(card({ ...a, version: null, hint: null, iconSpec: FX.agentIcon(a) }, actions, extra));
         }
         box.append(grid);
@@ -98,45 +98,45 @@
       // Everything 应用（HeyPuter/everything，按上游的 9 个分组），在本机从上游源码构建
       const evBox = el('section', { class: 'ev-section' });
       async function evInstall(ids, label) {
-        const code = await FX.runInTerminal(`安装 ${label}`, `foxos everything install ${ids.join(' ')}`);
-        FX.toast(code === 0 ? `${label} 安装完成` : `安装命令退出码 ${code}`, code === 0 ? 'ok' : 'error');
+        const code = await FX.runInTerminal(FX.t('common.install_2', label), `foxos everything install ${ids.join(' ')}`);
+        FX.toast(code === 0 ? FX.t('common.installed_2', label) : FX.t('appcenter.install_command_exited_with_code', code), code === 0 ? 'ok' : 'error');
         await FX.loadEverything(true); renderEverything(); FX.emit('everything-changed');
       }
       async function renderEverything() {
-        let c; try { c = await FX.loadEverything(true); } catch (e) { evBox.replaceChildren(el('h3', { text: 'Everything 应用' }), el('div', { class: 'muted', text: e.message })); return; }
+        let c; try { c = await FX.loadEverything(true); } catch (e) { evBox.replaceChildren(el('h3', { text: FX.t('appcenter.everything_apps') }), el('div', { class: 'muted', text: e.message })); return; }
         const inst = c.apps.filter((a) => a.installed).length;
         evBox.replaceChildren(
-          el('h3', { text: `Everything 应用（已安装 ${inst}/${c.apps.length}）` }),
-          el('div', { class: 'muted small', text: `来源 ${c.upstream} @ ${String(c.commit).slice(0, 8)} · 根目录许可 ${c.rootLicense}；标注 AGPL-3.0 的应用作为独立组件在安装时从上游获取，狐狸OS 不修改其源码。` }),
+          el('h3', { text: FX.t('appcenter.everything_apps_installed', inst, c.apps.length) }),
+          el('div', { class: 'muted small', text: FX.t('appcenter.source_root_license_apps_marked_agpl', c.upstream, String(c.commit).slice(0, 8), c.rootLicense) }),
           ...c.groups.map((g) => {
             const apps = c.apps.filter((a) => a.group === g.id);
             const missing = apps.filter((a) => !a.installed && !a.upstreamIssue).map((a) => a.id);
             return el('div', { class: 'ev-group', 'data-group': g.id },
               el('div', { class: 'row' }, icon(FX.groupIcon(g.id)), el('b', { text: `${g.zh} ${g.en}` }), el('span', { class: 'muted small', text: `${apps.filter((a) => a.installed).length}/${apps.length}` }), el('div', { class: 'spacer' }),
-                missing.length ? el('button', { class: 'btn sm ghost', 'data-install-group': g.id, onclick: () => evInstall(missing, `${g.zh}分组`) }, icon('download'), `安装本组（${missing.length}）`) : null),
+                missing.length ? el('button', { class: 'btn sm ghost', 'data-install-group': g.id, onclick: () => evInstall(missing, FX.t('appcenter.the_group', g.zh)) }, icon('download'), FX.t('appcenter.install_group', missing.length)) : null),
               el('div', { class: 'card-grid' }, apps.map((a) => el('div', { class: `app-card ${a.installed ? 'ok' : 'missing'}`, 'data-ev-app': a.id },
                 el('div', { class: 'app-card-icon' }, FX.appIcon(FX.evIcon(a))),
                 el('div', { class: 'app-card-main' },
-                  el('div', { class: 'app-card-name' }, a.name, el('span', { class: `badge ${a.installed ? 'ok' : a.upstreamIssue ? 'error' : 'warn'}`, text: a.installed ? '已安装' : a.upstreamIssue ? '上游不可构建' : '未安装' }), a.agpl ? el('span', { class: 'badge', text: 'AGPL' }) : null),
+                  el('div', { class: 'app-card-name' }, a.name, el('span', { class: `badge ${a.installed ? 'ok' : a.upstreamIssue ? 'error' : 'warn'}`, text: a.installed ? FX.t('common.installed') : a.upstreamIssue ? FX.t('appcenter.upstream_does_not_build') : FX.t('common.not_installed') }), a.agpl ? el('span', { class: 'badge', text: 'AGPL' }) : null),
                   el('div', { class: 'muted small', text: a.upstreamIssue || a.description || '' })),
                 el('div', { class: 'app-card-actions' }, a.installed
-                  ? [el('button', { class: 'btn sm ghost', onclick: () => FX.openWindow('everything', { app: a.id }) }, '打开'),
-                    el('button', { class: 'btn sm ghost', onclick: async () => { if (await FX.confirm('卸载', `卸载 ${a.name}？工作空间里的数据不会删除。`, { danger: true, okText: '卸载' })) { await FX.k(['everything', 'uninstall', a.id]); renderEverything(); FX.emit('everything-changed'); } } }, '卸载')]
-                  : a.upstreamIssue ? [] : [el('button', { class: 'btn sm primary', 'data-install': a.id, onclick: () => evInstall([a.id], a.name) }, icon('download'), '安装')])))));
+                  ? [el('button', { class: 'btn sm ghost', onclick: () => FX.openWindow('everything', { app: a.id }) }, FX.t('common.open')),
+                    el('button', { class: 'btn sm ghost', onclick: async () => { if (await FX.confirm(FX.t('appcenter.uninstall'), FX.t('appcenter.uninstall_data_in_the_workspace_is', a.name), { danger: true, okText: FX.t('appcenter.uninstall') })) { await FX.k(['everything', 'uninstall', a.id]); renderEverything(); FX.emit('everything-changed'); } } }, FX.t('appcenter.uninstall'))]
+                  : a.upstreamIssue ? [] : [el('button', { class: 'btn sm primary', 'data-install': a.id, onclick: () => evInstall([a.id], a.name) }, icon('download'), FX.t('common.install'))])))));
           }));
       }
 
       async function refresh() {
-        content.replaceChildren(el('div', { class: 'muted', text: '正在检测本机软件…' }));
+        content.replaceChildren(el('div', { class: 'muted', text: FX.t('appcenter.detecting_software_on_this_machine') }));
         const d = await FX.detectApps(true);
         content.replaceChildren(
-          section('内置应用', d.builtin.map((a) => card(a, [el('button', { class: 'btn sm ghost', onclick: () => FX.openWindow(a.id, {}) }, '打开')]))),
-          section('办公套件（LibreOffice 原生窗口）', d.office.map((a) => card(a, a.installed
-            ? [el('button', { class: 'btn sm ghost', onclick: () => FX.launchOffice(a.id) }, '打开')]
-            : [el('button', { class: 'btn sm primary', onclick: () => setupCmd(a.id) }, icon('download'), '安装')]))),
-          section('开发工具与依赖', d.tools.map((a) => card(a, a.installed ? [] : [el('button', { class: 'btn sm primary', onclick: () => setupCmd(a.id) }, icon('download'), '安装')]))),
+          section(FX.t('appcenter.built_in_apps'), d.builtin.map((a) => card(a, [el('button', { class: 'btn sm ghost', onclick: () => FX.openWindow(a.id, {}) }, FX.t('common.open'))]))),
+          section(FX.t('appcenter.office_suite_native_libreoffice'), d.office.map((a) => card(a, a.installed
+            ? [el('button', { class: 'btn sm ghost', onclick: () => FX.launchOffice(a.id) }, FX.t('common.open'))]
+            : [el('button', { class: 'btn sm primary', onclick: () => setupCmd(a.id) }, icon('download'), FX.t('common.install'))]))),
+          section(FX.t('appcenter.developer_tools_and_dependencies'), d.tools.map((a) => card(a, a.installed ? [] : [el('button', { class: 'btn sm primary', onclick: () => setupCmd(a.id) }, icon('download'), FX.t('common.install'))]))),
           evBox,
-          el('section', {}, el('h3', { text: 'ACP 智能体' }), filter, agentsBox));
+          el('section', {}, el('h3', { text: FX.t('appcenter.acp_agents') }), filter, agentsBox));
         renderEverything();
         loadAgents();
       }

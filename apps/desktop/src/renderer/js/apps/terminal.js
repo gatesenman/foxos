@@ -6,7 +6,7 @@
   window.foxos.pty.onExit((id, code) => ptyHandlers.get(id)?.exit(code));
 
   FX.registerApp('terminal', {
-    title: (p) => p.title || '终端',
+    title: (p) => p.title || FX.t('common.terminal'),
     icon: 'terminal-2',
     geometry: { w: 820, h: 480 },
     mount(body, params, win) {
@@ -32,12 +32,12 @@
         ptyId = info.id;
         win.ptyId = info.id;
         win.shell = info.shell;
-        if (!params.title) win.setTitle(`终端 — ${info.title}`);
+        if (!params.title) win.setTitle(FX.t('terminal.terminal', info.title));
         ptyHandlers.set(info.id, {
           data: (d) => term.write(d),
           exit: (code) => {
             exited = true;
-            term.write(`\r\n\x1b[2m[进程已退出，退出码 ${code}]\x1b[0m\r\n`);
+            term.write(FX.t('terminal.2m_process_exited_with_code_0m', code));
             win.exitCode = code;
             params.onExit && params.onExit(code);
             FX.emit('pty-exit', { winId: win.id, code });
@@ -46,7 +46,7 @@
         term.onData((d) => { if (!exited) window.foxos.pty.write(info.id, d); });
         doFit();
         return info;
-      }).catch((e) => { term.write(`无法启动终端：${e.message}\r\n`); });
+      }).catch((e) => { term.write(FX.t('terminal.cannot_start_the_terminal', e.message)); });
       term.focus();
       return {
         term, ready,

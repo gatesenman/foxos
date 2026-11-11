@@ -15,7 +15,7 @@
   FX.fileUrl = (rel) => `file://${FX.env.workspace.replace(/\\/g, '/').replace(/^([A-Za-z]):/, '/$1:')}/${rel.split('/').map(encodeURIComponent).join('/')}`;
 
   FX.registerApp('files', {
-    title: (p) => `文件 — ${p.path ? p.path : '工作空间'}`,
+    title: (p) => FX.t('files.files', p.path ? p.path : FX.t('common.workspace')),
     icon: 'folder',
     geometry: { w: 760, h: 480 },
     mount(body, params, win) {
@@ -28,21 +28,21 @@
       const status = el('div', { class: 'statusbar' });
       const tb = (ic, title, fn, extra = '') => el('button', { class: `icon-btn ${extra}`, title, onclick: fn }, icon(ic));
       const toolbar = el('div', { class: 'toolbar' },
-        tb('arrow-left', '后退', () => { if (history.length) go(history.pop(), false); }),
-        tb('arrow-up', '上一级', () => { if (cwd) go(FX.dirname(cwd)); }),
-        tb('refresh', '刷新', () => load()),
+        tb('arrow-left', FX.t('common.back'), () => { if (history.length) go(history.pop(), false); }),
+        tb('arrow-up', FX.t('files.up'), () => { if (cwd) go(FX.dirname(cwd)); }),
+        tb('refresh', FX.t('common.refresh'), () => load()),
         crumbs,
         el('div', { class: 'spacer' }),
-        el('button', { class: 'btn ghost sm', 'data-action': 'new-folder', onclick: newFolder }, icon('folder-plus'), '新建文件夹'),
-        el('button', { class: 'btn ghost sm', 'data-action': 'new-file', onclick: newFile }, icon('file-plus'), '新建文件'),
-        tb('pencil', '重命名（F2）', () => rename(), 'need-sel'),
-        tb('trash', '删除（Delete）', () => del(), 'need-sel danger'));
+        el('button', { class: 'btn ghost sm', 'data-action': 'new-folder', onclick: newFolder }, icon('folder-plus'), FX.t('files.new_folder')),
+        el('button', { class: 'btn ghost sm', 'data-action': 'new-file', onclick: newFile }, icon('file-plus'), FX.t('files.new_file')),
+        tb('pencil', FX.t('files.rename_f2'), () => rename(), 'need-sel'),
+        tb('trash', FX.t('files.delete_delete'), () => del(), 'need-sel danger'));
       body.append(toolbar, list, status);
 
       function rel(name) { return cwd ? `${cwd}/${name}` : name; }
 
       function renderCrumbs() {
-        crumbs.replaceChildren(el('button', { class: 'crumb', onclick: () => go('') }, icon('home'), '工作空间'));
+        crumbs.replaceChildren(el('button', { class: 'crumb', onclick: () => go('') }, icon('home'), FX.t('common.workspace')));
         let acc = '';
         for (const part of cwd.split('/').filter(Boolean)) {
           acc = acc ? `${acc}/${part}` : part;
@@ -52,8 +52,8 @@
       }
 
       function render() {
-        list.replaceChildren(el('div', { class: 'file-row head' }, el('span', { text: '名称' }), el('span', { text: '类型' }), el('span', { text: '大小' }), el('span', { text: '修改时间' })));
-        if (!entries.length) list.append(el('div', { class: 'empty' }, icon('folder-open'), el('div', { text: '空文件夹' })));
+        list.replaceChildren(el('div', { class: 'file-row head' }, el('span', { text: FX.t('files.name') }), el('span', { text: FX.t('files.type') }), el('span', { text: FX.t('files.size') }), el('span', { text: FX.t('files.modified') })));
+        if (!entries.length) list.append(el('div', { class: 'empty' }, icon('folder-open'), el('div', { text: FX.t('files.empty_folder') })));
         for (const e of entries) {
           const kind = FX.fileKind(e.name, e.type);
           const row = el('div', {
@@ -66,7 +66,7 @@
           el('span', { class: 'muted', text: FX.fmtTime(e.modified) }));
           list.append(row);
         }
-        status.textContent = `${entries.length} 项${selected ? ` · 已选择 ${FX.basename(selected)}` : ''}`;
+        status.textContent = FX.t('files.items', entries.length, selected ? FX.t('files.selected', FX.basename(selected)) : '');
         body.classList.toggle('has-sel', Boolean(selected));
       }
 
@@ -76,7 +76,7 @@
           entries = r.entries;
           if (selected && !entries.some((e) => e.path === selected)) selected = null;
           renderCrumbs(); render();
-          win.setTitle(`文件 — ${cwd || '工作空间'}`);
+          win.setTitle(FX.t('files.files', cwd || FX.t('common.workspace')));
         } catch (e) {
           FX.toast(e.message, 'error');
           if (e.code === 'NOT_FOUND' && cwd) go(FX.dirname(cwd), false);
@@ -87,12 +87,12 @@
       function open(e) { if (e.type === 'dir') go(e.path); else FX.openPath(e.path, e.type); }
 
       async function newFolder() {
-        const name = await FX.prompt('新建文件夹', { placeholder: '文件夹名称' });
+        const name = await FX.prompt(FX.t('files.new_folder'), { placeholder: FX.t('files.folder_name') });
         if (!name) return;
         try { await FX.k(['files', 'mkdir', rel(name)]); selected = rel(name); await load(); } catch (e) { FX.toast(e.message, 'error'); }
       }
       async function newFile() {
-        const name = await FX.prompt('新建文件', { placeholder: '例如 notes.md、report.docx、data.xlsx、deck.pptx' });
+        const name = await FX.prompt(FX.t('files.new_file'), { placeholder: FX.t('files.e_g_notes_md_report_docx_data_xlsx') });
         if (!name) return;
         const p = rel(name);
         const e = FX.ext(name);
@@ -106,23 +106,23 @@
       }
       async function rename(target = selected) {
         if (!target) return;
-        const name = await FX.prompt('重命名', { value: FX.basename(target) });
+        const name = await FX.prompt(FX.t('files.rename'), { value: FX.basename(target) });
         if (!name || name === FX.basename(target)) return;
         const dest = FX.dirname(target) ? `${FX.dirname(target)}/${name}` : name;
         try { await FX.k(['files', 'rename', target, dest]); selected = dest; await load(); } catch (e) { FX.toast(e.message, 'error'); }
       }
       async function del(target = selected) {
         if (!target) return;
-        if (!(await FX.confirm('删除', `把「${FX.basename(target)}」移到回收站？可以在活动面板或用 foxos files restore 恢复。`, { okText: '删除', danger: true }))) return;
-        try { const r = await FX.k(['files', 'delete', target]); FX.toast(`已移到回收站：${r.path}`, 'ok'); selected = null; await load(); } catch (e) { FX.toast(e.message, 'error'); }
+        if (!(await FX.confirm(FX.t('common.delete'), FX.t('files.move_to_the_trash_you_can_restore_it', FX.basename(target)), { okText: FX.t('common.delete'), danger: true }))) return;
+        try { const r = await FX.k(['files', 'delete', target]); FX.toast(FX.t('files.moved_to_trash', r.path), 'ok'); selected = null; await load(); } catch (e) { FX.toast(e.message, 'error'); }
       }
 
       function menu(ev, e) {
         const kind = FX.fileKind(e.name, e.type);
-        const items = [['folder-open', '打开', () => open(e)]];
-        if (kind.alt) items.push(['external-link', kind.alt === 'browser' ? '用浏览器打开' : '用 LibreOffice Calc 打开', () => FX.openPath(e.path, e.type, kind.alt)]);
-        if (e.type === 'file' && kind.opener !== 'editor' && ['csv', 'md', 'txt', 'html'].includes(FX.ext(e.name))) items.push(['code', '用编辑器打开', () => FX.openPath(e.path, e.type, 'editor')]);
-        items.push(['pencil', '重命名', () => rename(e.path)], ['trash', '删除', () => del(e.path)]);
+        const items = [['folder-open', FX.t('common.open'), () => open(e)]];
+        if (kind.alt) items.push(['external-link', kind.alt === 'browser' ? FX.t('files.open_in_browser') : FX.t('files.open_in_libreoffice_calc'), () => FX.openPath(e.path, e.type, kind.alt)]);
+        if (e.type === 'file' && kind.opener !== 'editor' && ['csv', 'md', 'txt', 'html'].includes(FX.ext(e.name))) items.push(['code', FX.t('files.open_in_editor'), () => FX.openPath(e.path, e.type, 'editor')]);
+        items.push(['pencil', FX.t('files.rename'), () => rename(e.path)], ['trash', FX.t('common.delete'), () => del(e.path)]);
         FX.contextMenu(ev.clientX, ev.clientY, items);
       }
 

@@ -8,7 +8,10 @@ const call = (ch, ...a) => ipcRenderer.invoke(ch, ...a).then((r) => {
 });
 const on = (ch, cb) => ipcRenderer.on(ch, (_e, ...a) => cb(...a));
 
+const I18N = ipcRenderer.sendSync('i18n:init');
+
 contextBridge.exposeInMainWorld('foxos', {
+  i18n: { ...I18N, set: (l) => call('i18n:set', l) },
   run: (args, opts) => ipcRenderer.invoke('foxos:run', args, opts),
   openExternal: (url) => ipcRenderer.invoke('foxos:openExternal', url),
   env: () => call('env'),

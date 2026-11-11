@@ -1,4 +1,5 @@
 'use strict';
+const { t } = require('./i18n');
 // ACP 智能体：读取官方 ACP Registry，真实下载安装（npm 包或二进制压缩包 + sha256 校验），列出已安装
 const { app, net } = require('electron');
 const { spawn } = require('node:child_process');
@@ -63,7 +64,7 @@ async function list() {
 
 function registryEntry(reg, id) {
   const a = reg.data.agents.find((x) => x.id === id);
-  if (!a) throw new Error(`注册表中没有智能体：${id}`);
+  if (!a) throw new Error(t('agents.no_such_agent_in_the_registry', id));
   return a;
 }
 
@@ -74,13 +75,13 @@ function runLogged(cmd, args, opts, log) {
     child.stdout.on('data', (d) => log(String(d)));
     child.stderr.on('data', (d) => log(String(d)));
     child.on('error', reject);
-    child.on('close', (code) => (code === 0 ? resolve() : reject(new Error(`${path.basename(cmd)} 退出码 ${code}`))));
+    child.on('close', (code) => (code === 0 ? resolve() : reject(new Error(t('agents.exited_with_code', path.basename(cmd), code)))));
   });
 }
 
 async function download(url, dest, log, progress) {
   const res = await net.fetch(url);
-  if (!res.ok) throw new Error(`下载失败 HTTP ${res.status}：${url}`);
+  if (!res.ok) throw new Error(t('agents.download_failed_http', res.status, url));
   const total = Number(res.headers.get('content-length')) || 0;
   const out = fs.createWriteStream(dest);
   const hash = crypto.createHash('sha256');
@@ -95,7 +96,7 @@ async function download(url, dest, log, progress) {
     progress(total ? got / total : null, got, total);
   }
   await new Promise((r) => out.end(r));
-  log(`已下载 ${(got / 1048576).toFixed(1)} MB\n`);
+  log(t('agents.downloaded_mb', (got / 1048576).toFixed(1)));
   return hash.digest('hex');
 }
 
@@ -103,7 +104,7 @@ function npmBin(dir, pkgSpec) {
   const name = pkgSpec.replace(/@[^@/]+$/, '');
   const pj = JSON.parse(fs.readFileSync(path.join(dir, 'node_modules', name, 'package.json'), 'utf8'));
   const bin = typeof pj.bin === 'string' ? pj.bin : Object.values(pj.bin || {})[0];
-  if (!bin) throw new Error(`${name} 没有可执行入口`);
+  if (!bin) throw new Error(t('agents.has_no_executable_entry_point', name));
   return { script: path.join(dir, 'node_modules', name, bin), version: pj.version };
 }
 
@@ -117,7 +118,7 @@ async function install(id, { log = () => {}, progress = () => {} } = {}) {
   let info;
   if (d.npx) {
     const npm = which('npm');
-    if (!npm) throw new Error('需要 npm：请先在安装向导中安装 Node.js');
+    if (!npm) throw new Error(t('agents.npm_is_required_install_node_js_from'));
     progress(null);
     await runLogged(npm, ['install', '--prefix', dir, '--no-fund', '--no-audit', '--loglevel', 'http', d.npx.package], { cwd: dir, env: process.env }, log);
     const { script, version } = npmBin(dir, d.npx.package);
@@ -128,10 +129,10 @@ async function install(id, { log = () => {}, progress = () => {} } = {}) {
   } else if (d.binary && d.binary[platformKey()]) {
     const b = d.binary[platformKey()];
     const archive = path.join(dir, path.basename(new URL(b.archive).pathname));
-    log(`下载 ${b.archive}\n`);
+    log(t('agents.downloading', b.archive));
     const sha = await download(b.archive, archive, log, progress);
-    if (b.sha256 && sha !== b.sha256.toLowerCase()) throw new Error(`sha256 校验失败：期望 ${b.sha256}，实际 ${sha}`);
-    log(`sha256 校验通过：${sha}\n`);
+    if (b.sha256 && sha !== b.sha256.toLowerCase()) throw new Error(t('agents.sha256_mismatch_expected_got', b.sha256, sha));
+    log(t('agents.sha256_verified', sha));
     const unpack = path.join(dir, 'bin');
     fs.rmSync(unpack, { recursive: true, force: true });
     fs.mkdirSync(unpack, { recursive: true });
@@ -146,10 +147,10 @@ async function install(id, { log = () => {}, progress = () => {} } = {}) {
     if (!IS_WIN) fs.chmodSync(cmd, 0o755);
     info = { id, name: a.name, version: a.version, method: 'binary', command: cmd, args: b.args || [], env: b.env || {} };
   } else {
-    throw new Error(`${a.name} 没有适用于 ${platformKey()} 的安装方式`);
+    throw new Error(t('agents.has_no_install_method_for', a.name, platformKey()));
   }
   fs.writeFileSync(path.join(dir, 'foxos-agent.json'), JSON.stringify({ ...info, installedAt: new Date().toISOString() }, null, 2));
-  log(`安装完成：${a.name} ${info.version}\n`);
+  log(t('agents.installed', a.name, info.version));
   return info;
 }
 

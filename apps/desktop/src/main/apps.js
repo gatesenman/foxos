@@ -1,4 +1,5 @@
 'use strict';
+const { t } = require('./i18n');
 // 已安装软件检测、LibreOffice 原生窗口启动与跟踪
 const { app } = require('electron');
 const { spawn, execFile } = require('node:child_process');
@@ -44,15 +45,15 @@ async function detect() {
   const loVer = soffice ? await version(soffice) : null;
   const office = (id, name, flag, exts) => ({
     id, name, kind: 'native', installed: Boolean(soffice), version: loVer, path: soffice, flag, exts,
-    hint: soffice ? null : 'LibreOffice 未安装：在「安装向导」中勾选 LibreOffice，或从 https://www.libreoffice.org/download 安装',
+    hint: soffice ? null : t('apps.libreoffice_is_not_installed_select'),
   });
   return {
     builtin: [
-      { id: 'terminal', name: '终端', installed: true, kind: 'builtin', version: require('./pty').defaultShell() },
-      { id: 'files', name: '文件管理器', installed: true, kind: 'builtin' },
-      { id: 'editor', name: '代码编辑器', installed: true, kind: 'builtin', version: `Monaco ${JSON.parse(fs.readFileSync(path.join(__dirname, '..', '..', 'node_modules', 'monaco-editor', 'package.json'), 'utf8')).version}` },
-      { id: 'browser', name: '浏览器', installed: true, kind: 'builtin', version: `Chromium ${process.versions.chrome}` },
-      { id: 'environments', name: '环境', installed: true, kind: 'builtin', version: { linux: 'Linux 命名空间', win32: 'WSL2', darwin: 'Virtualization.framework' }[process.platform] || process.platform },
+      { id: 'terminal', name: t('common.terminal'), installed: true, kind: 'builtin', version: require('./pty').defaultShell() },
+      { id: 'files', name: t('apps.file_manager'), installed: true, kind: 'builtin' },
+      { id: 'editor', name: t('apps.code_editor'), installed: true, kind: 'builtin', version: `Monaco ${JSON.parse(fs.readFileSync(path.join(__dirname, '..', '..', 'node_modules', 'monaco-editor', 'package.json'), 'utf8')).version}` },
+      { id: 'browser', name: t('common.browser'), installed: true, kind: 'builtin', version: `Chromium ${process.versions.chrome}` },
+      { id: 'environments', name: t('common.environments'), installed: true, kind: 'builtin', version: { linux: t('apps.linux_namespaces'), win32: 'WSL2', darwin: 'Virtualization.framework' }[process.platform] || process.platform },
     ],
     office: [
       office('writer', 'LibreOffice Writer', '--writer', ['.docx', '.doc', '.odt', '.rtf', '.txt']),
@@ -60,13 +61,13 @@ async function detect() {
       office('impress', 'LibreOffice Impress', '--impress', ['.pptx', '.ppt', '.odp']),
     ],
     tools: [
-      { id: 'python', name: 'Python', installed: Boolean(pyVer), version: pyVer, path: py, hint: pyVer ? null : '安装 Python 3.10+' },
-      { id: 'python-deps', name: 'Python 办公库（openpyxl / python-docx / python-pptx）', installed: deps.ok, version: deps.ok ? deps.stdout : null,
-        hint: deps.ok ? null : '在「安装向导」中勾选「Python 依赖」' },
-      { id: 'git', name: 'git', installed: Boolean(git), version: await version(git), path: git, hint: git ? null : '安装 git' },
-      { id: 'node', name: 'Node.js', installed: Boolean(node), version: await version(node), path: node, hint: node ? null : '安装 Node.js（npm 型 ACP 智能体需要）' },
+      { id: 'python', name: 'Python', installed: Boolean(pyVer), version: pyVer, path: py, hint: pyVer ? null : t('apps.install_python_3_10') },
+      { id: 'python-deps', name: t('apps.python_office_libraries_openpyxl'), installed: deps.ok, version: deps.ok ? deps.stdout : null,
+        hint: deps.ok ? null : t('apps.select_python_dependencies_in_the') },
+      { id: 'git', name: 'git', installed: Boolean(git), version: await version(git), path: git, hint: git ? null : t('apps.install_git') },
+      { id: 'node', name: 'Node.js', installed: Boolean(node), version: await version(node), path: node, hint: node ? null : t('apps.install_node_js_needed_by_npm_based') },
       { id: 'npm', name: 'npm', installed: Boolean(npm), version: await version(npm), path: npm },
-      { id: 'wmctrl', name: 'wmctrl（跟踪原生窗口，Linux）', installed: Boolean(which('wmctrl')), path: which('wmctrl'), hint: IS_WIN ? null : '可选：安装 wmctrl 以在任务栏跟踪 LibreOffice 窗口' },
+      { id: 'wmctrl', name: t('apps.wmctrl_tracks_native_windows_linux'), installed: Boolean(which('wmctrl')), path: which('wmctrl'), hint: IS_WIN ? null : t('apps.optional_install_wmctrl_to_track') },
     ],
   };
 }
@@ -86,15 +87,15 @@ function loProfile() {
 
 function launchOffice(appId, relFile) {
   const soffice = findSoffice();
-  if (!soffice) throw new Error('LibreOffice 未安装');
+  if (!soffice) throw new Error(t('apps.libreoffice_is_not_installed'));
   const flag = { writer: '--writer', calc: '--calc', impress: '--impress' }[appId];
-  if (!flag) throw new Error(`未知应用：${appId}`);
+  if (!flag) throw new Error(t('apps.unknown_app', appId));
   const args = [`-env:UserInstallation=${loProfile()}`, '--nologo', '--norestore', flag];
   let abs = null;
   if (relFile) {
     abs = path.resolve(kernel.getWorkspace(), relFile);
     const root = kernel.getWorkspace();
-    if (!(abs === root || abs.startsWith(root + path.sep))) throw new Error('只能打开工作空间内的文件');
+    if (!(abs === root || abs.startsWith(root + path.sep))) throw new Error(t('common.only_files_inside_the_workspace_can'));
     args.push(abs);
   }
   const child = spawn(soffice, args, { cwd: kernel.getWorkspace(), detached: !IS_WIN, stdio: 'ignore', windowsHide: false });

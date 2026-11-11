@@ -1,4 +1,5 @@
 'use strict';
+const { t } = require('./i18n');
 // ACP（Agent Client Protocol）客户端：以子进程启动智能体，stdio 上逐行 JSON-RPC 2.0。
 // 狐狸OS 作为客户端：提供 fs 读写（经 foxos 内核，受工作空间约束、写锁、人工接管与审计），
 // 并在 session/new 中把 foxos MCP 服务器交给智能体。
@@ -45,10 +46,10 @@ class AcpConnection {
       this.proc = spawn(kernel.pythonPath(), args, { cwd: kernel.getWorkspace(), env: { ...process.env, PYTHONPATH: corePath() }, stdio: ['pipe', 'pipe', 'pipe'], windowsHide: true });
     } else {
       const info = await kernel.run(['env', 'info', envName]);
-      if (!info.ok) throw new Error(info.data?.error?.message || `环境 ${envName} 不可用`);
+      if (!info.ok) throw new Error(info.data?.error?.message || t('acp.environment_is_unavailable', envName));
       const e = info.data.result;
-      if (e.state !== 'running') throw new Error(`环境 ${envName} 没有运行，先启动它`);
-      if (e.backend !== 'linux-ns') throw new Error(`在环境中运行智能体目前只支持 Linux 后端（当前 ${e.backend}）`);
+      if (e.state !== 'running') throw new Error(t('acp.environment_is_not_running_start_it', envName));
+      if (e.backend !== 'linux-ns') throw new Error(t('acp.running_agents_inside_an_environment', e.backend));
       const agentsRoot = require('./agents').agentsDir();
       const map = (p) => (typeof p === 'string' && p.startsWith(agentsRoot) ? `/opt/foxos/agents${p.slice(agentsRoot.length)}` : p);
       const args = ['-m', 'foxos.envs.linux', 'exec', e.path, '--cwd', e.workspace.mode === 'none' ? '/' : '/workspace'];
@@ -63,8 +64,8 @@ class AcpConnection {
       this.stderr = (this.stderr + String(d)).slice(-20000);
       this.onEvent({ type: 'stderr', text: String(d) });
     });
-    this.proc.on('error', (e) => this._close(`无法启动：${e.message}`));
-    this.proc.on('exit', (code, sig) => this._close(`智能体进程已退出（${sig || code}）`));
+    this.proc.on('error', (e) => this._close(t('common.cannot_start', e.message)));
+    this.proc.on('exit', (code, sig) => this._close(t('acp.the_agent_process_exited', sig || code)));
   }
 
   _close(reason) {
@@ -76,14 +77,14 @@ class AcpConnection {
   }
 
   _send(msg) {
-    if (this.closed) throw new Error('连接已关闭');
+    if (this.closed) throw new Error(t('acp.connection_closed'));
     this.proc.stdin.write(`${JSON.stringify(msg)}\n`);
   }
 
   request(method, params, timeoutMs = 120000) {
     const id = this.nextId++;
     return new Promise((resolve, reject) => {
-      const timer = setTimeout(() => { this.pending.delete(id); reject(new Error(`${method} 超时`)); }, timeoutMs);
+      const timer = setTimeout(() => { this.pending.delete(id); reject(new Error(t('acp.timed_out', method))); }, timeoutMs);
       this.pending.set(id, {
         resolve: (v) => { clearTimeout(timer); resolve(v); },
         reject: (e) => { clearTimeout(timer); reject(e); },
@@ -113,7 +114,7 @@ class AcpConnection {
       if (!p) return;
       this.pending.delete(msg.id);
       if (msg.error) {
-        const e = new Error(msg.error.message || 'ACP 错误');
+        const e = new Error(msg.error.message || t('acp.acp_error'));
         e.code = msg.error.code;
         e.data = msg.error.data;
         p.reject(e);
@@ -160,7 +161,7 @@ class AcpConnection {
       this.onEvent({ type: 'fs', op: 'write', path: rel });
       return null;
     }
-    throw Object.assign(new Error(`客户端不支持：${method}`), { rpcCode: -32601 });
+    throw Object.assign(new Error(t('acp.not_supported_by_the_client', method)), { rpcCode: -32601 });
   }
 
   _rel(p) {
@@ -175,7 +176,7 @@ class AcpConnection {
     this.init = await this.request('initialize', {
       protocolVersion: PROTOCOL_VERSION,
       clientCapabilities: { fs: { readTextFile: true, writeTextFile: true }, terminal: false },
-      clientInfo: { name: 'foxos', title: '狐狸OS', version: require('../../package.json').version },
+      clientInfo: { name: 'foxos', title: t('common.foxos'), version: require('../../package.json').version },
     }, 60000);
     return this.init;
   }
@@ -188,13 +189,13 @@ class AcpConnection {
         { env: { ...process.env, PYTHONPATH: corePath(), FOXOS_MCP_TOKEN: token, PYTHONIOENCODING: 'utf-8' }, stdio: ['ignore', 'pipe', 'pipe'] });
       this.mcpProc = p;
       let buf = '';
-      const t = setTimeout(() => reject(new Error('MCP HTTP 服务器启动超时')), 15000);
+      const tm = setTimeout(() => reject(new Error(t('acp.the_mcp_http_server_timed_out_while'))), 15000);
       p.stdout.on('data', (d) => {
         buf += String(d);
         const line = buf.split('\n')[0];
-        try { const j = JSON.parse(line); clearTimeout(t); this.mcpHttp = { url: j.url, token }; resolve(this.mcpHttp); } catch { /* 等待完整一行 */ }
+        try { const j = JSON.parse(line); clearTimeout(tm); this.mcpHttp = { url: j.url, token }; resolve(this.mcpHttp); } catch { /* 等待完整一行 */ }
       });
-      p.on('exit', (c) => { clearTimeout(t); if (!this.mcpHttp) reject(new Error(`MCP HTTP 服务器退出（${c}）`)); });
+      p.on('exit', (c) => { clearTimeout(tm); if (!this.mcpHttp) reject(new Error(t('acp.the_mcp_http_server_exited', c))); });
     });
   }
 
@@ -207,7 +208,7 @@ class AcpConnection {
     if (this.envName) {
       const caps = (this.init && this.init.agentCapabilities && this.init.agentCapabilities.mcpCapabilities) || {};
       if (!this.mcpHttp || !caps.http) {
-        this.onEvent({ type: 'stderr', text: `[狐狸OS] 环境 ${this.envName} 中的智能体${!this.mcpHttp ? '（环境无网络）' : '不支持 HTTP MCP'}，未注入 foxos MCP；可在环境里直接运行 foxos 命令以外的工具。\n` });
+        this.onEvent({ type: 'stderr', text: t('acp.foxos_agent_in_environment_foxos_mcp', this.envName, !this.mcpHttp ? t('acp.the_environment_has_no_network') : t('acp.does_not_support_http_mcp')) });
         return [];
       }
       return [{ type: 'http', name: 'foxos', url: this.mcpHttp.url, headers: [{ name: 'Authorization', value: `Bearer ${this.mcpHttp.token}` }] }];

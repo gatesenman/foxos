@@ -77,7 +77,7 @@
   // 打开一个应用窗口。key 相同则复用（例如同一文件只开一个编辑器窗口）
   FX.openWindow = (appId, params = {}, geom = null) => {
     const def = apps[appId];
-    if (!def) throw new Error(`未知应用 ${appId}`);
+    if (!def) throw new Error(FX.t('wm.unknown_app', appId));
     const key = def.key ? def.key(params) : null;
     if (key) {
       const existing = [...wins.values()].find((w) => w.key === key);
@@ -97,9 +97,9 @@
     el('div', { class: 'win-titlebar' },
       el('span', { class: 'win-icon' }, FX.appIcon(FX.programIcon(appId, def.icon))), titleEl,
       el('span', { class: 'win-controls' },
-        el('button', { class: 'wc min', title: '最小化', 'data-action': 'minimize' }, icon('minus')),
-        el('button', { class: 'wc max', title: '最大化 / 还原', 'data-action': 'maximize' }, icon('square')),
-        el('button', { class: 'wc close', title: '关闭', 'data-action': 'close' }, icon('x')))),
+        el('button', { class: 'wc min', title: FX.t('wm.minimize'), 'data-action': 'minimize' }, icon('minus')),
+        el('button', { class: 'wc max', title: FX.t('wm.maximize_restore'), 'data-action': 'maximize' }, icon('square')),
+        el('button', { class: 'wc close', title: FX.t('wm.close'), 'data-action': 'close' }, icon('x')))),
     body,
     ...['n', 's', 'e', 'w', 'ne', 'nw', 'se', 'sw'].map((d) => el('div', { class: `rz rz-${d}`, 'data-dir': d })));
     const w = { id, appId, key, params, node, body, state: 'normal', prevState: 'normal', setTitle: (t) => { titleEl.textContent = t; FX.renderTaskbar(); }, title: () => titleEl.textContent };
@@ -120,7 +120,7 @@
       const api = def.mount(body, params, w) || {};
       Object.assign(w, api);
     } catch (err) {
-      body.append(el('div', { class: 'empty error' }, icon('alert-triangle'), el('div', { text: `无法启动：${err.message}` })));
+      body.append(el('div', { class: 'empty error' }, icon('alert-triangle'), el('div', { text: FX.t('common.cannot_start', err.message) })));
     }
     if (g.state === 'maximized') setState(w, 'maximized');
     if (g.state === 'minimized') setState(w, 'minimized');
@@ -143,9 +143,9 @@
 
   // 会话保存：窗口、位置、状态、参数（重启后恢复）
   let saveTimer = null;
-  FX.saveSession = () => {
+  FX.saveSession = (now = false) => {
     clearTimeout(saveTimer);
-    saveTimer = setTimeout(() => {
+    const save = () => {
       const list = FX.windows().filter((w) => apps[w.appId].persist !== false).map((w) => {
         const n = w.node;
         const geom = w.state === 'maximized' && w.restore
@@ -153,8 +153,11 @@
           : { x: n.offsetLeft, y: n.offsetTop, w: n.offsetWidth, h: n.offsetHeight };
         return { app: w.appId, params: w.persistParams ? w.persistParams() : w.params, geom: { ...geom, state: w.state } };
       });
-      window.foxos.session.save({ windows: list }).catch(() => {});
-    }, 300);
+      return window.foxos.session.save({ windows: list }).catch(() => {});
+    };
+    if (now) return save();
+    saveTimer = setTimeout(save, 300);
+    return null;
   };
 
   // 任务栏：内置窗口 + 真实的 LibreOffice 原生窗口
@@ -173,7 +176,7 @@
     }
     for (const nw of FX.nativeWindows) {
       box.append(el('button', {
-        class: 'task native', title: `${nw.title}（原生窗口）`, 'data-native': nw.wid,
+        class: 'task native', title: FX.t('wm.native_window', nw.title), 'data-native': nw.wid,
         onclick: () => window.foxos.office.focus(nw.wid).catch(() => {}),
       }, FX.appIcon(FX.programIcon(/Calc/.test(nw.title) ? 'calc' : /Impress/.test(nw.title) ? 'impress' : 'writer')), el('span', { text: nw.title }), el('i', { class: 'ti ti-external-link native-mark' })));
     }

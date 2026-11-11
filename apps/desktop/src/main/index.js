@@ -1,5 +1,7 @@
 'use strict';
 // 狐狸OS 桌面（Electron 主进程）
+const i18n = require('./i18n');
+const { t } = i18n;
 const { app, BrowserWindow, ipcMain, nativeImage, session, shell, dialog, webContents } = require('electron');
 const fs = require('node:fs');
 const path = require('node:path');
@@ -21,6 +23,9 @@ const everything = require('./everything');
 const control = require('./control');
 
 const s0 = settings.load();
+// 界面语言：--lang= > 设置 > FOXOS_LANG > zh-CN；同时设置 Chromium 自身的界面语言（右键菜单、日期控件）
+i18n.setLang(paths.argValue('lang') || s0.lang || process.env.FOXOS_LANG || i18n.DEFAULT);
+app.commandLine.appendSwitch('lang', i18n.getLang());
 kernel.setWorkspace(paths.argValue('workspace') || s0.workspace || paths.defaultWorkspace());
 const SCREENSHOT = paths.argValue('screenshot');
 const HEADLESS = process.argv.includes('--headless');
@@ -36,7 +41,7 @@ function createWindow() {
     ...b,
     minWidth: 1024,
     minHeight: 680,
-    title: '狐狸OS',
+    title: t('common.foxos'),
     icon: nativeImage.createFromPath(paths.iconPath()),
     backgroundColor: '#0b0d12',
     autoHideMenuBar: true,
@@ -117,7 +122,7 @@ handle('apps:detect', () => apps.detect());
 
 // Everything 应用
 handle('ev:list', () => everything.list());
-handle('ev:attach', (appId, wcId) => { const wc = webContents.fromId(wcId); if (!wc) throw new Error('webview 不存在'); everything.registerWebview(appId, wc); return true; });
+handle('ev:attach', (appId, wcId) => { const wc = webContents.fromId(wcId); if (!wc) throw new Error(t('index.the_webview_does_not_exist')); everything.registerWebview(appId, wc); return true; });
 handle('ev:openFile', (appId, rel) => everything.openFile(appId, rel));
 everything.hooks.onTitle = (appId, t) => send('ev:title', appId, t);
 everything.hooks.onLaunchApp = (name, args) => send('ev:launchApp', name, args);
@@ -139,7 +144,7 @@ async function controlHandler(msg) {
   if (op === 'ev.reset') return everything.reset(appId);
   if (op === 'ev.bridge') return everything.bridge(appId, params.method, params.args || {});
   if (op === 'ev.reloadData') { everything.kvInvalidate(appId); const inst = everything.instances.get(appId); if (inst) { inst.wc.reload(); await everything.waitReady(inst.wc); } return everything.status(appId); }
-  throw Object.assign(new Error(`未知操作 ${op}`), { code: 'USAGE' });
+  throw Object.assign(new Error(t('index.unknown_operation', op)), { code: 'USAGE' });
 }
 handle('office:launch', (appId, file) => apps.launchOffice(appId, file));
 handle('office:list', async () => ({ processes: apps.processList(), windows: await apps.nativeWindows() }));
@@ -166,7 +171,7 @@ let nextConn = 1;
 let nextPerm = 1;
 handle('acp:start', async (agentId, opts = {}) => {
   const info = agents.installedInfo(agentId);
-  if (!info) throw new Error(`未安装：${agentId}`);
+  if (!info) throw new Error(t('index.not_installed', agentId));
   const connId = nextConn++;
   const c = new AcpConnection(info, {
     onEvent: (ev) => send('acp:event', connId, ev),
@@ -221,8 +226,15 @@ ipcMain.on('ui:ready', async () => {
   console.log(`screenshot saved: ${path.resolve(SCREENSHOT)}`);
   app.quit();
 });
+// 语言：预加载脚本同步取词条；切换后保存到设置，之后的内核调用（FOXOS_LANG）与界面都跟随
+ipcMain.on('i18n:init', (e) => { e.returnValue = { lang: i18n.getLang(), supported: i18n.SUPPORTED, messages: i18n.messages, chosen: !!settings.load().lang }; });
+handle('i18n:set', (l) => {
+  const lang = i18n.setLang(l);
+  settings.save({ ...settings.load(), lang });
+  return lang;
+});
 handle('icons:report', () => require('./icons').report());
-ipcMain.on('ui:log', (_e, msg) => console.error(`[界面] ${msg}`));
+ipcMain.on('ui:log', (_e, msg) => console.error(t('index.ui', msg)));
 
 app.whenReady().then(() => {
   session.defaultSession.setPermissionRequestHandler((_wc, _perm, cb) => cb(false));

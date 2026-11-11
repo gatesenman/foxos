@@ -1,4 +1,5 @@
 'use strict';
+const { t } = require('./i18n');
 // Everything 应用宿主：在本机运行上游 Everything 应用（不连接 puter.com）。
 // - foxapp://<应用>/ 协议提供构建产物；https://js.puter.com/v2/ 被替换为狐狸OS 本地运行时
 // - 应用的 puter.fs 映射到工作空间，puter.kv 存在 工作空间/AppData/<应用>/kv.json
@@ -48,8 +49,8 @@ function toRel(appId, p) {
   else if (s.startsWith('/')) rel = s.slice(1);
   else rel = `${appDataRel(appId)}/${s}`;
   rel = path.posix.normalize(rel || '.').replace(/^\.\/?/, '');
-  if (rel === '..' || rel.startsWith('../')) throw Object.assign(new Error('路径越出工作空间'), { code: 'forbidden' });
-  if (rel === '.foxos' || rel.startsWith('.foxos/')) throw Object.assign(new Error('.foxos 为狐狸OS 保留目录'), { code: 'forbidden' });
+  if (rel === '..' || rel.startsWith('../')) throw Object.assign(new Error(t('everything.the_path_is_outside_the_workspace')), { code: 'forbidden' });
+  if (rel === '.foxos' || rel.startsWith('.foxos/')) throw Object.assign(new Error(t('everything.foxos_is_reserved_for_foxos')), { code: 'forbidden' });
   return rel;
 }
 function absOf(rel) {
@@ -58,13 +59,13 @@ function absOf(rel) {
   const real = (p) => { try { return fs.realpathSync(p); } catch { return null; } };
   let probe = abs; while (!fs.existsSync(probe) && probe !== root) probe = path.dirname(probe);
   const rp = real(probe) || probe; const rr = real(root) || root;
-  if (rp !== rr && !rp.startsWith(rr + path.sep)) throw Object.assign(new Error('路径越出工作空间'), { code: 'forbidden' });
+  if (rp !== rr && !rp.startsWith(rr + path.sep)) throw Object.assign(new Error(t('everything.the_path_is_outside_the_workspace')), { code: 'forbidden' });
   return abs;
 }
 const vpath = (rel) => (rel ? `/${USER}/${rel}` : `/${USER}`);
 function statItem(rel) {
   const abs = absOf(rel);
-  let st; try { st = fs.statSync(abs); } catch { throw Object.assign(new Error(`${vpath(rel)} 不存在`), { code: 'subject_does_not_exist' }); }
+  let st; try { st = fs.statSync(abs); } catch { throw Object.assign(new Error(t('everything.does_not_exist', vpath(rel))), { code: 'subject_does_not_exist' }); }
   const uid = crypto.createHash('sha1').update(`${st.ino}:${st.dev}`).digest('hex').slice(0, 16);
   return { path: vpath(rel), name: rel ? path.posix.basename(rel) : USER, is_dir: st.isDirectory(), size: st.isDirectory() ? null : st.size, modified: Math.floor(st.mtimeMs / 1000), created: Math.floor(st.birthtimeMs / 1000), accessed: Math.floor(st.atimeMs / 1000), uid, immutable: false, type: null };
 }
@@ -105,23 +106,23 @@ const glob = (pat) => new RegExp(`^${String(pat).replace(/[.+^${}()|[\]\\]/g, '\
 
 // ---------------------------------------------------------------- 宿主方法（应用内 puter.* 调用）
 const methods = {
-  'fs.read': (a, p) => { const rel = toRel(a, p); const abs = absOf(rel); if (!fs.existsSync(abs)) throw Object.assign(new Error(`${vpath(rel)} 不存在`), { code: 'subject_does_not_exist' }); return { name: path.basename(abs), bytes: fs.readFileSync(abs) }; },
+  'fs.read': (a, p) => { const rel = toRel(a, p); const abs = absOf(rel); if (!fs.existsSync(abs)) throw Object.assign(new Error(t('everything.does_not_exist', vpath(rel))), { code: 'subject_does_not_exist' }); return { name: path.basename(abs), bytes: fs.readFileSync(abs) }; },
   'fs.write': (a, p, bytes, o = {}) => {
     const rel = toRel(a, p); let abs = absOf(rel);
-    const lk = lockedBy(rel); if (lk && (lk.owner || lk.agent) && !String(lk.owner || lk.agent).startsWith('human')) throw Object.assign(new Error(`${rel} 正被 ${lk.owner || lk.agent} 写入（写锁）`), { code: 'locked' });
-    if (fs.existsSync(abs) && fs.statSync(abs).isDirectory()) throw Object.assign(new Error('目标是文件夹'), { code: 'is_dir' });
-    if (fs.existsSync(abs) && o.overwrite === false) { if (o.dedupeName) abs = uniqueName(abs); else throw Object.assign(new Error(`${vpath(rel)} 已存在`), { code: 'item_with_same_name_exists' }); }
+    const lk = lockedBy(rel); if (lk && (lk.owner || lk.agent) && !String(lk.owner || lk.agent).startsWith('human')) throw Object.assign(new Error(t('everything.is_being_written_by_write_lock', rel, lk.owner || lk.agent)), { code: 'locked' });
+    if (fs.existsSync(abs) && fs.statSync(abs).isDirectory()) throw Object.assign(new Error(t('everything.the_target_is_a_folder')), { code: 'is_dir' });
+    if (fs.existsSync(abs) && o.overwrite === false) { if (o.dedupeName) abs = uniqueName(abs); else throw Object.assign(new Error(t('everything.already_exists', vpath(rel))), { code: 'item_with_same_name_exists' }); }
     fs.mkdirSync(path.dirname(abs), { recursive: true });
     const tmp = `${abs}.foxos-tmp-${process.pid}`; fs.writeFileSync(tmp, Buffer.from(bytes)); fs.renameSync(tmp, abs);
     const r = path.relative(kernel.getWorkspace(), abs).split(path.sep).join('/');
-    if (!r.startsWith(`${appDataRel(a)}/`)) audit({ agent: `human:${a}`, command: 'everything.fs.write', targets: [{ path: r, access: 'write' }], message: `${a} 保存了 ${r}` });
+    if (!r.startsWith(`${appDataRel(a)}/`)) audit({ agent: `human:${a}`, command: 'everything.fs.write', targets: [{ path: r, access: 'write' }], message: t('everything.saved', a, r) });
     return statItem(r);
   },
-  'fs.readdir': (a, p) => { const rel = toRel(a, p); const abs = absOf(rel); if (!fs.existsSync(abs)) { if (rel.startsWith(appDataRel(a))) return []; throw Object.assign(new Error(`${vpath(rel)} 不存在`), { code: 'subject_does_not_exist' }); } return fs.readdirSync(abs).filter((n) => n !== '.foxos' && !n.includes('.foxos-tmp-')).map((n) => statItem(rel ? `${rel}/${n}` : n)); },
+  'fs.readdir': (a, p) => { const rel = toRel(a, p); const abs = absOf(rel); if (!fs.existsSync(abs)) { if (rel.startsWith(appDataRel(a))) return []; throw Object.assign(new Error(t('everything.does_not_exist', vpath(rel))), { code: 'subject_does_not_exist' }); } return fs.readdirSync(abs).filter((n) => n !== '.foxos' && !n.includes('.foxos-tmp-')).map((n) => statItem(rel ? `${rel}/${n}` : n)); },
   'fs.stat': (a, p) => statItem(toRel(a, p)),
   'fs.mkdir': (a, p) => { const rel = toRel(a, p); fs.mkdirSync(absOf(rel), { recursive: true }); return statItem(rel); },
-  'fs.delete': (a, p, o = {}) => { const rel = toRel(a, p); if (!rel) throw Object.assign(new Error('不能删除工作空间根目录'), { code: 'forbidden' }); const abs = absOf(rel); if (!fs.existsSync(abs)) return true; fs.rmSync(abs, { recursive: Boolean(o.recursive) || fs.statSync(abs).isFile(), force: true }); if (!rel.startsWith(`${appDataRel(a)}/`)) audit({ agent: `human:${a}`, command: 'everything.fs.delete', targets: [{ path: rel, access: 'write' }] }); return true; },
-  'fs.rename': (a, p, n) => { const rel = toRel(a, p); if (/[\\/]/.test(n)) throw new Error('新名称不能包含路径'); const dest = path.posix.join(path.posix.dirname(rel), n); fs.renameSync(absOf(rel), absOf(dest)); return statItem(dest); },
+  'fs.delete': (a, p, o = {}) => { const rel = toRel(a, p); if (!rel) throw Object.assign(new Error(t('everything.the_workspace_root_cannot_be_deleted')), { code: 'forbidden' }); const abs = absOf(rel); if (!fs.existsSync(abs)) return true; fs.rmSync(abs, { recursive: Boolean(o.recursive) || fs.statSync(abs).isFile(), force: true }); if (!rel.startsWith(`${appDataRel(a)}/`)) audit({ agent: `human:${a}`, command: 'everything.fs.delete', targets: [{ path: rel, access: 'write' }] }); return true; },
+  'fs.rename': (a, p, n) => { const rel = toRel(a, p); if (/[\\/]/.test(n)) throw new Error(t('everything.the_new_name_cannot_contain_a_path')); const dest = path.posix.join(path.posix.dirname(rel), n); fs.renameSync(absOf(rel), absOf(dest)); return statItem(dest); },
   'fs.move': (a, p, d, o = {}) => { const rel = toRel(a, p); let dest = toRel(a, d); if (fs.existsSync(absOf(dest)) && fs.statSync(absOf(dest)).isDirectory()) dest = path.posix.join(dest, path.posix.basename(rel)); if (o.createMissingParents) fs.mkdirSync(path.dirname(absOf(dest)), { recursive: true }); fs.renameSync(absOf(rel), absOf(dest)); return statItem(dest); },
   'fs.copy': (a, p, d) => { const rel = toRel(a, p); let dest = toRel(a, d); if (fs.existsSync(absOf(dest)) && fs.statSync(absOf(dest)).isDirectory()) dest = path.posix.join(dest, path.posix.basename(rel)); fs.cpSync(absOf(rel), absOf(dest), { recursive: true }); return statItem(dest); },
   'fs.url': (a, p) => `${SCHEME}://${a}/__workspace/${toRel(a, p).split('/').map(encodeURIComponent).join('/')}`,
@@ -136,20 +137,20 @@ const methods = {
   'ui.openPicker': async (a, o = {}, wc) => {
     const r = await dialog.showOpenDialog(BrowserWindow.fromWebContents(wc) || undefined, { defaultPath: kernel.getWorkspace(), properties: [o.directory ? 'openDirectory' : 'openFile', ...(o.multiple ? ['multiSelections'] : [])] });
     if (r.canceled || !r.filePaths.length) return null;
-    return r.filePaths.map((f) => { const rel = path.relative(kernel.getWorkspace(), f).split(path.sep).join('/'); if (rel.startsWith('..')) throw Object.assign(new Error('只能打开工作空间内的文件'), { code: 'forbidden' }); return statItem(rel); });
+    return r.filePaths.map((f) => { const rel = path.relative(kernel.getWorkspace(), f).split(path.sep).join('/'); if (rel.startsWith('..')) throw Object.assign(new Error(t('common.only_files_inside_the_workspace_can')), { code: 'forbidden' }); return statItem(rel); });
   },
   'ui.savePicker': async (a, o = {}, wc) => {
     const r = await dialog.showSaveDialog(BrowserWindow.fromWebContents(wc) || undefined, { defaultPath: path.join(kernel.getWorkspace(), o.suggestedName || 'untitled') });
     if (r.canceled || !r.filePath) return null;
     const rel = path.relative(kernel.getWorkspace(), r.filePath).split(path.sep).join('/');
-    if (rel.startsWith('..')) throw Object.assign(new Error('只能保存到工作空间内'), { code: 'forbidden' });
+    if (rel.startsWith('..')) throw Object.assign(new Error(t('everything.can_only_save_inside_the_workspace')), { code: 'forbidden' });
     return vpath(rel);
   },
   'ui.title': (a, t) => { hooks.onTitle && hooks.onTitle(a, t); return true; },
   'ui.launchApp': (a, name, args) => { hooks.onLaunchApp && hooks.onLaunchApp(name, args); return true; },
   'ui.close': (a) => { hooks.onClose && hooks.onClose(a); return true; },
   'net.fetch': async (a, url, init) => {
-    const u = new URL(url); if (BLOCK.test(u.hostname)) throw new Error(`本地模式不连接 ${u.hostname}`);
+    const u = new URL(url); if (BLOCK.test(u.hostname)) throw new Error(t('everything.local_mode_does_not_connect_to', u.hostname));
     const r = await fetch(url, { method: init.method, headers: init.headers, body: init.body && init.body.length ? Buffer.from(init.body) : undefined, redirect: 'follow' });
     return { status: r.status, statusText: r.statusText, headers: Object.fromEntries(r.headers), body: new Uint8Array(await r.arrayBuffer()) };
   },
@@ -208,9 +209,9 @@ ipcMain.on('ev:info', (e) => {
 });
 ipcMain.handle('ev:invoke', async (e, method, ...args) => {
   const a = appOfSender(e.sender);
-  if (!a) return { ok: false, error: { message: '未知应用', code: 'forbidden' } };
+  if (!a) return { ok: false, error: { message: t('everything.unknown_app'), code: 'forbidden' } };
   const fn = methods[method];
-  if (!fn) return { ok: false, error: { message: `本地模式未实现 ${method}`, code: 'not_supported_locally' } };
+  if (!fn) return { ok: false, error: { message: t('everything.not_implemented_in_local_mode', method), code: 'not_supported_locally' } };
   try { return { ok: true, value: await fn(a, ...args, e.sender) }; } catch (err) { return { ok: false, error: { message: String(err.message || err), code: err.code || 'error' } }; }
 });
 
@@ -226,7 +227,7 @@ function registerWebview(appId, wc) {
 async function ensureInstance(appId, { launchRel = null } = {}) {
   const cur = instances.get(appId);
   if (cur && !cur.wc.isDestroyed()) return cur;
-  if (!fs.existsSync(path.join(distDir(appId), 'index.html'))) throw Object.assign(new Error(`${appId} 未安装：运行 foxos everything install ${appId}`), { code: 'DEPENDENCY_MISSING' });
+  if (!fs.existsSync(path.join(distDir(appId), 'index.html'))) throw Object.assign(new Error(t('everything.is_not_installed_run_foxos', appId, appId)), { code: 'DEPENDENCY_MISSING' });
   const part = setupSession(appId);
   const win = new BrowserWindow({ show: false, width: 1280, height: 800, webPreferences: { partition: part, preload: PRELOAD, contextIsolation: true, sandbox: true, backgroundThrottling: false, offscreen: false } });
   const inst = { wc: win.webContents, hidden: true, win, launchItems: launchRel ? [launchRel] : null };
