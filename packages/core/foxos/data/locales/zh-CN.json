@@ -1304,5 +1304,6 @@
   "env.expose_summary": "把虚拟机的 SSH 端口转发开放到主机的所有地址，或收回到本机",
   "env.expose_ssh_param": "on（对外开放）或 off（只在本机）",
   "env.expose_port_param": "主机上的固定端口（默认自动挑一个）",
-  "env.expose_limit": "开放只有人能执行；下次启动生效；主机防火墙需放行该端口"
+  "env.expose_limit": "开放只有人能执行；下次启动生效；主机防火墙需放行该端口",
+  "cli.acp_stdio": "启动一个已安装的 ACP 智能体，stdio 直通（供桌面客户端经 SSH 使用）"
 }

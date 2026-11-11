@@ -194,6 +194,11 @@ def build_parser() -> argparse.ArgumentParser:
         bs.add_argument("--open", action="store_true", help=tr("cli.bot_serve_open"))
         bs.add_argument("--ready-file", default=None, metavar="PATH", help=tr("cli.bot_serve_ready"))
         bs.set_defaults(_special="bot-serve")
+    if "acp" in app_subs:
+        # 只在命令行：在本机启动一个已安装的 ACP 智能体并把 stdio 直接交给调用者（桌面客户端经 SSH 在狐狸OS 电脑里运行智能体）
+        st = app_subs["acp"].add_parser("stdio", help=tr("cli.acp_stdio"), parents=parents)
+        st.add_argument("acp_id", metavar="AGENT")
+        st.set_defaults(_special="acp-stdio")
     if "machine" in app_subs:
         ms = app_subs["machine"].add_parser("serve", help=tr("cli.machine_serve"), parents=parents)
         ms.add_argument("--listen", default="0.0.0.0:7443", metavar="HOST:PORT")
@@ -396,6 +401,14 @@ def main(argv: list[str] | None = None) -> int:
             host, _, port = ns.listen.rpartition(":")
             return bot_serve(ws, host or "127.0.0.1", int(port or 0), token=ns.token or os.environ.get("FOXOS_BOTS_TOKEN"),
                              open_ui=ns.open, ready_file=ns.ready_file)
+        if special == "acp-stdio":
+            from .apps import acp as acp_app
+            info = acp_app.installed_info(ns.acp_id)
+            if not info:
+                raise FoxError("NOT_FOUND", tr("acp.not_installed", ns.acp_id), hint=f"foxos acp agent install {ns.acp_id}")
+            env = {**os.environ, **acp_app.agent_env(ns.acp_id, info), "FOXOS_WORKSPACE": str(ws.root), "FOXOS_AGENT": f"acp:{ns.acp_id}"}
+            os.chdir(ws.root)
+            os.execvpe(info["command"], [info["command"], *(info.get("args") or [])], env)
         if special == "machine-serve":
             from .machines import serve as machine_serve
             host, _, port = ns.listen.rpartition(":")

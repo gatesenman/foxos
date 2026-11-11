@@ -21,6 +21,17 @@
         root.replaceChildren(
           el('section', { 'data-section': 'language' }, el('h3', { class: 'lang-label', text: FX.t('util.language') }), FX.langPicker(),
             el('div', { class: 'muted small', text: FX.t('settings.language_hint') })),
+          el('section', { 'data-section': 'execution' }, el('h3', { text: FX.t('client.execution_title') }),
+            el('div', { class: 'muted small', 'data-mode': env.mode, text: env.mode === 'client' ? FX.t('client.mode_client', env.guest ? (env.guest.env || env.guest.host || env.guest.machine) : FX.t('client.not_connected')) : FX.t('client.mode_native') }),
+            env.mode === 'client' ? el('div', { class: 'row' }, el('button', { class: 'btn ghost sm', onclick: () => FX.openWindow('computer', {}) }, icon('device-desktop'), FX.t('client.computer_title'))) : null,
+            env.mode === 'client' ? el('label', { class: 'row', 'data-host-exec-toggle': '' },
+              el('input', { type: 'checkbox', checked: !!s.hostExecution, onchange: async (e) => {
+                const on = e.target.checked;
+                if (on && !(await FX.confirm(FX.t('client.host_execution_enable_title'), FX.t('client.host_execution_enable_body'), { danger: true }))) { e.target.checked = false; return; }
+                await window.foxos.settings.set({ hostExecution: on }); FX.env.hostExecution = on; FX.toast(on ? FX.t('client.host_execution_on_badge') : FX.t('client.host_execution_off_badge'), on ? 'error' : 'ok');
+              } }),
+              el('span', { text: FX.t('client.host_execution_label') })) : null,
+            env.mode === 'client' ? el('div', { class: 'muted small', text: FX.t('client.host_execution_hint') }) : null),
           el('section', {}, el('h3', { text: FX.t('common.workspace') }),
             el('div', { class: 'row' }, el('code', { class: 'grow', text: env.workspace }),
               el('button', { class: 'btn ghost sm', onclick: async () => {

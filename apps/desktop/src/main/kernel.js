@@ -8,6 +8,7 @@ const path = require('node:path');
 const { REPO_ROOT, IS_WIN, corePath, which } = require('./paths');
 const settings = require('./settings');
 const { foxosCommandLine } = require('./cmdline');
+const policy = require('./policy');
 
 let workspace = null;
 
@@ -71,7 +72,16 @@ function cliPath() { return path.join(ensureShim(), IS_WIN ? 'foxos.cmd' : 'foxo
 // 在桌面终端里运行 foxos 的命令行（Windows 是 PowerShell，其余是 sh）
 function cliCommandLine(args) { return foxosCommandLine(cliPath(), args, IS_WIN ? 'powershell' : 'posix'); }
 
-function run(args, { json = true, stdin = null, agent = 'human:desktop', timeoutMs = 180000 } = {}) {
+// 客户端模式（policy.mode() === 'client'）：除了虚拟机生命周期与配对（env / machine），所有 foxos 命令都在狐狸OS 电脑里执行
+function run(args, opts = {}) {
+  if (Array.isArray(args) && executionMode() === 'client' && policy.routeKernel(args) === 'guest') return require('./guest').kernelRun(args, opts);
+  return runLocal(args, opts);
+}
+
+let cachedMode = null;
+function executionMode() { if (!cachedMode) cachedMode = policy.mode({ packaged: app.isPackaged }); return cachedMode; }
+
+function runLocal(args, { json = true, stdin = null, agent = 'human:desktop', timeoutMs = 180000 } = {}) {
   if (!Array.isArray(args) || args.some((a) => typeof a !== 'string')) {
     return Promise.resolve({ ok: false, exitCode: 2, data: null, stdout: '', stderr: t('kernel.args_must_be_an_array_of_strings') });
   }
@@ -98,4 +108,4 @@ function run(args, { json = true, stdin = null, agent = 'human:desktop', timeout
   });
 }
 
-module.exports = { run, setWorkspace, getWorkspace, pythonPath, pythonInfo, bundledPython, coreEnv, ensureShim, cliPath, cliCommandLine };
+module.exports = { run, runLocal, executionMode, setWorkspace, getWorkspace, pythonPath, pythonInfo, bundledPython, coreEnv, ensureShim, cliPath, cliCommandLine };

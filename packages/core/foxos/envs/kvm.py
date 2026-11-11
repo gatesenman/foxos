@@ -162,6 +162,8 @@ def start(cfg: dict, d: Path) -> dict:
     mem = int(cfg.get("limits", {}).get("memory_mb") or cfg.get("memory_mb") or 2048)
     cpus = int(cfg.get("limits", {}).get("cpus") or cfg.get("cpus") or 2)
     vnc_port = _free_port()
+    while vnc_port < 5900:  # -vnc 用显示号（端口 - 5900）
+        vnc_port = _free_port()
     way_port = _free_port()
     # SSH 端口转发：默认只在本机回环；env expose NAME --ssh on 后绑定所有地址并用固定端口（cfg["ssh_port"]）
     ssh_port = int(cfg.get("ssh_port") or 0) or _free_port()
@@ -182,6 +184,7 @@ def start(cfg: dict, d: Path) -> dict:
             "vmm": "qemu-tcg",
             "warning": vmm.get("warning"),
             "note": tr("env.guest_wayvnc_listens_after_the_guest"),
+            "console": {"protocol": "rfb", "host": "127.0.0.1", "port": vnc_port, "kind": "vmm-console"},
         }
     proc = subprocess.Popen(argv, stdout=log, stderr=log, stdin=subprocess.DEVNULL, start_new_session=True)
     _pid_file(d).write_text(str(proc.pid), encoding="utf-8")
@@ -233,7 +236,8 @@ def _argv_cloud_hypervisor(ch: str, cfg: dict, d: Path, mem: int, cpus: int, way
 
 def _argv_qemu_tcg(qemu: str, cfg: dict, d: Path, mem: int, cpus: int, vnc_port: int, way_port: int, serial: Path, ssh_port: int | None = None) -> list[str]:
     argv = [qemu, "-accel", "tcg", "-cpu", "max", "-m", str(mem), "-smp", str(cpus), "-machine", "q35",
-            "-display", "none", "-vga", "virtio",
+            # 虚拟机控制台（RFB，只听 127.0.0.1）：桌面客户端的“狐狸OS 电脑”窗口直接显示它，开机过程也看得到
+            "-display", "none", "-vga", "virtio", "-vnc", f"127.0.0.1:{vnc_port - 5900}",
             "-chardev", f"file,id=serial0,path={serial}", "-serial", "chardev:serial0"]
     iso = cfg.get("iso")
     disk = cfg.get("disk")

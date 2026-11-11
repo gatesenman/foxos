@@ -39,4 +39,19 @@ function mergeUserPath(current, bin, exists = () => true) {
   return [b, ...rest].join(';');
 }
 
-module.exports = { withPath, foxosCommandLine, mergeUserPath, psQuote, shQuote };
+// 狐狸OS 电脑（来宾）的 SSH 参数：BatchMode（不问密码），known_hosts 放在 userData，首次连接记下指纹之后严格校验
+function sshArgs(s, { tty = false, knownHosts } = {}) {
+  const a = ['-o', 'BatchMode=yes', '-o', 'ConnectTimeout=15', '-o', 'ServerAliveInterval=20', '-o', `UserKnownHostsFile=${knownHosts}`, '-o', 'StrictHostKeyChecking=accept-new', '-o', 'LogLevel=ERROR'];
+  if (s.alias) a.push('-o', `HostKeyAlias=${s.alias}`);
+  if (s.port) a.push('-p', String(s.port));
+  if (s.key) a.push('-i', s.key, '-o', 'IdentitiesOnly=yes');
+  a.push(tty ? '-tt' : '-T', `${s.user || 'foxos'}@${s.host}`);
+  return a;
+}
+
+// 来宾里执行的命令行（来宾是狐狸OS，sh）：登录 shell 让 PATH 与桌面会话一致，每个参数单独加引号。
+// SSH 会话没有 DISPLAY：默认接到狐狸OS 的桌面会话 :0（live-autologin / lightdm），这样“打开 Word”出现在来宾桌面上
+const GUEST_SESSION_ENV = '[ -n "${DISPLAY:-}" ] || export DISPLAY=:0; [ -n "${XAUTHORITY:-}" ] || [ ! -f "$HOME/.Xauthority" ] || export XAUTHORITY="$HOME/.Xauthority"; ';
+function remoteLine(argv) { return `exec sh -lc ${shQuote(`${GUEST_SESSION_ENV}exec ${argv.map(shQuote).join(' ')}`)}`; }
+
+module.exports = { withPath, foxosCommandLine, mergeUserPath, psQuote, shQuote, sshArgs, remoteLine, GUEST_SESSION_ENV };

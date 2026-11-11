@@ -30,7 +30,12 @@ class AcpConnection {
   // 工作空间在 /workspace；MCP 改用宿主上的 Streamable HTTP 服务器（环境需共享宿主网络）。
   async start(envName = null) {
     const extra = { ...settings.secretEnv(), ...(this.agent.env || {}), FOXOS_WORKSPACE: kernel.getWorkspace(), FOXOS_AGENT: this.identity };
-    if (!envName) {
+    if (this.agent.remote) {
+      // 客户端模式：智能体跑在狐狸OS 电脑里（foxos acp stdio，经 SSH），MCP 用来宾里的 foxos mcp，文件读写经 kernel.run 也路由到来宾
+      const client = require('./client');
+      this.remoteCwd = await client.guestWorkspace();
+      this.proc = await require('./guest').spawnStdio(['foxos', 'acp', 'stdio', this.agent.id], { env: { ...settings.secretEnv(), FOXOS_AGENT: this.identity } });
+    } else if (!envName) {
       this.proc = spawn(this.agent.command, this.agent.args || [], { cwd: kernel.getWorkspace(), env: { ...process.env, ...extra }, stdio: ['pipe', 'pipe', 'pipe'], windowsHide: true });
     } else if (envName === '@sandbox' || envName === '@sandbox-offline') {
       // 轻量隔离：智能体直接运行在宿主上，但只能读写工作空间（foxos.sandbox：Landlock + seccomp / Seatbelt / 受限令牌 + 作业对象）。
@@ -166,6 +171,11 @@ class AcpConnection {
 
   _rel(p) {
     let s = String(p || '');
+    if (this.remoteCwd) {
+      const abs = path.posix.resolve(this.remoteCwd, s.replace(/\\/g, '/'));
+      const rel = path.posix.relative(this.remoteCwd, abs);
+      return rel || '.';
+    }
     // 环境里的智能体看到的工作空间是 /workspace
     if (this.envName && (s === '/workspace' || s.startsWith('/workspace/'))) s = s.slice('/workspace'.length).replace(/^\//, '') || '.';
     const abs = path.resolve(kernel.getWorkspace(), s);
@@ -200,6 +210,7 @@ class AcpConnection {
   }
 
   mcpServers() {
+    if (this.remoteCwd) return [{ name: 'foxos', command: 'foxos', args: ['mcp'], env: [{ name: 'FOXOS_AGENT', value: this.identity }, { name: 'PYTHONIOENCODING', value: 'utf-8' }] }];
     if (this.sandbox) {
       const caps = (this.init && this.init.agentCapabilities && this.init.agentCapabilities.mcpCapabilities) || {};
       if (caps.http) return [{ type: 'http', name: 'foxos', url: this.mcpHttp.url, headers: [{ name: 'Authorization', value: `Bearer ${this.mcpHttp.token}` }] }];
@@ -226,7 +237,7 @@ class AcpConnection {
   }
 
   async newSession() {
-    const r = await this.request('session/new', { cwd: this.envName ? '/workspace' : kernel.getWorkspace(), mcpServers: this.mcpServers() }, 120000);
+    const r = await this.request('session/new', { cwd: this.remoteCwd || (this.envName ? '/workspace' : kernel.getWorkspace()), mcpServers: this.mcpServers() }, 120000);
     this.sessions.add(r.sessionId);
     return r;
   }

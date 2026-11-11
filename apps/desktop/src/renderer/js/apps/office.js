@@ -13,6 +13,7 @@
     try {
       const rec = await window.foxos.office.launch(app, rel);
       FX.toast(FX.t('office.starting_native_window', NAMES[app], rel ? FX.t('office.file_suffix', FX.basename(rel)) : ''));
+      if (FX.env.mode === 'client') FX.openWindow('computer', {});
       FX.refreshNative();
       setTimeout(FX.refreshNative, 2500);
       setTimeout(FX.refreshNative, 6000);

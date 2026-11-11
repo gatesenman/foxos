@@ -292,3 +292,15 @@ body.paused .desktop { box-shadow: inset 0 0 0 2px var(--warn); }
 
 /* hidden 属性优先于 .btn 等的 display */
 [hidden] { display: none !important; }
+
+/* 狐狸OS 电脑（客户端模式的主窗口）：工具栏 + 画面（noVNC 画布按窗口缩放） */
+.computer { display: flex; flex-direction: column; height: 100%; min-height: 0; }
+.computer-bar { gap: 6px; flex-wrap: wrap; border-bottom: 1px solid var(--border, rgba(127,127,127,.25)); }
+.computer-main { flex: 1; min-height: 0; display: flex; }
+.computer-view { flex: 1; min-height: 0; background: #111; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.computer-view > div:not(.empty):not(.computer-setup) { width: 100%; height: 100%; }
+.computer-view .empty { color: #ddd; }
+.computer-setup { width: 100%; height: 100%; background: var(--bg, #fff); color: inherit; display: flex; flex-direction: column; gap: 12px; }
+.computer-setup .card { padding: 12px; border: 1px solid var(--border, rgba(127,127,127,.25)); border-radius: 8px; display: flex; flex-direction: column; gap: 8px; }
+.computer-setup .row { gap: 6px; flex-wrap: wrap; align-items: center; }
+.computer-setup input, .computer-setup select { padding: 3px 6px; }

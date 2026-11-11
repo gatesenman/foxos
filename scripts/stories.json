@@ -746,6 +746,22 @@
           "^test_US86"
         ]
       ]
+    },
+    {
+      "id": "US-87",
+      "title": "Windows / macOS / 普通 Linux 上的桌面程序是“狐狸OS 电脑”的客户端：应用中心安装、打开 Word、终端、文件、智能体、聊天都在狐狸OS 虚拟机或远程狐狸OS 里执行；本机执行默认关闭，打开后每次确认；虚拟机控制台 / 来宾桌面画面（noVNC）",
+      "match": [
+        [
+          "pytest",
+          "test_desktop_client.py",
+          "^test_US87"
+        ],
+        [
+          "e2e",
+          "client.e2e.js",
+          "US-87"
+        ]
+      ]
     }
   ]
 }
