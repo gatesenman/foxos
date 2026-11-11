@@ -72,6 +72,25 @@ def _geometry(win: str) -> tuple[int, int, int, int] | None:
     return None
 
 
+def _set_strut(win: str, side: str, width: int, height: int, sw: int) -> None:
+    """EWMH _NET_WM_STRUT(_PARTIAL)：告诉窗口管理器这一条屏幕边归停靠窗口，其他窗口最大化时让开。
+    顺序：left, right, top, bottom, left_start_y, left_end_y, right_start_y, right_end_y, top_start_x, top_end_x, bottom_start_x, bottom_end_x"""
+    if not shutil.which("xprop"):
+        return
+    width = max(0, min(int(width), sw // 2))
+    left, right = (width, 0) if side == "left" else (0, width)
+    partial = [left, right, 0, 0, 0, height - 1 if left else 0, 0, height - 1 if right else 0, 0, 0, 0, 0]
+    subprocess.run(["xprop", "-id", win, "-f", "_NET_WM_STRUT_PARTIAL", "32c", "-set", "_NET_WM_STRUT_PARTIAL", ",".join(map(str, partial))],
+                   capture_output=True)
+    subprocess.run(["xprop", "-id", win, "-f", "_NET_WM_STRUT", "32c", "-set", "_NET_WM_STRUT", f"{left},{right},0,0"], capture_output=True)
+
+
+def _clear_strut(win: str) -> None:
+    if shutil.which("xprop"):
+        for prop in ("_NET_WM_STRUT_PARTIAL", "_NET_WM_STRUT"):
+            subprocess.run(["xprop", "-id", win, "-remove", prop], capture_output=True)
+
+
 def apply_window_mode(prefs: dict) -> dict:
     """在 XFCE / X11 上把聊天窗口停靠到屏幕一侧（全高、置顶、所有工作区可见），或恢复成普通窗口。"""
     if not os.environ.get("DISPLAY") or not shutil.which("wmctrl"):
@@ -93,6 +112,7 @@ def apply_window_mode(prefs: dict) -> dict:
             subprocess.run(["wmctrl", "-i", "-r", w, "-b", "remove,maximized_vert,maximized_horz"])
             subprocess.run(["wmctrl", "-i", "-r", w, "-e", f"0,{x},0,{prefs['width']},{sh - panel}"])
             subprocess.run(["wmctrl", "-i", "-r", w, "-b", "add,above,sticky,skip_taskbar"])
+            _set_strut(w, prefs["side"], prefs["width"], sh - panel, sw)
             if prefs["side"] == "right":
                 # 浏览器有最小宽度、窗框有边：按实际几何把右边缘贴回屏幕边
                 time.sleep(0.3)
@@ -100,7 +120,11 @@ def apply_window_mode(prefs: dict) -> dict:
                 if g and (g[0] + g[2] != sw or g[1] + g[3] > sh - panel):
                     h = g[3] - max(0, g[1] + g[3] - (sh - panel))
                     subprocess.run(["wmctrl", "-i", "-r", w, "-e", f"0,{max(0, x - (g[0] + g[2] - sw))},0,-1,{h}"])
+                g = _geometry(w)
+                if g:
+                    _set_strut(w, "right", sw - g[0] + 2, sh - panel, sw)
         else:
+            _clear_strut(w)
             subprocess.run(["wmctrl", "-i", "-r", w, "-b", "remove,above,sticky,skip_taskbar"])
             ww, wh = min(1200, sw - 120), min(820, sh - panel - 80)
             subprocess.run(["wmctrl", "-i", "-r", w, "-e", f"0,{(sw - ww) // 2},{(sh - panel - wh) // 2},{ww},{wh}"])
