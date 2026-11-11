@@ -139,6 +139,20 @@ test('US-126..US-134 智能体窗口：真实 Chrome 窗口里的完整流程', 
       const btn = await page.waitForSelector(`${scope} [data-approve="${a.id}"]${allow ? '.primary' : ':not(.primary)'}`, { timeout: 30000 });
       return { a, btn };
     };
+    // 等回合结束；期间这个智能体每请求一次审批（代理可能要多次，比如写完再用命令核对）都在界面上点 allow / deny
+    const finish = async (done, bot, allow, scope = '#messages') => {
+      return until(async () => {
+        const r = done(); if (r) return r;
+        const a = E.cli(['bot', 'approval', 'list']).approvals.find(x => x.bot === bot && !handled.has(x.id));
+        if (a) {
+          const sel = `${scope} [data-approve="${a.id}"]${allow ? '.primary' : ':not(.primary)'}`;
+          if (scope === '#view' && !(await page.$(sel))) await page.click('.nav-item[data-view="approvals"]');
+          await (await page.waitForSelector(sel, { timeout: 15000 })).click();
+          handled.add(a.id);
+        }
+        return false;
+      }, 300000, `${bot} turn`);
+    };
     // 窄窗口（停靠时）侧栏收起，先点菜单按钮
     const side = async sel => {
       const el = page.locator(sel).first();
@@ -164,7 +178,7 @@ test('US-126..US-134 智能体窗口：真实 Chrome 窗口里的完整流程', 
       const { btn } = await answer('coder', true);
       await shot(page, 'bots-e2e-approval.png');
       await btn.click();
-      const reply = await until(done, 300000, 'coder reply');
+      const reply = await finish(done, 'coder', true);
       await page.waitForSelector('#messages .card .diff');
       assert.equal(fs.readFileSync(path.join(E.ws, 'gui', 'hello.txt'), 'utf8'), 'hello beta\n');
       const edit = reply.cards.find(c => c.kind === 'edit' && c.approval);
@@ -177,7 +191,7 @@ test('US-126..US-134 智能体窗口：真实 Chrome 窗口里的完整流程', 
       const done = await say('coder', 'Use your edit tool to change the word beta to gamma in gui/hello.txt.');
       const { btn } = await answer('coder', false);
       await btn.click();
-      const reply = await until(done, 300000, 'coder reply');
+      const reply = await finish(done, 'coder', false);
       assert.equal(fs.readFileSync(path.join(E.ws, 'gui', 'hello.txt'), 'utf8'), 'hello beta\n');
       assert.ok(reply.cards.some(c => c.approval && c.approval.decision === 'deny' && c.approval.by === 'human'));
       await page.waitForSelector('#messages .approval .chip.bad');
@@ -198,7 +212,7 @@ test('US-126..US-134 智能体窗口：真实 Chrome 窗口里的完整流程', 
       const { btn: allow } = await answer('helper', true, '#view');
       await shot(page, 'bots-e2e-approvals-page.png');
       await allow.click();
-      const reply = await until(() => E.botMessages('coder').filter(m => m.role === 'bot').length > n && E.botMessages('coder').pop(), 300000, 'delegation');
+      const reply = await finish(() => E.botMessages('coder').filter(m => m.role === 'bot').length > n && E.botMessages('coder').pop(), 'helper', true, '#view');
       const card = reply.cards.find(c => c.type === 'delegation');
       assert.deepEqual([card.to, card.via, card.status], ['helper', 'mention', 'completed']);
       assert.equal(fs.readFileSync(path.join(E.ws, 'gui', 'helper.txt'), 'utf8').trim(), 'from helper');
