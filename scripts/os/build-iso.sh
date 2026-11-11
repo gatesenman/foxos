@@ -224,15 +224,19 @@ https://github.com/gatesenman/foxos
 这是一张可试用、可安装的系统光盘（${ARCH}）。请从 UEFI$([ "$ARCH" = amd64 ] && echo "（或传统 BIOS）")引导。
 EOF
 
+GRUB_DIR=()
 if [ "$ARCH" = arm64 ]; then
-  [ -d /usr/lib/grub/arm64-efi ] || die "构建机缺少 /usr/lib/grub/arm64-efi（apt install grub-efi-arm64-bin）"
-  log "grub-mkrescue 生成 ISO（arm64 UEFI）"
+  # arm64 机器上用构建机自己的 grub-efi-arm64-bin；在 x86_64 上（qemu-user 交叉构建）用 chroot 里装好的同一个包
+  if [ -d /usr/lib/grub/arm64-efi ]; then GRUB_DIR=(-d /usr/lib/grub/arm64-efi)
+  elif [ -d "$CHROOT/usr/lib/grub/arm64-efi" ]; then GRUB_DIR=(-d "$CHROOT/usr/lib/grub/arm64-efi")
+  else die "没有 arm64-efi 的 grub 模块（构建机 apt install grub-efi-arm64-bin）"; fi
+  log "grub-mkrescue 生成 ISO（arm64 UEFI，模块 ${GRUB_DIR[1]}）"
 else
   log "grub-mkrescue 生成混合 ISO（UEFI + BIOS）"
 fi
 mkdir -p "$OUT"
 rm -f "$OUT/$ISO_NAME"
-grub-mkrescue -o "$OUT/$ISO_NAME" "$ISO" \
+grub-mkrescue "${GRUB_DIR[@]}" -o "$OUT/$ISO_NAME" "$ISO" \
   --compress=xz \
   -volid "$VOLID" \
   -joliet -rational-rock

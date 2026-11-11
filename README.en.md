@@ -53,13 +53,15 @@ Everything is on [v0.3.2-os-preview](https://github.com/gatesenman/foxos/release
 
 | OS | x64 | arm64 |
 | --- | --- | --- |
-| Windows 10 1809+ / 11 | `FoxOS-Setup-0.3.2-x64.exe` (installer) · `FoxOS-0.3.2-win-x64.msi` (MSI) · `FoxOS-0.3.2-win-x64.zip` (portable) | `FoxOS-Setup-0.3.2-arm64.exe` · `FoxOS-0.3.2-win-arm64.msi` · `FoxOS-0.3.2-win-arm64.zip` |
-| macOS 11+ | Intel: `FoxOS-0.3.2-mac-x64.dmg` / `.zip` | Apple silicon: `FoxOS-0.3.2-mac-arm64.dmg` / `.zip` |
+| Windows 10 1809+ / 11 | `FoxOS-Setup-0.3.2-x64.exe` (installer) · `FoxOS-0.3.2-win-x64.zip` (portable) | `FoxOS-Setup-0.3.2-arm64.exe` · `FoxOS-0.3.2-win-arm64.zip` |
+| macOS 11+ | Intel: `FoxOS-0.3.2-mac-x64.zip` | Apple silicon: `FoxOS-0.3.2-mac-arm64.zip` |
 | Ubuntu / Debian / Mint | `FoxOS-0.3.2-linux-x64.deb` | `FoxOS-0.3.2-linux-arm64.deb` |
 | Fedora / RHEL / Rocky / Alma / openSUSE | `FoxOS-0.3.2-linux-x64.rpm` | `FoxOS-0.3.2-linux-arm64.rpm` |
 | Arch / Manjaro / other distros | `FoxOS-0.3.2-linux-x64.tar.gz` · `.AppImage` | `FoxOS-0.3.2-linux-arm64.tar.gz` · `.AppImage` |
-| **FoxOS OS ISO** | `FoxOS-0.3.2-amd64.iso` (UEFI + BIOS; also `.part1` + `.part2`) | `FoxOS-0.3.2-arm64.iso` (UEFI; ARM PCs, UTM on Apple silicon, ARM servers) |
+| **FoxOS OS ISO** | `FoxOS-0.3.2-amd64.iso.part1` + `.part2` (join into the ISO; UEFI + BIOS) | build script ready (`FOXOS_OS_ARCH=arm64`); built on an arm64 runner once GitHub Actions is available |
 | Package managers (drafts, not submitted) | winget `gatesenman.FoxOS` · Homebrew cask `foxos` · AUR `foxos-bin`, see `FoxOS-0.3.2-package-manifests.zip` and [`packaging/`](packaging/) | same |
+
+The MSI, dmg, arm64 ISO and single-file ISO are built by GitHub Actions ([`release.yml`](.github/workflows/release.yml)) on Windows / macOS / arm64 runners. Actions currently cannot start on this repository because of a GitHub account billing lock; re-running the workflow afterwards adds them. The macOS zips are ad-hoc signed but not yet tested on a real Mac.
 
 One-line install (detects OS and CPU, downloads, verifies SHA-256, installs, then runs `foxos --version`):
 
@@ -75,7 +77,7 @@ irm https://github.com/gatesenman/foxos/releases/download/v0.3.2-os-preview/inst
 
 The packages are not code-signed yet: on Windows, SmartScreen → "More info" → "Run anyway"; on macOS, Control-click FoxOS in Applications → Open (macOS 15+: System Settings → Privacy & Security → "Open Anyway"). Per-OS details, AppImage and ISO usage: **[docs/install.md](docs/install.md#english)**.
 
-Each ISO is a single file under 2 GiB; on a flaky connection download the parts and join them:
+The ISO is published as two parts; join and verify them:
 
 ```bash
 cat FoxOS-0.3.2-amd64.iso.part1 FoxOS-0.3.2-amd64.iso.part2 > FoxOS-0.3.2-amd64.iso
@@ -87,7 +89,7 @@ cmd /c copy /b FoxOS-0.3.2-amd64.iso.part1+FoxOS-0.3.2-amd64.iso.part2 FoxOS-0.3
 Get-FileHash -Algorithm SHA256 .\FoxOS-0.3.2-amd64.iso
 ```
 
-USB and Hyper-V steps: [ISO test guide](docs/os-test-guide.md). All packages and the arm64 ISO are built by GitHub Actions ([`release.yml`](.github/workflows/release.yml)) on matching runners, installed and checked there, then uploaded straight to the release. Older releases (`v0.3.1-os-preview`, `v0.3.0-os-preview`, the Windows companion `v0.2.0-windows-preview`) remain on the [Releases](https://github.com/gatesenman/foxos/releases) page.
+USB and Hyper-V steps: [ISO test guide](docs/os-test-guide.md). Older releases (`v0.3.1-os-preview`, `v0.3.0-os-preview`, the Windows companion `v0.2.0-windows-preview`) remain on the [Releases](https://github.com/gatesenman/foxos/releases) page.
 
 ## Windows 伴侣程序（在现有 Windows 桌面上运行，v0.2.0） / Windows companion app
 

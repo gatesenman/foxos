@@ -9,24 +9,27 @@
 - **狐狸OS 操作系统**：可引导的 ISO（Ubuntu 24.04 + XFCE，中文界面），写进 U 盘装到电脑上，或在 Hyper-V / QEMU / UTM 里启动。
 - **狐狸OS 桌面伴侣程序 + `foxos` 命令行**：装在你现有的 Windows、macOS 或 Linux 上的应用程序。安装包自带 Python 3.12 和狐狸OS 内核，装好就能在终端里用 `foxos`，不需要另外装 Python。
 
-所有文件都在 GitHub Release [v0.3.2-os-preview](https://github.com/gatesenman/foxos/releases/tag/v0.3.2-os-preview)。每个文件的 SHA-256 都在同一发布的 `SHA256SUMS` 里；安装脚本会自动校验，校验不通过就停止。
+所有文件都在 GitHub Release [v0.3.2-os-preview](https://github.com/gatesenman/foxos/releases/tag/v0.3.2-os-preview)。
+
+> **现状（2026-11-12）**：表里标「待 CI」的文件（MSI、dmg、arm64 ISO、单文件 ISO）要在 GitHub Actions 的 Windows / macOS / arm64 机器上构建。本仓库的 Actions 目前因 GitHub 账户的账单问题无法启动（任务未开始即失败）；账单恢复后手动运行一次 `release` 工作流就会补上。其余文件已在 Linux 构建机上构建并做过安装测试；macOS 的 zip 已 ad-hoc 签名，但还没在真 Mac 上运行过。
+每个文件的 SHA-256 都在同一发布的 `SHA256SUMS` 里；安装脚本会自动校验，校验不通过就停止。
 
 ### 选哪个文件
 
 | 系统 | CPU | 文件 | 说明 |
 | --- | --- | --- | --- |
 | Windows 10 1809+ / 11 | x64 | `FoxOS-Setup-0.3.2-x64.exe` | 安装程序（按用户安装，可选目录，中文 / English） |
-| | x64 | `FoxOS-0.3.2-win-x64.msi` | MSI（按机器安装，适合批量部署；需要管理员） |
+| | x64 | `FoxOS-0.3.2-win-x64.msi`（待 CI） | MSI（按机器安装，适合批量部署；需要管理员） |
 | | x64 | `FoxOS-0.3.2-win-x64.zip` | 便携版，解压即用 |
-| | arm64 | `FoxOS-Setup-0.3.2-arm64.exe` · `FoxOS-0.3.2-win-arm64.msi` · `FoxOS-0.3.2-win-arm64.zip` | 同上，原生 arm64（Surface Pro X / 骁龙 X 等） |
-| macOS 11+ | Apple 芯片（M1–M4） | `FoxOS-0.3.2-mac-arm64.dmg` / `.zip` | 拖到「应用程序」 |
-| | Intel | `FoxOS-0.3.2-mac-x64.dmg` / `.zip` | 同上 |
+| | arm64 | `FoxOS-Setup-0.3.2-arm64.exe` · `FoxOS-0.3.2-win-arm64.zip` · `FoxOS-0.3.2-win-arm64.msi`（待 CI） | 同上，原生 arm64（Surface Pro X / 骁龙 X 等） |
+| macOS 11+ | Apple 芯片（M1–M4） | `FoxOS-0.3.2-mac-arm64.zip`（`.dmg` 待 CI） | 解压后拖到「应用程序」 |
+| | Intel | `FoxOS-0.3.2-mac-x64.zip`（`.dmg` 待 CI） | 同上 |
 | Ubuntu / Debian / Linux Mint / deepin / 统信 UOS | x64 · arm64 | `FoxOS-0.3.2-linux-x64.deb` · `FoxOS-0.3.2-linux-arm64.deb` | `sudo apt install ./文件名.deb` |
 | Fedora / RHEL / Rocky / Alma / openEuler / openSUSE | x64 · arm64 | `FoxOS-0.3.2-linux-x64.rpm` · `FoxOS-0.3.2-linux-arm64.rpm` | `sudo dnf install ./文件名.rpm`；openSUSE 用 `sudo zypper install --allow-unsigned-rpm ./文件名.rpm` |
 | Arch / Manjaro / 其他发行版 | x64 · arm64 | `FoxOS-0.3.2-linux-x64.tar.gz` · `FoxOS-0.3.2-linux-arm64.tar.gz` | 解压即用；Arch 也可以用 AUR 草稿 `foxos-bin` |
 | 任何 Linux 桌面 | x64 · arm64 | `FoxOS-0.3.2-linux-x64.AppImage` · `FoxOS-0.3.2-linux-arm64.AppImage` | 单文件，`chmod +x` 后双击；需要 FUSE 2（Ubuntu 24.04：`sudo apt install libfuse2t64`）。只含桌面，命令行请用 deb / rpm / tar.gz |
-| 狐狸OS 系统（PC、Hyper-V、VMware、QEMU） | amd64 | `FoxOS-0.3.2-amd64.iso`（或分卷 `.part1` + `.part2`） | UEFI + 传统 BIOS |
-| 狐狸OS 系统（ARM 电脑、UTM / Parallels on Apple 芯片、ARM 服务器） | arm64 | `FoxOS-0.3.2-arm64.iso`（或分卷 `.part1` + `.part2`） | 仅 UEFI；Google 没有 Linux arm64 版 Chrome，arm64 系统默认用 Firefox |
+| 狐狸OS 系统（PC、Hyper-V、VMware、QEMU） | amd64 | 分卷 `FoxOS-0.3.2-amd64.iso.part1` + `.part2`（单文件 `.iso` 待 CI） | UEFI + 传统 BIOS |
+| 狐狸OS 系统（ARM 电脑、UTM / Parallels on Apple 芯片、ARM 服务器） | arm64 | `FoxOS-0.3.2-arm64.iso`（待 CI） | 仅 UEFI；Google 没有 Linux arm64 版 Chrome，arm64 系统默认用 Firefox |
 
 ### 一行安装
 
@@ -109,24 +112,27 @@ FoxOS ships two different things:
 - **The FoxOS operating system**: a bootable ISO (Ubuntu 24.04 + XFCE, Chinese UI by default). Flash it to a USB stick or boot it in Hyper-V / QEMU / UTM.
 - **The FoxOS desktop companion + `foxos` CLI**: an app for your existing Windows, macOS or Linux. Every package bundles Python 3.12 and the FoxOS kernel, so `foxos` works in a terminal right after install.
 
-Everything is on the GitHub release [v0.3.2-os-preview](https://github.com/gatesenman/foxos/releases/tag/v0.3.2-os-preview). `SHA256SUMS` in the same release covers every file; the install scripts verify it and stop on a mismatch.
+Everything is on the GitHub release [v0.3.2-os-preview](https://github.com/gatesenman/foxos/releases/tag/v0.3.2-os-preview).
+
+> **Status (2026-11-12)**: files marked "pending CI" (MSI, dmg, arm64 ISO, single-file ISO) need GitHub Actions Windows / macOS / arm64 runners. Actions cannot start on this repository right now because of a GitHub account billing lock; once that is resolved, run the `release` workflow once to add them. Everything else was built and install-tested on a Linux build machine; the macOS zips are ad-hoc signed but not yet run on a real Mac.
+ `SHA256SUMS` in the same release covers every file; the install scripts verify it and stop on a mismatch.
 
 ### Which file
 
 | OS | CPU | File | Notes |
 | --- | --- | --- | --- |
 | Windows 10 1809+ / 11 | x64 | `FoxOS-Setup-0.3.2-x64.exe` | Installer (per user, choose folder, Chinese / English) |
-| | x64 | `FoxOS-0.3.2-win-x64.msi` | MSI (per machine, for managed deployment; needs admin) |
+| | x64 | `FoxOS-0.3.2-win-x64.msi` (pending CI) | MSI (per machine, for managed deployment; needs admin) |
 | | x64 | `FoxOS-0.3.2-win-x64.zip` | Portable |
-| | arm64 | `FoxOS-Setup-0.3.2-arm64.exe` · `FoxOS-0.3.2-win-arm64.msi` · `FoxOS-0.3.2-win-arm64.zip` | Same, native arm64 |
-| macOS 11+ | Apple silicon | `FoxOS-0.3.2-mac-arm64.dmg` / `.zip` | Drag to Applications |
-| | Intel | `FoxOS-0.3.2-mac-x64.dmg` / `.zip` | Same |
+| | arm64 | `FoxOS-Setup-0.3.2-arm64.exe` · `FoxOS-0.3.2-win-arm64.zip` · `.msi` (pending CI) | Same, native arm64 |
+| macOS 11+ | Apple silicon | `FoxOS-0.3.2-mac-arm64.zip` (`.dmg` pending CI) | Unzip, drag to Applications |
+| | Intel | `FoxOS-0.3.2-mac-x64.zip` (`.dmg` pending CI) | Same |
 | Ubuntu / Debian / Mint | x64 · arm64 | `FoxOS-0.3.2-linux-<arch>.deb` | `sudo apt install ./file.deb` |
 | Fedora / RHEL / Rocky / Alma / openSUSE | x64 · arm64 | `FoxOS-0.3.2-linux-<arch>.rpm` | `sudo dnf install ./file.rpm`; openSUSE: `sudo zypper install --allow-unsigned-rpm ./file.rpm` |
 | Arch / other distros | x64 · arm64 | `FoxOS-0.3.2-linux-<arch>.tar.gz` | Extract and run; AUR draft `foxos-bin` |
 | Any Linux desktop | x64 · arm64 | `FoxOS-0.3.2-linux-<arch>.AppImage` | Single file; needs FUSE 2. Desktop only; use deb / rpm / tar.gz for the CLI |
-| FoxOS OS (PC, Hyper-V, VMware, QEMU) | amd64 | `FoxOS-0.3.2-amd64.iso` (or `.part1` + `.part2`) | UEFI + legacy BIOS |
-| FoxOS OS (ARM PCs, UTM / Parallels on Apple silicon, ARM servers) | arm64 | `FoxOS-0.3.2-arm64.iso` (or parts) | UEFI only; Google ships no Linux arm64 Chrome, so Firefox is the default browser |
+| FoxOS OS (PC, Hyper-V, VMware, QEMU) | amd64 | `.part1` + `.part2` (single `.iso` pending CI) | UEFI + legacy BIOS |
+| FoxOS OS (ARM PCs, UTM / Parallels on Apple silicon, ARM servers) | arm64 | `FoxOS-0.3.2-arm64.iso` (pending CI) | UEFI only; Google ships no Linux arm64 Chrome, so Firefox is the default browser |
 
 ### One-line install
 

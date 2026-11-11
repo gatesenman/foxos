@@ -74,13 +74,15 @@ Windows 伴侣程序的截图在下方单独一节：[Windows 伴侣程序](#win
 
 | 系统 | x64 | arm64 |
 | --- | --- | --- |
-| Windows 10 1809+ / 11 | `FoxOS-Setup-0.3.2-x64.exe`（安装程序）· `FoxOS-0.3.2-win-x64.msi`（MSI）· `FoxOS-0.3.2-win-x64.zip`（便携版） | `FoxOS-Setup-0.3.2-arm64.exe` · `FoxOS-0.3.2-win-arm64.msi` · `FoxOS-0.3.2-win-arm64.zip` |
-| macOS 11+ | Intel：`FoxOS-0.3.2-mac-x64.dmg` / `.zip` | Apple 芯片：`FoxOS-0.3.2-mac-arm64.dmg` / `.zip` |
+| Windows 10 1809+ / 11 | `FoxOS-Setup-0.3.2-x64.exe`（安装程序）· `FoxOS-0.3.2-win-x64.zip`（便携版） | `FoxOS-Setup-0.3.2-arm64.exe` · `FoxOS-0.3.2-win-arm64.zip` |
+| macOS 11+ | Intel：`FoxOS-0.3.2-mac-x64.zip` | Apple 芯片：`FoxOS-0.3.2-mac-arm64.zip` |
 | Ubuntu / Debian / Mint / deepin / UOS | `FoxOS-0.3.2-linux-x64.deb` | `FoxOS-0.3.2-linux-arm64.deb` |
 | Fedora / RHEL / Rocky / Alma / openEuler / openSUSE | `FoxOS-0.3.2-linux-x64.rpm` | `FoxOS-0.3.2-linux-arm64.rpm` |
 | Arch / Manjaro / 其他发行版 | `FoxOS-0.3.2-linux-x64.tar.gz` · `.AppImage` | `FoxOS-0.3.2-linux-arm64.tar.gz` · `.AppImage` |
-| **狐狸OS 系统 ISO** | `FoxOS-0.3.2-amd64.iso`（UEFI + BIOS；也有 `.part1` + `.part2` 分卷） | `FoxOS-0.3.2-arm64.iso`（UEFI；ARM 电脑、Apple 芯片上的 UTM、ARM 服务器） |
+| **狐狸OS 系统 ISO** | `FoxOS-0.3.2-amd64.iso.part1` + `.part2`（合并成 ISO，UEFI + BIOS） | 构建脚本已支持（`FOXOS_OS_ARCH=arm64`），等 GitHub Actions 恢复后在 arm64 机器上构建 |
 | 包管理器（草稿，未提交） | winget `gatesenman.FoxOS` · Homebrew cask `foxos` · AUR `foxos-bin`，见 `FoxOS-0.3.2-package-manifests.zip` 与 [`packaging/`](packaging/) | 同左 |
+
+MSI、dmg、arm64 ISO 和单文件 ISO 由 GitHub Actions（[`release.yml`](.github/workflows/release.yml)）在 Windows / macOS / arm64 机器上构建；仓库的 Actions 目前因 GitHub 账户账单问题无法启动，恢复后重新运行即可补上。macOS 的 zip 已做 ad-hoc 签名，但还没在真 Mac 上验证过。
 
 一行安装（自动识别系统与 CPU，下载、校验 SHA-256、安装，最后运行 `foxos --version`）：
 
@@ -96,7 +98,7 @@ irm https://github.com/gatesenman/foxos/releases/download/v0.3.2-os-preview/inst
 
 安装包还没有代码签名：Windows 首次运行时 SmartScreen 选「更多信息 → 仍要运行」；macOS 首次打开时在「应用程序」里按住 Control 点按 FoxOS → 「打开」（macOS 15 起到「系统设置 → 隐私与安全性」点「仍要打开」）。每个系统的细节、AppImage 与 ISO 的用法见 **[docs/install.md](docs/install.md)**。
 
-ISO 单个文件小于 2 GiB，可以直接下载；网络不稳时下载分卷再合并、校验：
+ISO 目前只提供两个分卷，下载后合并、校验：
 
 ```bash
 cat FoxOS-0.3.2-amd64.iso.part1 FoxOS-0.3.2-amd64.iso.part2 > FoxOS-0.3.2-amd64.iso
@@ -108,7 +110,7 @@ cmd /c copy /b FoxOS-0.3.2-amd64.iso.part1+FoxOS-0.3.2-amd64.iso.part2 FoxOS-0.3
 Get-FileHash -Algorithm SHA256 .\FoxOS-0.3.2-amd64.iso
 ```
 
-写 U 盘或在 Hyper-V 里启动见 [ISO 测试指南](docs/os-test-guide.md)。所有安装包和 arm64 ISO 都由 GitHub Actions（[`release.yml`](.github/workflows/release.yml)）在对应系统的机器上构建、真装验证后直接上传到 Release。旧版本（`v0.3.1-os-preview`、`v0.3.0-os-preview`、Windows 伴侣程序 `v0.2.0-windows-preview`）仍在 [Releases](https://github.com/gatesenman/foxos/releases) 页面。
+写 U 盘或在 Hyper-V 里启动见 [ISO 测试指南](docs/os-test-guide.md)。旧版本（`v0.3.1-os-preview`、`v0.3.0-os-preview`、Windows 伴侣程序 `v0.2.0-windows-preview`）仍在 [Releases](https://github.com/gatesenman/foxos/releases) 页面。
 
 ## Windows 伴侣程序（在现有 Windows 桌面上运行，v0.2.0） / Windows companion app
 
