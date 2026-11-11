@@ -329,7 +329,15 @@ def print_human(cmd_id: str, result: dict) -> None:
             print("  skills: " + ", ".join(r["skills_used"]), file=out)
         print(r.get("text", ""), file=out)
         return
-    if cmd_id.split(".")[0] in ("bot", "connector", "machine", "runtime", "acp") and not result.get("message"):
+    if isinstance(result.get("checks"), list):
+        for c in result["checks"]:
+            mark = "+" if c.get("ok") else ("-" if c.get("required") else "~")
+            print(f"{mark} {c.get('check')}: {c.get('detail') or ''}" + ("" if c.get("ok") or not c.get("hint") else f"  ({c['hint']})"), file=out)
+        for k, v in result.items():
+            if k not in ("checks", "ok") and v not in (None, [], {}):
+                print(f"  {k}: {json.dumps(v, ensure_ascii=False) if isinstance(v, (dict, list)) else v}", file=out)
+        return
+    if cmd_id.split(".")[0] in ("bot", "connector", "machine", "runtime", "acp", "computer") and not result.get("message"):
         print(json.dumps(result, ensure_ascii=False, indent=2, default=str), file=out)
         return
     skip = {"message", "rows", "values", "charts", "files", "entries", "tasks", "note", "content", "stdout", "stderr", "apps", "envs", "elements"}
