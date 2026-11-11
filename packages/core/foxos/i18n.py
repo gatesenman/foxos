@@ -7,6 +7,8 @@
 
 from __future__ import annotations
 
+import contextlib
+import contextvars
 import json
 import os
 from pathlib import Path
@@ -37,8 +39,22 @@ def messages(lang: str) -> dict[str, str]:
     return _messages[lang]
 
 
+# 一次请求内的语言（界面服务按请求头 X-FoxOS-Lang 设置，多线程互不影响）
+_request_lang: contextvars.ContextVar[str | None] = contextvars.ContextVar("foxos_lang", default=None)
+
+
 def get_lang() -> str:
-    return _lang
+    return _request_lang.get() or _lang
+
+
+@contextlib.contextmanager
+def using(lang: str | None):
+    """在这段代码里改用 lang（只影响当前线程/上下文）；lang 不支持时不变。"""
+    tok = _request_lang.set(normalize(lang) or _request_lang.get())
+    try:
+        yield
+    finally:
+        _request_lang.reset(tok)
 
 
 def set_lang(lang: str | None) -> str:
@@ -65,7 +81,7 @@ def init_from_argv(argv: list[str]) -> str:
 
 def tr(key: str, *args) -> str:
     """取词条；有参数时按 str.format 填入位置参数 {0} {1}…（无参数时原样返回，文本里的花括号不受影响）。"""
-    s = messages(_lang).get(key)
+    s = messages(get_lang()).get(key)
     if s is None:
         s = messages(DEFAULT).get(key, key)
     return s.format(*args) if args else s

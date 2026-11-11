@@ -10,6 +10,7 @@
 
 from __future__ import annotations
 
+import contextvars
 import json
 import mimetypes
 import os
@@ -120,7 +121,7 @@ class State:
                 rec["status"] = "failed"
                 rec["error"] = {"code": "ERROR", "message": f"{type(e).__name__}: {e}"}
             rec["ended"] = time.time()
-        threading.Thread(target=run, daemon=True).start()
+        threading.Thread(target=contextvars.copy_context().run, args=(run,), daemon=True).start()
         return jid
 
 
@@ -176,6 +177,10 @@ def make_handler(st: State):
 
         # ---------------------------------------------------------- GET
         def do_GET(self):  # noqa: N802
+            with i18n.using(self.headers.get("X-FoxOS-Lang")):
+                return self._do_get()
+
+        def _do_get(self):
             u = urllib.parse.urlparse(self.path)
             q = {k: v[0] for k, v in urllib.parse.parse_qs(u.query).items()}
             if u.path == "/" and q.get("t"):
@@ -363,6 +368,10 @@ def make_handler(st: State):
             return self._write("DELETE")
 
         def _write(self, method: str):
+            with i18n.using(self.headers.get("X-FoxOS-Lang")):
+                return self._do_write(method)
+
+        def _do_write(self, method: str):
             u = urllib.parse.urlparse(self.path)
             if u.path.startswith("/hooks/") and method == "POST":
                 return self._hook(u.path)
@@ -522,7 +531,7 @@ def make_handler(st: State):
                 finally:
                     with st.lock:
                         st.running.pop(bot["id"], None)
-            threading.Thread(target=run, daemon=True).start()
+            threading.Thread(target=contextvars.copy_context().run, args=(run,), daemon=True).start()
             return {"started": True, "bot": bot["id"]}
 
         def _oauth(self, cid: str, b: dict):

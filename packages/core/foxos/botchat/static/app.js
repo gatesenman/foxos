@@ -24,7 +24,7 @@ function t(key, ...args) {
 function esc(s) { return String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])); }
 function h(html) { const d = document.createElement("div"); d.innerHTML = html.trim(); return d.firstElementChild; }
 async function api(method, path, body, raw) {
-  const opt = { method, headers: { "X-FoxOS": "1" } };
+  const opt = { method, headers: { "X-FoxOS": "1", "X-FoxOS-Lang": S.lang || "" } };
   if (raw) { opt.body = raw.body; opt.headers["X-Filename"] = encodeURIComponent(raw.name); opt.headers["Content-Type"] = "application/octet-stream"; }
   else if (body !== undefined) { opt.body = JSON.stringify(body); opt.headers["Content-Type"] = "application/json"; }
   const r = await fetch("/api/" + path, opt);
@@ -44,7 +44,7 @@ function avatar(b, cls = "", dot = "") {
   const inner = a.image ? `<img src="/api/file?path=${encodeURIComponent(a.image)}" alt="">` : `<i class="ti ti-${esc(a.icon || "robot")}"></i>`;
   return `<span class="avatar ${cls}" style="background:${esc(a.color || "#888")}">${inner}${dot}</span>`;
 }
-function agentIcon(id) { return id && id !== "foxos-local" ? `<img src="/api/agents/${encodeURIComponent(id)}/icon" alt="" onerror="this.replaceWith(Object.assign(document.createElement('i'),{className:'ti ti-terminal-2'}))">` : `<i class="ti ti-sparkles"></i>`; }
+function agentIcon(id) { return id && id !== "foxos-local" ? `<img src="/api/agents/${encodeURIComponent(id)}/icon" alt="" data-fallback="terminal-2">` : `<i class="ti ti-sparkles"></i>`; }
 function backendLabel(b) {
   const be = b.backend || {};
   if (be.kind === "model") return `<span class="chip"><i class="ti ti-cpu"></i>${esc(be.model || "")}</span>`;
@@ -396,7 +396,7 @@ function renderCard(c, m) {
     apHtml = `<div class="approval"><div class="q"><i class="ti ti-shield-question"></i> ${esc(t("approvals.question"))}</div>
       ${(ap.options || []).map(o => `<button class="btn sm ${String(o.kind).startsWith("allow") ? "primary" : ""}" data-approve="${esc(ap.request)}" data-option="${esc(o.optionId)}">${esc(optName(o))}</button>`).join("")}</div>`;
   } else if (ap.decision) {
-    apHtml = `<div class="approval"><span class="chip ${ap.decision === "allow" ? "ok" : "bad"}"><i class="ti ti-${ap.decision === "allow" ? "check" : "x"}"></i>${esc(t("approvals." + ap.decision))}</span><small>${esc(ap.by ? t("approvals.by", ap.by === "rule" ? t("approvals.by_rule") : ap.by) : "")}</small></div>`;
+    apHtml = `<div class="approval"><span class="chip ${ap.decision === "allow" ? "ok" : "bad"}"><i class="ti ti-${ap.decision === "allow" ? "check" : "x"}"></i>${esc(t("approvals." + ap.decision))}</span><small>${esc(ap.by ? t("approvals.by", ap.by === "rule" ? t("approvals.by_rule") : ap.by === "human" ? t("origin.person") : ap.by) : "")}</small></div>`;
   }
   const collapsed = st === "completed" && !(c.content || []).some(x => x.type === "diff") && ap.decision !== "pending";
   return `<div class="card ${collapsed ? "collapsed" : ""}"><div class="card-head"><span class="ico"><i class="ti ti-${KIND_ICON[c.kind] || "tool"}"></i></span>
@@ -924,9 +924,16 @@ async function init() {
   await refreshState(); renderTakeover(); renderDock();
   loadAgents().catch(() => {});
   connectEvents();
-  const hash = location.hash.slice(1);
-  if (hash && ["approvals", "connectors", "agents", "machines", "skills", "routines", "runtime"].includes(hash)) showView(hash);
-  else openBot(hash && botById(hash) ? hash : S.current);
+  // #approvals、#bot/<id>、#settings/<id>/<tab>
+  const [h0, h1, h2] = decodeURIComponent(location.hash.slice(1)).split("/");
+  if (["approvals", "connectors", "agents", "machines", "skills", "routines", "runtime"].includes(h0)) showView(h0);
+  else if (h0 === "settings" && botById(h1)) { openBot(h1); openSettings(h1, h2); }
+  else { const id = h0 === "bot" ? h1 : h0; openBot(id && botById(id) ? id : S.current); }
 }
 function renderDock() { $("#btn-dock").innerHTML = `<i class="ti ti-${S.prefs.dock ? "app-window" : "layout-sidebar-right"}"></i>`; $("#btn-dock").title = S.prefs.dock ? t("app.undock") : t("app.dock"); }
+// 图片加载失败时换成图标（CSP 不允许内联 onerror）
+document.addEventListener("error", e => {
+  const el = e.target;
+  if (el && el.tagName === "IMG" && el.dataset.fallback) el.replaceWith(Object.assign(document.createElement("i"), { className: "ti ti-" + el.dataset.fallback }));
+}, true);
 init();
