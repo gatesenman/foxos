@@ -99,7 +99,7 @@ if [ "$MIRROR" != "http://archive.ubuntu.com/ubuntu" ]; then
 fi
 
 REPACK=0
-if [ "${FOXOS_OS_REPACK:-0}" = 1 ] && [ -x "$CHROOT/usr/bin/labwc" ]; then
+if [ "${FOXOS_OS_REPACK:-0}" = 1 ] && [ -x "$CHROOT/usr/bin/startxfce4" ]; then
   REPACK=1
   log "FOXOS_OS_REPACK=1，跳过 apt / Firefox / VMM 下载，只重跑 hook 并打包"
 fi

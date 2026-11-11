@@ -1,0 +1,75 @@
+#!/bin/sh
+# 登录后把壁纸、主题套到当前显示器（显示器名称因机器而异）。
+set -eu
+WALL=${FOXOS_WALLPAPER:-/usr/share/backgrounds/foxos/default.png}
+ICON=Adwaita
+if [ -d /usr/share/icons/Yaru ]; then
+  ICON=Yaru
+fi
+command -v xfconf-query >/dev/null 2>&1 || exit 0
+
+xfconf-query -c xsettings -p /Net/ThemeName -n -t string -s FoxOS 2>/dev/null || \
+  xfconf-query -c xsettings -p /Net/ThemeName -s FoxOS || true
+xfconf-query -c xsettings -p /Net/IconThemeName -n -t string -s "$ICON" 2>/dev/null || \
+  xfconf-query -c xsettings -p /Net/IconThemeName -s "$ICON" || true
+xfconf-query -c xfwm4 -p /general/theme -n -t string -s FoxOS 2>/dev/null || \
+  xfconf-query -c xfwm4 -p /general/theme -s FoxOS || true
+xfconf-query -c xsettings -p /Gtk/FontName -n -t string -s "Noto Sans CJK SC 11" 2>/dev/null || \
+  xfconf-query -c xsettings -p /Gtk/FontName -s "Noto Sans CJK SC 11" || true
+
+if [ -f "$WALL" ]; then
+  xfconf-query -c xfce4-desktop -p /backdrop/single-workspace-mode -n -t bool -s true 2>/dev/null || \
+    xfconf-query -c xfce4-desktop -p /backdrop/single-workspace-mode -s true || true
+  # 给已有的 last-image 属性全部换成狐狸OS 壁纸；没有属性时再为 screen0/monitor0 建一条。
+  listed=$(xfconf-query -c xfce4-desktop -l 2>/dev/null || true)
+  found=0
+  echo "$listed" | grep -F '/backdrop/' | grep -F 'last-image' | while read -r p; do
+    xfconf-query -c xfce4-desktop -p "$p" -s "$WALL" || true
+    found=1
+  done
+  echo "$listed" | grep -F '/backdrop/' | grep -F 'image-style' | while read -r p; do
+    xfconf-query -c xfce4-desktop -p "$p" -s 5 || true
+  done
+  if ! echo "$listed" | grep -q last-image; then
+    xfconf-query -c xfce4-desktop -p /backdrop/screen0/monitor0/workspace0/last-image -n -t string -s "$WALL" 2>/dev/null || true
+    xfconf-query -c xfce4-desktop -p /backdrop/screen0/monitor0/workspace0/image-style -n -t int -s 5 2>/dev/null || true
+  fi
+  # 按当前已连接的显示器名称再写一遍（Xvfb 可能叫 screen，QEMU / Hyper-V 名称也各不相同）
+  if command -v xrandr >/dev/null; then
+    xrandr --current 2>/dev/null | awk '/ connected/{print $1}' | while read -r out; do
+      [ -n "$out" ] || continue
+      xfconf-query -c xfce4-desktop -p "/backdrop/screen0/monitor${out}/workspace0/last-image" -n -t string -s "$WALL" 2>/dev/null ||         xfconf-query -c xfce4-desktop -p "/backdrop/screen0/monitor${out}/workspace0/last-image" -s "$WALL" || true
+      xfconf-query -c xfce4-desktop -p "/backdrop/screen0/monitor${out}/workspace0/image-style" -n -t int -s 5 2>/dev/null ||         xfconf-query -c xfce4-desktop -p "/backdrop/screen0/monitor${out}/workspace0/image-style" -s 5 || true
+    done
+  fi
+  
+# 桌面图标：4.18 在 /desktop-icons，4.20 在 /backdrop/desktop-icons
+for base in /desktop-icons/file-icons /backdrop/desktop-icons/file-icons; do
+  for key in show-home show-filesystem show-trash show-removable; do
+    xfconf-query -c xfce4-desktop -p "$base/$key" -n -t bool -s false 2>/dev/null ||       xfconf-query -c xfce4-desktop -p "$base/$key" -s false || true
+  done
+done
+
+  command -v xfdesktop >/dev/null && xfdesktop --reload >/dev/null 2>&1 || true
+fi
+
+# 常用快捷键（不覆盖用户已改过的绑定：只在空闲时写入）
+set_key() {
+  chan=$1; prop=$2; val=$3
+  cur=$(xfconf-query -c "$chan" -p "$prop" 2>/dev/null || true)
+  if [ -z "$cur" ]; then
+    xfconf-query -c "$chan" -p "$prop" -n -t string -s "$val" 2>/dev/null || true
+  fi
+}
+set_key xfce4-keyboard-shortcuts /commands/custom/"<Super>Return" "xfce4-terminal"
+set_key xfce4-keyboard-shortcuts /commands/custom/"<Super>e" "thunar"
+set_key xfce4-keyboard-shortcuts /commands/custom/"<Alt>Escape" "foxos control pause --reason 键盘快捷键"
+set_key xfce4-keyboard-shortcuts /commands/custom/Print "scrot -e 'mv \$f \$HOME/Pictures/ 2>/dev/null || true' '\$HOME/Pictures/foxos-%Y%m%d-%H%M%S.png'"
+
+mkdir -p "$HOME/FoxOS/workspace" "$HOME/Pictures"
+command -v xdg-user-dirs-update >/dev/null && xdg-user-dirs-update || true
+
+if command -v systemctl >/dev/null; then
+  systemctl --user import-environment DISPLAY XAUTHORITY XDG_RUNTIME_DIR FOXOS_LANG LANG 2>/dev/null || true
+  systemctl --user start foxos-mcp.service 2>/dev/null || true
+fi

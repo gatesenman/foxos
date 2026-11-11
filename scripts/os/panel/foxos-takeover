@@ -1,0 +1,21 @@
+#!/bin/sh
+# 切换人工接管（面板按钮 / 快捷键）。默认身份是 human。
+set -eu
+action=${1:-toggle}
+status=$(foxos control status --json 2>/dev/null || true)
+paused=0
+printf '%s' "$status" | grep -q '"paused": true' && paused=1
+printf '%s' "$status" | grep -qi '"paused":true' && paused=1
+case "$action" in
+  status) echo "$paused"; exit 0 ;;
+  pause) foxos control pause --reason "${2:-面板按钮}"; exit $? ;;
+  resume) foxos control resume; exit $? ;;
+  toggle)
+    if [ "$paused" = 1 ]; then
+      exec foxos control resume
+    else
+      exec foxos control pause --reason "${2:-面板按钮}"
+    fi
+    ;;
+  *) echo "用法：foxos-takeover [toggle|pause|resume|status]" >&2; exit 2 ;;
+esac

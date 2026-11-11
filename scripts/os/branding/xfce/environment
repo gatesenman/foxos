@@ -1,7 +1,4 @@
 # 物理键盘用美式键位；中文输入由 fcitx5 拼音负责。
-# 不要写成 LAYOUT=cn VARIANT=us：xkb 没有 cn(us)，labwc 会编译键位失败并以 SIGSEGV 退出。
-XKB_DEFAULT_LAYOUT=us
-XKB_DEFAULT_VARIANT=
 LANG=zh_CN.UTF-8
 LANGUAGE=zh_CN:zh
 LC_MESSAGES=zh_CN.UTF-8
@@ -10,6 +7,6 @@ QT_IM_MODULE=fcitx
 XMODIFIERS=@im=fcitx
 SDL_IM_MODULE=fcitx
 FOXOS_LANG=zh-CN
-XDG_CURRENT_DESKTOP=FoxOS:labwc:wlroots
-XDG_SESSION_TYPE=wayland
+XDG_CURRENT_DESKTOP=XFCE
+XDG_SESSION_TYPE=x11
 XDG_SESSION_DESKTOP=foxos

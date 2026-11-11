@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=狐狸OS 桌面默认设置
+Name[en]=FoxOS desktop defaults
+Exec=/usr/lib/foxos/session/apply-defaults
+X-XFCE-Autostart-Override=true
+StartupNotify=false
+Terminal=false
+NoDisplay=true

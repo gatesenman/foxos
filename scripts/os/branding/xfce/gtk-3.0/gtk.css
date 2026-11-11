@@ -1,0 +1,77 @@
+/* 狐狸OS：在 Adwaita 之上做面板与强调色，不另做整套换肤。 */
+@import url("resource:///org/gtk/libgtk/theme/Adwaita/gtk-contained.css");
+
+@define-color foxos_accent #D96B2B;
+@define-color foxos_accent_fg #1A0F05;
+@define-color foxos_panel_bg #2A221C;
+@define-color foxos_panel_fg #F4EBDF;
+@define-color theme_selected_bg_color #D96B2B;
+@define-color theme_selected_fg_color #FFF8F0;
+
+.xfce4-panel,
+.xfce4-panel.background,
+panel-window,
+#XfcePanelWindow {
+  background-color: #2A221C;
+  background-image: none;
+  color: #F4EBDF;
+  border: none;
+  font: 11pt "Noto Sans CJK SC", sans-serif;
+  text-shadow: none;
+}
+
+.xfce4-panel button,
+.xfce4-panel menuitem,
+.xfce4-panel label,
+.xfce4-panel image {
+  color: #F4EBDF;
+}
+
+.xfce4-panel button {
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  padding: 2px 8px;
+  box-shadow: none;
+  text-shadow: none;
+}
+
+.xfce4-panel button:hover,
+.xfce4-panel button:active,
+.xfce4-panel button:checked {
+  background-color: rgba(255, 255, 255, 0.10);
+}
+
+/* Whisker「开始」按钮稍作强调，但不刺眼 */
+#whiskermenu-button,
+.xfce4-panel button#whiskermenu-button {
+  background-color: #D96B2B;
+  color: #1A0F05;
+  font-weight: 600;
+  padding: 2px 12px;
+}
+#whiskermenu-button:hover,
+.xfce4-panel button#whiskermenu-button:hover {
+  background-color: #E88A4F;
+  color: #1A0F05;
+}
+#whiskermenu-button label {
+  color: #1A0F05;
+  font-weight: 600;
+}
+
+/* 狐狸OS 自有 GTK 界面使用细滚动条；不改 Firefox / LibreOffice 内部控件 */
+scrollbar,
+scrollbar slider,
+scrollbar.vertical slider,
+scrollbar.horizontal slider {
+  min-width: 8px;
+  min-height: 8px;
+  border-radius: 8px;
+}
+scrollbar slider {
+  background-color: alpha(#2C241C, 0.35);
+}
+scrollbar slider:hover {
+  background-color: alpha(#2C241C, 0.55);
+}

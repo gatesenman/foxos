@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Name=系统
+Name[en]=System
+Name[zh_CN]=系统
+Comment=退出会话、锁定、关机或重新启动
+Comment[en]=Log out, lock, shut down or reboot
+Exec=xfce4-session-logout
+Icon=system-shutdown
+Terminal=false
+Categories=System;X-XFCE;X-Xfce-Toplevel;
+StartupNotify=false

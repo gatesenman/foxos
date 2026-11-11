@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Fcitx 5
+Exec=fcitx5 -d
+X-XFCE-Autostart-Override=true
+StartupNotify=false
+Terminal=false
+NoDisplay=true
