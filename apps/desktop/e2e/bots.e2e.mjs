@@ -24,6 +24,10 @@ const SKIP = !BROWSER ? 'no chrome/chromium' : NEED.length ? 'missing ' + NEED.j
 const CACHE = process.env.FOXOS_TEST_RUNTIME_CACHE || '/var/tmp/foxos-test-cache/runtime';
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 const SW = 1600, SH = 1000;
+// 有 DeepSeek 密钥文件时代码智能体用 deepseek/deepseek-flash（密钥只经标准输入进测试自己的密钥库）；
+// 没有时用 opencode 的默认免费模型（不需要密钥，但 opencode 对免费用量有上限）
+const KEY_FILE = process.env.FOXOS_TEST_DEEPSEEK_KEY_FILE || path.join(os.homedir(), '.secrets', 'deepseek_api_key');
+const HAS_KEY = fs.existsSync(KEY_FILE) && fs.readFileSync(KEY_FILE, 'utf8').trim().length > 0;
 
 // 截图只是给文档用的，不是断言；截不到就记一条，不影响结果
 async function shot(page, name) { await page.screenshot({ path: path.join(SHOTS, name), timeout: 15000 }).catch(e => console.log(`screenshot ${name}: ${e.message.split('\n')[0]}`)); }
@@ -65,15 +69,15 @@ class Env {
   }
 }
 
-test('US-126..US-133 智能体窗口：真实 Chrome 窗口里的完整流程', { skip: SKIP, timeout: 1800000 }, async t => {
+test('US-126..US-134 智能体窗口：真实 Chrome 窗口里的完整流程', { skip: SKIP, timeout: 1800000 }, async t => {
   const E = new Env();
   let browser;
   try {
     // 桌面：Xvfb + xfwm4（真实窗口管理器，处理停靠的屏幕边保留）
     E.bg('Xvfb', [E.display, '-screen', '0', `${SW}x${SH}x24`, '-nolisten', 'tcp']);
-    await until(() => spawnSync('xdpyinfo', [], { env: E.env }).status === 0, 20000, 'Xvfb');
+    await until(() => spawnSync('xdpyinfo', [], { env: E.env }).status === 0, 60000, 'Xvfb');
     E.bg('xfwm4', ['--replace', '--compositor=off']);
-    await until(() => spawnSync('wmctrl', ['-m'], { env: E.env }).status === 0, 20000, 'xfwm4');
+    await until(() => spawnSync('wmctrl', ['-m'], { env: E.env }).status === 0, 90000, 'xfwm4');
 
     // 真实的代码智能体：opencode（默认免费模型，不需要密钥）；编辑 / 执行默认要人批准
     const rt = E.cli(['runtime', 'install', 'opencode']);
@@ -98,6 +102,11 @@ test('US-126..US-133 智能体窗口：真实 Chrome 窗口里的完整流程', 
         await page.click('.modal [data-ok]');
         await page.waitForSelector('#input');
       }
+      if (HAS_KEY) {
+        E.cli(['acp', 'key', 'set', 'opencode', 'DEEPSEEK_API_KEY', '--value-stdin'], { input: fs.readFileSync(KEY_FILE, 'utf8').trim() });
+        for (const b of ['coder', 'helper']) E.cli(['bot', 'config', 'set', b, '--model', 'deepseek/deepseek-flash']);
+      }
+      console.log(`code bots model: ${HAS_KEY ? 'deepseek/deepseek-flash' : 'opencode default free model'}`);
       const coder = E.cli(['bot', 'config', 'get', 'coder']).config;
       assert.deepEqual([coder.name, coder.title, coder.backend.kind, coder.backend.agent], ['Coder', 'writes code', 'acp', 'opencode']);
       assert.equal(E.cli(['bot', 'config', 'get', 'helper']).config.backend.agent, 'opencode');

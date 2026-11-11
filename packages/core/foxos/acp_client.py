@@ -64,6 +64,10 @@ class _Terminal:
         return {"output": text, "truncated": self.truncated, **({"exitStatus": st} if st else {})}
 
 
+
+def _no_permission(params: dict) -> None:
+    return None
+
 class AcpConnection:
     """一个 ACP 智能体进程。回调：
     on_event(dict)：session/update、stderr、fs、terminal 事件（给聊天界面画卡片）
@@ -84,7 +88,7 @@ class AcpConnection:
         self.scope = (scope or ".").strip("/") or "."
         self.scope_root = (self.workspace / self.scope).resolve()
         self.on_event = on_event or (lambda e: None)
-        self.on_permission = on_permission or (lambda p: None)
+        self.on_permission = on_permission or _no_permission
         self.call = call
         self.paused = paused or (lambda: None)
         # 工作空间以外允许只读的目录（技能目录：pstack 与用户技能），读到时发 skill 事件
@@ -231,7 +235,8 @@ class AcpConnection:
     def _handle(self, method: str, params: dict) -> Any:
         if method == "session/request_permission":
             self.on_event({"type": "permission", "params": params})
-            if self.paused():
+            # 有审批处理（智能体）时由它处理接管（拒绝并在卡片上记为接管）；没有时这里直接拒绝
+            if self.paused() and self.on_permission is _no_permission:
                 opt = next((o["optionId"] for o in params.get("options", []) if str(o.get("kind", "")).startswith("reject")), None)
             else:
                 opt = self.on_permission(params)

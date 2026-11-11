@@ -798,7 +798,8 @@ def run_turn(ws, ref: str, text: str, *, attachments: list | None = None, actor:
                 try:
                     ans = run_turn(ws, mb["id"], rest or text, actor=actor, origin="mention", delegated_by=ident, depth=depth + 1,
                                    envelope={"from": bot["name"], "task": rest}, keep=keep, approval_mode=approval_mode)
-                    cd.update(status="completed", answer=ans.get("text", ""), message=ans["id"], skills_used=ans.get("skills_used", []))
+                    cd.update(status="failed" if ans.get("error") else "completed", answer=ans.get("text", ""), message=ans["id"],
+                              skills_used=ans.get("skills_used", []))
                 except FoxError as e:
                     cd.update(status="failed", answer=e.message)
                 turn.emit({"type": "card", "card": cd})
@@ -1100,6 +1101,8 @@ def _run_model(ws, bot, turn: _Turn, text, skill_block, envelope, attachments, i
                                    depth=turn.depth, turn=turn.turn, approve=approval_mode)
                     cd.update(answer=res.get("answer", ""), message=res.get("message"), refused=res.get("refused"),
                               skills_used=res.get("skills_used", []))
+                    if res.get("error"):
+                        raise FoxError(res["error"].get("code", "ERROR"), res["error"].get("message", ""))
                 else:
                     machine = args.pop("machine", None) or turn.machine
                     if machine != machines.LOCAL and machine not in allowed:
@@ -1170,7 +1173,8 @@ def delegate(ws, caller: str, to: str, task: str, constraints: str | None = None
     r = run_turn(ws, target["id"], body, actor=caller, origin="handoff", delegated_by=caller, depth=depth + 1, envelope=env, keep=keep,
                  approval_mode=appr)
     return {"refused": False, "to": target["id"], "to_name": target["name"], "answer": r.get("text", ""), "message": r["id"],
-            "skills_used": r.get("skills_used", []), "cards": len(r.get("cards", [])), "stop_reason": r.get("stop_reason")}
+            "skills_used": r.get("skills_used", []), "cards": len(r.get("cards", [])), "stop_reason": r.get("stop_reason"),
+            **({"error": r["error"]} if r.get("error") else {})}
 
 
 # ---------------------------------------------------------------------- 例程
