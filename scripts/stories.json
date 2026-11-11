@@ -702,6 +702,171 @@
           "^test_US118"
         ]
       ]
+    },
+    {
+      "id": "US-119",
+      "title": "主智能体用 DeepSeek（服务商预设，密钥在密钥库）真实回答",
+      "match": [
+        [
+          "pytest",
+          "test_bots_deepseek.py",
+          "^test_US119"
+        ]
+      ]
+    },
+    {
+      "id": "US-120",
+      "title": "主智能体用工具委托给 opencode 编码智能体（DeepSeek），改文件前人批准，卡片带 diff",
+      "match": [
+        [
+          "pytest",
+          "test_bots_deepseek.py",
+          "^test_US120"
+        ]
+      ]
+    },
+    {
+      "id": "US-121",
+      "title": "人拒绝真实代理的编辑：文件不变，卡片记为拒绝",
+      "match": [
+        [
+          "pytest",
+          "test_bots_deepseek.py",
+          "^test_US121"
+        ]
+      ]
+    },
+    {
+      "id": "US-122",
+      "title": "真实模型回合里用 pstack 技能",
+      "match": [
+        [
+          "pytest",
+          "test_bots_deepseek.py",
+          "^test_US122"
+        ]
+      ]
+    },
+    {
+      "id": "US-123",
+      "title": "真实模型的智能体读另一台狐狸OS 上的目录，对方审计写明控制端",
+      "match": [
+        [
+          "pytest",
+          "test_bots_deepseek.py",
+          "^test_US123"
+        ]
+      ]
+    },
+    {
+      "id": "US-124",
+      "title": "Qwen Code 经 OpenAI 兼容地址接 DeepSeek，写文件经狐狸OS 内核",
+      "match": [
+        [
+          "pytest",
+          "test_bots_deepseek.py",
+          "^test_US124"
+        ]
+      ]
+    },
+    {
+      "id": "US-125",
+      "title": "智能体窗口：新建并配置智能体（含 DeepSeek 服务商预设）",
+      "match": [
+        [
+          "e2e",
+          "bots.e2e.mjs",
+          "^US-125 "
+        ]
+      ]
+    },
+    {
+      "id": "US-126",
+      "title": "智能体窗口：真实 opencode 回合，编辑卡片带 diff，点允许后文件改了",
+      "match": [
+        [
+          "e2e",
+          "bots.e2e.mjs",
+          "^US-126 "
+        ]
+      ]
+    },
+    {
+      "id": "US-127",
+      "title": "智能体窗口：点拒绝，文件不变",
+      "match": [
+        [
+          "e2e",
+          "bots.e2e.mjs",
+          "^US-127 "
+        ]
+      ]
+    },
+    {
+      "id": "US-128",
+      "title": "智能体窗口：@ 委托给第二个智能体，在审批页批准",
+      "match": [
+        [
+          "e2e",
+          "bots.e2e.mjs",
+          "^US-128 "
+        ]
+      ]
+    },
+    {
+      "id": "US-129",
+      "title": "智能体窗口：/ 技能菜单与用过的技能",
+      "match": [
+        [
+          "e2e",
+          "bots.e2e.mjs",
+          "^US-129 "
+        ]
+      ]
+    },
+    {
+      "id": "US-130",
+      "title": "智能体窗口：添加真实的本地 MCP 连接器（HTTP + Bearer）并列出工具",
+      "match": [
+        [
+          "e2e",
+          "bots.e2e.mjs",
+          "^US-130 "
+        ]
+      ]
+    },
+    {
+      "id": "US-131",
+      "title": "停靠窗口占住屏幕边（_NET_WM_STRUT_PARTIAL），最大化窗口不被盖住",
+      "match": [
+        [
+          "e2e",
+          "bots.e2e.mjs",
+          "^US-131 "
+        ]
+      ]
+    },
+    {
+      "id": "US-132",
+      "title": "智能体窗口：配对第二台狐狸OS 并在聊天里切换机器",
+      "match": [
+        [
+          "e2e",
+          "bots.e2e.mjs",
+          "^US-132 "
+        ]
+      ]
+    },
+    {
+      "id": "US-133",
+      "title": "智能体窗口：人工接管让智能体的编辑停下，交还后恢复",
+      "match": [
+        [
+          "e2e",
+          "bots.e2e.mjs",
+          "^US-133 "
+        ]
+      ]
     }
   ]
 }

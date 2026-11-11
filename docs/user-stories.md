@@ -25,13 +25,30 @@
 | US-116 | 从官方发布地址安装第三方 ACP 智能体（sha256 校验）并真实握手；智能体设置与更新检查 | `packages/core/tests/test_acp_real.py`：`test_US116_…` |
 | US-117 | 镜像阶段运行环境：以用户 foxos 检查预装版本、PEP 668、专有智能体不进镜像 | `packages/core/tests/test_os_runtime.py`：`test_US117_…` |
 | US-118 | 镜像里预装的 ACP 智能体已登记，以用户 foxos 真实握手 | `packages/core/tests/test_os_runtime.py`：`test_US118_…` |
+| US-119 | 主智能体用 DeepSeek（服务商预设，密钥在密钥库）真实回答 | `packages/core/tests/test_bots_deepseek.py`：`test_US119_…` |
+| US-120 | 主智能体用工具委托给 opencode 编码智能体（DeepSeek），改文件前人批准，卡片带 diff | `packages/core/tests/test_bots_deepseek.py`：`test_US120_…` |
+| US-121 | 人拒绝真实代理的编辑：文件不变，卡片记为拒绝 | `packages/core/tests/test_bots_deepseek.py`：`test_US121_…` |
+| US-122 | 真实模型回合里用 pstack 技能 | `packages/core/tests/test_bots_deepseek.py`：`test_US122_…` |
+| US-123 | 真实模型的智能体读另一台狐狸OS 上的目录，对方审计写明控制端 | `packages/core/tests/test_bots_deepseek.py`：`test_US123_…` |
+| US-124 | Qwen Code 经 OpenAI 兼容地址接 DeepSeek，写文件经狐狸OS 内核 | `packages/core/tests/test_bots_deepseek.py`：`test_US124_…` |
+| US-125 | 智能体窗口：新建并配置智能体（含 DeepSeek 服务商预设） | `apps/desktop/e2e/bots.e2e.mjs`：`US-125` |
+| US-126 | 智能体窗口：真实 opencode 回合，编辑卡片带 diff，点允许后文件改了 | `apps/desktop/e2e/bots.e2e.mjs`：`US-126` |
+| US-127 | 智能体窗口：点拒绝，文件不变 | `apps/desktop/e2e/bots.e2e.mjs`：`US-127` |
+| US-128 | 智能体窗口：@ 委托给第二个智能体，在审批页批准 | `apps/desktop/e2e/bots.e2e.mjs`：`US-128` |
+| US-129 | 智能体窗口：/ 技能菜单与用过的技能 | `apps/desktop/e2e/bots.e2e.mjs`：`US-129` |
+| US-130 | 智能体窗口：添加真实的本地 MCP 连接器（HTTP + Bearer）并列出工具 | `apps/desktop/e2e/bots.e2e.mjs`：`US-130` |
+| US-131 | 停靠窗口占住屏幕边（`_NET_WM_STRUT_PARTIAL`），最大化窗口不被盖住，取消停靠后释放 | `apps/desktop/e2e/bots.e2e.mjs`：`US-131` |
+| US-132 | 智能体窗口：配对第二台狐狸OS 并在聊天里切换机器 | `apps/desktop/e2e/bots.e2e.mjs`：`US-132` |
+| US-133 | 智能体窗口：人工接管让智能体的编辑停下（卡片记为接管），交还后恢复 | `apps/desktop/e2e/bots.e2e.mjs`：`US-133` |
 
 说明：
 
 - US-102–US-108 用仓库自带的本地 ACP 智能体（`python3 -m foxos.local_agent`，一个真实的 ACP stdio 进程，按规则回答，不需要模型账号）。这样每一步（工具卡片、审批、diff、委托、技能）都能在测试里确定地重现。
 - US-112 会真实调用 Exa 的免密钥 MCP 服务；US-116 会从 GitHub 下载 opencode。没有网络时这两个跳过。
 - US-117、US-118 要先运行 `sudo scripts/os/tools/agent-overlay.sh up`，在镜像 chroot 的 overlay 里检查；没挂载时跳过。
-- 没有一个故事用真实的模型账号跑过回答。真实的 Gemini、Codex、Qwen、Claude、Cursor 测到的是 ACP 握手和会话建立，见 [agent-runtime.md](agent-runtime.md)。
+- US-119–US-124 用真实模型（DeepSeek 的 OpenAI 兼容接口）跑回答。密钥从 `~/.secrets/deepseek_api_key`（或 `FOXOS_TEST_DEEPSEEK_KEY_FILE`）读取，只经标准输入存进测试自己的密钥库；没有密钥文件时这些用例**跳过**（不算失败），所以没有密钥的 CI 仍然是绿的。
+- US-125–US-133 在自己的 Xvfb + xfwm4 桌面里打开真实的智能体窗口（Chrome 应用模式），用 Playwright 经 CDP 点界面。代码智能体是 opencode：有 DeepSeek 密钥时用 `deepseek/deepseek-flash`，没有时用 opencode 的默认免费模型（不需要密钥，但 opencode 对免费用量有上限，用完会报 “Free usage limit reached”）。
+- 真实的 Gemini、Codex、Claude、Cursor 测到的是 ACP 握手和会话建立，见 [agent-runtime.md](agent-runtime.md)。
 
 ---
 
@@ -46,5 +63,5 @@ Every story has an automated test, and `scripts/stories.json` maps each story to
 - US-113–US-115: multiple machines with two real `machine serve` hosts.
 - US-116: opencode is downloaded, checked against its sha256, and completes a real ACP handshake.
 - US-117–US-118: the ISO runtime, checked as user `foxos` in an overlay of the image chroot.
-
-No story was run against a real model account.
+- US-119–US-124: real model turns through DeepSeek's OpenAI-compatible API: the main bot answers, delegates to an opencode code bot that edits a file after a person approves (the card carries the diff), a denied edit leaves the file alone, a pstack skill, a read on a second FoxOS machine, and Qwen Code pointed at DeepSeek. The key is read from `~/.secrets/deepseek_api_key` (or `FOXOS_TEST_DEEPSEEK_KEY_FILE`) and only goes into the test's own secret store over stdin. Without the key file these tests are skipped, not failed.
+- US-125–US-133: the real bots window (Chrome app mode) on its own Xvfb + xfwm4 desktop, driven with Playwright over CDP: create and configure bots, approve and deny real opencode edits, @ delegation, `/` skills, a real local MCP connector, docking with a reserved screen edge, pairing a second machine, and takeover. The code bots use `deepseek/deepseek-flash` when the key file exists and opencode's default free model otherwise (no key, but opencode caps free usage).

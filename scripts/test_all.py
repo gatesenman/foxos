@@ -28,7 +28,7 @@ ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "build" / "test-results"
 DESKTOP = ROOT / "apps" / "desktop"
 PY = str(ROOT / ".venv" / "bin" / "python") if (ROOT / ".venv" / "bin" / "python").exists() else sys.executable
-E2E_ORDER = ["icons.e2e.js", "scrollbars.e2e.js", "i18n.e2e.js", "mcp.e2e.mjs", "sandbox.e2e.js", "environments.e2e.js", "env-install.e2e.js", "everything.e2e.js"]
+E2E_ORDER = ["icons.e2e.js", "scrollbars.e2e.js", "i18n.e2e.js", "mcp.e2e.mjs", "sandbox.e2e.js", "environments.e2e.js", "env-install.e2e.js", "bots.e2e.mjs", "everything.e2e.js"]
 
 
 def ensure_display(env: dict) -> subprocess.Popen | None:

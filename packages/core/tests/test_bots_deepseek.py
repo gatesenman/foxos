@@ -87,7 +87,7 @@ def box(tmp_path_factory):
     return b
 
 
-def test_US120_main_bot_real_deepseek_answer_and_provider_preset(box):
+def test_US119_main_bot_real_deepseek_answer_and_provider_preset(box):
     cfg = box.ok("bot", "config", "get", "fox")["config"]
     assert cfg["backend"] == {**cfg["backend"], "kind": "model", "provider": "deepseek", "base_url": "https://api.deepseek.com"}
     assert cfg["has_api_key"] and "deepseek" in cfg["providers"]
@@ -98,7 +98,7 @@ def test_US120_main_bot_real_deepseek_answer_and_provider_preset(box):
     assert '"model:deepseek-flash"' in ev
 
 
-def test_US121_delegate_to_acp_code_bot_edit_with_diff_and_human_approval(box):
+def test_US120_delegate_to_acp_code_bot_edit_with_diff_and_human_approval(box):
     (box.ws / "notes").mkdir(exist_ok=True)
     (box.ws / "notes" / "todo.txt").write_text("status: alpha\n")
     reply, seen = box.send_answering(
@@ -117,7 +117,7 @@ def test_US121_delegate_to_acp_code_bot_edit_with_diff_and_human_approval(box):
     assert diff and "alpha" in (diff[-1].get("oldText") or "") and "beta" in diff[-1]["newText"]
 
 
-def test_US122_human_denies_edit_file_untouched(box):
+def test_US121_human_denies_edit_file_untouched(box):
     (box.ws / "notes" / "keep.txt").write_text("keep me\n")
     reply, seen = box.send_answering("coder", "Use your edit tool to replace the word keep with drop in notes/keep.txt.",
                                      decide=lambda a: "reject")
@@ -126,14 +126,14 @@ def test_US122_human_denies_edit_file_untouched(box):
     assert any((c.get("approval") or {}).get("decision") == "deny" for c in reply["cards"])
 
 
-def test_US123_pstack_skill_with_real_model(box):
+def test_US122_pstack_skill_with_real_model(box):
     r = box.ok("bot", "message", "send", "fox", "/unslop Rewrite: 'In today's fast-paced world, it is important to note that "
                                                 "our robust solution leverages synergy.' Give only the rewritten sentence.")["reply"]
     assert "unslop" in r["skills_used"]
     assert r["text"].strip() and "fast-paced" not in r["text"].lower()
 
 
-def test_US124_real_model_bot_reads_another_foxos_machine(box, tmp_path):
+def test_US123_real_model_bot_reads_another_foxos_machine(box, tmp_path):
     host = Node(tmp_path, "alpha-host")
     host.serve()
     try:
@@ -153,7 +153,7 @@ def test_US124_real_model_bot_reads_another_foxos_machine(box, tmp_path):
         host.stop()
 
 
-def test_US125_qwen_code_via_openai_compatible_deepseek(box):
+def test_US124_qwen_code_via_openai_compatible_deepseek(box):
     assert box.ok("runtime", "install", "qwen")["results"][0]["ok"]
     box.key("acp", "key", "set", "qwen-code", "OPENAI_API_KEY", "--value-stdin")
     box.ok("acp", "agent", "config", "qwen-code", "--env", "OPENAI_BASE_URL=https://api.deepseek.com", "--env", "OPENAI_MODEL=deepseek-flash")
