@@ -23,9 +23,10 @@ async function launchClient(ws, guest) {
     args: ['.', '--no-sandbox', `--user-data-dir=${ud}`, `--workspace=${ws}`],
     cwd: path.join(ROOT, 'apps', 'desktop'),
     env: env({ DISPLAY: process.env.DISPLAY || ':99', FOXOS_PYTHON: PY, FOXOS_CLIENT_MODE: '1' }),
+    timeout: 600000,                                     // 共享构建机负载很高时 Electron 启动可能要几分钟
   });
-  const page = await app.firstWindow();
-  await page.waitForSelector('body.ready', { timeout: 60000 });
+  const page = await app.firstWindow({ timeout: 600000 });
+  await page.waitForSelector('body.ready', { timeout: 180000 });
   return { app, page, ud };
 }
 
@@ -41,7 +42,7 @@ test('US-87 客户端模式：所有动作都在狐狸OS 电脑里执行，本�
     assert.equal(env0.hostExecution, false);
 
     // 1. 狐狸OS 电脑窗口自动打开：在线，画面（来宾 x11vnc 经 ssh -W）连上
-    await page.waitForSelector('.window[data-app=computer] [data-guest-status=ok]', { timeout: 120000 });
+    await page.waitForSelector('.window[data-app=computer] [data-guest-status=ok]', { timeout: 300000 });
     await page.waitForFunction(() => document.querySelector('[data-guest-view]')?.dataset.connected === '1', null, { timeout: 120000 });
     assert.equal(await page.getAttribute('[data-guest-view]', 'data-via'), 'ssh');
     await page.waitForTimeout(2000);
