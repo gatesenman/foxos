@@ -71,25 +71,64 @@ for _ in $(seq 60); do
 done
 sleep 8  # 等 apply-defaults、壁纸、genmon 刷新
 
-x "xfce4-terminal --geometry=96x26+140+96" >/dev/null 2>&1 &
+
+P=os-031   # 新文件名：GitHub 按 URL 缓存图片，换名才能让 README 立即显示新图
+shot() { x "scrot -o /tmp/$P-$1.png"; cp "$R/tmp/$P-$1.png" "$OUT/$P-$1.png"; }
+typeln() { x "xdotool type --delay 12 -- '$1'"; x "xdotool key Return"; sleep "${2:-2}"; }
+win() { x "xdotool search --sync --onlyvisible --class $1" | tail -1; }
+hide_all() { for w in $(x "wmctrl -l" | awk '$2>=0{print $1}'); do x "xdotool windowminimize $w" >/dev/null 2>&1 || true; done; }
+as_root() {
+  unshare --uts /bin/sh -c 'hostname foxos; exec "$@"' sh \
+  chroot "$R" /usr/bin/env -i HOME=/root PATH=/usr/sbin:/usr/bin:/sbin:/bin DISPLAY="$DISP" \
+    LANG=zh_CN.UTF-8 LANGUAGE=zh_CN:zh LC_ALL=zh_CN.UTF-8 /bin/sh -c "$*"
+}
+
+# 1. 终端：foxos 命令操作真实桌面与工作空间里的表格、文档
+x "xfce4-terminal --geometry=110x30+120+70" >/dev/null 2>&1 &
 sleep 4
-WID=$(x "xdotool search --sync --onlyvisible --class xfce4-terminal" | tail -1)
-x "xdotool windowactivate --sync $WID"
-sleep 1
-x "xdotool type --delay 15 'clear; grep PRETTY /etc/os-release; echo \$XDG_CURRENT_DESKTOP \$LANG'"
-x "xdotool key Return"; sleep 1
-x "xdotool type --delay 15 'foxos desktop windows'"
-x "xdotool key Return"; sleep 3
-x "scrot -o /tmp/os-desktop-session.png"
-cp "$R/tmp/os-desktop-session.png" "$OUT/os-desktop-session.png"
-x "scrot -o -u /tmp/os-terminal.png"
-cp "$R/tmp/os-terminal.png" "$OUT/os-terminal.png"
+WID=$(win xfce4-terminal)
+x "xdotool windowactivate --sync $WID"; sleep 4
+typeln 'clear; foxos desktop windows'
+typeln 'foxos sheets create 2026-sales.xlsx --headers 月份,销售额' 3
+typeln 'foxos sheets write 2026-sales.xlsx A2=1月 B2=1200 A3=2月 B3=1500 A4=合计 "B4==SUM(B2:B3)"' 3
+typeln 'foxos sheets read 2026-sales.xlsx' 3
+typeln 'foxos docs create weekly.docx --title 项目周报' 3
+typeln 'foxos docs append weekly.docx 本周完成：XFCE 桌面、Papirus 图标与暖色主题。' 3
+typeln 'foxos files list' 3
+shot terminal
+
+# 2. 开始菜单（终端在后面）
 x "xfce4-popup-whiskermenu" >/dev/null 2>&1 || true
 sleep 3
-x "scrot -o /tmp/os-desktop.png"
-cp "$R/tmp/os-desktop.png" "$OUT/os-desktop.png"
+shot desktop
 x "xdotool key Escape"; sleep 1
-# 编辑器：Mousepad 打开一份中文说明
+
+# 3. Thunar 文件管理器：工作空间里刚生成的文件
+hide_all
+x "thunar /home/foxos/FoxOS/workspace" >/dev/null 2>&1 &
+sleep 5
+TW=$(win thunar)
+x "xdotool windowsize $TW 1100 680 windowmove $TW 380 150 windowactivate --sync $TW" || true
+sleep 2
+shot files
+x "wmctrl -ic $TW" || true
+
+# 4. Firefox
+hide_all
+x "firefox --new-window https://github.com/gatesenman/foxos" >/dev/null 2>&1 &
+sleep 25
+FW=$(win firefox)
+x "xdotool windowsize $FW 1500 900 windowmove $FW 200 60 windowactivate --sync $FW" || true
+sleep 4
+# 首次启动的条款对话框与翻译提示：像用户一样关掉（Esc 关翻译提示，点「继续」）
+x "xdotool key Escape"; sleep 1
+x "xdotool mousemove 950 384 click 1"; sleep 3
+x "xdotool mousemove 1700 1000"; sleep 1
+shot firefox
+x "wmctrl -ic $FW" || true
+sleep 2
+
+# 5. Mousepad 编辑器
 cat > "$R/home/foxos/欢迎使用狐狸OS.txt" <<'TXT'
 欢迎使用狐狸OS
 
@@ -101,14 +140,51 @@ cat > "$R/home/foxos/欢迎使用狐狸OS.txt" <<'TXT'
 Ctrl+空格 切换拼音输入。
 TXT
 chroot "$R" chown foxos:foxos "/home/foxos/欢迎使用狐狸OS.txt"
-x "xdotool search --class xfce4-terminal windowminimize" >/dev/null 2>&1 || true
+hide_all
 x "mousepad /home/foxos/欢迎使用狐狸OS.txt" >/dev/null 2>&1 &
 sleep 5
-MW=$(x "xdotool search --sync --onlyvisible --class mousepad" | tail -1)
-x "xdotool windowsize $MW 900 560 windowmove $MW 300 160 windowactivate --sync $MW" || true
+MW=$(win mousepad)
+x "xdotool windowsize $MW 1000 620 windowmove $MW 460 180 windowactivate --sync $MW" || true
 sleep 2
-x "scrot -o -u -b /tmp/os-editor.png"
-cp "$R/tmp/os-editor.png" "$OUT/os-editor.png"
+shot editor
+x "wmctrl -ic $MW" || true
+
+# 6. 设置管理器
+hide_all
+x "xfce4-settings-manager" >/dev/null 2>&1 &
+sleep 5
+SW=$(win xfce4-settings-manager)
+x "xdotool windowmove $SW 380 120 windowactivate --sync $SW" || true
+sleep 2
+shot settings
+x "wmctrl -ic $SW" || true
+
+# 7. 底栏「系统」：注销 / 关机对话框（只截图，按 Esc 取消）
+hide_all
+x "xfce4-session-logout" >/dev/null 2>&1 &
+sleep 4
+shot system
+x "xdotool key Escape"; sleep 2
+x "pkill -f xfce4-session-logout" >/dev/null 2>&1 || true
+
+# 8. 人工接管：人暂停后，智能体的写操作返回 PAUSED，底栏显示「接管中」
+x "xdotool windowactivate --sync $WID"; sleep 1
+typeln 'clear; foxos control pause --reason 我来改一下' 3
+typeln 'foxos --agent demo-agent desktop type hello; echo 退出码 $?' 4
+sleep 15   # 等底栏 genmon 刷新到「接管中」
+shot takeover
+typeln 'foxos control resume' 3
+
+# 9. 安装器：开始菜单「安装 狐狸OS」启动的 Calamares（Live 上经 pkexec 以 root 运行）
+hide_all
+as_root "calamares" >"$WORK/shot-calamares.log" 2>&1 &
+sleep 20
+CW=$(win calamares)
+[ -n "$CW" ] && x "xdotool windowactivate --sync $CW" || true
+sleep 2
+shot installer
+pkill -f 'calamares$' 2>/dev/null || true
+
 # 窗口信息供核对：会话确实是 xfwm4 下的 foxos 用户
 x "wmctrl -m" > "$OUT/wm.txt" 2>&1 || true
 x "id; echo \$LANG \$LANGUAGE" >> "$OUT/wm.txt" 2>&1 || true

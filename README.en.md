@@ -6,7 +6,7 @@
 
 <p align="center"><a href="README.md">中文</a> · <a href="https://github.com/gatesenman/foxos/releases/tag/v0.3.1-os-preview">Bootable ISO</a> · <a href="https://github.com/gatesenman/foxos/releases/tag/v0.2.0-windows-preview">Windows companion preview</a> · <a href="docs/os-test-guide.md">ISO test guide</a> · <a href="AGENTS.md">AGENTS.md</a></p>
 
-![FoxOS real desktop: XFCE, start menu, bottom panel, and terminal](docs/screenshots/os-desktop.png)
+![FoxOS real desktop: XFCE, start menu, bottom panel, and terminal](docs/screenshots/os-031-desktop.png)
 
 This screenshot is from a real FoxOS XFCE graphical session (QEMU / Xvfb used for testing only). It shows real xfwm4 windows: the XFCE terminal (`foxos@foxos`), the bottom panel (Start, clock, System, Take over), and the Whisker applications menu — not a painted Electron fake desktop.
 
@@ -28,25 +28,26 @@ The workbench includes:
 - **Own scrollbars**: no default OS scrollbars anywhere. The shell, every window and every Everything app webview use a thin FoxOS overlay scrollbar (transparent track, hidden until hover or scroll, wider on hover, accent while dragging, dark/light aware); Monaco and the terminal use matching settings.
 - **Own isolation layer**: no Docker or VM software. Linux namespaces on Linux; one-click WSL2 distros, Windows Sandbox and Hyper-V on Windows.
 
-## Screenshots
+## Screenshots (the real FoxOS 0.3.1 system)
 
-Captured from the running desktop (xvfb, 1600×1000) with real files created in the workspace by `foxos` commands ([script](apps/desktop/scripts/screenshots.js)).
+Every image below comes from FoxOS 0.3.1 itself: the ISO's root filesystem running a real XFCE session as user `foxos` in `zh_CN` (Xvfb, 1920×1080), with real xfwm4 windows and real application processes. The installer and boot shots come from the ISO booted in QEMU. Nothing is composited or mocked. Script: [`scripts/os/tools/shoot-desktop.sh`](scripts/os/tools/shoot-desktop.sh).
 
 | | |
 | --- | --- |
-| ![Start menu](docs/screenshots/start-menu.png)<br>Start menu: built-ins and installed Everything apps in 9 groups, each with its project's own icon | ![App center](docs/screenshots/app-center.png)<br>App center: 51 Everything apps with their upstream icons, plus built-ins, LibreOffice, tools, ACP agents |
-| ![Setup wizard](docs/screenshots/setup-wizard.png)<br>First-run wizard with component picker | ![Terminal](docs/screenshots/terminal.png)<br>Terminal running `foxos` commands |
-| ![Files](docs/screenshots/files.png)<br>File manager, live-synced workspace | ![Editor](docs/screenshots/editor.png)<br>Monaco editor |
-| ![Browser](docs/screenshots/browser.png)<br>Browser | ![Settings → Language](docs/screenshots/settings-language-en.png)<br>Settings → Language: 简体中文 (default) / English, applies immediately |
-| ![App center (English)](docs/screenshots/app-center-en.png)<br>App center in English: group names and app descriptions follow the language | ![Desktop (Chinese, default)](docs/screenshots/desktop.png)<br>The same desktop in the default Chinese UI |
-| ![Writer](docs/screenshots/libreoffice-writer.png)<br>LibreOffice Writer with a generated .docx | ![Calc](docs/screenshots/libreoffice-calc.png)<br>LibreOffice Calc: formulas and a native chart |
-| ![Spreadsheet](docs/screenshots/everything-spreadsheet.png)<br>Everything Spreadsheet opening a workspace .xlsx (Chinese UI, shipped upstream, follows the FoxOS language) | ![Documents](docs/screenshots/everything-documents.png)<br>Everything Documents opening a workspace .docx |
-| ![Whiteboard](docs/screenshots/everything-whiteboard.png)<br>Everything Whiteboard | ![CRM](docs/screenshots/everything-crm.png)<br>Everything CRM |
-| ![Chess](docs/screenshots/everything-chess.png)<br>Everything Chess | ![ACP install](docs/screenshots/acp-agent-install.png)<br>One-click ACP agent install from the official registry |
-| ![Install a system](docs/screenshots/environments-catalog.png)<br>Environments → Install a system (WSL2 distros, rootfs, Windows Sandbox, Hyper-V) | ![Alpine](docs/screenshots/environments-alpine.png)<br>A running Alpine environment with live stats |
-| ![Audit and takeover](docs/screenshots/audit-takeover.png)<br>Activity log and human takeover (`PAUSED`) | |
+| ![Desktop and start menu](docs/screenshots/os-031-desktop.png)<br>**Desktop and start menu**: XFCE desktop, Whisker "开始" menu (Chinese, Papirus icons, "安装 狐狸OS" in favorites), panel with clock / takeover / system | ![foxos commands in a terminal](docs/screenshots/os-031-terminal.png)<br>**foxos commands in a terminal**: XFCE Terminal, a real `foxos@foxos` session: `foxos sheets` writes formulas, `foxos docs` builds a report, `foxos files` lists the workspace |
+| ![Thunar file manager](docs/screenshots/os-031-files.png)<br>**Thunar file manager**: The workspace with the `.xlsx` / `.docx` the commands just created | ![Firefox](docs/screenshots/os-031-firefox.png)<br>**Firefox**: The bundled browser in 0.3.1 (Google Chrome replaces it in the next build) showing the project page |
+| ![Mousepad text editor](docs/screenshots/os-031-editor.png)<br>**Mousepad text editor**: Chinese menus, editing Markdown in the workspace | ![Settings Manager](docs/screenshots/os-031-settings.png)<br>**Settings Manager**: XFCE settings (appearance, display, keyboard, input method), Chinese UI |
+| ![System menu](docs/screenshots/os-031-system.png)<br>**System menu**: Log out / restart / shut down dialog from the panel "系统" button | ![Human takeover](docs/screenshots/os-031-takeover.png)<br>**Human takeover**: After `foxos control pause`, agent writes are refused (`PAUSED`, exit code 8); real terminal output. The panel indicator had not refreshed to "接管中" yet in this shot; fixed in 0.3.2 |
+| ![Install FoxOS](docs/screenshots/os-031-installer.png)<br>**Install FoxOS**: Calamares started from the 0.3.1 ISO booted in QEMU (VM resolution, blank disk attached) | ![Booted from the ISO](docs/screenshots/os-live-boot.png)<br>**Booted from the ISO**: The 0.3.1 live session in a VM, auto-logged in as `foxos` on XFCE |
+
+Screenshots of the Windows companion app are in their own section below: [Windows companion app](#windows-伴侣程序在现有-windows-桌面上运行v020--windows-companion-app).
 
 ## Download
+
+Everything is on [Releases](https://github.com/gatesenman/foxos/releases). Two different things:
+
+- **The FoxOS operating system** = the bootable ISO in `v0.3.1-os-preview` (two parts, `part1` + `part2`; concatenate them, then check SHA-256 `7acb74c92d159034966821900d43ddeec1815d0d7456d57232811371c31b4500`). The screenshots above are this system.
+- **The Windows companion app** = `FoxOS-Setup-0.2.0-x64.exe` / `FoxOS-0.2.0-win-x64.zip` / `install.ps1` in `v0.2.0-windows-preview`. It is an application that runs on your existing Windows desktop, not an operating system.
 
 **Bootable ISO (recommended):** [v0.3.1-os-preview](https://github.com/gatesenman/foxos/releases/tag/v0.3.1-os-preview) (pre-release). Write it to USB or boot it in Hyper-V; see the [ISO test guide](docs/os-test-guide.md).
 
@@ -74,14 +75,7 @@ cmd /c copy /b FoxOS-0.3.1-amd64.iso.part1+FoxOS-0.3.1-amd64.iso.part2 FoxOS-0.3
 Get-FileHash -Algorithm SHA256 .\FoxOS-0.3.1-amd64.iso
 ```
 
-Real-desktop screenshots:
-
-| | |
-| --- | --- |
-| ![FoxOS desktop](docs/screenshots/os-desktop.png)<br>**Desktop**: XFCE, Whisker start menu (Chinese, Papirus icons), clock / takeover / system on the panel | ![Terminal](docs/screenshots/os-terminal.png)<br>**XFCE Terminal**: a real `foxos@foxos` session |
-| ![Text editor](docs/screenshots/os-editor.png)<br>**Text editor**: Mousepad with Chinese menus | ![Booted from the ISO](docs/screenshots/os-live-boot.png)<br>**Booted from the ISO**: the 0.3.1 live session in a VM, logged in as `foxos` on XFCE |
-
-**Windows x64 companion preview:** [v0.2.0-windows-preview](https://github.com/gatesenman/foxos/releases/tag/v0.2.0-windows-preview) (pre-release, not yet verified on real Windows hardware — see the [test checklist](docs/windows-test-guide.md)).
+**Windows x64 companion app (not the OS):** [v0.2.0-windows-preview](https://github.com/gatesenman/foxos/releases/tag/v0.2.0-windows-preview) (pre-release, not yet verified on real Windows hardware — see the [test checklist](docs/windows-test-guide.md)).
 
 ```powershell
 irm https://github.com/gatesenman/foxos/releases/download/v0.2.0-windows-preview/install.ps1 | iex      # anonymous download, verifies SHA256SUMS
@@ -92,6 +86,23 @@ $env:FOXOS_LANG = 'en-US'; irm https://github.com/gatesenman/foxos/releases/down
 The setup program offers Simplified Chinese (default) and English and picks the one matching the Windows UI language.
 
 `$env:GITHUB_TOKEN` is optional and only helps with GitHub's anonymous API rate limit. The installer is unsigned (SmartScreen warns on first run). Linux: boot the ISO above, or run the Windows/Linux companion from source. We do not ship a macOS OS image for non-Apple hardware.
+
+## Windows 伴侣程序（在现有 Windows 桌面上运行，v0.2.0） / Windows companion app
+
+These are screenshots of the **Windows companion app** (`v0.2.0-windows-preview`, Electron). It runs on your existing Windows (or Linux) desktop and provides a terminal, editor, Everything apps, environments and agent sessions. **It is not the FoxOS operating system desktop**; see the [screenshots](#screenshots-the-real-foxos-031-system) above for that. Captured with xvfb at 1600×1000 by [`apps/desktop/scripts/screenshots.js`](apps/desktop/scripts/screenshots.js).
+
+| | |
+| --- | --- |
+| ![Start menu](docs/screenshots/start-menu.png)<br>Start menu: built-ins and installed Everything apps in 9 groups, each with its project's own icon | ![App center](docs/screenshots/app-center.png)<br>App center: 51 Everything apps with their upstream icons, plus built-ins, LibreOffice, tools, ACP agents |
+| ![Setup wizard](docs/screenshots/setup-wizard.png)<br>First-run wizard with component picker | ![Terminal](docs/screenshots/terminal.png)<br>Terminal running `foxos` commands |
+| ![Files](docs/screenshots/files.png)<br>File manager, live-synced workspace | ![Editor](docs/screenshots/editor.png)<br>Monaco editor |
+| ![Browser](docs/screenshots/browser.png)<br>Browser | ![Settings → Language](docs/screenshots/settings-language-en.png)<br>Settings → Language: 简体中文 (default) / English, applies immediately |
+| ![App center (English)](docs/screenshots/app-center-en.png)<br>App center in English: group names and app descriptions follow the language | ![Writer](docs/screenshots/libreoffice-writer.png)<br>LibreOffice Writer with a generated .docx |
+| ![Calc](docs/screenshots/libreoffice-calc.png)<br>LibreOffice Calc: formulas and a native chart | ![Spreadsheet](docs/screenshots/everything-spreadsheet.png)<br>Everything Spreadsheet opening a workspace .xlsx (Chinese UI, shipped upstream, follows the FoxOS language) |
+| ![Documents](docs/screenshots/everything-documents.png)<br>Everything Documents opening a workspace .docx | ![Whiteboard](docs/screenshots/everything-whiteboard.png)<br>Everything Whiteboard |
+| ![CRM](docs/screenshots/everything-crm.png)<br>Everything CRM | ![Chess](docs/screenshots/everything-chess.png)<br>Everything Chess |
+| ![ACP install](docs/screenshots/acp-agent-install.png)<br>One-click ACP agent install from the official registry | ![Install a system](docs/screenshots/environments-catalog.png)<br>Environments → Install a system (WSL2 distros, rootfs, Windows Sandbox, Hyper-V) |
+| ![Alpine](docs/screenshots/environments-alpine.png)<br>A running Alpine environment with live stats | ![Audit and takeover](docs/screenshots/audit-takeover.png)<br>Activity log and human takeover (`PAUSED`) |
 
 ## Quick start (from source)
 
