@@ -41,6 +41,7 @@ class Param:
     cli_repeat: bool = False  # array 参数在 CLI 中以重复选项传入（--bullet a --bullet b），否则逗号分隔
     cli_stdin: bool = False  # string 参数可用 --<name>-stdin 从标准输入读取（大文本，如编辑器保存）
     metavar: str | None = None
+    secret: bool = False  # 密钥类参数：审计日志里写成 ***，CLI 建议用 --<name>-stdin 传入
 
     def __post_init__(self):
         assert self.type in JSON_TYPES, self.type
@@ -117,7 +118,8 @@ class Context:
     agent: str = "human"
     task: str | None = None
     lock_wait: float = 0.0
-    interface: str = "cli"  # cli | mcp | desktop
+    interface: str = "cli"  # cli | mcp | desktop | remote
+    machine: str | None = None  # 远程调用时：发起方的机器 / 客户端名，写入审计
 
     def rel(self, path: Path) -> str:
         return self.workspace.rel(path)
@@ -151,6 +153,32 @@ def is_human(agent: str) -> bool:
     return agent == "human" or agent.startswith("human:")
 
 
+def agent_matches(agent: str, targets: list) -> bool:
+    """接管目标匹配：目标 bot:fox 同时匹配 bot:fox、bot:fox/acp:codex、bot:fox@laptop。"""
+    for t in targets or []:
+        t = str(t)
+        if agent == t or agent.startswith(t + "/") or agent.startswith(t + "@"):
+            return True
+    return False
+
+
+def paused_for(ws, agent: str) -> dict | None:
+    """该身份是否处于人工接管：全体暂停（没有 targets）或 targets 里包含它。"""
+    st = control_state(ws)
+    if st is None or is_human(agent):
+        return None
+    if st.get("targets") and not agent_matches(agent, st["targets"]):
+        return None
+    return st
+
+
+def redact(cmd: "Command | None", params: dict) -> dict:
+    if not cmd or not isinstance(params, dict):
+        return params
+    secret = {p.name for p in cmd.params if p.secret}
+    return {k: ("***" if k in secret and v not in (None, "") else v) for k, v in params.items()}
+
+
 def control_state(ws: Workspace) -> dict | None:
     """人工接管状态：.foxos/paused 存在即暂停所有智能体（非 human）的写操作。"""
     p = ws.data_dir / "paused"
@@ -181,7 +209,7 @@ def register(cmd: Command) -> Command:
 
 def load_apps() -> None:
     # 导入即注册
-    from .apps import browser, desktop, docs, env, everything, sandbox, sheets, slides, system  # noqa: F401
+    from .apps import acp, bot, browser, connector, desktop, docs, env, everything, machine, runtime, sandbox, sheets, slides, system  # noqa: F401
 
 
 def find(command_id: str) -> Command:
@@ -240,14 +268,17 @@ def invoke(command_id: str, params: dict | None, ctx: Context) -> dict:
         "command": command_id,
         "args": params or {},
     }
+    if ctx.machine:
+        record["machine"] = ctx.machine
     held: list[Path] = []
     try:
         cmd = find(command_id)
         record["command"] = cmd.id
         record["permission"] = cmd.permission
+        record["args"] = redact(cmd, params or {})
         values = validate(cmd, params or {})
-        if cmd.permission != "read" and cmd.app != "control" and not is_human(ctx.agent) and control_state(ctx.workspace):
-            st = control_state(ctx.workspace)
+        if cmd.permission != "read" and cmd.app != "control" and paused_for(ctx.workspace, ctx.agent):
+            st = paused_for(ctx.workspace, ctx.agent)
             raise FoxError(
                 "PAUSED",
                 tr("kernel.human_takeover_is_active_agent", st.get('by', tr("common.unknown"))),
@@ -286,5 +317,10 @@ def invoke(command_id: str, params: dict | None, ctx: Context) -> dict:
         if cmd_obj is None or cmd_obj.audited or record.get("status") != "ok":
             try:
                 audit.append(ctx.workspace, record)
+            except OSError:
+                pass
+            try:
+                from . import activity
+                activity.record(ctx.workspace, ctx.agent, record["command"], record.get("status", "error"), ctx.machine)
             except OSError:
                 pass

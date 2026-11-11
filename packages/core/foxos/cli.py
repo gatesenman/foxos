@@ -69,6 +69,7 @@ def _globals(suppress: bool) -> argparse.ArgumentParser:
     g.add_argument("--agent", default=d(None), metavar="NAME", help=tr("cli.caller_identity_written_to_the_audit"))
     g.add_argument("--task", default=d(None), metavar="ID", help=tr("cli.related_task_id"))
     g.add_argument("--lang", default=d(None), metavar="LANG", help=tr("cli.lang_option"))
+    g.add_argument("--machine", "-m", default=d(None), metavar="NAME", help=tr("catalog.machine_option"))
     g.add_argument("--lock-wait", type=float, default=d(0.0), metavar="SECONDS", help=tr("cli.seconds_to_wait_for_a_file_lock"))
     return g
 
@@ -106,8 +107,14 @@ def _add_command(sub, cmd, parents):
             continue
         flags = [prm.flag] + ([prm.cli_short] if prm.cli_short else [])
         kw["dest"] = DEST + prm.name
+        if prm.cli_kv:  # --rule KEY=VALUE 可重复
+            p.add_argument(*flags, action="append", metavar="KEY=VALUE", **kw)
+            p.add_argument(f"--{prm.name.replace('_', '-')}-json", dest=f"{DEST}{prm.name}__json", metavar="JSON",
+                           help=tr("cli.pass_as_a_json_object", prm.name))
+            continue
         if prm.type == "boolean":
-            p.add_argument(*flags, action="store_true", default=None, **kw)
+            # 没有默认值的布尔参数是「三态」：--x 设为真，--no-x 设为假，不写则不改（如 bot config set --no-pinned）
+            p.add_argument(*flags, action=argparse.BooleanOptionalAction if prm.default is None else "store_true", default=None, **kw)
         elif prm.type == "array" and (prm.items or {}).get("type") in ("array", "object"):
             p.add_argument(f"--{prm.name.replace('_', '-')}-json", dest=DEST + prm.name, metavar="JSON",
                            type=_json_arg, help=prm.description)
@@ -159,6 +166,7 @@ def build_parser() -> argparse.ArgumentParser:
     t2 = apps.add_parser("agent-guide", help=tr("cli.print_the_agent_guide_docs_agent"), parents=parents)
     t2.set_defaults(_special="agent-guide")
 
+    app_subs = {}
     for app, meta in APPS.items():
         cmds = [c for c in REGISTRY.values() if c.app == app]
         desc = meta["summary"] + ("\n\n" + meta["description"] if meta["description"] else "")
@@ -168,6 +176,7 @@ def build_parser() -> argparse.ArgumentParser:
         ap = apps.add_parser(app, help=meta["summary"], description=desc,
                              formatter_class=argparse.RawDescriptionHelpFormatter, parents=parents)
         asub = ap.add_subparsers(dest="_sub", metavar="<command>", parser_class=_Parser)
+        app_subs[app] = asub
         groups: dict = {}
         for c in cmds:
             words = c.name.split()
@@ -178,6 +187,18 @@ def build_parser() -> argparse.ArgumentParser:
                     groups[words[0]] = gp.add_subparsers(dest="_sub2", metavar="<command>", parser_class=_Parser)
                 target = groups[words[0]]
             _add_command(target, c, parents)
+    if "bot" in app_subs:
+        bs = app_subs["bot"].add_parser("serve", help=tr("cli.bot_serve"), parents=parents)
+        bs.add_argument("--listen", default="127.0.0.1:0", metavar="HOST:PORT")
+        bs.add_argument("--token", default=None, help=tr("cli.bot_serve_token"))
+        bs.add_argument("--open", action="store_true", help=tr("cli.bot_serve_open"))
+        bs.add_argument("--ready-file", default=None, metavar="PATH", help=tr("cli.bot_serve_ready"))
+        bs.set_defaults(_special="bot-serve")
+    if "machine" in app_subs:
+        ms = app_subs["machine"].add_parser("serve", help=tr("cli.machine_serve"), parents=parents)
+        ms.add_argument("--listen", default="0.0.0.0:7443", metavar="HOST:PORT")
+        ms.add_argument("--name", default=None)
+        ms.set_defaults(_special="machine-serve")
     return top
 
 
@@ -271,6 +292,19 @@ def print_human(cmd_id: str, result: dict) -> None:
     if "tasks" in result and isinstance(result["tasks"], list):
         for t in result["tasks"]:
             print(f"{t['id']}  {t['status']:<8} {t['goal']}", file=out)
+    if cmd_id in ("bot.message.send", "bot.skill.run"):
+        r = result["reply"]
+        for c in r.get("cards") or []:
+            ap = (c.get("approval") or {}).get("decision")
+            print(f"  [{c.get('type')}:{c.get('kind') or c.get('to') or ''}] {c.get('title') or c.get('to_name') or ''} {c.get('status') or ''}"
+                  + (f" ({ap})" if ap else "") + (f" @{c['machine']}" if c.get("machine") and c["machine"] != "local" else ""), file=out)
+        if r.get("skills_used"):
+            print("  skills: " + ", ".join(r["skills_used"]), file=out)
+        print(r.get("text", ""), file=out)
+        return
+    if cmd_id.split(".")[0] in ("bot", "connector", "machine", "runtime", "acp") and not result.get("message"):
+        print(json.dumps(result, ensure_ascii=False, indent=2, default=str), file=out)
+        return
     skip = {"message", "rows", "values", "charts", "files", "entries", "tasks", "note", "content", "stdout", "stderr", "apps", "envs", "elements"}
     if cmd_id.startswith(("workspace", "sheets.create", "sheets.write", "sheets.chart.create", "sheets.export",
                           "docs.create", "docs.append", "docs.replace", "docs.export", "slides.create", "slides.add",
@@ -335,6 +369,15 @@ def main(argv: list[str] | None = None) -> int:
         ws = Workspace(ns.workspace)
         agent = ns.agent or os.environ.get("FOXOS_AGENT") or "human"
         task = ns.task or os.environ.get("FOXOS_TASK")
+        if special == "bot-serve":
+            from .botchat.server import serve as bot_serve
+            host, _, port = ns.listen.rpartition(":")
+            return bot_serve(ws, host or "127.0.0.1", int(port or 0), token=ns.token or os.environ.get("FOXOS_BOTS_TOKEN"),
+                             open_ui=ns.open, ready_file=ns.ready_file)
+        if special == "machine-serve":
+            from .machines import serve as machine_serve
+            host, _, port = ns.listen.rpartition(":")
+            return machine_serve(ws, host or "0.0.0.0", int(port or 7443), name=ns.name)
         if special == "mcp":
             from .mcp_server import serve, serve_http
             kw = dict(agent_default=ns.agent or os.environ.get("FOXOS_AGENT"), task=task, profile=ns.profile,
@@ -352,7 +395,8 @@ def main(argv: list[str] | None = None) -> int:
         params = {}
         for p in cmd.params:
             if p.cli_kv:
-                merged = parse_kv(getattr(ns, DEST + p.name, None) or [])
+                raw_kv = getattr(ns, DEST + p.name, None) or []
+                merged = {k: (v if not isinstance(v, (int, float, bool)) or p.name != "roles" else str(v)) for k, v in parse_kv(raw_kv).items()}
                 raw_json = getattr(ns, f"{DEST}{p.name}__json", None)
                 if raw_json:
                     try:
@@ -384,7 +428,12 @@ def main(argv: list[str] | None = None) -> int:
                     raise FoxError("USAGE", tr("cli.elements_of_parameter_must_be", p.name, e)) from e
             params[p.name] = v
         ctx = Context(ws, agent=agent, task=task, lock_wait=ns.lock_wait, interface="cli")
-        result = invoke(cmd.id, params, ctx)
+        machine = getattr(ns, "machine", None) or os.environ.get("FOXOS_MACHINE")
+        if machine and machine != "local" and cmd.app not in catalog.NO_MACHINE_PARAM:
+            from . import machines
+            result = machines.invoke(ws, machine, cmd.id, params, agent, task, interface="cli")
+        else:
+            result = invoke(cmd.id, params, ctx)
         if as_json:
             print(json.dumps({"ok": True, "command": cmd.id, "result": result}, ensure_ascii=False, indent=2, default=str))
         else:
