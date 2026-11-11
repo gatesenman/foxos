@@ -354,7 +354,7 @@ def foxos_mcp_server(workspace: Path, identity: str, extra_env: dict | None = No
     env = {"PYTHONPATH": core, "FOXOS_AGENT": identity, "PYTHONIOENCODING": "utf-8", **(extra_env or {})}
     if os.environ.get("FOXOS_HOME"):
         env["FOXOS_HOME"] = os.environ["FOXOS_HOME"]
-    if os.environ.get("FOXOS_LANG"):
-        env["FOXOS_LANG"] = os.environ["FOXOS_LANG"]
+    from .i18n import get_lang
+    env["FOXOS_LANG"] = get_lang()
     return {"name": "foxos", "command": sys.executable, "args": ["-m", "foxos", "--workspace", str(workspace), "mcp"],
             "env": [{"name": k, "value": v} for k, v in env.items()]}
