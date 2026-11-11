@@ -337,6 +337,33 @@ class AcpConnection:
     def new_session(self, mcp_servers: list | None = None, timeout: float = 120.0) -> dict:
         return self.request("session/new", {"cwd": str(self.scope_root), "mcpServers": mcp_servers or []}, timeout)
 
+    def configure_session(self, session: dict, model: str | None = None, mode: str | None = None, timeout: float = 30.0) -> dict:
+        """按设置切换会话的模型与模式（ACP session/set_model、session/set_mode）。
+        只在智能体在 session/new 里报告了可选项时才发；智能体不支持或拒绝时记下原因，不中断回合。"""
+        out: dict = {}
+        sid = session.get("sessionId")
+        models = (session.get("models") or {}).get("availableModels") or []
+        modes = (session.get("modes") or {}).get("availableModes") or []
+        if model:
+            if models and not any(m.get("modelId") == model for m in models):
+                out["model"] = {"ok": False, "error": "unknown model", "available": [m.get("modelId") for m in models]}
+            else:
+                try:
+                    self.request("session/set_model", {"sessionId": sid, "modelId": model}, timeout)
+                    out["model"] = {"ok": True, "id": model}
+                except AcpError as e:
+                    out["model"] = {"ok": False, "error": str(e)}
+        if mode:
+            if modes and not any(m.get("id") == mode for m in modes):
+                out["mode"] = {"ok": False, "error": "unknown mode", "available": [m.get("id") for m in modes]}
+            else:
+                try:
+                    self.request("session/set_mode", {"sessionId": sid, "modeId": mode}, timeout)
+                    out["mode"] = {"ok": True, "id": mode}
+                except AcpError as e:
+                    out["mode"] = {"ok": False, "error": str(e)}
+        return out
+
     def prompt(self, session_id: str, blocks: list[dict], timeout: float = 3600.0) -> dict:
         return self.request("session/prompt", {"sessionId": session_id, "prompt": blocks}, timeout)
 

@@ -1,0 +1,7 @@
+[Unit]
+Description=FoxOS bot routines that are due
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/foxos bot routine run
+ExecStart=/usr/bin/foxos bot channel poll

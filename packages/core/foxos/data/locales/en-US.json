@@ -1233,5 +1233,18 @@
   "system.pause_targets": "Pause only these identities (for example bot:coder); empty pauses everyone",
   "system.paused_only": "Paused: {0}",
   "system.resume_targets": "Resume only these identities; empty resumes everyone",
-  "botchat.busy": "{0} is still answering…"
+  "botchat.busy": "{0} is still answering…",
+  "acp.c_config": "Show or change an ACP agent's settings: default model, mode, extra launch arguments, non-secret environment variables (use acp key set for secrets)",
+  "acp.c_update": "Compare with the official registry and update ACP agents (installs into the user folder, so preinstalled agents update without root)",
+  "acp.env_looks_secret": "{0} looks like a secret; store it in the secret store",
+  "acp.p_accept_license": "Accept a non-redistributable license (for example a proprietary agent)",
+  "acp.p_all": "Check every installed agent",
+  "acp.p_arg": "Extra launch argument (repeatable; replaces the previous extra arguments)",
+  "acp.p_check": "Only check, do not install",
+  "acp.p_clear": "Clear every setting first",
+  "acp.p_env_kv": "Non-secret environment variable KEY=VALUE (repeatable; empty VALUE removes it)",
+  "acp.p_mode": "Default mode ID (session/set_mode; empty string clears)",
+  "acp.p_model": "Default model ID (switched with session/set_model when a session starts; empty string clears)",
+  "acp.registry_offline": "Cannot reach the official ACP registry to confirm the latest version",
+  "acp.update_what": "Name an agent or pass --all"
 }

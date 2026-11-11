@@ -1233,5 +1233,18 @@
   "system.pause_targets": "只暂停这些身份（如 bot:coder）；不填则全部暂停",
   "system.paused_only": "已暂停：{0}",
   "system.resume_targets": "只恢复这些身份；不填则全部恢复",
-  "botchat.busy": "{0} 正在回答…"
+  "botchat.busy": "{0} 正在回答…",
+  "acp.c_config": "查看或修改某个 ACP 智能体的设置：默认模型、模式、额外启动参数、非机密环境变量（机密用 acp key set）",
+  "acp.c_update": "和官方注册表比较版本并更新 ACP 智能体（装到用户目录，系统预装的也不需要 root）",
+  "acp.env_looks_secret": "{0} 看起来是机密，请存到密钥库",
+  "acp.p_accept_license": "确认不可再分发的许可证（例如专有智能体）",
+  "acp.p_all": "检查全部已安装的智能体",
+  "acp.p_arg": "额外启动参数（可重复；替换原有的额外参数）",
+  "acp.p_check": "只检查，不安装",
+  "acp.p_clear": "先清空全部设置",
+  "acp.p_env_kv": "非机密环境变量 KEY=VALUE（可重复；VALUE 为空表示删除）",
+  "acp.p_mode": "默认模式 ID（session/set_mode；空字符串清除）",
+  "acp.p_model": "默认模型 ID（会话开始时用 session/set_model 切换；空字符串清除）",
+  "acp.registry_offline": "连不上官方 ACP 注册表，无法确认最新版本",
+  "acp.update_what": "请指定智能体，或用 --all"
 }

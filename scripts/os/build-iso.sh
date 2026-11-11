@@ -72,7 +72,7 @@ log "工作目录 $WORK"
 mkdir -p "$WORK" "$OUT" "$ISO/casper" "$ISO/boot/grub" "$ISO/.disk" "$STAGING"
 # 把脚本、品牌、面板、仓库里的 foxos 包、图标放到 staging，供 chroot hook 使用
 rsync -a --delete \
-  "$SCRIPT_DIR/branding" "$SCRIPT_DIR/panel" "$SCRIPT_DIR/calamares" "$SCRIPT_DIR/systemd" "$SCRIPT_DIR/hooks" "$SCRIPT_DIR/chrome" \
+  "$SCRIPT_DIR/branding" "$SCRIPT_DIR/panel" "$SCRIPT_DIR/calamares" "$SCRIPT_DIR/systemd" "$SCRIPT_DIR/hooks" "$SCRIPT_DIR/chrome" "$SCRIPT_DIR/bots" \
   "$STAGING/"
 mkdir -p "$STAGING/icons" "$STAGING/foxos-pkg"
 cp -a "$ROOT/assets/icons/." "$STAGING/icons/"
@@ -244,10 +244,9 @@ grub-mkrescue "${GRUB_DIR[@]}" -o "$OUT/$ISO_NAME" "$ISO" \
 # 有些 grub-mkrescue 会忽略 -volid 的短横写法，再以 xorriso 确认体积即可
 ls -lh "$OUT/$ISO_NAME"
 sha256sum "$OUT/$ISO_NAME" | tee "$OUT/SHA256SUMS"
-SIZE=$(stat -c%s "$OUT/$ISO_NAME")
-if [ "$SIZE" -ge $((2 * 1024 * 1024 * 1024)) ]; then
-  die "ISO 达到或超过 2 GB（GitHub Release 单文件上限），需要再减包"
-fi
+# 发布用分卷：每份不超过 0.8 GiB（GitHub Release 单文件上限 2 GiB，分卷也方便断点续传）。
+# 还原：cat FoxOS-*.iso.part-* > FoxOS.iso && sha256sum -c SHA256SUMS
+"$SCRIPT_DIR/tools/split-iso.sh" "$OUT/$ISO_NAME"
 
 if [ "${FOXOS_OS_KEEP:-0}" != 1 ]; then
   log "清理工作目录（FOXOS_OS_KEEP=1 可保留）"
