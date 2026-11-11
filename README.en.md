@@ -61,7 +61,7 @@ Everything is on [v0.3.2-os-preview](https://github.com/gatesenman/foxos/release
 | **FoxOS OS ISO** | `FoxOS-0.3.2-amd64.iso.part1` + `.part2` (join into the ISO; UEFI + BIOS) | build script ready (`FOXOS_OS_ARCH=arm64`); built on an arm64 runner once GitHub Actions is available |
 | Package managers (drafts, not submitted) | winget `gatesenman.FoxOS` · Homebrew cask `foxos` · AUR `foxos-bin`, see `FoxOS-0.3.2-package-manifests.zip` and [`packaging/`](packaging/) | same |
 
-The MSI, dmg, arm64 ISO and single-file ISO are built by GitHub Actions ([`release.yml`](.github/workflows/release.yml)) on Windows / macOS / arm64 runners. Actions currently cannot start on this repository because of a GitHub account billing lock; re-running the workflow afterwards adds them. The macOS zips are ad-hoc signed but not yet tested on a real Mac.
+End-to-end tests (install → desktop launch → `foxos --version` → `foxos sheets create` → uninstall): the Linux x64 deb / rpm / tar.gz / AppImage pass on Ubuntu 24.04, Debian 12, Fedora 43, openSUSE Tumbleweed and Arch. Linux arm64 install, CLI and uninstall pass under qemu; the desktop launch still needs a real arm64 machine. **The Windows and macOS builds have not been tested on real machines yet, so treat them as previews.** The MSI, dmg, arm64 ISO and single-file ISO are built by GitHub Actions ([`release.yml`](.github/workflows/release.yml)), which also runs the end-to-end tests on every platform. Actions cannot start on this repository right now because of a GitHub account billing lock; re-run the workflow once that is fixed. See [docs/install.md](docs/install.md) and the [test report](docs/test-report.md).
 
 One-line install (detects OS and CPU, downloads, verifies SHA-256, installs, then runs `foxos --version`):
 

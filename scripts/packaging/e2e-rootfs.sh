@@ -3,6 +3,7 @@
 #   install.sh 一行安装（从 file:// “发布目录”下载并校验 SHA256SUMS）→ foxos --version → foxos sheets create
 #   → 以普通用户无头启动桌面并截图（xvfb）→ 卸载 → 确认 /usr/bin/foxos 与安装目录已删除
 # 用法：sudo e2e-rootfs.sh <根文件系统> <deb|rpm|tar|appimage> <产物目录> <x64|arm64> [截图输出目录]
+#   FOXOS_E2E_NO_DESKTOP=1  跳过桌面启动（只用于 qemu-user 跨架构，报告里要标“未验证”）；FOXOS_E2E_TIMEOUT 桌面启动超时秒数
 set -euo pipefail
 R=${1:?根文件系统}; METHOD=${2:?方式}; ART=$(cd "${3:?产物目录}" && pwd); ARCH=${4:?x64|arm64}; SHOTS=${5:-$ART/smoke}
 HERE=$(cd "$(dirname "$0")/../.." && pwd)
@@ -64,10 +65,14 @@ else
   su tester -c "rm -rf ~/e2e-ws; ~/squashfs-root/resources/bin/foxos --workspace ~/e2e-ws sheets create e2e.xlsx --json" | grep -q '"ok": true' || fail "sheets create"; step "foxos sheets create e2e.xlsx → OK"
   DESK="/home/tester/squashfs-root/AppRun"
 fi
+if [ "${FOXOS_E2E_NO_DESKTOP:-0}" = 1 ]; then
+  step "跳过桌面启动（FOXOS_E2E_NO_DESKTOP=1：qemu-user 下 Chromium 无法运行，要在原生 arm64 机器上验证）——本项未验证"
+else
 rm -f /tmp/e2e-shot.png
 su tester -c "sh /tmp/e2e-launch.sh \$DESK" || true
 [ -s /tmp/e2e-shot.png ] || { tail -5 /tmp/e2e-desk.log; fail "桌面没有启动出截图"; }
 step "桌面无头启动并截图 → /tmp/e2e-shot.png"
+fi
 case "$METHOD" in
   deb) apt-get remove -y -qq foxos-desktop >/dev/null || fail "apt remove" ;;
   rpm) if command -v dnf >/dev/null; then dnf remove -y -q foxos-desktop >/dev/null; else zypper -q --non-interactive remove foxos-desktop >/dev/null; fi || fail "rpm 卸载" ;;
@@ -75,7 +80,7 @@ case "$METHOD" in
 esac
 for p in /usr/bin/foxos /usr/bin/foxos-desktop /opt/FoxOS /home/tester/.local/opt/foxos /home/tester/.local/bin/foxos /home/tester/.local/bin/foxos-desktop; do [ ! -e "\$p" ] || fail "卸载后还有 \$p"; done
 step "卸载干净"
-step "通过"
+if [ "${FOXOS_E2E_NO_DESKTOP:-0}" = 1 ]; then step "通过（桌面启动未验证）"; else step "通过"; fi
 IN
-chroot "$R" /bin/bash /tmp/e2e.sh
-mkdir -p "$SHOTS"; cp "$R/tmp/e2e-shot.png" "$SHOTS/e2e-$NAME-$METHOD-$ARCH.png"
+chroot "$R" /usr/bin/env FOXOS_E2E_NO_DESKTOP="${FOXOS_E2E_NO_DESKTOP:-0}" /bin/bash /tmp/e2e.sh
+mkdir -p "$SHOTS"; [ "${FOXOS_E2E_NO_DESKTOP:-0}" = 1 ] || cp "$R/tmp/e2e-shot.png" "$SHOTS/e2e-$NAME-$METHOD-$ARCH.png"

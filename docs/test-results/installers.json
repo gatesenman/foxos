@@ -1,0 +1,143 @@
+{
+ "tag": "v0.3.2-os-preview",
+ "intro": "2026-11-12 01:00–02:30（Asia/Shanghai）。Linux 用 `scripts/packaging/e2e-rootfs.sh` 在各发行版官方根文件系统里（chroot，不用容器）真实走一遍：Release 同款 `install.sh` 一行安装（从 file:// 发布目录下载并校验 SHA256SUMS）→ 以普通用户无头启动桌面并截图 → `foxos --version` → `foxos sheets create` → 卸载并确认 `/usr/bin/foxos`、`/opt/FoxOS`、`~/.local/opt/foxos` 都已删除。arm64 在 x86_64 上用 qemu-user 运行。Windows / macOS 的端到端要在 GitHub Actions 的真机上跑（`release.yml` 的 e2e-windows / e2e-mac 任务），仓库 Actions 因账户账单被锁，任务未开始即失败，所以这两个平台**未验证**。",
+ "runs": [
+  {
+   "id": 43057548522,
+   "url": "https://github.com/gatesenman/foxos/actions/runs/43057548522",
+   "result": "失败：账户账单锁定，任务未启动"
+  },
+  {
+   "id": 43059095200,
+   "url": "https://github.com/gatesenman/foxos/actions/runs/43059095200",
+   "result": "失败：账户账单锁定，任务未启动"
+  },
+  {
+   "id": 43070332484,
+   "url": "https://github.com/gatesenman/foxos/actions/runs/43070332484",
+   "result": "失败：账户账单锁定，任务未启动"
+  }
+ ],
+ "rows": [
+  {
+   "os": "Ubuntu 24.04",
+   "arch": "x64",
+   "formats": "deb · tar.gz · AppImage",
+   "built": "✅ 本地",
+   "e2e": "✅ 通过 ×3",
+   "note": "截图 e2e-ubuntu-24.04-{deb,tar,appimage}-x64.png"
+  },
+  {
+   "os": "Debian 12",
+   "arch": "x64",
+   "formats": "deb · tar.gz · AppImage",
+   "built": "✅ 本地",
+   "e2e": "✅ 通过 ×3",
+   "note": ""
+  },
+  {
+   "os": "Fedora 43",
+   "arch": "x64",
+   "formats": "rpm",
+   "built": "✅ 本地",
+   "e2e": "✅ 通过",
+   "note": "测试机连不上 Cisco openh264 源，测试时关掉（与 FoxOS 无关）"
+  },
+  {
+   "os": "openSUSE Tumbleweed",
+   "arch": "x64",
+   "formats": "rpm",
+   "built": "✅ 本地",
+   "e2e": "✅ 通过",
+   "note": "第一次失败：最小系统没有字体，Chromium 启动崩溃；rpm 加了字体依赖后重建并通过"
+  },
+  {
+   "os": "Arch Linux",
+   "arch": "x64",
+   "formats": "tar.gz · AppImage",
+   "built": "✅ 本地",
+   "e2e": "✅ 通过 ×2",
+   "note": "AUR PKGBUILD 加了 ttf-font 依赖"
+  },
+  {
+   "os": "Debian 12",
+   "arch": "arm64",
+   "formats": "deb · tar.gz",
+   "built": "✅ 本地",
+   "e2e": "⚠️ 部分：安装、CLI、卸载通过；桌面启动未验证",
+   "note": "qemu-user 下 Chromium 崩溃（GPU 进程起不来、SIGTRAP），需真 arm64 机器"
+  },
+  {
+   "os": "Fedora 43",
+   "arch": "arm64",
+   "formats": "rpm",
+   "built": "✅ 本地",
+   "e2e": "⚠️ 部分：安装、CLI、卸载通过；桌面启动未验证",
+   "note": "同上"
+  },
+  {
+   "os": "Linux",
+   "arch": "arm64",
+   "formats": "AppImage",
+   "built": "✅ 本地",
+   "e2e": "⚠️ 只验证内容（unsquashfs 后 foxos --version、sheets create）",
+   "note": "AppImage 头里的魔数让 qemu 的 binfmt 不匹配，无法在 qemu 下执行"
+  },
+  {
+   "os": "Windows 10/11",
+   "arch": "x64",
+   "formats": "NSIS exe · 便携 zip",
+   "built": "✅ 本地（wine 交叉构建）",
+   "e2e": "❌ 未验证",
+   "note": "wine 下解包 payload，python -m foxos --version 正常；真机静默安装 / 启动 / 卸载要等 CI"
+  },
+  {
+   "os": "Windows 11",
+   "arch": "arm64",
+   "formats": "NSIS exe · 便携 zip",
+   "built": "✅ 本地（wine 交叉构建）",
+   "e2e": "❌ 未验证",
+   "note": "只检查了 PE 架构为 ARM64"
+  },
+  {
+   "os": "Windows",
+   "arch": "x64 · arm64",
+   "formats": "MSI",
+   "built": "❌ 未构建",
+   "e2e": "❌",
+   "note": "WiX 在 wine 下崩溃，只能在 CI 的 Windows 机器上构建"
+  },
+  {
+   "os": "macOS 11+",
+   "arch": "arm64 · x64",
+   "formats": "zip",
+   "built": "✅ 本地（ad-hoc 签名）",
+   "e2e": "❌ 未验证",
+   "note": "没有 Mac；CI 的 macos-14 / macos-15-intel 任务被账单锁挡住"
+  },
+  {
+   "os": "macOS 11+",
+   "arch": "arm64 · x64",
+   "formats": "dmg",
+   "built": "❌ 未构建",
+   "e2e": "❌",
+   "note": "dmg 需要 macOS 工具链（CI）"
+  },
+  {
+   "os": "狐狸OS 系统",
+   "arch": "arm64",
+   "formats": "ISO",
+   "built": "❌ 未构建",
+   "e2e": "❌",
+   "note": "构建机出口连不上 ports.ubuntu.com（所有 ubuntu-ports 镜像返回 500）；CI 的 ubuntu-24.04-arm 任务被账单锁挡住"
+  },
+  {
+   "os": "狐狸OS 系统",
+   "arch": "amd64",
+   "formats": "单文件 ISO",
+   "built": "❌ 未上传",
+   "e2e": "—",
+   "note": "分卷 part1 + part2 已在发布里；单文件由 CI 合并上传"
+  }
+ ]
+}

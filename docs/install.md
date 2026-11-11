@@ -11,7 +11,11 @@
 
 所有文件都在 GitHub Release [v0.3.2-os-preview](https://github.com/gatesenman/foxos/releases/tag/v0.3.2-os-preview)。
 
-> **现状（2026-11-12）**：表里标「待 CI」的文件（MSI、dmg、arm64 ISO、单文件 ISO）要在 GitHub Actions 的 Windows / macOS / arm64 机器上构建。本仓库的 Actions 目前因 GitHub 账户的账单问题无法启动（任务未开始即失败）；账单恢复后手动运行一次 `release` 工作流就会补上。其余文件已在 Linux 构建机上构建并做过安装测试；macOS 的 zip 已 ad-hoc 签名，但还没在真 Mac 上运行过。
+> **现状（2026-11-12）**：
+> - **已端到端验证**（安装 → 启动桌面截图 → `foxos --version` → `foxos sheets create` → 卸载，见 [测试报告](test-report.md#安装包发布矩阵v032-os-preview)）：Linux x64 的 deb（Ubuntu 24.04、Debian 12）、rpm（Fedora 43、openSUSE Tumbleweed）、tar.gz（Ubuntu、Debian、Arch）、AppImage（Ubuntu、Debian、Arch）。
+> - **部分验证**：Linux arm64 的 deb / tar.gz（Debian 12）、rpm（Fedora 43）在 qemu 里装上、命令行可用、卸载干净，但桌面启动只能在真 arm64 机器上验证（qemu 跑不了 Chromium）；AppImage 只验证了内容。
+> - **还没验证**：Windows（NSIS 安装程序、便携 zip）和 macOS（zip）已经构建并上传，但还没有在真 Windows / Mac 上装过，请当作预览版。
+> - **还没有**：标「待 CI」的文件（MSI、dmg、arm64 ISO、单文件 ISO）要在 GitHub Actions 的 Windows / macOS / arm64 机器上构建；本仓库的 Actions 目前因 GitHub 账户的账单问题无法启动（任务未开始即失败）。账单恢复后手动运行一次 `release` 工作流，就会补上这些文件，并在每个系统上跑一遍端到端测试。
 每个文件的 SHA-256 都在同一发布的 `SHA256SUMS` 里；安装脚本会自动校验，校验不通过就停止。
 
 ### 选哪个文件
@@ -115,7 +119,11 @@ FoxOS ships two different things:
 
 Everything is on the GitHub release [v0.3.2-os-preview](https://github.com/gatesenman/foxos/releases/tag/v0.3.2-os-preview).
 
-> **Status (2026-11-12)**: files marked "pending CI" (MSI, dmg, arm64 ISO, single-file ISO) need GitHub Actions Windows / macOS / arm64 runners. Actions cannot start on this repository right now because of a GitHub account billing lock; once that is resolved, run the `release` workflow once to add them. Everything else was built and install-tested on a Linux build machine; the macOS zips are ad-hoc signed but not yet run on a real Mac.
+> **Status (2026-11-12)**:
+> - **End-to-end verified** (install → desktop launch screenshot → `foxos --version` → `foxos sheets create` → uninstall): Linux x64 deb (Ubuntu 24.04, Debian 12), rpm (Fedora 43, openSUSE Tumbleweed), tar.gz (Ubuntu, Debian, Arch), AppImage (Ubuntu, Debian, Arch).
+> - **Partly verified**: Linux arm64 deb / tar.gz (Debian 12) and rpm (Fedora 43) install, run the CLI and uninstall cleanly under qemu; the desktop launch needs a real arm64 machine (Chromium does not run under qemu-user). The arm64 AppImage was checked for contents only.
+> - **Not verified yet**: the Windows (NSIS setup, portable zip) and macOS (zip) builds are uploaded but have not been installed on a real Windows PC or Mac. Treat them as previews.
+> - **Missing**: files marked "pending CI" (MSI, dmg, arm64 ISO, single-file ISO) need GitHub Actions Windows / macOS / arm64 runners. Actions cannot start on this repository right now because of a GitHub account billing lock. Once that is fixed, run the `release` workflow once: it builds them and runs the end-to-end tests on every platform.
  `SHA256SUMS` in the same release covers every file; the install scripts verify it and stop on a mismatch.
 
 ### Which file

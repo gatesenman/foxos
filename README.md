@@ -82,7 +82,7 @@ Windows 伴侣程序的截图在下方单独一节：[Windows 伴侣程序](#win
 | **狐狸OS 系统 ISO** | `FoxOS-0.3.2-amd64.iso.part1` + `.part2`（合并成 ISO，UEFI + BIOS） | 构建脚本已支持（`FOXOS_OS_ARCH=arm64`），等 GitHub Actions 恢复后在 arm64 机器上构建 |
 | 包管理器（草稿，未提交） | winget `gatesenman.FoxOS` · Homebrew cask `foxos` · AUR `foxos-bin`，见 `FoxOS-0.3.2-package-manifests.zip` 与 [`packaging/`](packaging/) | 同左 |
 
-MSI、dmg、arm64 ISO 和单文件 ISO 由 GitHub Actions（[`release.yml`](.github/workflows/release.yml)）在 Windows / macOS / arm64 机器上构建；仓库的 Actions 目前因 GitHub 账户账单问题无法启动，恢复后重新运行即可补上。macOS 的 zip 已做 ad-hoc 签名，但还没在真 Mac 上验证过。
+端到端测试（安装 → 启动桌面 → `foxos --version` → `foxos sheets create` → 卸载）：Linux x64 的 deb / rpm / tar.gz / AppImage 已在 Ubuntu 24.04、Debian 12、Fedora 43、openSUSE Tumbleweed、Arch 上全部通过；Linux arm64 在 qemu 里验证了安装、命令行与卸载，桌面启动还要在真 arm64 机器上验证；**Windows 与 macOS 的安装包还没有在真机上测过，请当作预览**。MSI、dmg、arm64 ISO 和单文件 ISO 由 GitHub Actions（[`release.yml`](.github/workflows/release.yml)）构建并在各系统上跑端到端测试；仓库的 Actions 目前因 GitHub 账户账单问题无法启动，恢复后重新运行即可补上。详见 [docs/install.md](docs/install.md) 与[测试报告](docs/test-report.md)。
 
 一行安装（自动识别系统与 CPU，下载、校验 SHA-256、安装，最后运行 `foxos --version`）：
 
