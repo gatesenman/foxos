@@ -302,7 +302,8 @@ class Agent:
             r = self.mcp(sid).tool("connector_tool_call", {"connector": cid, "tool": tool, "arguments": args})
             if r.get("ok"):
                 res = r["result"]
-                text = "\n".join(c.get("text", "") for c in (res.get("content") or []) if c.get("type") == "text") or json.dumps(res, ensure_ascii=False)[:2000]
+                text = res.get("text") or "\n".join(c.get("text", "") for c in (res.get("content") or []) if c.get("type") == "text") \
+                    or json.dumps(res, ensure_ascii=False)[:2000]
                 self.done(sid, tid, not res.get("isError"), [{"type": "content", "content": {"type": "text", "text": text[:4000]}}], {"connector": cid})
                 self.say(sid, T(f"{cid} · {tool} 返回：{text[:400]}\n", f"{cid} · {tool} returned: {text[:400]}\n"))
             else:
