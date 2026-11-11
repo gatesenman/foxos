@@ -17,6 +17,12 @@ def _backend(ctx: Context):
     return get_backend(ctx.workspace)
 
 
+def _claim(ctx: Context) -> None:
+    """多个智能体共用一台机器：桌面输入同一时间只归一个智能体，另一个得到 CONFLICT。"""
+    from .. import activity
+    activity.claim_desktop(ctx.workspace, ctx.agent)
+
+
 def desktop_status(ctx: Context) -> dict:
     from .system import control_status
 
@@ -38,26 +44,31 @@ def desktop_windows(ctx: Context) -> dict:
 
 
 def desktop_focus(ctx: Context, window: str) -> dict:
+    _claim(ctx)
     r = _backend(ctx).focus(window)
     return {"message": tr("desktop.focused_window", window), **r}
 
 
 def desktop_close(ctx: Context, window: str) -> dict:
+    _claim(ctx)
     r = _backend(ctx).close(window)
     return {"message": tr("desktop.closed_window", window), **r}
 
 
 def desktop_move(ctx: Context, window: str, x: int, y: int) -> dict:
+    _claim(ctx)
     r = _backend(ctx).move(window, int(x), int(y))
     return {"message": tr("desktop.moved_window", window, x, y), **r}
 
 
 def desktop_resize(ctx: Context, window: str, width: int, height: int) -> dict:
+    _claim(ctx)
     r = _backend(ctx).resize(window, int(width), int(height))
     return {"message": tr("desktop.resized_window", window, width, height), **r}
 
 
 def desktop_launch(ctx: Context, command: list) -> dict:
+    _claim(ctx)
     argv = [str(c) for c in (command or [])]
     if len(argv) == 1 and " " in argv[0]:
         argv = ["/bin/sh", "-c", argv[0]]
@@ -66,16 +77,19 @@ def desktop_launch(ctx: Context, command: list) -> dict:
 
 
 def desktop_type(ctx: Context, text: str) -> dict:
+    _claim(ctx)
     r = _backend(ctx).type_text(text)
     return {"message": tr("desktop.typed_characters", r.get("length", len(text))), **r}
 
 
 def desktop_key(ctx: Context, keys: str) -> dict:
+    _claim(ctx)
     r = _backend(ctx).key(keys)
     return {"message": tr("desktop.sent_keys", keys), **r}
 
 
 def desktop_click(ctx: Context, x: int, y: int, button: int = 1) -> dict:
+    _claim(ctx)
     r = _backend(ctx).click(int(x), int(y), int(button or 1))
     return {"message": tr("desktop.clicked", x, y, button or 1), **r}
 
@@ -95,14 +109,24 @@ def _ts() -> str:
     return datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
 
 
-def desktop_takeover(ctx: Context, reason: str | None = None) -> dict:
+def desktop_takeover(ctx: Context, reason: str | None = None, targets: list | None = None) -> dict:
     from .system import control_pause
-    return control_pause(ctx, reason=reason)
+    return control_pause(ctx, reason=reason, targets=targets)
 
 
-def desktop_resume(ctx: Context) -> dict:
+def desktop_resume(ctx: Context, targets: list | None = None) -> dict:
     from .system import control_resume
-    return control_resume(ctx)
+    return control_resume(ctx, targets=targets)
+
+
+def desktop_activity(ctx: Context) -> dict:
+    from .. import activity
+    return {"acting": activity.current(ctx.workspace), "desktop_owner": activity.desktop_owner(ctx.workspace)}
+
+
+def desktop_release(ctx: Context) -> dict:
+    from .. import activity
+    return {"released": activity.release_desktop(ctx.workspace, ctx.agent)}
 
 
 def _register_for(app: str) -> None:
@@ -140,11 +164,17 @@ def _register_for(app: str) -> None:
     register(Command(app, "screenshot", tr("desktop.capture_the_session"), desktop_screenshot,
                      params=[Param("path", "string", tr("desktop.workspace_relative_png_path"), path="write")],
                      examples=[f"foxos {app} screenshot --path shots/desk.png"], permission="read"))
+    register(Command(app, "activity", tr("desktop.who_is_acting"), desktop_activity,
+                     examples=[f"foxos {app} activity --json"], audited=False))
+    register(Command(app, "release", tr("desktop.release_input"), desktop_release,
+                     examples=[f"foxos {app} release"], permission="run"))
     register(Command(app, "takeover", tr("desktop.human_takeover_pause_agent_writes"), desktop_takeover,
-                     params=[Param("reason", "string", tr("system.reason_for_pausing_written_to_the"))],
+                     params=[Param("reason", "string", tr("system.reason_for_pausing_written_to_the")),
+                             Param("targets", "array", tr("system.pause_targets"), items={"type": "string"}, cli_flag="--only", cli_repeat=True, metavar="IDENTITY")],
                      examples=[tr("desktop.foxos_app_takeover_reason", app)],
                      limits=[tr("system.only_the_human_identity_can_run_this")], permission="modify"))
     register(Command(app, "resume", tr("desktop.end_human_takeover"), desktop_resume,
+                     params=[Param("targets", "array", tr("system.resume_targets"), items={"type": "string"}, cli_flag="--only", cli_repeat=True, metavar="IDENTITY")],
                      examples=[f"foxos {app} resume"],
                      limits=[tr("system.only_the_human_identity_can_run_this")], permission="modify"))
 

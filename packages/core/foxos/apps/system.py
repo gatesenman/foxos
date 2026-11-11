@@ -282,23 +282,40 @@ def control_status(ctx: Context) -> dict:
     return {"paused": st is not None, **({"state": st} if st is not None else {})}
 
 
-def control_pause(ctx: Context, reason: str | None = None) -> dict:
-    from ..kernel import is_human
+def control_pause(ctx: Context, reason: str | None = None, targets: list | None = None) -> dict:
+    from ..kernel import control_state, is_human
 
     if not is_human(ctx.agent):
         raise FoxError("PERMISSION_DENIED", tr("system.only_a_person_the_human_identity_can"))
+    targets = [str(t) for t in (targets or []) if str(t).strip()]
+    prev = control_state(ctx.workspace)
+    if targets and prev is not None and prev.get("targets"):
+        # 已经按身份暂停了一部分：合并
+        targets = sorted(set(prev["targets"]) | set(targets))
+    elif targets and prev is not None and not prev.get("targets"):
+        targets = []  # 已经全体暂停，保持全体
     st = {"by": ctx.agent, "since": audit.now_iso(), "reason": reason}
+    if targets:
+        st["targets"] = targets
     _pause_file(ctx).write_text(json.dumps(st, ensure_ascii=False), encoding="utf-8")
-    return {"message": tr("system.taken_over_agent_writes_are_paused"), "paused": True, "state": st}
+    msg = tr("system.paused_only", ", ".join(targets)) if targets else tr("system.taken_over_agent_writes_are_paused")
+    return {"message": msg, "paused": True, "state": st}
 
 
-def control_resume(ctx: Context) -> dict:
-    from ..kernel import is_human
+def control_resume(ctx: Context, targets: list | None = None) -> dict:
+    from ..kernel import control_state, is_human
 
     if not is_human(ctx.agent):
         raise FoxError("PERMISSION_DENIED", tr("system.only_a_person_the_human_identity_can_2"))
     p = _pause_file(ctx)
     was = p.exists()
+    st = control_state(ctx.workspace)
+    if was and targets and st and st.get("targets"):
+        left = [t for t in st["targets"] if t not in set(targets)]
+        if left:
+            st["targets"] = left
+            p.write_text(json.dumps(st, ensure_ascii=False), encoding="utf-8")
+            return {"message": tr("system.paused_only", ", ".join(left)), "paused": True, "state": st}
     if was:
         p.unlink()
     return {"message": tr("system.resumed_agents_can_write_again") if was else tr("system.not_paused"), "paused": False}
@@ -307,9 +324,11 @@ def control_resume(ctx: Context) -> dict:
 register(Command("control", "status", tr("system.show_whether_human_takeover_pause_is"), control_status,
                  examples=["foxos control status --json"], limits=[tr("system.the_query_itself_is_not_written_to")], audited=False))
 register(Command("control", "pause", tr("system.human_takeover_pause_all_agent"), control_pause,
-                 params=[Param("reason", "string", tr("system.reason_for_pausing_written_to_the"))],
-                 examples=[tr("system.foxos_control_pause_reason_i_am")],
+                 params=[Param("reason", "string", tr("system.reason_for_pausing_written_to_the")),
+                         Param("targets", "array", tr("system.pause_targets"), items={"type": "string"}, cli_flag="--only", cli_repeat=True, metavar="IDENTITY")],
+                 examples=[tr("system.foxos_control_pause_reason_i_am"), "foxos control pause --only bot:coder"],
                  limits=[tr("system.only_the_human_identity_can_run_this"), tr("system.the_identity_is_declared_by_the")], permission="modify"))
 register(Command("control", "resume", tr("system.end_human_takeover_and_resume_agent"), control_resume,
-                 examples=["foxos control resume"],
+                 params=[Param("targets", "array", tr("system.resume_targets"), items={"type": "string"}, cli_flag="--only", cli_repeat=True, metavar="IDENTITY")],
+                 examples=["foxos control resume", "foxos control resume --only bot:coder"],
                  limits=[tr("system.only_the_human_identity_can_run_this")], permission="modify"))

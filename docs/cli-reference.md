@@ -12,6 +12,7 @@
   - `--task ID`：关联的任务 ID（默认 $FOXOS_TASK）
   - `--lang LANG`：界面语言：zh-CN（默认）或 en-US；也可用环境变量 FOXOS_LANG。JSON 字段名与错误码不随语言变化
   - `--lock-wait SECONDS`：目标文件被锁时最多等待的秒数（默认 0，立即返回 LOCKED）
+  - `--machine NAME`：在这台已配对的狐狸OS 上执行（默认本机 local）
 - **exit_codes**
   - 0：OK：成功
   - 1：ERROR：未分类错误或内部错误
@@ -26,6 +27,1156 @@
 - **formulas**：单元格值以 = 开头即为 Excel 公式，如 =SUM(B2:B13)；以 ' 开头强制为文本
 - **audit**：每次调用（含失败与拒绝）都追加到 <workspace>/.foxos/audit.jsonl；只读自省命令 audit tail、control status 成功时不记录
 - **tool_names**：工具接口名 = 命令 ID 把 . 换成 _，如 sheets.chart.create → sheets_chart_create
+
+## acp — ACP 代码智能体：安装、登录、密钥、握手检查
+
+通过 Agent Client Protocol（ACP）接入代码智能体：Claude Code、Codex、Gemini CLI、Qwen Code、opencode 等。智能体的文件读写与终端命令都走狐狸OS 内核（范围限制、写锁、审计、人工接管）。官方注册表：https://cdn.agentclientprotocol.com/registry/v1/latest/registry.json
+
+### `foxos acp agent list`
+
+列出已安装的 ACP 智能体（--available 列出注册表）
+
+```text
+foxos acp agent list [--available]
+```
+
+工具接口名：`acp_agent_list` · 权限：`read`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `available` | `--available` | boolean |  | 列出注册表中全部可安装的智能体 |
+
+示例：
+
+```bash
+foxos acp agent list --json
+foxos acp agent list --available --json
+```
+
+### `foxos acp agent install`
+
+从 ACP 官方注册表安装智能体（npm / 校验 sha256 的二进制 / uvx）
+
+```text
+foxos acp agent install AGENT
+```
+
+工具接口名：`acp_agent_install` · 权限：`run`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `agent` | `AGENT` | string | 是 | 智能体 ID（如 codex-acp、gemini、claude-acp） |
+
+示例：
+
+```bash
+foxos acp agent install codex-acp
+foxos acp agent install gemini
+```
+
+限制：
+
+- 下载只来自注册表里的官方地址；二进制按注册表的 sha256 校验
+
+### `foxos acp agent uninstall`
+
+卸载用户安装的智能体
+
+```text
+foxos acp agent uninstall AGENT
+```
+
+工具接口名：`acp_agent_uninstall` · 权限：`delete`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `agent` | `AGENT` | string | 是 | 智能体 ID（如 codex-acp、gemini、claude-acp） |
+
+示例：
+
+```bash
+foxos acp agent uninstall codex-acp
+```
+
+### `foxos acp agent show`
+
+查看一个智能体：版本、许可证、来源、登录方式、密钥
+
+```text
+foxos acp agent show AGENT
+```
+
+工具接口名：`acp_agent_show` · 权限：`read`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `agent` | `AGENT` | string | 是 | 智能体 ID（如 codex-acp、gemini、claude-acp） |
+
+示例：
+
+```bash
+foxos acp agent show gemini --json
+```
+
+### `foxos acp agent probe`
+
+真实启动智能体并握手：initialize，可选 session/new
+
+```text
+foxos acp agent probe AGENT [--session]
+```
+
+工具接口名：`acp_agent_probe` · 权限：`run`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `agent` | `AGENT` | string | 是 | 智能体 ID（如 codex-acp、gemini、claude-acp） |
+| `session` | `--session` | boolean |  | 握手后再建一个会话（session/new）；默认 True |
+
+示例：
+
+```bash
+foxos acp agent probe codex-acp --json
+```
+
+### `foxos acp agent login`
+
+用智能体自己的登录方式登录（ACP authenticate）
+
+```text
+foxos acp agent login AGENT --method METHOD
+```
+
+工具接口名：`acp_agent_login` · 权限：`run`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `agent` | `AGENT` | string | 是 | 智能体 ID（如 codex-acp、gemini、claude-acp） |
+| `method` | `--method` | string | 是 | 登录方式 ID（见 acp agent show） |
+
+示例：
+
+```bash
+foxos acp agent login gemini --method oauth-personal
+```
+
+限制：
+
+- 只有人可以登录智能体账号
+
+### `foxos acp key set`
+
+保存智能体的 API 密钥到本地密钥库（从标准输入读取，不写日志）
+
+```text
+foxos acp key set AGENT ENV_NAME --value VALUE
+```
+
+工具接口名：`acp_key_set` · 权限：`modify`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `agent` | `AGENT` | string | 是 | 智能体 ID（如 codex-acp、gemini、claude-acp） |
+| `name` | `ENV_NAME` | string | 是 | 环境变量名（如 OPENAI_API_KEY） |
+| `value` | `--value` | string | 是 | 密钥值（建议用 --value-stdin） |
+
+示例：
+
+```bash
+printf %s "$KEY" | foxos acp key set codex-acp OPENAI_API_KEY --value-stdin
+```
+
+限制：
+
+- 只有人可以管理智能体密钥
+- 密钥只存本地密钥库（0600），不写审计日志
+
+### `foxos acp key list`
+
+列出已保存的智能体密钥（只显示末 4 位）
+
+```text
+foxos acp key list [--acp-agent AGENT]
+```
+
+工具接口名：`acp_key_list` · 权限：`read`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `agent` | `--acp-agent` | string |  | 智能体 ID（如 codex-acp、gemini、claude-acp） |
+
+示例：
+
+```bash
+foxos acp key list --json
+```
+
+### `foxos acp key remove`
+
+删除一个智能体密钥
+
+```text
+foxos acp key remove AGENT ENV_NAME
+```
+
+工具接口名：`acp_key_remove` · 权限：`delete`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `agent` | `AGENT` | string | 是 | 智能体 ID（如 codex-acp、gemini、claude-acp） |
+| `name` | `ENV_NAME` | string | 是 | 环境变量名（如 OPENAI_API_KEY） |
+
+示例：
+
+```bash
+foxos acp key remove codex-acp OPENAI_API_KEY
+```
+
+## bot — 智能体：主智能体与其它智能体、对话、委托、技能、记忆、审批、例程
+
+一个主智能体（狐狸）加任意多个智能体。每个智能体有名字、头像、职责与指令、后端（ACP 代码智能体或 OpenAI 兼容模型）、自己的对话与记忆、工作范围、技能（pstack）、连接器、可控制的机器、审批规则、委托规则、例程与频道。设置项与 OpenBot 逐项对应。主智能体可以把任务委托给其它智能体（bot_task_delegate），结果回到主对话。
+
+### `foxos bot profile list`
+
+列出智能体
+
+```text
+foxos bot profile list [--hidden]
+```
+
+工具接口名：`bot_profile_list` · 权限：`read`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `hidden` | `--hidden` | boolean |  | 包括隐藏的智能体 |
+
+示例：
+
+```bash
+foxos bot profile list --json
+```
+
+### `foxos bot profile show`
+
+查看一个智能体
+
+```text
+foxos bot profile show BOT
+```
+
+工具接口名：`bot_profile_show` · 权限：`read`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `bot` | `BOT` | string | 是 | 智能体 ID 或名字（main 表示主智能体） |
+
+示例：
+
+```bash
+foxos bot profile show fox --json
+```
+
+### `foxos bot profile create`
+
+新建智能体
+
+```text
+foxos bot profile create NAME [--title TITLE] [--role ROLE] [--instructions INSTRUCTIONS] [--icon ICON] [--color COLOR] [--image IMAGE] [--acp-agent AGENT] [--base-url BASE_URL] [--model MODEL] [--api-key API_KEY] [--scope SCOPE] [--isolated] [--visibility {private,public}] [--pinned] [--hidden] [--active] [--notifications] [--skills-mode {all,selected}] [--skills SKILLS] [--skills-off SKILLS_OFF] [--connectors CONNECTORS] [--machines MACHINES] [--default-machine DEFAULT_MACHINE] [--approval-mode {ask,allow_reads,allow_all}] [--rule RULES] [--delegate-to DELEGATE_TO] [--max-depth MAX_DEPTH] [--max-per-turn MAX_PER_TURN] [--id ID]
+```
+
+工具接口名：`bot_profile_create` · 权限：`create`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `name` | `NAME` | string | 是 | 名字 |
+| `title` | `--title` | string |  | 头衔（一行） |
+| `role` | `--role` | string |  | 职责说明（它是做什么的） |
+| `instructions` | `--instructions` | string |  | 指令（长文本，可用 --instructions-stdin） |
+| `icon` | `--icon` | string |  | 头像字体图标名（Tabler，如 robot、code、search） |
+| `color` | `--color` | string |  | 头像颜色 #RRGGBB |
+| `image` | `--image` | string |  | 头像图片（工作空间内的 png/jpg/svg/webp） |
+| `agent` | `--acp-agent` | string |  | 后端 ACP 智能体 ID（如 codex-acp、gemini、claude-acp、foxos-local） |
+| `base_url` | `--base-url` | string |  | OpenAI 兼容端点（https://…/v1）；设置后后端改为模型 |
+| `model` | `--model` | string |  | 模型名（模型后端）或给 ACP 智能体的模型偏好 |
+| `api_key` | `--api-key` | string |  | 模型端点的 API 密钥（存本地密钥库；用 --api-key-stdin） |
+| `scope` | `--scope` | string |  | 工作范围（工作空间内的目录） |
+| `isolated` | `--isolated` | boolean |  | 隔离：只能操作自己的目录 bots/<id> |
+| `visibility` | `--visibility` | string |  | 可见性：private 仅自己 / public 本机所有用户；可选：private / public |
+| `pinned` | `--pinned` | boolean |  | 置顶 |
+| `hidden` | `--hidden` | boolean |  | 从列表中隐藏 |
+| `active` | `--active` | boolean |  | 是否启用 |
+| `notifications` | `--notifications` | boolean |  | 完成时发桌面通知 |
+| `skills_mode` | `--skills-mode` | string |  | 技能模式：all 全部 / selected 只用选中的；可选：all / selected |
+| `skills` | `--skills` | array |  | 只启用这些技能（逗号分隔） |
+| `skills_off` | `--skills-off` | array |  | 关闭这些技能（逗号分隔） |
+| `connectors` | `--connectors` | array |  | 可用的连接器 ID（逗号分隔） |
+| `machines` | `--machines` | array |  | 可以控制的机器（逗号分隔，local 是本机） |
+| `default_machine` | `--default-machine` | string |  | 默认在哪台机器上操作 |
+| `approval_mode` | `--approval-mode` | string |  | 审批方式：ask 每次询问 / allow_reads 读操作自动允许 / allow_all 全部允许；可选：ask / allow_reads / allow_all |
+| `rules` | `--rule` | object |  | 审批规则：工具类型=allow\|ask\|deny（read、edit、delete、move、search、execute、fetch…；default 删除规则） |
+| `delegate_to` | `--delegate-to` | array |  | 可以委托给哪些智能体（* 表示全部） |
+| `max_depth` | `--max-depth` | integer |  | 委托最大深度 |
+| `max_per_turn` | `--max-per-turn` | integer |  | 每轮最多委托几次 |
+| `id` | `--id` | string |  | 指定 ID（小写字母数字与 -） |
+
+示例：
+
+```bash
+foxos bot profile create Coder --title Coding --acp-agent codex-acp --icon code --color '#3B82F6' --isolated
+```
+
+限制：
+
+- 这个操作只有人可以做
+
+### `foxos bot profile update`
+
+修改智能体资料（同 bot config set）
+
+```text
+foxos bot profile update BOT [--name NAME] [--title TITLE] [--role ROLE] [--instructions INSTRUCTIONS] [--icon ICON] [--color COLOR] [--image IMAGE] [--acp-agent AGENT] [--base-url BASE_URL] [--model MODEL] [--api-key API_KEY] [--scope SCOPE] [--isolated] [--visibility {private,public}] [--pinned] [--hidden] [--active] [--notifications] [--skills-mode {all,selected}] [--skills SKILLS] [--skills-off SKILLS_OFF] [--connectors CONNECTORS] [--machines MACHINES] [--default-machine DEFAULT_MACHINE] [--approval-mode {ask,allow_reads,allow_all}] [--rule RULES] [--delegate-to DELEGATE_TO] [--max-depth MAX_DEPTH] [--max-per-turn MAX_PER_TURN]
+```
+
+工具接口名：`bot_profile_update` · 权限：`modify`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `bot` | `BOT` | string | 是 | 智能体 ID 或名字（main 表示主智能体） |
+| `name` | `--name` | string |  | 名字 |
+| `title` | `--title` | string |  | 头衔（一行） |
+| `role` | `--role` | string |  | 职责说明（它是做什么的） |
+| `instructions` | `--instructions` | string |  | 指令（长文本，可用 --instructions-stdin） |
+| `icon` | `--icon` | string |  | 头像字体图标名（Tabler，如 robot、code、search） |
+| `color` | `--color` | string |  | 头像颜色 #RRGGBB |
+| `image` | `--image` | string |  | 头像图片（工作空间内的 png/jpg/svg/webp） |
+| `agent` | `--acp-agent` | string |  | 后端 ACP 智能体 ID（如 codex-acp、gemini、claude-acp、foxos-local） |
+| `base_url` | `--base-url` | string |  | OpenAI 兼容端点（https://…/v1）；设置后后端改为模型 |
+| `model` | `--model` | string |  | 模型名（模型后端）或给 ACP 智能体的模型偏好 |
+| `api_key` | `--api-key` | string |  | 模型端点的 API 密钥（存本地密钥库；用 --api-key-stdin） |
+| `scope` | `--scope` | string |  | 工作范围（工作空间内的目录） |
+| `isolated` | `--isolated` | boolean |  | 隔离：只能操作自己的目录 bots/<id> |
+| `visibility` | `--visibility` | string |  | 可见性：private 仅自己 / public 本机所有用户；可选：private / public |
+| `pinned` | `--pinned` | boolean |  | 置顶 |
+| `hidden` | `--hidden` | boolean |  | 从列表中隐藏 |
+| `active` | `--active` | boolean |  | 是否启用 |
+| `notifications` | `--notifications` | boolean |  | 完成时发桌面通知 |
+| `skills_mode` | `--skills-mode` | string |  | 技能模式：all 全部 / selected 只用选中的；可选：all / selected |
+| `skills` | `--skills` | array |  | 只启用这些技能（逗号分隔） |
+| `skills_off` | `--skills-off` | array |  | 关闭这些技能（逗号分隔） |
+| `connectors` | `--connectors` | array |  | 可用的连接器 ID（逗号分隔） |
+| `machines` | `--machines` | array |  | 可以控制的机器（逗号分隔，local 是本机） |
+| `default_machine` | `--default-machine` | string |  | 默认在哪台机器上操作 |
+| `approval_mode` | `--approval-mode` | string |  | 审批方式：ask 每次询问 / allow_reads 读操作自动允许 / allow_all 全部允许；可选：ask / allow_reads / allow_all |
+| `rules` | `--rule` | object |  | 审批规则：工具类型=allow\|ask\|deny（read、edit、delete、move、search、execute、fetch…；default 删除规则） |
+| `delegate_to` | `--delegate-to` | array |  | 可以委托给哪些智能体（* 表示全部） |
+| `max_depth` | `--max-depth` | integer |  | 委托最大深度 |
+| `max_per_turn` | `--max-per-turn` | integer |  | 每轮最多委托几次 |
+
+示例：
+
+```bash
+foxos bot profile update coder --title Backend
+```
+
+限制：
+
+- 这个操作只有人可以做
+
+### `foxos bot profile delete`
+
+删除智能体（主智能体不能删）
+
+```text
+foxos bot profile delete BOT
+```
+
+工具接口名：`bot_profile_delete` · 权限：`delete`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `bot` | `BOT` | string | 是 | 智能体 ID 或名字（main 表示主智能体） |
+
+示例：
+
+```bash
+foxos bot profile delete coder
+```
+
+限制：
+
+- 这个操作只有人可以做
+- 主智能体不能删除或停用
+
+### `foxos bot profile duplicate`
+
+复制一个智能体的设置
+
+```text
+foxos bot profile duplicate BOT --name NAME
+```
+
+工具接口名：`bot_profile_duplicate` · 权限：`create`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `bot` | `BOT` | string | 是 | 智能体 ID 或名字（main 表示主智能体） |
+| `name` | `--name` | string | 是 | 名字 |
+
+示例：
+
+```bash
+foxos bot profile duplicate coder --name Coder2
+```
+
+### `foxos bot profile reset`
+
+清空对话（默认也清空记忆）
+
+```text
+foxos bot profile reset BOT [--keep-memory]
+```
+
+工具接口名：`bot_profile_reset` · 权限：`delete`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `bot` | `BOT` | string | 是 | 智能体 ID 或名字（main 表示主智能体） |
+| `keep_memory` | `--keep-memory` | boolean |  | 保留记忆 |
+
+示例：
+
+```bash
+foxos bot profile reset coder
+```
+
+### `foxos bot config get`
+
+查看一个智能体的全部设置
+
+```text
+foxos bot config get BOT
+```
+
+工具接口名：`bot_config_get` · 权限：`read`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `bot` | `BOT` | string | 是 | 智能体 ID 或名字（main 表示主智能体） |
+
+示例：
+
+```bash
+foxos bot config get fox --json
+```
+
+### `foxos bot config set`
+
+修改智能体设置（与 OpenBot 的 Bot 设置逐项对应）
+
+```text
+foxos bot config set BOT [--name NAME] [--title TITLE] [--role ROLE] [--instructions INSTRUCTIONS] [--icon ICON] [--color COLOR] [--image IMAGE] [--acp-agent AGENT] [--base-url BASE_URL] [--model MODEL] [--api-key API_KEY] [--scope SCOPE] [--isolated] [--visibility {private,public}] [--pinned] [--hidden] [--active] [--notifications] [--skills-mode {all,selected}] [--skills SKILLS] [--skills-off SKILLS_OFF] [--connectors CONNECTORS] [--machines MACHINES] [--default-machine DEFAULT_MACHINE] [--approval-mode {ask,allow_reads,allow_all}] [--rule RULES] [--delegate-to DELEGATE_TO] [--max-depth MAX_DEPTH] [--max-per-turn MAX_PER_TURN]
+```
+
+工具接口名：`bot_config_set` · 权限：`modify`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `bot` | `BOT` | string | 是 | 智能体 ID 或名字（main 表示主智能体） |
+| `name` | `--name` | string |  | 名字 |
+| `title` | `--title` | string |  | 头衔（一行） |
+| `role` | `--role` | string |  | 职责说明（它是做什么的） |
+| `instructions` | `--instructions` | string |  | 指令（长文本，可用 --instructions-stdin） |
+| `icon` | `--icon` | string |  | 头像字体图标名（Tabler，如 robot、code、search） |
+| `color` | `--color` | string |  | 头像颜色 #RRGGBB |
+| `image` | `--image` | string |  | 头像图片（工作空间内的 png/jpg/svg/webp） |
+| `agent` | `--acp-agent` | string |  | 后端 ACP 智能体 ID（如 codex-acp、gemini、claude-acp、foxos-local） |
+| `base_url` | `--base-url` | string |  | OpenAI 兼容端点（https://…/v1）；设置后后端改为模型 |
+| `model` | `--model` | string |  | 模型名（模型后端）或给 ACP 智能体的模型偏好 |
+| `api_key` | `--api-key` | string |  | 模型端点的 API 密钥（存本地密钥库；用 --api-key-stdin） |
+| `scope` | `--scope` | string |  | 工作范围（工作空间内的目录） |
+| `isolated` | `--isolated` | boolean |  | 隔离：只能操作自己的目录 bots/<id> |
+| `visibility` | `--visibility` | string |  | 可见性：private 仅自己 / public 本机所有用户；可选：private / public |
+| `pinned` | `--pinned` | boolean |  | 置顶 |
+| `hidden` | `--hidden` | boolean |  | 从列表中隐藏 |
+| `active` | `--active` | boolean |  | 是否启用 |
+| `notifications` | `--notifications` | boolean |  | 完成时发桌面通知 |
+| `skills_mode` | `--skills-mode` | string |  | 技能模式：all 全部 / selected 只用选中的；可选：all / selected |
+| `skills` | `--skills` | array |  | 只启用这些技能（逗号分隔） |
+| `skills_off` | `--skills-off` | array |  | 关闭这些技能（逗号分隔） |
+| `connectors` | `--connectors` | array |  | 可用的连接器 ID（逗号分隔） |
+| `machines` | `--machines` | array |  | 可以控制的机器（逗号分隔，local 是本机） |
+| `default_machine` | `--default-machine` | string |  | 默认在哪台机器上操作 |
+| `approval_mode` | `--approval-mode` | string |  | 审批方式：ask 每次询问 / allow_reads 读操作自动允许 / allow_all 全部允许；可选：ask / allow_reads / allow_all |
+| `rules` | `--rule` | object |  | 审批规则：工具类型=allow\|ask\|deny（read、edit、delete、move、search、execute、fetch…；default 删除规则） |
+| `delegate_to` | `--delegate-to` | array |  | 可以委托给哪些智能体（* 表示全部） |
+| `max_depth` | `--max-depth` | integer |  | 委托最大深度 |
+| `max_per_turn` | `--max-per-turn` | integer |  | 每轮最多委托几次 |
+
+示例：
+
+```bash
+foxos bot config set coder --acp-agent claude-acp --skills tdd,architect --approval-mode allow_reads --rule execute=ask
+foxos bot config set fox --machines local,vm1 --default-machine local --connectors exa
+```
+
+限制：
+
+- 这个操作只有人可以做
+
+### `foxos bot message send`
+
+给智能体发消息并等待回答（@名字 委托，/技能 调用技能）
+
+```text
+foxos bot message send BOT TEXT [--attach ATTACHMENTS] [--approve {rules,allow,deny}]
+```
+
+工具接口名：`bot_message_send` · 权限：`run`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `bot` | `BOT` | string | 是 | 智能体 ID 或名字（main 表示主智能体） |
+| `text` | `TEXT` | string | 是 | 文字 |
+| `attachments` | `--attach` | array |  | 附件（工作空间内的文件路径，可重复） |
+| `approve` | `--approve` | string |  | 这一轮的审批：rules 按规则 / allow 全部允许 / deny 全部拒绝；可选：rules / allow / deny；默认 rules |
+
+示例：
+
+```bash
+foxos bot message send fox '@coder write hello.py'
+foxos bot message send coder '/tdd add tests for parse()'
+```
+
+### `foxos bot message list`
+
+查看对话记录
+
+```text
+foxos bot message list BOT [--limit LIMIT]
+```
+
+工具接口名：`bot_message_list` · 权限：`read`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `bot` | `BOT` | string | 是 | 智能体 ID 或名字（main 表示主智能体） |
+| `limit` | `--limit` | integer |  | 最多返回多少条；默认 50 |
+
+示例：
+
+```bash
+foxos bot message list fox --json
+```
+
+### `foxos bot task delegate`
+
+把任务交给另一个智能体（任务/约束/期望结果），等它回报
+
+```text
+foxos bot task delegate TASK --to TO [--constraints CONSTRAINTS] [--expecting EXPECTING]
+```
+
+工具接口名：`bot_task_delegate` · 权限：`run`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `to` | `--to` | string | 是 | 交给哪个智能体 |
+| `task` | `TASK` | string | 是 | 任务 |
+| `constraints` | `--constraints` | string |  | 约束（不能做什么、范围） |
+| `expecting` | `--expecting` | string |  | 期望得到什么结果 |
+
+示例：
+
+```bash
+foxos bot task delegate --to coder 'fix tests/test_x.py' --expecting 'which files changed'
+```
+
+限制：
+
+- 受对方智能体的委托规则、最大深度和每轮上限约束；被拒绝时返回 refused
+
+### `foxos bot skill list`
+
+列出技能与原则（工作空间、~/.agents/skills、pstack）
+
+```text
+foxos bot skill list [--bot BOT] [--kind {skill,principle,subagent}]
+```
+
+工具接口名：`bot_skill_list` · 权限：`read`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `bot` | `--bot` | string |  | 智能体 ID 或名字（main 表示主智能体） |
+| `kind` | `--kind` | string |  | 类型：skill 技能 / principle 原则 / subagent 子智能体；可选：skill / principle / subagent |
+
+示例：
+
+```bash
+foxos bot skill list --json
+foxos bot skill list --kind principle
+```
+
+### `foxos bot skill show`
+
+查看一个技能的内容
+
+```text
+foxos bot skill show SKILL
+```
+
+工具接口名：`bot_skill_show` · 权限：`read`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `name` | `SKILL` | string | 是 | 技能名 |
+
+示例：
+
+```bash
+foxos bot skill show architect
+```
+
+### `foxos bot skill run`
+
+让智能体按某个技能完成任务
+
+```text
+foxos bot skill run BOT [TASK] --skill NAME
+```
+
+工具接口名：`bot_skill_run` · 权限：`run`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `bot` | `BOT` | string | 是 | 智能体 ID 或名字（main 表示主智能体） |
+| `name` | `--skill` | string | 是 | 技能名 |
+| `task` | `TASK` | string |  | 任务；默认  |
+
+示例：
+
+```bash
+foxos bot skill run fox --skill architect 'design the plugin interface'
+```
+
+### `foxos bot skill install`
+
+把技能（含 pstack）安装到某个代码智能体的技能目录
+
+```text
+foxos bot skill install --harness {claude-code,codex,agents,gemini}
+```
+
+工具接口名：`bot_skill_install` · 权限：`create`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `harness` | `--harness` | string | 是 | 目标代码智能体；可选：claude-code / codex / agents / gemini |
+
+示例：
+
+```bash
+foxos bot skill install --harness claude-code
+```
+
+### `foxos bot skill models`
+
+写 pstack 的角色配置（pstack-models.md），角色指向狐狸OS 智能体
+
+```text
+foxos bot skill models [ROLE=BOTS...]
+```
+
+工具接口名：`bot_skill_models` · 权限：`modify`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `roles` | `ROLE=BOTS` | object |  | 角色=智能体列表，如 'arena runners=claude,codex' |
+
+示例：
+
+```bash
+foxos bot skill models 'arena runners=claude,codex'
+```
+
+### `foxos bot memory list`
+
+列出智能体的记忆
+
+```text
+foxos bot memory list BOT
+```
+
+工具接口名：`bot_memory_list` · 权限：`read`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `bot` | `BOT` | string | 是 | 智能体 ID 或名字（main 表示主智能体） |
+
+示例：
+
+```bash
+foxos bot memory list fox
+```
+
+### `foxos bot memory add`
+
+让智能体记住一件事
+
+```text
+foxos bot memory add BOT TEXT
+```
+
+工具接口名：`bot_memory_add` · 权限：`create`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `bot` | `BOT` | string | 是 | 智能体 ID 或名字（main 表示主智能体） |
+| `text` | `TEXT` | string | 是 | 文字 |
+
+示例：
+
+```bash
+foxos bot memory add fox 'weekly report goes to #team'
+```
+
+### `foxos bot memory forget`
+
+删除一条记忆
+
+```text
+foxos bot memory forget BOT MEMORY_ID
+```
+
+工具接口名：`bot_memory_forget` · 权限：`delete`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `bot` | `BOT` | string | 是 | 智能体 ID 或名字（main 表示主智能体） |
+| `memory` | `MEMORY_ID` | string | 是 | 记忆 ID |
+
+示例：
+
+```bash
+foxos bot memory forget fox mem-1a2b3c4d
+```
+
+### `foxos bot approval list`
+
+列出待审批的请求
+
+```text
+foxos bot approval list
+```
+
+工具接口名：`bot_approval_list` · 权限：`read`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| — | | | | 无参数 |
+
+示例：
+
+```bash
+foxos bot approval list --json
+```
+
+### `foxos bot approval answer`
+
+回答一个待审批请求（允许/拒绝）
+
+```text
+foxos bot approval answer REQUEST [--option OPTION] [--deny]
+```
+
+工具接口名：`bot_approval_answer` · 权限：`modify`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `request` | `REQUEST` | string | 是 | 审批请求 ID |
+| `option` | `--option` | string |  | 选项 ID（如 allow、allow_always、reject） |
+| `deny` | `--deny` | boolean |  | 拒绝 |
+
+示例：
+
+```bash
+foxos bot approval answer apr-0123456789 --option allow
+```
+
+限制：
+
+- 这个操作只有人可以做
+
+### `foxos bot routine list`
+
+列出例程
+
+```text
+foxos bot routine list [--bot BOT]
+```
+
+工具接口名：`bot_routine_list` · 权限：`read`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `bot` | `--bot` | string |  | 智能体 ID 或名字（main 表示主智能体） |
+
+示例：
+
+```bash
+foxos bot routine list --json
+```
+
+### `foxos bot routine create`
+
+新建例程：每隔若干分钟让智能体做一件事
+
+```text
+foxos bot routine create BOT --instruction INSTRUCTION --every-minutes EVERY_MINUTES [--title TITLE]
+```
+
+工具接口名：`bot_routine_create` · 权限：`create`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `bot` | `BOT` | string | 是 | 智能体 ID 或名字（main 表示主智能体） |
+| `instruction` | `--instruction` | string | 是 | 例程每次要做的事 |
+| `every_minutes` | `--every-minutes` | integer | 是 | 间隔分钟（至少 15） |
+| `title` | `--title` | string |  | 头衔（一行） |
+
+示例：
+
+```bash
+foxos bot routine create fox --instruction 'tidy the inbox' --every-minutes 60
+```
+
+限制：
+
+- 最短间隔 15 分钟，最多 20 个启用的例程
+
+### `foxos bot routine update`
+
+启用、停用或修改例程间隔
+
+```text
+foxos bot routine update ROUTINE [--enabled] [--every-minutes EVERY_MINUTES]
+```
+
+工具接口名：`bot_routine_update` · 权限：`modify`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `routine` | `ROUTINE` | string | 是 | 例程 ID |
+| `enabled` | `--enabled` | boolean |  | 启用 |
+| `every_minutes` | `--every-minutes` | integer |  | 间隔分钟（至少 15） |
+
+示例：
+
+```bash
+foxos bot routine update rt-1a2b3c4d --no-enabled
+```
+
+### `foxos bot routine delete`
+
+删除例程
+
+```text
+foxos bot routine delete ROUTINE
+```
+
+工具接口名：`bot_routine_delete` · 权限：`delete`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `routine` | `ROUTINE` | string | 是 | 例程 ID |
+
+示例：
+
+```bash
+foxos bot routine delete rt-1a2b3c4d
+```
+
+### `foxos bot routine run`
+
+运行到期的例程（或立即运行指定例程）
+
+```text
+foxos bot routine run [--routine ROUTINE]
+```
+
+工具接口名：`bot_routine_run` · 权限：`run`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `routine` | `--routine` | string |  | 例程 ID |
+
+示例：
+
+```bash
+foxos bot routine run
+foxos bot routine run --routine rt-1a2b3c4d
+```
+
+### `foxos bot channel set`
+
+设置频道：Telegram 机器人或 Webhook
+
+```text
+foxos bot channel set BOT --kind {telegram,webhook} [--token TOKEN] [--chat CHAT]
+```
+
+工具接口名：`bot_channel_set` · 权限：`modify`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `bot` | `BOT` | string | 是 | 智能体 ID 或名字（main 表示主智能体） |
+| `kind` | `--kind` | string | 是 | 频道类型；可选：telegram / webhook |
+| `token` | `--token` | string |  | Telegram 机器人令牌（用 --token-stdin） |
+| `chat` | `--chat` | string |  | 只回答这个 Telegram 会话 ID |
+
+示例：
+
+```bash
+printf %s "$TG" | foxos bot channel set fox --kind telegram --token-stdin
+foxos bot channel set fox --kind webhook
+```
+
+限制：
+
+- 这个操作只有人可以做
+
+### `foxos bot channel remove`
+
+移除一个频道
+
+```text
+foxos bot channel remove BOT --kind {telegram,webhook}
+```
+
+工具接口名：`bot_channel_remove` · 权限：`delete`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `bot` | `BOT` | string | 是 | 智能体 ID 或名字（main 表示主智能体） |
+| `kind` | `--kind` | string | 是 | 频道类型；可选：telegram / webhook |
+
+示例：
+
+```bash
+foxos bot channel remove fox --kind telegram
+```
+
+### `foxos bot channel poll`
+
+收取频道新消息并让智能体回答（Telegram）
+
+```text
+foxos bot channel poll [--bot BOT]
+```
+
+工具接口名：`bot_channel_poll` · 权限：`run`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `bot` | `--bot` | string |  | 智能体 ID 或名字（main 表示主智能体） |
+
+示例：
+
+```bash
+foxos bot channel poll
+```
+
+## connector — 连接器：MCP 服务器与 OAuth 应用
+
+连接器：远程 MCP 服务器（HTTP / SSE）、本地 MCP 命令、OAuth 应用（PKCE、动态注册）。目录与 OpenBot 一致（Parallel、Exa、Firecrawl、Notion、Google Drive），另加 GitHub 和自定义地址。令牌存本地密钥库；每个智能体单独开启；写操作按智能体的审批规则询问。
+
+### `foxos connector catalog`
+
+连接器目录
+
+```text
+foxos connector catalog
+```
+
+工具接口名：`connector_catalog` · 权限：`read`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| — | | | | 无参数 |
+
+示例：
+
+```bash
+foxos connector catalog --json
+```
+
+### `foxos connector list`
+
+已添加的连接器
+
+```text
+foxos connector list
+```
+
+工具接口名：`connector_list` · 权限：`read`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| — | | | | 无参数 |
+
+示例：
+
+```bash
+foxos connector list --json
+```
+
+### `foxos connector add`
+
+添加连接器（目录里的 key，或自定义 URL / 命令）
+
+```text
+foxos connector add [--key KEY] [--id ID] [--title TITLE] [--url URL] [--arg COMMAND] [--auth {none,bearer,oauth}] [--header HEADER]
+```
+
+工具接口名：`connector_add` · 权限：`create`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `key` | `--key` | string |  | 目录里的 key（见 connector catalog） |
+| `id` | `--id` | string |  | 连接器 ID |
+| `title` | `--title` | string |  | 显示名 |
+| `url` | `--url` | string |  | MCP 服务器地址（https） |
+| `command` | `--arg` | array |  | 本地 MCP 命令及参数（可重复 --arg） |
+| `auth` | `--auth` | string |  | 认证方式；可选：none / bearer / oauth |
+| `header` | `--header` | string |  | 令牌放在哪个请求头（默认 Authorization: Bearer） |
+
+示例：
+
+```bash
+foxos connector add --key exa
+foxos connector add --id mine --url https://mcp.example.com/mcp --auth bearer
+```
+
+限制：
+
+- 这个操作只有人可以做
+
+### `foxos connector remove`
+
+移除连接器
+
+```text
+foxos connector remove CONNECTOR
+```
+
+工具接口名：`connector_remove` · 权限：`delete`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `connector` | `CONNECTOR` | string | 是 | 连接器 ID |
+
+示例：
+
+```bash
+foxos connector remove exa
+```
+
+### `foxos connector connect`
+
+连接：API 令牌或 OAuth 登录
+
+```text
+foxos connector connect CONNECTOR [--token TOKEN] [--client-id CLIENT_ID] [--client-secret CLIENT_SECRET] [--no-browser]
+```
+
+工具接口名：`connector_connect` · 权限：`modify`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `connector` | `CONNECTOR` | string | 是 | 连接器 ID |
+| `token` | `--token` | string |  | API 令牌（用 --token-stdin） |
+| `client_id` | `--client-id` | string |  | OAuth 客户端 ID（不支持动态注册的服务需要） |
+| `client_secret` | `--client-secret` | string |  | OAuth 客户端密钥 |
+| `no_browser` | `--no-browser` | boolean |  | 不自动打开浏览器，只打印授权地址 |
+
+示例：
+
+```bash
+printf %s "$KEY" | foxos connector connect exa-authenticated --token-stdin
+foxos connector connect notion
+```
+
+限制：
+
+- 这个操作只有人可以做
+- 令牌只存本地密钥库，不写日志
+
+### `foxos connector disconnect`
+
+断开连接并删除令牌
+
+```text
+foxos connector disconnect CONNECTOR
+```
+
+工具接口名：`connector_disconnect` · 权限：`modify`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `connector` | `CONNECTOR` | string | 是 | 连接器 ID |
+
+示例：
+
+```bash
+foxos connector disconnect notion
+```
+
+### `foxos connector tools`
+
+连接器提供的工具
+
+```text
+foxos connector tools CONNECTOR [--refresh]
+```
+
+工具接口名：`connector_tools` · 权限：`read`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `connector` | `CONNECTOR` | string | 是 | 连接器 ID |
+| `refresh` | `--refresh` | boolean |  | 重新向服务器获取工具列表 |
+
+示例：
+
+```bash
+foxos connector tools exa --refresh
+```
+
+### `foxos connector tool call`
+
+调用连接器的一个工具
+
+```text
+foxos connector tool call CONNECTOR --tool TOOL [--arguments ARGUMENTS]
+```
+
+工具接口名：`connector_tool_call` · 权限：`run`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `connector` | `CONNECTOR` | string | 是 | 连接器 ID |
+| `tool` | `--tool` | string | 是 | 工具名 |
+| `arguments` | `--arguments` | object |  | 工具参数（JSON 对象） |
+
+示例：
+
+```bash
+foxos connector tool call exa --tool web_search_exa --arguments '{"query":"ACP"}'
+```
+
+限制：
+
+- 智能体调用时：连接器必须对该智能体开启；非只读工具按审批规则询问
 
 ## desktop — 真实桌面会话
 
@@ -259,12 +1410,52 @@ foxos desktop screenshot [--path PATH]
 foxos desktop screenshot --path shots/desk.png
 ```
 
+### `foxos desktop activity`
+
+现在是谁在操作：每个智能体最近的命令与桌面占用
+
+```text
+foxos desktop activity
+```
+
+工具接口名：`desktop_activity` · 权限：`read`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| — | | | | 无参数 |
+
+示例：
+
+```bash
+foxos desktop activity --json
+```
+
+### `foxos desktop release`
+
+释放桌面输入占用（人用）
+
+```text
+foxos desktop release
+```
+
+工具接口名：`desktop_release` · 权限：`run`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| — | | | | 无参数 |
+
+示例：
+
+```bash
+foxos desktop release
+```
+
 ### `foxos desktop takeover`
 
 人工接管：暂停智能体的写操作
 
 ```text
-foxos desktop takeover [--reason REASON]
+foxos desktop takeover [--reason REASON] [--only IDENTITY]
 ```
 
 工具接口名：`desktop_takeover` · 权限：`modify`
@@ -272,6 +1463,7 @@ foxos desktop takeover [--reason REASON]
 | 参数 | CLI | 类型 | 必填 | 说明 |
 |---|---|---|---|---|
 | `reason` | `--reason` | string |  | 暂停原因（写入状态与审计） |
+| `targets` | `--only` | array |  | 只暂停这些身份（如 bot:coder）；不填则全部暂停 |
 
 示例：
 
@@ -288,14 +1480,14 @@ foxos desktop takeover --reason 我来改
 结束人工接管，恢复智能体写操作
 
 ```text
-foxos desktop resume
+foxos desktop resume [--only IDENTITY]
 ```
 
 工具接口名：`desktop_resume` · 权限：`modify`
 
 | 参数 | CLI | 类型 | 必填 | 说明 |
 |---|---|---|---|---|
-| — | | | | 无参数 |
+| `targets` | `--only` | array |  | 只恢复这些身份；不填则全部恢复 |
 
 示例：
 
@@ -539,12 +1731,52 @@ foxos session screenshot [--path PATH]
 foxos session screenshot --path shots/desk.png
 ```
 
+### `foxos session activity`
+
+现在是谁在操作：每个智能体最近的命令与桌面占用
+
+```text
+foxos session activity
+```
+
+工具接口名：`session_activity` · 权限：`read`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| — | | | | 无参数 |
+
+示例：
+
+```bash
+foxos session activity --json
+```
+
+### `foxos session release`
+
+释放桌面输入占用（人用）
+
+```text
+foxos session release
+```
+
+工具接口名：`session_release` · 权限：`run`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| — | | | | 无参数 |
+
+示例：
+
+```bash
+foxos session release
+```
+
 ### `foxos session takeover`
 
 人工接管：暂停智能体的写操作
 
 ```text
-foxos session takeover [--reason REASON]
+foxos session takeover [--reason REASON] [--only IDENTITY]
 ```
 
 工具接口名：`session_takeover` · 权限：`modify`
@@ -552,6 +1784,7 @@ foxos session takeover [--reason REASON]
 | 参数 | CLI | 类型 | 必填 | 说明 |
 |---|---|---|---|---|
 | `reason` | `--reason` | string |  | 暂停原因（写入状态与审计） |
+| `targets` | `--only` | array |  | 只暂停这些身份（如 bot:coder）；不填则全部暂停 |
 
 示例：
 
@@ -568,14 +1801,14 @@ foxos session takeover --reason 我来改
 结束人工接管，恢复智能体写操作
 
 ```text
-foxos session resume
+foxos session resume [--only IDENTITY]
 ```
 
 工具接口名：`session_resume` · 权限：`modify`
 
 | 参数 | CLI | 类型 | 必填 | 说明 |
 |---|---|---|---|---|
-| — | | | | 无参数 |
+| `targets` | `--only` | array |  | 只恢复这些身份；不填则全部恢复 |
 
 示例：
 
@@ -794,7 +2027,7 @@ foxos env run NAME [--image IMAGE] [--iso ISO] [--provider PROVIDER] [--network 
 
 ```bash
 foxos env run dev --image alpine-3.20
-foxos env run live --provider linux-kvm --iso FoxOS-0.3.1-amd64.iso --desktop-attach
+foxos env run live --provider linux-kvm --iso FoxOS-0.3.0-amd64.iso --desktop-attach
 ```
 
 ### `foxos env desktop-attach`
@@ -1547,6 +2780,309 @@ foxos everything uninstall APP
 foxos everything uninstall chess
 ```
 
+## machine — 多台狐狸OS：配对、授权、远程执行
+
+一个智能体可以控制多台狐狸OS，多个智能体也可以共用一台。被控端运行 foxos machine serve（HTTPS，自签证书，控制端固定证书指纹），用一次性配对码换取令牌；每个智能体在每台机器上的权限单独授予，默认全部拒绝；被控端的审计日志写明是哪台控制端的哪个智能体。
+
+### `foxos machine list`
+
+列出机器（本机与已配对的机器）
+
+```text
+foxos machine list [--check]
+```
+
+工具接口名：`machine_list` · 权限：`read`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `check` | `--check` | boolean |  | 逐台检查在线状态 |
+
+示例：
+
+```bash
+foxos machine list --check --json
+```
+
+### `foxos machine pair`
+
+与另一台狐狸OS 配对
+
+```text
+foxos machine pair --name NAME --url URL --code CODE [--fingerprint FINGERPRINT] [--client CLIENT]
+```
+
+工具接口名：`machine_pair` · 权限：`create`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `name` | `--name` | string | 是 | 机器名 |
+| `url` | `--url` | string | 是 | 被控端地址 https://主机:7443 |
+| `code` | `--code` | string | 是 | 被控端给出的配对码 |
+| `fingerprint` | `--fingerprint` | string |  | 被控端证书的 sha256 指纹（强烈建议填写） |
+| `client` | `--client` | string |  | 本机在对方那里显示的名字（默认主机名） |
+
+示例：
+
+```bash
+foxos machine pair --name vm1 --url https://192.168.1.20:7443 --code AB12-CD34-EF56 --fingerprint 3f…
+```
+
+限制：
+
+- 只有人可以配对机器或修改授权
+
+### `foxos machine remove`
+
+移除配对的机器
+
+```text
+foxos machine remove MACHINE
+```
+
+工具接口名：`machine_remove` · 权限：`delete`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `name` | `MACHINE` | string | 是 | 机器名 |
+
+示例：
+
+```bash
+foxos machine remove vm1
+```
+
+### `foxos machine ping`
+
+检查机器是否在线，看授权与谁在操作
+
+```text
+foxos machine ping MACHINE
+```
+
+工具接口名：`machine_ping` · 权限：`read`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `name` | `MACHINE` | string | 是 | 机器名 |
+
+示例：
+
+```bash
+foxos machine ping vm1 --json
+```
+
+### `foxos machine call`
+
+在一台机器上执行一条 foxos 命令
+
+```text
+foxos machine call MACHINE --command COMMAND [--params PARAMS]
+```
+
+工具接口名：`machine_call` · 权限：`run`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `name` | `MACHINE` | string | 是 | 机器名 |
+| `command` | `--command` | string | 是 | 命令 ID（如 files.list） |
+| `params` | `--params` | object |  | 命令参数（JSON 对象） |
+
+示例：
+
+```bash
+foxos machine call vm1 --command files.list --params '{"path":"."}'
+```
+
+### `foxos machine host code`
+
+（被控端）生成一次性配对码
+
+```text
+foxos machine host code [--ttl TTL]
+```
+
+工具接口名：`machine_host_code` · 权限：`create`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `ttl` | `--ttl` | integer |  | 配对码有效秒数；默认 600 |
+
+示例：
+
+```bash
+foxos machine host code --json
+```
+
+限制：
+
+- 只有人可以配对机器或修改授权
+
+### `foxos machine host clients`
+
+（被控端）已配对的控制端与授权
+
+```text
+foxos machine host clients
+```
+
+工具接口名：`machine_host_clients` · 权限：`read`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| — | | | | 无参数 |
+
+示例：
+
+```bash
+foxos machine host clients --json
+```
+
+### `foxos machine host grant`
+
+（被控端）给某台控制端的某个智能体授权
+
+```text
+foxos machine host grant --client CLIENT --bot BOT --permissions PERMISSIONS [--apps APPS] [--scope SCOPE]
+```
+
+工具接口名：`machine_host_grant` · 权限：`modify`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `client` | `--client` | string | 是 | 控制端名 |
+| `bot` | `--bot` | string | 是 | 控制端上的智能体 ID（* 表示全部） |
+| `permissions` | `--permissions` | array | 是 | 权限：read、create、modify、delete、run |
+| `apps` | `--apps` | array |  | 允许的应用（逗号分隔，不填表示全部） |
+| `scope` | `--scope` | string |  | 允许的目录范围（工作空间内）；默认 . |
+
+示例：
+
+```bash
+foxos machine host grant --client laptop --bot coder --permissions read,create,modify --apps files --scope projects
+```
+
+限制：
+
+- 只有人可以配对机器或修改授权
+- 默认拒绝：没有授权的智能体什么都不能做；machine 与 control 命令永远不能远程执行
+
+### `foxos machine host revoke`
+
+（被控端）撤销授权
+
+```text
+foxos machine host revoke --client CLIENT [--bot BOT]
+```
+
+工具接口名：`machine_host_revoke` · 权限：`modify`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `client` | `--client` | string | 是 | 控制端名 |
+| `bot` | `--bot` | string |  | 控制端上的智能体 ID（* 表示全部） |
+
+示例：
+
+```bash
+foxos machine host revoke --client laptop --bot coder
+```
+
+### `foxos machine host unpair`
+
+（被控端）解除一台控制端的配对
+
+```text
+foxos machine host unpair --client CLIENT
+```
+
+工具接口名：`machine_host_unpair` · 权限：`delete`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `client` | `--client` | string | 是 | 控制端名 |
+
+示例：
+
+```bash
+foxos machine host unpair --client laptop
+```
+
+## runtime — 运行环境：Node、Bun、Python、常用工具与智能体命令行
+
+智能体运行环境：Node.js LTS、npm、pnpm、corepack、Bun、Python（pip、venv、uv、pipx）、git、gh、curl、wget、jq、ripgrep、fd、gcc/make、unzip、sqlite3，可选 Go 与 Rust，以及智能体命令行（gemini、codex、claude、qwen、opencode、cursor-agent、aider 与 ACP 适配器）。清单固定版本、许可证、官方来源和 sha256；ISO 只预装可再分发的，其余首次登录时安装。
+
+### `foxos runtime list`
+
+列出清单里的工具与安装状态
+
+```text
+foxos runtime list [--phase {iso,firstboot,optional}] [--group {runtime,tools,agents,optional}]
+```
+
+工具接口名：`runtime_list` · 权限：`read`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `phase` | `--phase` | string |  | 安装阶段；可选：iso / firstboot / optional |
+| `group` | `--group` | string |  | 分组；可选：runtime / tools / agents / optional |
+
+示例：
+
+```bash
+foxos runtime list --json
+foxos runtime list --group agents
+```
+
+### `foxos runtime doctor`
+
+检查运行环境：缺什么、版本、PEP 668、PATH、磁盘
+
+```text
+foxos runtime doctor
+```
+
+工具接口名：`runtime_doctor` · 权限：`read`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| — | | | | 无参数 |
+
+示例：
+
+```bash
+foxos runtime doctor --json
+```
+
+### `foxos runtime install`
+
+安装工具（固定版本，官方来源，校验 sha256）；firstboot 表示全部首次登录项
+
+```text
+foxos runtime install NAME... [--force] [--accept-license]
+```
+
+工具接口名：`runtime_install` · 权限：`create`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `name` | `NAME` | array | 是 | 工具名（见 runtime list），或 firstboot |
+| `force` | `--force` | boolean |  | 已安装也重新安装 |
+| `accept_license` | `--accept-license` | boolean |  | 确认许可证（不可再分发的工具需要） |
+
+示例：
+
+```bash
+foxos runtime install codex codex-acp
+foxos runtime install claude claude-acp --accept-license
+foxos runtime install go
+```
+
+限制：
+
+- 只有人可以安装软件
+- 只从清单里的官方地址下载；不可再分发的工具需要 --accept-license
+
 ## sandbox — 轻量隔离
 
 进程级沙箱：直接运行宿主上的程序，只能读写工作空间，可选禁止联网（Linux Landlock + seccomp、macOS Seatbelt、Windows 受限令牌 / AppContainer + 作业对象）。
@@ -2295,7 +3831,7 @@ foxos control status --json
 人工接管：暂停所有智能体的写操作
 
 ```text
-foxos control pause [--reason REASON]
+foxos control pause [--reason REASON] [--only IDENTITY]
 ```
 
 工具接口名：`control_pause` · 权限：`modify`
@@ -2303,11 +3839,13 @@ foxos control pause [--reason REASON]
 | 参数 | CLI | 类型 | 必填 | 说明 |
 |---|---|---|---|---|
 | `reason` | `--reason` | string |  | 暂停原因（写入状态与审计） |
+| `targets` | `--only` | array |  | 只暂停这些身份（如 bot:coder）；不填则全部暂停 |
 
 示例：
 
 ```bash
 foxos control pause --reason '我来改第 3 页数据'
+foxos control pause --only bot:coder
 ```
 
 限制：
@@ -2320,19 +3858,20 @@ foxos control pause --reason '我来改第 3 页数据'
 结束人工接管，恢复智能体写操作
 
 ```text
-foxos control resume
+foxos control resume [--only IDENTITY]
 ```
 
 工具接口名：`control_resume` · 权限：`modify`
 
 | 参数 | CLI | 类型 | 必填 | 说明 |
 |---|---|---|---|---|
-| — | | | | 无参数 |
+| `targets` | `--only` | array |  | 只恢复这些身份；不填则全部恢复 |
 
 示例：
 
 ```bash
 foxos control resume
+foxos control resume --only bot:coder
 ```
 
 限制：

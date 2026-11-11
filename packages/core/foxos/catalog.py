@@ -16,6 +16,7 @@ CONVENTIONS = {
         "--task ID": tr("catalog.related_task_id_default_foxos_task"),
         "--lang LANG": tr("cli.lang_option"),
         "--lock-wait SECONDS": tr("catalog.maximum_seconds_to_wait_when_the"),
+        "--machine NAME": tr("catalog.machine_option"),
     },
     "exit_codes": {str(k): v for k, v in EXIT_CODE_DOCS.items()},
     "paths": tr("catalog.all_paths_are_relative_to_the"),
@@ -105,11 +106,18 @@ def select_commands(profile: str = "compact", apps: list[str] | None = None) -> 
     return out
 
 
+NO_MACHINE_PARAM = {"machine", "control"}  # 机器管理与接管只在本机执行
+
+
 def mcp_tools(profile: str = "full", apps: list[str] | None = None, names: str = "underscore") -> list[dict]:
     out = []
     for c in select_commands(profile, apps):
+        schema = c.input_schema()
+        if c.app not in NO_MACHINE_PARAM:
+            schema = {**schema, "properties": {**schema.get("properties", {}),
+                                               "machine": {"type": "string", "description": tr("catalog.machine_param")}}}
         t = {"name": c.id if names == "dotted" else c.tool_name, "title": c.cli, "description": tool_description(c),
-             "inputSchema": c.input_schema(),
+             "inputSchema": schema,
              "annotations": {"title": c.cli, "readOnlyHint": c.permission == "read", "destructiveHint": c.permission == "delete",
                              "idempotentHint": c.permission == "read", "openWorldHint": False},
              "_meta": {"foxos/id": c.id, "foxos/cli": c.cli, "foxos/permission": c.permission, "foxos/examples": c.examples}}
