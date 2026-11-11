@@ -494,8 +494,63 @@ def case_install() -> str:
     return f"{time.time() - t0:.0f}s 完成；{' '.join(tail.split())[-400:]}；目标盘：{' '.join(lsblk.split())}", shots
 
 
+def case_win_client() -> str:
+    """Windows 0.3.3 客户端要求的来宾前提：sshd（只认密钥）、foxos acp stdio（ACP 经 SSH）、x11vnc -localhost（画面经 ssh -W）。"""
+    act = ssh("systemctl is-active ssh; systemctl is-enabled ssh", check=True).stdout.split()
+    assert act[:2] == ["active", "enabled"], act
+    # foxos acp stdio：经 SSH 的标准输入输出说 ACP（initialize 握手）
+    init = {"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": {"protocolVersion": 1, "clientCapabilities": {"fs": {"readTextFile": True, "writeTextFile": True}, "terminal": True}}}
+    p = subprocess.run(ssh_base() + ["-T", "bash", "-lc", shlex.quote("timeout 600 foxos acp stdio opencode")], input=json.dumps(init) + "\n",
+                       capture_output=True, text=True, timeout=900)
+    rep = next((json.loads(l) for l in p.stdout.splitlines() if l.strip().startswith("{") and '"id":1' in l.replace(" ", "")), None)
+    assert rep and "result" in rep and rep["result"].get("protocolVersion") == 1, (p.stdout[-500:], scrub(p.stderr[-500:]))
+    # x11vnc：按需起在来宾回环，ssh -W 转发后能读到 RFB 握手
+    ssh("pkill -x x11vnc; (x11vnc -display :0 -localhost -shared -rfbport 5917 -nopw -once -quiet >/tmp/x11vnc-e2e.log 2>&1 &); sleep 20", timeout=300)
+    w = subprocess.run(ssh_base(extra=["-W", "127.0.0.1:5917"]), input="", capture_output=True, timeout=120)
+    banner = w.stdout[:12].decode("latin1", "replace")
+    assert banner.startswith("RFB "), (banner, w.stderr[-300:])
+    ver = ssh("x11vnc -version 2>/dev/null | head -1").stdout.strip()
+    return (f"sshd active/enabled；foxos acp stdio initialize 返回 protocolVersion=1（agentInfo={json.dumps(rep['result'].get('agentInfo'), ensure_ascii=False)}）；"
+            f"x11vnc（{ver}）-localhost 经 ssh -W 转发读到 {banner.strip()} 握手")
+
+
+def case_cu() -> str:
+    """电脑操控真实端到端（test_cu_real.py，FOXOS_CU_E2E=1）在启动的 ISO 里跑：agent-desktop / agent-browser / Chrome CDP / Jev / DeepSeek。
+
+    测试文件从本仓库拷进来宾 ~/cu-e2e；pytest 装到 /tmp/cu-pt（测试专用）；xedit（x11-apps）不在 ISO 里，测试时从 Ubuntu 源装。
+    DeepSeek 与 TypeSafe（Jev）密钥只经 SSH 标准输入传进这一次命令的环境变量，不落盘、不进输出。
+    """
+    root = Path(__file__).resolve().parents[3]
+    import io, tarfile
+    buf = io.BytesIO()
+    with tarfile.open(fileobj=buf, mode="w:gz") as tf:
+        for rel in ("packages/core/tests/test_cu_real.py", "packages/core/tests/conftest.py", "scripts/cu_bench.py"):
+            tf.add(root / rel, arcname=rel)
+    up = subprocess.run(ssh_base() + ["rm -rf ~/cu-e2e && mkdir -p ~/cu-e2e/packages/core && tar -xzf - -C ~/cu-e2e"], input=buf.getvalue(), capture_output=True, timeout=300)
+    assert up.returncode == 0, up.stderr[-300:]
+    ssh("ln -sfn /usr/lib/foxos/python/foxos ~/cu-e2e/packages/core/foxos; "
+        "test -d /tmp/cu-pt || /usr/lib/foxos/venv/bin/python -m pip install -q --target /tmp/cu-pt pytest; "
+        "command -v xedit || { sudo -n apt-get update -q >/dev/null; sudo -n DEBIAN_FRONTEND=noninteractive apt-get install -y -q x11-apps >/dev/null; }", check=True, timeout=3600)
+    ds = SECRET_FILE.read_text().strip()
+    tsf = Path(os.environ.get("FOXOS_E2E_TYPESAFE_KEY_FILE", str(Path.home() / ".secrets/typesafe_api_key")))
+    ts = tsf.read_text().strip() if tsf.exists() else ""
+    _SECRETS.extend([ds, ts])
+    cmd = ("read -r DEEPSEEK_API_KEY; read -r TYPESAFE_API_KEY; export DEEPSEEK_API_KEY TYPESAFE_API_KEY; "
+           "[ -n \"$TYPESAFE_API_KEY\" ] || unset TYPESAFE_API_KEY; cd ~/cu-e2e/packages/core; "
+           "FOXOS_CU_E2E=1 FOXOS_CU_E2E_WS=$HOME/FoxOS/workspace PYTHONPATH=/tmp/cu-pt:/usr/lib/foxos/python "
+           "timeout 7000 /usr/lib/foxos/venv/bin/python -m pytest -q -p no:cacheprovider -rA tests/test_cu_real.py 2>&1 | tail -40")
+    p = ssh(cmd, input=f"{ds}\n{ts}\n", timeout=7500)
+    out = scrub(p.stdout)
+    (WORK / f"cu-{int(time.time())}.log").write_text(out)
+    summary = next((l for l in reversed(out.splitlines()) if re.search(r"\d+ (passed|failed)", l)), out[-300:])
+    passed = re.findall(r"^PASSED (\S+)", out, re.M)
+    failed = re.findall(r"^(?:FAILED|ERROR) (\S+)", out, re.M)
+    assert "failed" not in summary and "error" not in summary and passed, f"{summary}；失败：{', '.join(failed)}"
+    return f"{summary.strip('= ')}；通过：{', '.join(x.split('::')[-1] for x in passed)}"
+
+
 CASES = {"ssh": case_ssh, "foxos_over_ssh": case_foxos_over_ssh, "runtime": case_runtime, "acp": case_acp, "desktop": case_desktop,
-         "chrome": case_chrome, "bots": case_bots, "preset": case_preset, "installed_ssh": case_installed_ssh, "install": case_install}
+         "chrome": case_chrome, "bots": case_bots, "preset": case_preset, "installed_ssh": case_installed_ssh, "install": case_install, "win_client": case_win_client, "cu": case_cu}
 
 
 def run(names: list[str]) -> int:
@@ -524,7 +579,8 @@ TITLES = {"ssh": "SSH：密钥可登录、默认 / 错误密码与 root 被拒�
           "runtime": "foxos runtime doctor", "acp": "foxos acp list 与 opencode 握手", "desktop": "桌面会话控制（foxos desktop …）",
           "chrome": "Google Chrome 安装、默认浏览器、CDP", "bots": "「智能体」窗口启动 + opencode（ACP，DeepSeek）真实对话",
           "preset": "在线预设：真实下载 + 校验 + 引导 Linux 预设", "install": "Calamares 安装到虚拟磁盘",
-          "installed_ssh": "重启进入装好的系统：密钥可登录、密码被拒、foxos 可用"}
+          "installed_ssh": "重启进入装好的系统：密钥可登录、密码被拒、foxos 可用",
+          "win_client": "Windows 0.3.3 客户端前提：sshd、foxos acp stdio、x11vnc", "cu": "电脑操控真实端到端（FOXOS_CU_E2E=1）"}
 
 
 def report(path: Path, heading: str) -> None:
