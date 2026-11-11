@@ -90,7 +90,14 @@
       "shortcutName": "狐狸OS",
       "installerIcon": "../../assets/icon.ico",
       "uninstallerIcon": "../../assets/icon.ico",
-      "artifactName": "FoxOS-Setup-${version}-x64.${ext}"
+      "artifactName": "FoxOS-Setup-${version}-x64.${ext}",
+      "multiLanguageInstaller": true,
+      "installerLanguages": [
+        "zh_CN",
+        "en_US"
+      ],
+      "language": "2052",
+      "displayLanguageSelector": false
     },
     "linux": {
       "target": [
