@@ -194,6 +194,10 @@ def main() -> int:
             L.append("")
             L.append("GitHub Actions 运行：" + "；".join(f"[{x['id']}]({x['url']})（{x['result']}）" for x in inst["runs"]))
         L.append("")
+    notes = ROOT / "docs" / "test-results" / "notes.md"  # 这次运行的说明（人写，随报告提交）
+    if notes.exists():
+        L.append("## 说明\n")
+        L.append(notes.read_text(encoding="utf-8").strip() + "\n")
     L.append("## 复现\n")
     L.append("```bash\npython3 -m venv .venv && .venv/bin/pip install -e 'packages/core[test]'\n(cd apps/desktop && npm ci)\n"
              "FOXOS_HOME=~/.local/share/FoxOS npm run test:all          # 全部\npython3 scripts/test_all.py --only e2e --e2e mcp,sandbox  # 只跑部分\n```\n")
