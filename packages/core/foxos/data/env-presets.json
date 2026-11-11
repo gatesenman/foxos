@@ -37,25 +37,25 @@
    "artifacts": {
     "qcow2": {
      "name": "foxos-debian-12.qcow2",
-     "size": 1414660096,
-     "sha256": "df058ed23c7d13992cbcd8078993f919e9b0ee0dcd98deb08cf7c58932efb0b4",
+     "size": 1545076736,
+     "sha256": "d84811a1500d7e2358f1f29d9e6516e2b9b4983274725669a6787d0b56988ea4",
      "parts": [
       {
        "name": "foxos-debian-12.qcow2.part1",
        "size": 943718400,
-       "sha256": "f1af224dfc0f5b48e8c53f8ec4827388f40bca4b43ca63cc7e6f5273080da282"
+       "sha256": "63e2eb4c67d5723b3e251df3f4ad452be9edbf36b9e40ac8b43683adf16d7f4a"
       },
       {
        "name": "foxos-debian-12.qcow2.part2",
-       "size": 470941696,
-       "sha256": "6b0165496f6fa9860dd26987b2c403c32bedbb98ad2719301103b1485cec223f"
+       "size": 601358336,
+       "sha256": "b72db218dd66c3c5a275b46fe313e540ac1e7124904d6425fa68e1e5318ed3a0"
       }
      ]
     },
     "wsl": {
      "name": "foxos-debian-12-wsl.tar.gz",
-     "size": 782922112,
-     "sha256": "d14bbbe4c31d1db466336aef381914e2f275adc3a265ddbad39be8c2c78c5356"
+     "size": 760510614,
+     "sha256": "e5ef45963e68b49d9adc437f25034c20cdbc21b6f922b03af82396b7a650d7fe"
     }
    },
    "hosts": {
@@ -112,25 +112,25 @@
    "artifacts": {
     "qcow2": {
      "name": "foxos-ubuntu-24.04.qcow2",
-     "size": 1175846912,
-     "sha256": "efc080fc3704cff3e251e9876013cb28dfa0eb4469a8c0acd4f81e932d80ab94",
+     "size": 1159725056,
+     "sha256": "4f7e7fd6280639dd86be1c399d675854b3e4dda6045f24d2333a0be6284d685d",
      "parts": [
       {
        "name": "foxos-ubuntu-24.04.qcow2.part1",
        "size": 943718400,
-       "sha256": "253b88ef8e4140d6bdd749635bf194207cfa5aef4cecbb93e785a6dc12fa651e"
+       "sha256": "1030c0d834a49970b6d74cf8462e1fe41829e45c4f2e60e0877ba9981be6ce8d"
       },
       {
        "name": "foxos-ubuntu-24.04.qcow2.part2",
-       "size": 232128512,
-       "sha256": "89e46a66e55557a0bab9337caadc978f31300f7362a2b81abeec8180d31c71b7"
+       "size": 216006656,
+       "sha256": "81d3d13d66145723102e48f3a607aa28b4b7e92b40b7b124f6a53ca69d929a5f"
       }
      ]
     },
     "wsl": {
      "name": "foxos-ubuntu-24.04-wsl.tar.gz",
-     "size": 612279696,
-     "sha256": "a0c86d4c27bb357f2316a1d4027c0b3d118de803fe50a1294f010d7cc3e87f4a"
+     "size": 600719431,
+     "sha256": "68cfcf8cb76e7b3704b2d4bbc08850f3b7b2fb6bfcbf590f177be5e3cd374f43"
     }
    },
    "hosts": {

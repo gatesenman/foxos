@@ -21,7 +21,7 @@ test('US-50 安装系统目录与一键安装（Linux 宿主上真实安装 Alpi
     assert.match(await page.textContent('[data-entry=macos-guest]'), /Apple/);
     assert.ok(await page.$('[data-provider=linux-ns]'));
     const cat = cli(ws, ['env', 'catalog'], { extraEnv }).result;
-    assert.equal(await page.$$eval('[data-entry]', (n) => n.length), cat.count);
+    assert.equal(await page.$$eval('[data-entry], [data-preset]', (n) => n.length), cat.count);
     await shot(page, 'US-50-env-install');
 
     await page.click('[data-install=alpine]');
@@ -38,6 +38,38 @@ test('US-50 安装系统目录与一键安装（Linux 宿主上真实安装 Alpi
     assert.match(out.stdout, /^\d+\.\d+/);
     cli(ws, ['env', 'stop', NAME], { extraEnv });
     cli(ws, ['env', 'delete', NAME], { extraEnv });
+  } finally {
+    await app.close();
+  }
+});
+
+test('US-63 预设系统：目录顶部列出已配置好的 Linux / Windows / macOS，显示大小、可用性与原因，安装对话框', { skip: process.platform !== 'linux' && '本用例按 Linux 宿主的可用性断言' }, async () => {
+  const ws = tmpWorkspace('envpreset');
+  const { app, page } = await launch(ws, { extraEnv });
+  try {
+    await page.dblclick('[data-launch=environments]');
+    await page.click('[data-act=env-install]');
+    await page.waitForSelector('[data-section=presets] [data-preset="foxos-debian-12"]', { timeout: 60000 });
+    const cat = cli(ws, ['env', 'catalog', '--presets'], { extraEnv }).result;
+    assert.equal(await page.$$eval('[data-section=presets] [data-preset]', (n) => n.length), cat.presets);
+    // 每张卡都显示下载大小与所需磁盘
+    for (const e of cat.entries) {
+      const txt = await page.textContent(`[data-preset="${e.id}"] [data-sizes]`);
+      assert.match(txt, /\d/);
+    }
+    // Linux 宿主：Linux 预设可装；Windows 预设禁用并说明 cloud-hypervisor；macOS 说明 Apple 许可
+    assert.ok(await page.$('[data-install-preset="foxos-debian-12"]'));
+    assert.ok(await page.$('[data-preset="windows-11-enterprise-eval"].disabled'));
+    assert.match(await page.textContent('[data-preset="windows-11-enterprise-eval"]'), /cloud-hypervisor/);
+    assert.match(await page.textContent('[data-preset="macos-latest"]'), /Apple/);
+    await page.$eval('[data-section=presets]', (n) => n.scrollIntoView());
+    await shot(page, 'US-63-env-presets');
+    await page.click('[data-install-preset="foxos-debian-12"]');
+    await page.waitForSelector('.dialog input[name=env-name]');
+    assert.ok(await page.$('.dialog input[name=env-start]'));
+    assert.equal(await page.$('.dialog input[name=env-product-key]'), null);
+    await shot(page, 'US-63-env-preset-dialog');
+    await page.click('.dialog button.ghost');
   } finally {
     await app.close();
   }
