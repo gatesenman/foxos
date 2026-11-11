@@ -76,6 +76,20 @@
 - **截图**：`docs/screenshots/os-desktop.png`、`os-desktop-session.png`、`os-terminal.png`、`os-editor.png` 由 `scripts/os/tools/shoot-desktop.sh` 生成：在 ISO 构建出的根文件系统上叠一层只读 overlay，以 Live 用户 `foxos`、`zh_CN.UTF-8`、主机名 `foxos` 用 `startxfce4` 启动真实会话（Xvfb 1920×1080），不是合成图。
 - **US-61**（4 通过）：`packages/core/tests/test_os_kvm.py`。`linux-kvm` 已登记为内置提供者；Linux 目录条目（如 Alpine）含该提供者；`foxos env run --iso --no-start` 与 `foxos env desktop-attach` 命令/MCP 已接通。此构建盒的 `/dev/kvm` 存在，但内核曾出现 `kvm_arch_vcpu_create` BUG，`foxos env doctor --provider linux-kvm` 会如实报告不可用；**不会**在未设置 `FOXOS_ALLOW_TEST_VMM=qemu-tcg` 时改用 QEMU。产品路径仍是 cloud-hypervisor + KVM，来宾桌面走 wayvnc。默认测试套件不引导狐狸OS ISO（太慢）；在支持 KVM 的机器上可用该 ISO 或目录中的 Linux 系统做来宾桌面。复现：`npm run test:os`。
 
+## 智能体、连接器、多机与运行环境（2026-11-12 01:00，Asia/Shanghai）
+
+在合并主线（`bf5b1a6`）之后的分支上运行 `packages/core` 的全部 pytest：**111 通过、1 失败、3 跳过**（13 分 34 秒）。失败的是 US-61 `test_os_kvm.py`：这台构建盒上 `/dev/kvm` 存在但当前用户不可读写，是环境原因，以前就是这样。跳过的 3 个仍是 Windows 实机与 wine 用例。Electron 桌面端到端（Playwright）这次**没有**重跑；`apps/desktop` 的 `lint:i18n` 通过（511 个词条，0 错误）。
+
+| 故事 | 测试 | 结果 |
+|---|---|---|
+| US-100–US-108 | `test_bots.py`（9 个）：智能体增删改、每个智能体的设置、真实 ACP 回合与审批卡片、委托、pstack、记忆与例程、暂停、聊天服务 SSE、真实无头 Chrome 里的界面（中英文） | 通过 |
+| US-109–US-112 | `test_connectors.py`（4 个）：目录与 stdio MCP、OAuth 2.1（本地真实授权服务，PKCE、动态注册、刷新）、Bearer 令牌、Exa 真实调用 | 通过 |
+| US-113–US-115 | `test_machines.py`（3 个）：两个真实 `machine serve` 被控端；配对码、指纹、双向 TLS；一个智能体控制两台；两个智能体共用一台（LOCKED、CONFLICT、PAUSED、撤销） | 通过 |
+| US-116 | `test_acp_real.py`：从 GitHub 下载 opencode 2.2.7（sha256 校验），真实 ACP 握手与会话 | 通过 |
+| US-117–US-118 | `test_os_runtime.py`：镜像 chroot 的 overlay 里（同一份 hook 30/35），以用户 foxos 检查版本、PEP 668、ACP 握手 | 通过 |
+
+没有用真实模型账号跑过回答。Gemini CLI、codex-acp、Qwen Code、Cursor CLI 的握手结果是「需要登录」；opencode 和 claude-agent-acp 能建立会话。详见 [agent-runtime.md](agent-runtime.md)。截图在 `docs/screenshots/bots-*.png`，是 overlay 里真实 XFCE 会话中的「智能体」窗口（Firefox 后备浏览器）。
+
 ## Everything 应用覆盖（51 个）
 
 等价检查：同一个操作分别用真实鼠标 / 键盘事件（GUI）和 `foxos` CLI 执行，两次结束后的界面状态与应用数据必须一致。操作数来自 [操作清单](operations/)。
