@@ -678,7 +678,9 @@ def env_install(ctx: Context, entry: str, name: str, provider: str | None = None
     cands = [provider] if provider else [p for p in e["providers"] if p in provs and host in provs[p].platforms] or e["providers"][:1]
     if not provider and host == "linux" and "linux-kvm" in cands:
         kvm_doc = providers.get("linux-kvm").doctor()
-        if kvm_doc.get("available") and kvm_doc.get("kvm", {}).get("available"):
+        # 根文件系统类的条目（alpine / rootfs / lxc）没有可引导的磁盘：没给 --iso 时用 KVM 装不了，不要优先它
+        rootfs_only = e["source"]["kind"] in ("rootfs", "alpine", "lxc") and not iso
+        if kvm_doc.get("available") and kvm_doc.get("kvm", {}).get("available") and not rootfs_only:
             cands = ["linux-kvm"] + [c for c in cands if c != "linux-kvm"]
         else:
             cands = [c for c in cands if c != "linux-kvm"] + (["linux-kvm"] if "linux-kvm" in cands else [])
