@@ -97,6 +97,7 @@ def installed_info(id_: str) -> dict | None:
     if not cmd or not os.path.exists(cmd):
         return None
     info["system"] = str(f).startswith(str(SYSTEM_AGENTS))
+    info["args"] = default_args(id_, info.get("args") or [])
     cfg = agent_config(id_)
     if cfg:
         info["config"] = cfg
@@ -265,6 +266,21 @@ def install_agent(id_: str, log=print, progress=lambda got, total: None) -> dict
 DEFAULT_ENV = {
     "opencode": {"OPENCODE_CONFIG_CONTENT": json.dumps({"permission": {"edit": "ask", "bash": "ask", "webfetch": "ask"}})},
 }
+
+
+# 启动参数里的审批模式：Qwen Code 默认用 default（改文件、跑命令前都要审批卡片），不能是 auto-edit / yolo。
+# 用户在 acp agent config --args 里明确写了 --approval-mode / --yolo 时以用户的为准（它们排在后面，命令行解析取最后一个）。
+DEFAULT_ARGS = {
+    "qwen-code": ["--approval-mode", "default"],
+}
+_APPROVAL_FLAGS = ("--approval-mode", "--yolo", "-y")
+
+
+def default_args(id_: str, args: list) -> list:
+    extra = DEFAULT_ARGS.get(id_)
+    if not extra or any(str(a).split("=")[0] in _APPROVAL_FLAGS for a in args):
+        return list(args)
+    return [*args, *extra]
 
 
 def agent_env(id_: str, info: dict) -> dict:

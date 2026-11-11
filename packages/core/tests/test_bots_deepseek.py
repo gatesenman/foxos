@@ -162,3 +162,20 @@ def test_US145_qwen_code_via_openai_compatible_deepseek(box):
     assert (box.ws / "notes" / "qwen.txt").read_text().strip() == "qwen via deepseek"
     w = [json.loads(x) for x in (box.ws / ".foxos" / "audit.jsonl").read_text().splitlines() if '"files.write"' in x]
     assert any(e["agent"] == "bot:qwen/acp:qwen-code" and e["status"] == "ok" for e in w)
+
+
+def test_US157_qwen_code_asks_before_writing_by_default(box):
+    """在狐狸OS 里 Qwen Code 默认用 --approval-mode default：写文件前弹审批卡片；拒绝 → 文件不出现，批准 → 写入。"""
+    if not (box.ws / ".foxos" / "bots" / "qwen").exists() and "qwen" not in json.dumps(box.ok("bot", "profile", "list")):
+        test_US145_qwen_code_via_openai_compatible_deepseek(box)
+    from foxos.apps import acp as acp_app
+    assert acp_app.default_args("qwen-code", ["--acp"]) == ["--acp", "--approval-mode", "default"]
+    assert acp_app.default_args("qwen-code", ["--acp", "--approval-mode=yolo"]) == ["--acp", "--approval-mode=yolo"]  # 人明确改过的以人为准
+    (box.ws / "notes").mkdir(exist_ok=True)
+    target = box.ws / "notes" / "qwen-ask.txt"
+    _, seen = box.send_answering("qwen", "Use your write_file tool to create notes/qwen-ask.txt containing exactly: denied", decide=lambda a: "reject")
+    assert seen and all(a["bot"] == "qwen" for a in seen), "Qwen Code should ask before writing"
+    assert not target.exists()
+    _, seen = box.send_answering("qwen", "Use your write_file tool to create notes/qwen-ask.txt containing exactly: approved", decide=lambda a: "allow")
+    assert seen, "Qwen Code should ask before writing"
+    assert target.read_text().strip() == "approved"
