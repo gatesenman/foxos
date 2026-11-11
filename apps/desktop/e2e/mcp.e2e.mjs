@@ -5,7 +5,7 @@ import assert from 'node:assert';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { spawn } from 'node:child_process';
+import { spawn, spawnSync } from 'node:child_process';
 import { createRequire } from 'node:module';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js';
@@ -16,6 +16,9 @@ const { ROOT, PY, cli, readAudit } = require('./helpers.js');
 const SDK_VERSION = JSON.parse(fs.readFileSync(path.join(ROOT, 'apps/desktop/node_modules/@modelcontextprotocol/sdk/package.json'), 'utf8')).version;
 const RESULTS = path.join(ROOT, 'docs', 'test-results', 'mcp.json');
 const env = { ...process.env, PYTHONPATH: path.join(ROOT, 'packages', 'core'), PYTHONIOENCODING: 'utf-8' };
+
+// 调用 Everything 应用的工具会在这个工作空间里启动应用宿主（Electron）；测试结束时关掉，免得一直留在机器上
+function stopAppHosts(ws) { spawnSync('pkill', ['-f', `--workspace=${ws}`]); }
 
 function parse(r) { return r.structuredContent || JSON.parse(r.content[0].text); }
 
@@ -28,7 +31,7 @@ test('US-10 官方 MCP SDK 通过 stdio 列出工具并逐个应用调用', asyn
   const transport = new StdioClientTransport({ command: PY, args: ['-m', 'foxos', '--workspace', ws, 'mcp', '--profile', 'full'], env: { ...env, FOXOS_AGENT: 'mcp-sdk-e2e' }, stderr: 'pipe' });
   const client = new Client({ name: 'foxos-e2e', version: '1.0.0' });
   await client.connect(transport);
-  try { await us10(client, ws); } finally { await client.close().catch(() => {}); }
+  try { await us10(client, ws); } finally { await client.close().catch(() => {}); stopAppHosts(ws); }
 });
 
 async function us10(client, ws) {
