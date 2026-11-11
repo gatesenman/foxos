@@ -3,6 +3,8 @@
 // modules / invoke：调用应用自身 ES 模块导出的函数（构建时由 vite.foxos.config.mjs 登记）。
 (() => {
   'use strict';
+  // 消息语言跟随狐狸OS（通过 Chromium 语言传入页面的 navigator.language）
+  const L = (zh, en) => (/^zh/i.test(navigator.language || 'zh') ? zh : en);
   let seq = 0;
   const refs = new Map();
   const INTERACTIVE = 'button, a[href], input, select, textarea, summary, [role=button], [role=menuitem], [role=tab], [role=option], [role=checkbox], [role=switch], [role=link], [role=treeitem], [role=gridcell], [contenteditable=""], [contenteditable=true], [tabindex]:not([tabindex="-1"])';
@@ -17,7 +19,7 @@
     const w = refs.get(ref); const el = w && w.deref();
     if (el && el.isConnected) return el;
     const q = document.querySelector(`[data-foxos-ref="${CSS.escape(ref)}"]`);
-    if (!q) throw Object.assign(new Error(`界面元素 ${ref} 已不存在（重新 snapshot）`), { code: 'NOT_FOUND' });
+    if (!q) throw Object.assign(new Error(L(`界面元素 ${ref} 已不存在（重新 snapshot）`, `UI element ${ref} no longer exists (take a new snapshot)`)), { code: 'NOT_FOUND' });
     return q;
   }
   function region(el) { const r = el.closest('[role=dialog], dialog, [role=menu], header, nav, aside, main, footer, [role=toolbar], [aria-label]'); return r && r !== el ? (r.getAttribute('aria-label') || r.getAttribute('role') || r.tagName.toLowerCase()) : null; }
@@ -47,7 +49,7 @@
     const part = exact.length ? [] : pool.filter((e) => nameOf(e).toLowerCase().includes(want));
     const cands = exact.length ? exact : part;
     const el = (cands.length > 1 && cands.find((e) => hittable(e))) || cands[0];
-    if (!el) throw Object.assign(new Error(`没有找到名为「${name}」的控件`), { code: 'NOT_FOUND' });
+    if (!el) throw Object.assign(new Error(L(`没有找到名为「${name}」的控件`, `No control named "${name}"`)), { code: 'NOT_FOUND' });
     return el;
   }
   // 与人一样：控件被弹窗 / 遮罩挡住时不能点（返回 OBSCURED），除非显式 force
@@ -61,7 +63,8 @@
     if (force || hittable(el)) return;
     const top = document.elementFromPoint(...(() => { const r = el.getBoundingClientRect(); return [r.left + r.width / 2, r.top + r.height / 2]; })());
     const cover = top && (top.closest('[role=dialog], dialog') || top);
-    throw Object.assign(new Error(`「${nameOf(el)}」被${cover && cover.getAttribute ? (cover.getAttribute('aria-label') || cover.getAttribute('role') || cover.tagName.toLowerCase()) : '其他元素'}挡住，先关闭弹窗（或加 force）`), { code: 'CONFLICT' });
+    const by = cover && cover.getAttribute ? (cover.getAttribute('aria-label') || cover.getAttribute('role') || cover.tagName.toLowerCase()) : L('其他元素', 'another element');
+    throw Object.assign(new Error(L(`「${nameOf(el)}」被${by}挡住，先关闭弹窗（或加 force）`, `"${nameOf(el)}" is covered by ${by}; close the dialog first (or add force)`)), { code: 'CONFLICT' });
   }
   function click({ ref, name, role, region: reg, force }) {
     const el = ref ? find(ref) : byName(name, role, reg);
@@ -81,7 +84,7 @@
   }
   function focus(ref, clear) {
     const el = ref ? find(ref) : document.activeElement;
-    if (!el) throw Object.assign(new Error('没有可输入的元素'), { code: 'NOT_FOUND' });
+    if (!el) throw Object.assign(new Error(L('没有可输入的元素', 'No element to type into')), { code: 'NOT_FOUND' });
     el.focus();
     if (clear) { if ('value' in el) { el.value = ''; el.dispatchEvent(new Event('input', { bubbles: true })); } else if (el.isContentEditable) el.textContent = ''; }
     if ('select' in el && !clear && el.type !== 'checkbox') { try { el.setSelectionRange(el.value.length, el.value.length); } catch { /* 不支持 */ } }
@@ -110,9 +113,9 @@
   function resolve(target) {
     const [file, ...pathParts] = String(target).split('#');
     const ns = mods()[file];
-    if (!ns) throw Object.assign(new Error(`应用模块 ${file} 不存在（是否用狐狸OS 构建安装？）`), { code: 'NOT_FOUND' });
+    if (!ns) throw Object.assign(new Error(L(`应用模块 ${file} 不存在（是否用狐狸OS 构建安装？）`, `App module ${file} does not exist (was the app built and installed by FoxOS?)`)), { code: 'NOT_FOUND' });
     let obj = ns; let parent = null;
-    for (const p of (pathParts[0] || '').split('.').filter(Boolean)) { parent = obj; obj = obj[p]; if (obj == null) throw Object.assign(new Error(`${target} 不存在`), { code: 'NOT_FOUND' }); }
+    for (const p of (pathParts[0] || '').split('.').filter(Boolean)) { parent = obj; obj = obj[p]; if (obj == null) throw Object.assign(new Error(L(`${target} 不存在`, `${target} does not exist`)), { code: 'NOT_FOUND' }); }
     return { obj, parent };
   }
   const plain = (v, d = 0) => {
@@ -172,6 +175,6 @@
   const api = { snapshot, click: clickSettled, focus, describe, setValue: setSettled, press, hittable: ({ ref }) => hittable(find(ref)), modules, invoke, read, run, text: () => document.body.innerText.slice(0, 20000) };
   window.__foxosBridge = {
     ...api,
-    call: async (m, p) => { if (!api[m]) throw new Error(`未知桥方法 ${m}`); return api[m](p || {}); },
+    call: async (m, p) => { if (!api[m]) throw new Error(L(`未知桥方法 ${m}`, `Unknown bridge method ${m}`)); return api[m](p || {}); },
   };
 })();

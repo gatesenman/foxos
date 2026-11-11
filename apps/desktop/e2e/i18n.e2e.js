@@ -99,11 +99,12 @@ test('US-55 默认中文，可在设置中实时切换到 English 并保存', as
 // 上游提供了中文界面的（spreadsheet）跟随切换，其余应用在中文下标「英文界面」（见 data/everything-locale.json）
 const evText = (page) => page.evaluate(async () => {
   const v = document.querySelector('.window[data-app=everything] webview');
-  try { return JSON.parse(await v.executeJavaScript('JSON.stringify([navigator.language, document.documentElement.lang, (document.body && document.body.innerText) || ""])')); } catch { return null; }
+  try { return JSON.parse(await v.executeJavaScript('JSON.stringify([navigator.language, document.documentElement.lang, (document.body && document.body.innerText) || "", document.title])')); } catch { return null; }
 });
 test('US-55 Everything 应用跟随狐狸OS 语言（上游支持时）', async (t) => {
   if (!fs.existsSync(path.join(FOXOS_HOME, 'everything', 'spreadsheet', 'dist', 'index.html'))) return t.skip('需要已安装的 spreadsheet（FOXOS_HOME）');
   const ws = tmpWorkspace('i18n-ev');
+  cli(ws, ['sheets', 'create', 'q3-report.xlsx']);
   for (const [lang, want, uiLang, badge] of [['zh-CN', /文件\n编辑\n视图/, 'zh-Hans', true], ['en-US', /File\nEdit\nView/, 'en', false]]) {
     const { app, page } = await launch(ws, { extraEnv: { FOXOS_HOME, FOXOS_LANG: lang } });
     try {
@@ -112,14 +113,16 @@ test('US-55 Everything 应用跟随狐狸OS 语言（上游支持时）', async 
       assert.equal(await page.$('[data-ev-app=chess] [data-ui-lang]') !== null, badge, `${lang}：没有中文界面的应用${badge ? '应' : '不应'}标「英文界面」`);
       assert.equal(await page.$('[data-ev-app=spreadsheet] [data-ui-lang]'), null, 'spreadsheet 有中文界面，不标');
       await page.evaluate(() => FX.windows().forEach((w) => FX.closeWindow(w)));
-      await page.evaluate(() => FX.openWindow('everything', { app: 'spreadsheet' }));
+      await page.evaluate(() => FX.openWindow('everything', { app: 'spreadsheet', file: 'q3-report.xlsx' }));
       await page.waitForSelector('.window[data-app=everything] webview', { timeout: 30000 });
       let r = null;
-      for (let i = 0; i < 60 && !(r && want.test(r[2])); i++) { await page.waitForTimeout(500); r = await evText(page); }
+      for (let i = 0; i < 60 && !(r && want.test(r[2]) && /q3-report/.test(r[3])); i++) { await page.waitForTimeout(500); r = await evText(page); }
       assert.ok(r, 'spreadsheet 页面应载入');
       assert.equal(r[0], lang, 'navigator.language 跟随狐狸OS 语言');
       assert.equal(r[1], uiLang, 'spreadsheet 选用对应语言的界面');
       assert.match(r[2], want);
+      // 应用异步载入界面语言后仍能打开桌面传来的文件（运行时会暂存打开请求）
+      assert.match(r[3], /q3-report/, `${lang}：应打开工作空间里的文件（标题 ${r[3]}）`);
       await shot(page, `US-55-spreadsheet-${lang}`);
     } finally {
       await app.close();

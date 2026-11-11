@@ -1,5 +1,6 @@
 // 从运行中的真实桌面截取 README 截图（xvfb 1600x1000）。
 // 用法：DISPLAY=:99 FOXOS_HOME=<含已安装 Everything 应用的目录> FOXOS_SHOT_WS=<工作空间> node scripts/screenshots.js [名称…]
+// FOXOS_SHOT_LANG=en-US：以英文界面截图，文件名加 -en 后缀（默认 zh-CN）
 'use strict';
 const fs = require('node:fs');
 const os = require('node:os');
@@ -12,11 +13,13 @@ const OUT = path.join(ROOT, 'docs', 'screenshots');
 const WS = process.env.FOXOS_SHOT_WS || path.join(os.homedir(), 'FoxOS', 'workspace');
 const W = 1600; const H = 1000;
 const only = new Set(process.argv.slice(2));
+const LANG = process.env.FOXOS_SHOT_LANG || 'zh-CN';
+const SUFFIX = LANG === 'zh-CN' ? '' : '-en';
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 async function main() {
   const ud = fs.mkdtempSync(path.join(os.tmpdir(), 'foxos-shots-ud-'));
-  fs.writeFileSync(path.join(ud, 'settings.json'), JSON.stringify({ setupDone: true, workspace: WS }));
+  fs.writeFileSync(path.join(ud, 'settings.json'), JSON.stringify({ setupDone: true, workspace: WS, lang: LANG }));
   fs.writeFileSync(path.join(ud, 'session.json'), JSON.stringify({ bounds: { x: 0, y: 0, width: W, height: H }, windows: [] }));
   const app = await _electron.launch({
     args: ['.', '--no-sandbox', `--user-data-dir=${ud}`, `--workspace=${WS}`],
@@ -33,6 +36,7 @@ async function main() {
   const shots = [];
   async function shot(name, caption, fn) {
     if (only.size && !only.has(name)) return;
+    name += SUFFIX;
     await closeAll();
     await page.evaluate(() => document.getElementById('start-menu').classList.add('hidden'));
     try {
@@ -66,6 +70,10 @@ async function main() {
     await open('setup', {}, { x: 180, y: 30, w: 900, h: 820 });
     await page.click('[data-action=next]');
     await page.waitForSelector('[data-comp]', { timeout: 60000 }); await sleep(800);
+  });
+  await shot('settings-language', '设置 → 语言：简体中文（默认）/ English，立即切换并保存；安装向导第一步也可选择', async () => {
+    await open('settings', {}, { x: 180, y: 30, w: 900, h: 760 });
+    await page.waitForSelector('[data-section=language] [data-lang]', { timeout: 30000 }); await sleep(600);
   });
   await shot('terminal', '终端：真实 PTY，foxos 命令可直接读写工作空间里的表格与文档', async () => {
     await open('terminal', {}, big);

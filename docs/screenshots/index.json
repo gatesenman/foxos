@@ -1,18 +1,28 @@
 [
  {
-  "name": "libreoffice-writer",
-  "caption": "LibreOffice Writer：打开工作空间里由智能体生成的 .docx",
-  "file": "docs/screenshots/libreoffice-writer.png"
+  "name": "desktop",
+  "caption": "桌面：桌面快捷方式、窗口标题栏与任务栏显示各程序自带的图标（LibreOffice、系统终端、Code - OSS、Electron、Everything 上游图标），右侧是智能体会话面板",
+  "file": "docs/screenshots/desktop.png"
  },
  {
-  "name": "libreoffice-calc",
-  "caption": "LibreOffice Calc：公式与原生图表（由 foxos sheets 命令写入）",
-  "file": "docs/screenshots/libreoffice-calc.png"
+  "name": "start-menu",
+  "caption": "开始菜单：内置程序与按 9 个分组列出的已安装 Everything 应用，每个程序显示其开源项目自带的图标",
+  "file": "docs/screenshots/start-menu.png"
+ },
+ {
+  "name": "app-center",
+  "caption": "应用中心：51 个 Everything 应用（9 个分组）显示各自上游自带的图标；另有内置应用、LibreOffice、开发工具与 ACP 智能体",
+  "file": "docs/screenshots/app-center.png"
  },
  {
   "name": "setup-wizard",
   "caption": "首次运行安装向导：检测并在线安装 LibreOffice、Python 办公库、Node.js、git、环境与 Everything 分组",
   "file": "docs/screenshots/setup-wizard.png"
+ },
+ {
+  "name": "settings-language",
+  "caption": "设置 → 语言：简体中文（默认）/ English，立即切换并保存；安装向导第一步也可选择",
+  "file": "docs/screenshots/settings-language.png"
  },
  {
   "name": "terminal",
@@ -33,11 +43,6 @@
   "name": "browser",
   "caption": "浏览器：内置网页浏览器",
   "file": "docs/screenshots/browser.png"
- },
- {
-  "name": "everything-spreadsheet",
-  "caption": "Everything 应用：表格（打开工作空间里的 2026年销售.xlsx），本机构建运行，CLI / MCP 可操作",
-  "file": "docs/screenshots/everything-spreadsheet.png"
  },
  {
   "name": "everything-documents",
@@ -75,23 +80,38 @@
   "file": "docs/screenshots/audit-takeover.png"
  },
  {
+  "name": "libreoffice-writer",
+  "caption": "LibreOffice Writer：打开工作空间里由智能体生成的 .docx",
+  "file": "docs/screenshots/libreoffice-writer.png"
+ },
+ {
+  "name": "libreoffice-calc",
+  "caption": "LibreOffice Calc：公式与原生图表（由 foxos sheets 命令写入）",
+  "file": "docs/screenshots/libreoffice-calc.png"
+ },
+ {
   "name": "acp-agent-install",
   "caption": "ACP 智能体一键安装：从 ACP Registry 安装，过程在真实终端中可见",
   "file": "docs/screenshots/acp-agent-install.png"
  },
  {
-  "name": "start-menu",
-  "caption": "开始菜单：内置程序与按 9 个分组列出的已安装 Everything 应用，每个程序显示其开源项目自带的图标",
-  "file": "docs/screenshots/start-menu.png"
- },
- {
-  "name": "app-center",
-  "caption": "应用中心：51 个 Everything 应用（9 个分组）显示各自上游自带的图标；另有内置应用、LibreOffice、开发工具与 ACP 智能体",
-  "file": "docs/screenshots/app-center.png"
- },
- {
-  "name": "desktop",
+  "name": "desktop-en",
   "caption": "桌面：桌面快捷方式、窗口标题栏与任务栏显示各程序自带的图标（LibreOffice、系统终端、Code - OSS、Electron、Everything 上游图标），右侧是智能体会话面板",
-  "file": "docs/screenshots/desktop.png"
+  "file": "docs/screenshots/desktop-en.png"
+ },
+ {
+  "name": "app-center-en",
+  "caption": "应用中心：51 个 Everything 应用（9 个分组）显示各自上游自带的图标；另有内置应用、LibreOffice、开发工具与 ACP 智能体",
+  "file": "docs/screenshots/app-center-en.png"
+ },
+ {
+  "name": "settings-language-en",
+  "caption": "设置 → 语言：简体中文（默认）/ English，立即切换并保存；安装向导第一步也可选择",
+  "file": "docs/screenshots/settings-language-en.png"
+ },
+ {
+  "name": "everything-spreadsheet",
+  "caption": "Everything 应用：表格（打开工作空间里的 2026年销售.xlsx），本机构建运行，CLI / MCP 可操作",
+  "file": "docs/screenshots/everything-spreadsheet.png"
  }
 ]

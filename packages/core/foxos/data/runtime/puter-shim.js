@@ -3,11 +3,13 @@
 // 依赖云端的能力（AI、Worker、P2P、托管、分享）不会连接 puter.com，而是明确报错。
 (() => {
   'use strict';
+  // 消息语言跟随狐狸OS（通过 Chromium 语言传入页面的 navigator.language）
+  const L = (zh, en) => (/^zh/i.test(navigator.language || 'zh') ? zh : en);
   const host = window.__foxosHost;
-  if (!host) { console.error('[foxos] 缺少宿主桥，Puter 运行时不可用'); return; }
+  if (!host) { console.error(L('[foxos] 缺少宿主桥，Puter 运行时不可用', '[foxos] Host bridge missing; the Puter runtime is unavailable')); return; }
   const info = host.info();
   const call = (m, ...a) => host.invoke(m, ...a);
-  const unsupported = (what) => () => Promise.reject(Object.assign(new Error(`${what} 需要 Puter 云服务，狐狸OS 本地模式未提供`), { code: 'not_supported_locally' }));
+  const unsupported = (what) => () => Promise.reject(Object.assign(new Error(L(`${what} 需要 Puter 云服务，狐狸OS 本地模式未提供`, `${what} needs the Puter cloud service, which FoxOS local mode does not provide`)), { code: 'not_supported_locally' }));
   const fsErr = (e) => { const err = new Error(e.message); err.code = e.code; throw err; };
   const toBytes = async (d) => {
     if (d == null) return new Uint8Array();
@@ -39,7 +41,7 @@
     async getReadURL(p) { return call('fs.url', pathOf(p)).catch(fsErr); },
     async upload(files, dir = '~', o = {}) { const out = []; for (const f of (files.length != null ? [...files] : [files])) out.push(await fs.write(`${pathOf(dir)}/${f.name}`, f, o)); return out.length === 1 ? out[0] : out; },
     async space() { return { capacity: 0, used: 0 }; },
-    share: unsupported('文件分享'),
+    share: unsupported(L('文件分享', 'File sharing')),
   };
   const kv = {
     MAX_KEY_SIZE: 1024, MAX_VALUE_SIZE: 400 * 1024, MAX: 1024,
@@ -51,25 +53,27 @@
     decr: (k, n = 1) => call('kv.incr', String(k), -(typeof n === 'number' ? n : 1)),
     add: (k, v) => call('kv.add', String(k), v), update: (k, v) => call('kv.update', String(k), v),
     flush: () => call('kv.flush'), expire: async () => true, expireAt: async () => true,
-    share: unsupported('KV 分享'), unshare: async () => true, listShared: async () => [], listSharedByMe: async () => [], getShared: unsupported('共享数据'),
+    share: unsupported(L('KV 分享', 'KV sharing')), unshare: async () => true, listShared: async () => [], listSharedByMe: async () => [], getShared: unsupported(L('共享数据', 'Shared data')),
   };
   const user = info.user;
   const auth = { isSignedIn: () => true, signIn: async () => user, signOut: async () => {}, getUser: async () => user, whoami: async () => user, getProfilePicture: async () => null, getMonthlyUsage: async () => ({}), getDetailedAppUsage: async () => ({}), type: 'user' };
   const launch = []; const opened = []; const closers = [];
-  host.onLaunchItems((items) => { const its = items.map(item); for (const fn of [...launch, ...opened]) { try { fn(its); } catch (e) { console.error(e); } } });
-  const cancelled = () => Object.assign(new Error('用户取消'), { code: 'cancelled', name: 'AbortError' });
+  // 打开文件的请求可能早于应用注册 onLaunchedWithItems（例如应用先异步载入界面语言）：先记下，注册时再交给应用
+  let pendingLaunch = null;
+  host.onLaunchItems((items) => { const its = items.map(item); if (!launch.length && !opened.length) pendingLaunch = its; for (const fn of [...launch, ...opened]) { try { fn(its); } catch (e) { console.error(e); } } });
+  const cancelled = () => Object.assign(new Error(L('用户取消', 'Cancelled by the user')), { code: 'cancelled', name: 'AbortError' });
   const ui = {
     showOpenFilePicker: async (o = {}) => { const r = await call('ui.openPicker', { multiple: Boolean(o.multiple), accept: o.accept || null }); if (!r) throw cancelled(); return o.multiple ? r.map(item) : item(r[0]); },
     showDirectoryPicker: async () => { const r = await call('ui.openPicker', { directory: true }); if (!r) throw cancelled(); return item(r[0]); },
     showSaveFilePicker: async (data, name) => { const t = await call('ui.savePicker', { suggestedName: name || 'untitled' }); if (!t) throw cancelled(); return data != null ? fs.write(t, data, { overwrite: true }) : item({ path: t, name: t.split('/').pop(), is_dir: false }); },
-    onLaunchedWithItems: (fn) => { launch.push(fn); if (info.launchItems && info.launchItems.length) setTimeout(() => fn(info.launchItems.map(item)), 0); },
+    onLaunchedWithItems: (fn) => { launch.push(fn); const its = pendingLaunch || (info.launchItems && info.launchItems.length ? info.launchItems.map(item) : null); pendingLaunch = null; if (its) setTimeout(() => fn(its), 0); },
     onItemsOpened: (fn) => { opened.push(fn); }, onWindowClose: (fn) => { closers.push(fn); },
     setWindowTitle: (t) => { call('ui.title', String(t)); }, launchApp: (n, a) => call('ui.launchApp', String(n), a || null),
     alert: async (m) => window.alert(String(m)), prompt: async (m, d) => window.prompt(String(m), d),
     contextMenu: () => {}, hideWindow: () => {}, showWindow: () => {}, hideSpinner: () => {}, showSpinner: () => {},
     requestPermission: async () => true, requestPictureInPicture: async () => false, exitPictureInPicture: async () => false,
-    showFeedbackDialog: async () => {}, socialShare: unsupported('社交分享'), parentApp: () => null, exit: () => call('ui.close'),
-    request: unsupported('Puter 桌面请求'), setMenubar: () => {}, on: () => {}, wasLaunchedWithItems: () => Boolean(info.launchItems && info.launchItems.length),
+    showFeedbackDialog: async () => {}, socialShare: unsupported(L('社交分享', 'Social sharing')), parentApp: () => null, exit: () => call('ui.close'),
+    request: unsupported(L('Puter 桌面请求', 'Puter desktop requests')), setMenubar: () => {}, on: () => {}, wasLaunchedWithItems: () => Boolean(pendingLaunch || (info.launchItems && info.launchItems.length)),
   };
   const noAI = unsupported('Puter AI');
   const ai = { enabled: false, chat: noAI, txt2img: noAI, img2txt: noAI, txt2speech: noAI, speech2txt: noAI, txt: noAI, img: noAI, speech: noAI, listModels: async () => [], listModelProviders: async () => [] };
@@ -80,17 +84,17 @@
       const r = await call('net.fetch', String(url), { method: init.method || 'GET', headers, body });
       return new Response([204, 304].includes(r.status) ? null : r.body, { status: r.status, statusText: r.statusText, headers: r.headers });
     },
-    Socket: function Socket() { throw new Error('原始 TCP 套接字需要 Puter 云中继，狐狸OS 本地模式未提供'); },
-    tls: { TLSSocket: function TLSSocket() { throw new Error('TLS 套接字需要 Puter 云中继，狐狸OS 本地模式未提供'); } },
+    Socket: function Socket() { throw new Error(L('原始 TCP 套接字需要 Puter 云中继，狐狸OS 本地模式未提供', 'Raw TCP sockets need the Puter cloud relay, which FoxOS local mode does not provide')); },
+    tls: { TLSSocket: function TLSSocket() { throw new Error(L('TLS 套接字需要 Puter 云中继，狐狸OS 本地模式未提供', 'TLS sockets need the Puter cloud relay, which FoxOS local mode does not provide')); } },
   };
   const cloud = (w) => ({ exec: unsupported(w), create: unsupported(w), delete: unsupported(w), get: unsupported(w), update: unsupported(w), list: async () => [] });
   window.puter = {
     env: 'app', appID: info.appID, appInstanceID: `foxos-${info.app}`, authToken: 'foxos-local', foxos: true,
     fs, kv, auth, ui, ai, net,
     perms: { request: async () => true, check: async () => true, requestReadFile: async () => true, requestWriteFile: async () => true },
-    workers: cloud('Puter Worker'), hosting: cloud('Puter 托管'), apps: cloud('Puter 应用目录'),
-    peer: { serve: unsupported('Puter P2P 中继'), connect: unsupported('Puter P2P 中继'), ensureTurnRelays: unsupported('Puter P2P 中继'), createGuestGrant: unsupported('Puter P2P 中继') },
-    drivers: { call: unsupported('Puter 驱动') }, print: (...a) => console.log(...a),
+    workers: cloud('Puter Worker'), hosting: cloud(L('Puter 托管', 'Puter hosting')), apps: cloud(L('Puter 应用目录', 'Puter app directory')),
+    peer: { serve: unsupported(L('Puter P2P 中继', 'Puter P2P relay')), connect: unsupported(L('Puter P2P 中继', 'Puter P2P relay')), ensureTurnRelays: unsupported(L('Puter P2P 中继', 'Puter P2P relay')), createGuestGrant: unsupported(L('Puter P2P 中继', 'Puter P2P relay')) },
+    drivers: { call: unsupported(L('Puter 驱动', 'Puter drivers')) }, print: (...a) => console.log(...a),
     randName: (s = '-') => `local${s}${Math.random().toString(36).slice(2, 8)}`,
     setAuthToken: () => {}, setAPIOrigin: () => {}, resetAuthToken: () => {},
   };
