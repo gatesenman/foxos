@@ -895,6 +895,26 @@ foxos everything run APP COMMAND [--args ARGS]
 foxos everything run tasks "add-task set" --args '{"value": "买牛奶", "submit": true}' --json
 ```
 
+### `foxos everything icons`
+
+给已安装的应用补上上游自带的程序图标（不重新构建）
+
+```text
+foxos everything icons [--source SOURCE]
+```
+
+工具接口名：`everything_icons` · 权限：`modify`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `source` | `--source` | string |  | 本地上游仓库路径（缺省从 GitHub 获取固定提交） |
+
+示例：
+
+```bash
+foxos everything icons --json
+```
+
 ### `foxos everything uninstall`
 
 卸载应用（保留工作空间中的数据）

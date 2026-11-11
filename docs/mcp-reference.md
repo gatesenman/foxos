@@ -16,7 +16,7 @@
 
 错误码：USAGE(2) NOT_FOUND(3) PERMISSION_DENIED(4) LOCKED(5) DEPENDENCY_MISSING(6) CONFLICT(7) PAUSED(8) ERROR(1)。
 
-共 4320 个工具。
+共 4321 个工具。
 
 ## docs（5 个工具）
 
@@ -590,7 +590,7 @@
 {"name": "env_progress", "arguments": {"name": "…"}}
 ```
 
-## everything（6 个工具）
+## everything（7 个工具）
 
 ### `everything_list`
 
@@ -677,6 +677,22 @@
 
 ```json
 {"name": "everything_run", "arguments": {"app": "…", "command": "…"}}
+```
+
+### `everything_icons`
+
+给已安装的应用补上上游自带的程序图标（不重新构建）。CLI：foxos everything icons [--source SOURCE]。示例：foxos everything icons --json
+
+只读：否 · 破坏性：否 · CLI：`foxos everything icons`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `source` | string |  | 本地上游仓库路径（缺省从 GitHub 获取固定提交） |
+
+调用示例：
+
+```json
+{"name": "everything_icons", "arguments": {}}
 ```
 
 ### `everything_uninstall`
