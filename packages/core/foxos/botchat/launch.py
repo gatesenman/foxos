@@ -89,6 +89,8 @@ def _firefox_profile() -> Path:
         'user_pref("browser.tabs.inTitlebar", 0);',
         'user_pref("trailhead.firstrun.didSeeAboutWelcome", true);',
         'user_pref("browser.aboutwelcome.enabled", false);',
+        'user_pref("toolkit.startup.max_resumed_crashes", -1);',
+        'user_pref("browser.sessionstore.resume_from_crash", false);',
         'user_pref("browser.preonboarding.enabled", false);',
         'user_pref("termsofuse.bypassNotification", true);',
         'user_pref("datareporting.policy.dataSubmissionPolicyBypassNotification", true);',
