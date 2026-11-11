@@ -1,0 +1,374 @@
+{
+ "format": "foxos-env-presets/1",
+ "version": "presets-2026.11",
+ "release_base": "https://github.com/gatesenman/foxos/releases/download",
+ "note": "狐狸OS 预设系统。Linux 与狐狸OS 镜像发布在 GitHub Releases（分卷、sha256）；Windows / macOS 只发布配方，介质安装时从官方下载。",
+ "entries": [
+  {
+   "id": "foxos-debian-12",
+   "name": "Debian 12 bookworm · 狐狸OS 预设",
+   "guest_os": "linux",
+   "family": "debian",
+   "version": "12",
+   "kind": "foxos-image",
+   "summary": "XFCE 桌面、默认中文、Node.js / Bun / Python、Gemini CLI（ACP）、foxos 命令与 MCP、SSH 来宾桥",
+   "release": "presets-2026.11",
+   "preset_version": "2026.11",
+   "features": [
+    "desktop-xfce",
+    "zh-CN",
+    "node",
+    "bun",
+    "python",
+    "acp-gemini-cli",
+    "foxos-cli",
+    "foxos-mcp",
+    "foxos-bridge-ssh"
+   ],
+   "runtime": {
+    "node": "v24.22.2",
+    "bun": "1.3.2",
+    "python": "3.13.9",
+    "companion_install": "https://github.com/gatesenman/foxos/releases/download/v0.2.0-windows-preview/install.ps1"
+   },
+   "disk_gb": 8,
+   "memory_mb": 2048,
+   "cpus": 2,
+   "artifacts": {
+    "qcow2": {
+     "name": "foxos-debian-12.qcow2",
+     "size": 1414660096,
+     "sha256": "df058ed23c7d13992cbcd8078993f919e9b0ee0dcd98deb08cf7c58932efb0b4",
+     "parts": [
+      {
+       "name": "foxos-debian-12.qcow2.part1",
+       "size": 943718400,
+       "sha256": "f1af224dfc0f5b48e8c53f8ec4827388f40bca4b43ca63cc7e6f5273080da282"
+      },
+      {
+       "name": "foxos-debian-12.qcow2.part2",
+       "size": 470941696,
+       "sha256": "6b0165496f6fa9860dd26987b2c403c32bedbb98ad2719301103b1485cec223f"
+      }
+     ]
+    },
+    "wsl": {
+     "name": "foxos-debian-12-wsl.tar.gz",
+     "size": 782922112,
+     "sha256": "d14bbbe4c31d1db466336aef381914e2f275adc3a265ddbad39be8c2c78c5356"
+    }
+   },
+   "hosts": {
+    "linux": {
+     "provider": "linux-kvm",
+     "artifact": "qcow2",
+     "arch": [
+      "x86_64"
+     ]
+    },
+    "windows": {
+     "provider": "wsl2",
+     "artifact": "wsl",
+     "arch": [
+      "x86_64"
+     ]
+    }
+   },
+   "unavailable": {
+    "macos": "预设镜像是 x86_64；Apple 芯片 Mac 上的 arm64 预设尚未发布"
+   },
+   "license": "各发行版软件包按各自许可；Node.js、Bun 为 MIT；Gemini CLI 为 Apache-2.0。不含不允许再分发的软件。"
+  },
+  {
+   "id": "foxos-ubuntu-24.04",
+   "name": "Ubuntu 24.04 LTS · 狐狸OS 预设",
+   "guest_os": "linux",
+   "family": "ubuntu",
+   "version": "24.04",
+   "kind": "foxos-image",
+   "summary": "XFCE 桌面、默认中文、Node.js / Bun / Python、Gemini CLI（ACP）、foxos 命令与 MCP、SSH 来宾桥",
+   "release": "presets-2026.11",
+   "preset_version": "2026.11",
+   "features": [
+    "desktop-xfce",
+    "zh-CN",
+    "node",
+    "bun",
+    "python",
+    "acp-gemini-cli",
+    "foxos-cli",
+    "foxos-mcp",
+    "foxos-bridge-ssh"
+   ],
+   "runtime": {
+    "node": "v24.22.2",
+    "bun": "1.3.2",
+    "python": "3.13.9",
+    "companion_install": "https://github.com/gatesenman/foxos/releases/download/v0.2.0-windows-preview/install.ps1"
+   },
+   "disk_gb": 8,
+   "memory_mb": 2048,
+   "cpus": 2,
+   "artifacts": {
+    "qcow2": {
+     "name": "foxos-ubuntu-24.04.qcow2",
+     "size": 1175846912,
+     "sha256": "efc080fc3704cff3e251e9876013cb28dfa0eb4469a8c0acd4f81e932d80ab94",
+     "parts": [
+      {
+       "name": "foxos-ubuntu-24.04.qcow2.part1",
+       "size": 943718400,
+       "sha256": "253b88ef8e4140d6bdd749635bf194207cfa5aef4cecbb93e785a6dc12fa651e"
+      },
+      {
+       "name": "foxos-ubuntu-24.04.qcow2.part2",
+       "size": 232128512,
+       "sha256": "89e46a66e55557a0bab9337caadc978f31300f7362a2b81abeec8180d31c71b7"
+      }
+     ]
+    },
+    "wsl": {
+     "name": "foxos-ubuntu-24.04-wsl.tar.gz",
+     "size": 612279696,
+     "sha256": "a0c86d4c27bb357f2316a1d4027c0b3d118de803fe50a1294f010d7cc3e87f4a"
+    }
+   },
+   "hosts": {
+    "linux": {
+     "provider": "linux-kvm",
+     "artifact": "qcow2",
+     "arch": [
+      "x86_64"
+     ]
+    },
+    "windows": {
+     "provider": "wsl2",
+     "artifact": "wsl",
+     "arch": [
+      "x86_64"
+     ]
+    }
+   },
+   "unavailable": {
+    "macos": "预设镜像是 x86_64；Apple 芯片 Mac 上的 arm64 预设尚未发布"
+   },
+   "license": "各发行版软件包按各自许可；Node.js、Bun 为 MIT；Gemini CLI 为 Apache-2.0。不含不允许再分发的软件。"
+  },
+  {
+   "id": "foxos-os-0.3.2",
+   "name": "狐狸OS 0.3.2（可引导 ISO，Live + 安装器）",
+   "guest_os": "linux",
+   "family": "foxos",
+   "version": "0.3.2",
+   "kind": "foxos-iso",
+   "summary": "狐狸OS 自己作为来宾：XFCE、中文、foxos、人工接管、Calamares 安装器",
+   "features": [
+    "desktop-xfce",
+    "zh-CN",
+    "foxos-cli",
+    "foxos-mcp",
+    "calamares"
+   ],
+   "memory_mb": 4096,
+   "cpus": 2,
+   "disk_gb": 32,
+   "artifacts": {
+    "iso": {
+     "name": "FoxOS-0.3.2-amd64.iso",
+     "release": "v0.3.2-os-preview",
+     "size": 1563162624,
+     "sha256": "8e6a9e65f5e39f22170a23c9dde583056663e26c298e936bdbda4524f1110e39",
+     "parts": [
+      {
+       "name": "FoxOS-0.3.2-amd64.iso.part1",
+       "size": 838860800,
+       "sha256": "3025bed949e77664790e2a7eb33b4f3e934c864ef2b5dedef222ddd0ed2eb09a"
+      },
+      {
+       "name": "FoxOS-0.3.2-amd64.iso.part2",
+       "size": 724301824,
+       "sha256": "e354732912b3aaca87257afb7fb7185a88d8f88311224503efe2eb506798f178"
+      }
+     ]
+    }
+   },
+   "hosts": {
+    "linux": {
+     "provider": "linux-kvm",
+     "artifact": "iso",
+     "arch": [
+      "x86_64"
+     ]
+    },
+    "windows": {
+     "provider": "hyperv",
+     "artifact": "iso",
+     "arch": [
+      "x86_64"
+     ]
+    }
+   },
+   "unavailable": {
+    "macos": "狐狸OS ISO 是 x86_64"
+   }
+  },
+  {
+   "id": "windows-11-enterprise-eval",
+   "name": "Windows 11 企业版评估版 · 狐狸OS 预设",
+   "guest_os": "windows",
+   "family": "windows",
+   "version": "11",
+   "kind": "windows-media",
+   "summary": "安装时从微软官方下载中文评估版 ISO，用 autounattend.xml 无人值守安装，首次登录脚本装好 Node.js / Bun / Python / Git、Gemini CLI、狐狸OS Windows 伴侣与 SSH 来宾桥",
+   "features": [
+    "desktop",
+    "zh-CN",
+    "node",
+    "bun",
+    "python",
+    "git",
+    "acp-gemini-cli",
+    "foxos-companion",
+    "foxos-bridge-ssh"
+   ],
+   "runtime": {
+    "node": "v24.22.2",
+    "bun": "1.3.2",
+    "python": "3.13.9",
+    "companion_install": "https://github.com/gatesenman/foxos/releases/download/v0.2.0-windows-preview/install.ps1"
+   },
+   "media": {
+    "source": "microsoft-evalcenter",
+    "url": "https://go.microsoft.com/fwlink/?LinkId=2382601&clcid=0x804&culture=zh-cn&country=cn",
+    "page": "https://www.microsoft.com/zh-cn/evalcenter/download-windows-11-enterprise",
+    "size": 8548628480,
+    "sha256": null,
+    "edition": "Windows 11 企业版（评估版，90 天）",
+    "language": "zh-CN",
+    "input_locale": "0804:00000804",
+    "timezone": "China Standard Time",
+    "image_index": 1,
+    "filename": "windows-11-enterprise-eval-zh-cn.iso",
+    "verify": "微软在评估中心页面公布 ISO 的 SHA-256；可用 --sha256 传入核对，否则记录实际 sha256"
+   },
+   "license": "微软评估许可；不允许再分发预装镜像，所以狐狸OS 只发布应答文件与脚本。有正式许可的用户可用 --product-key 传入密钥，或用 --iso 指定自己的零售版 ISO。",
+   "memory_mb": 4096,
+   "cpus": 2,
+   "disk_gb": 64,
+   "tpm": true,
+   "hosts": {
+    "windows": {
+     "provider": "hyperv",
+     "arch": [
+      "x86_64"
+     ]
+    }
+   },
+   "unavailable": {
+    "linux": "狐狸OS 主机的产品 VMM 是 cloud-hypervisor，不能从安装光盘安装 Windows（没有安装期的 CD/AHCI 与驱动注入路径）；请在 Windows 伴侣程序里用 Hyper-V 安装",
+    "macos": "macOS 上不提供 Windows 来宾"
+   }
+  },
+  {
+   "id": "windows-server-2025-eval",
+   "name": "Windows Server 2025 评估版 · 狐狸OS 预设",
+   "guest_os": "windows",
+   "family": "windows",
+   "version": "2025",
+   "kind": "windows-media",
+   "summary": "安装时从微软官方下载中文评估版 ISO，用 autounattend.xml 无人值守安装，首次登录脚本装好 Node.js / Bun / Python / Git、Gemini CLI、狐狸OS Windows 伴侣与 SSH 来宾桥",
+   "features": [
+    "desktop",
+    "zh-CN",
+    "node",
+    "bun",
+    "python",
+    "git",
+    "acp-gemini-cli",
+    "foxos-companion",
+    "foxos-bridge-ssh"
+   ],
+   "runtime": {
+    "node": "v24.22.2",
+    "bun": "1.3.2",
+    "python": "3.13.9",
+    "companion_install": "https://github.com/gatesenman/foxos/releases/download/v0.2.0-windows-preview/install.ps1"
+   },
+   "media": {
+    "source": "microsoft-evalcenter",
+    "url": "https://go.microsoft.com/fwlink/?linkid=2345732&clcid=0x804&culture=zh-cn&country=cn",
+    "page": "https://www.microsoft.com/zh-cn/evalcenter/download-windows-server-2025",
+    "size": 8423151616,
+    "sha256": null,
+    "edition": "Windows Server 2025（评估版，180 天）",
+    "language": "zh-CN",
+    "input_locale": "0804:00000804",
+    "timezone": "China Standard Time",
+    "image_index": 2,
+    "filename": "windows-server-2025-eval-zh-cn.iso",
+    "verify": "微软在评估中心页面公布 ISO 的 SHA-256；可用 --sha256 传入核对，否则记录实际 sha256"
+   },
+   "license": "微软评估许可；不允许再分发预装镜像，所以狐狸OS 只发布应答文件与脚本。有正式许可的用户可用 --product-key 传入密钥，或用 --iso 指定自己的零售版 ISO。",
+   "memory_mb": 4096,
+   "cpus": 2,
+   "disk_gb": 64,
+   "tpm": false,
+   "hosts": {
+    "windows": {
+     "provider": "hyperv",
+     "arch": [
+      "x86_64"
+     ]
+    }
+   },
+   "unavailable": {
+    "linux": "狐狸OS 主机的产品 VMM 是 cloud-hypervisor，不能从安装光盘安装 Windows（没有安装期的 CD/AHCI 与驱动注入路径）；请在 Windows 伴侣程序里用 Hyper-V 安装",
+    "macos": "macOS 上不提供 Windows 来宾"
+   }
+  },
+  {
+   "id": "macos-latest",
+   "name": "macOS（最新支持版本）· 狐狸OS 预设",
+   "guest_os": "macos",
+   "family": "macos",
+   "version": "latest",
+   "kind": "macos-ipsw",
+   "summary": "仅在 Apple 芯片 Mac 上：由 Virtualization.framework 下载 Apple 官方 IPSW 安装 macOS 虚拟机；设置助理完成后运行共享文件夹里的脚本装好 Node.js / Bun / Gemini CLI / foxos",
+   "features": [
+    "desktop",
+    "node",
+    "bun",
+    "acp-gemini-cli",
+    "foxos-cli",
+    "foxos-bridge-ssh"
+   ],
+   "runtime": {
+    "node": "v24.22.2",
+    "bun": "1.3.2",
+    "python": "3.13.9",
+    "companion_install": "https://github.com/gatesenman/foxos/releases/download/v0.2.0-windows-preview/install.ps1"
+   },
+   "media": {
+    "source": "apple-ipsw",
+    "via": "VZMacOSRestoreImage.fetchLatestSupported",
+    "size": 17179869184
+   },
+   "license": "Apple 软件许可只允许在 Apple 硬件上运行的 macOS 中虚拟化 macOS（每台 Mac 最多 2 个额外实例）。不提供任何非 Apple 硬件上的 macOS 镜像。",
+   "memory_mb": 8192,
+   "cpus": 4,
+   "disk_gb": 64,
+   "hosts": {
+    "macos": {
+     "provider": "macos-vz",
+     "arch": [
+      "aarch64"
+     ]
+    }
+   },
+   "unavailable": {
+    "linux": "Apple 的软件许可只允许在 Apple 硬件上的 macOS 中虚拟化 macOS；PC 上不提供",
+    "windows": "Apple 的软件许可只允许在 Apple 硬件上的 macOS 中虚拟化 macOS；PC 上不提供"
+   }
+  }
+ ]
+}

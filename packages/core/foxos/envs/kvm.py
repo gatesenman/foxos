@@ -163,6 +163,7 @@ def start(cfg: dict, d: Path) -> dict:
     cpus = int(cfg.get("limits", {}).get("cpus") or cfg.get("cpus") or 2)
     vnc_port = _free_port()
     way_port = _free_port()
+    ssh_port = _free_port()
     log = open(d / "logs" / "vmm.log", "ab")
     serial = d / "logs" / "serial.log"
     serial.write_text("", encoding="utf-8")
@@ -170,7 +171,7 @@ def start(cfg: dict, d: Path) -> dict:
         argv = _argv_cloud_hypervisor(vmm["path"], cfg, d, mem, cpus, way_port)
         display = {"protocol": "wayvnc", "host": "127.0.0.1", "port": way_port, "kind": "guest-wayvnc", "product": True}
     else:
-        argv = _argv_qemu_tcg(vmm["path"], cfg, d, mem, cpus, vnc_port, way_port, serial)
+        argv = _argv_qemu_tcg(vmm["path"], cfg, d, mem, cpus, vnc_port, way_port, serial, ssh_port)
         display = {
             "protocol": "wayvnc",
             "host": "127.0.0.1",
@@ -185,6 +186,8 @@ def start(cfg: dict, d: Path) -> dict:
     _pid_file(d).write_text(str(proc.pid), encoding="utf-8")
     (d / "run" / "vmm.argv.json").write_text(json.dumps(argv, ensure_ascii=False, indent=1), encoding="utf-8")
     _write_json(_display_file(d), display)
+    if vmm["id"] != "cloud-hypervisor" and (cfg.get("network") or "user") != "none":
+        _write_json(d / "run" / "ssh.json", {"host": "127.0.0.1", "port": ssh_port})
     time.sleep(0.3)
     if proc.poll() is not None:
         raise FoxError("ERROR", tr("env.vmm_exited_immediately", proc.returncode), hint=tr("common.see", d / "logs" / "vmm.log"))
@@ -207,6 +210,10 @@ def _argv_cloud_hypervisor(ch: str, cfg: dict, d: Path, mem: int, cpus: int, way
         argv += ["--cmdline", cmdline]
     if disk:
         argv += ["--disk", f"path={disk}"]
+        if cfg.get("boot") == "uefi" and not iso:
+            argv += ["--firmware", _ovmf()[0]]
+    if cfg.get("seed"):
+        argv += ["--disk", f"path={cfg['seed']},readonly=on"]
     if iso:
         argv += ["--disk", f"path={iso},readonly=on"]
         code, _vars = _ovmf()
@@ -223,13 +230,8 @@ def _argv_cloud_hypervisor(ch: str, cfg: dict, d: Path, mem: int, cpus: int, way
     return argv
 
 
-def _argv_qemu_tcg(qemu: str, cfg: dict, d: Path, mem: int, cpus: int, vnc_port: int, way_port: int, serial: Path) -> list[str]:
-    argv = [qemu, "-accel", "tcg", "-m", str(mem), "-smp", str(cpus), "-machine", "q35",
-            "-display", "none", "-vga", "virtio",
-            "-serial", f"file:{serial}",
-            "-daemonize" if False else "-nodefaults"]
-    # -nodefaults can drop cdrom; don't use it. Rebuild without nodefaults.
-    argv = [qemu, "-accel", "tcg", "-m", str(mem), "-smp", str(cpus), "-machine", "q35",
+def _argv_qemu_tcg(qemu: str, cfg: dict, d: Path, mem: int, cpus: int, vnc_port: int, way_port: int, serial: Path, ssh_port: int | None = None) -> list[str]:
+    argv = [qemu, "-accel", "tcg", "-cpu", "max", "-m", str(mem), "-smp", str(cpus), "-machine", "q35",
             "-display", "none", "-vga", "virtio",
             "-chardev", f"file,id=serial0,path={serial}", "-serial", "chardev:serial0"]
     iso = cfg.get("iso")
@@ -249,10 +251,20 @@ def _argv_qemu_tcg(qemu: str, cfg: dict, d: Path, mem: int, cpus: int, vnc_port:
                  "-drive", f"if=pflash,format=raw,file={vars_copy}",
                  "-cdrom", iso, "-boot", "d"]
     if disk:
-        argv += ["-drive", f"file={disk},if=virtio,format=qcow2"]
+        if cfg.get("boot") == "uefi" and not iso:
+            code, vars_tpl = _ovmf()
+            vars_copy = d / "run" / "OVMF_VARS.fd"
+            if not vars_copy.exists():
+                shutil.copy(vars_tpl, vars_copy)
+            argv += ["-drive", f"if=pflash,format=raw,readonly=on,file={code}",
+                     "-drive", f"if=pflash,format=raw,file={vars_copy}"]
+        argv += ["-drive", f"file={disk},if=virtio,format={cfg.get('disk_format') or 'qcow2'}"]
+    if cfg.get("seed"):
+        argv += ["-drive", f"id=seed,if=none,file={cfg['seed']},media=cdrom,readonly=on", "-device", "ide-cd,drive=seed,bus=ide.1"]
     net = cfg.get("network") or "user"
     if net != "none":
-        argv += ["-netdev", f"user,id=n0,hostfwd=tcp:127.0.0.1:{way_port}-:5900",
+        fwd = f"hostfwd=tcp:127.0.0.1:{way_port}-:5900" + (f",hostfwd=tcp:127.0.0.1:{ssh_port}-:22" if ssh_port else "")
+        argv += ["-netdev", f"user,id=n0,{fwd}",
                  "-device", "virtio-net-pci,netdev=n0"]
     else:
         argv += ["-nic", "none"]
@@ -313,14 +325,21 @@ def desktop_attach(cfg: dict, d: Path) -> dict:
 
 def exec_in(cfg: dict, d: Path, argv: list[str], cwd: str = "/", timeout: float | None = None) -> subprocess.CompletedProcess:
     """第一版：若配置了 ssh，则走 ssh；否则说明尚需来宾内的通道。"""
-    ssh = cfg.get("ssh") or {}
+    ssh = dict(cfg.get("ssh") or {})
+    run_ssh = d / "run" / "ssh.json"
+    if ssh and run_ssh.exists():
+        try:
+            ssh.update(json.loads(run_ssh.read_text(encoding="utf-8")))
+        except (OSError, ValueError):
+            pass
     if ssh.get("host"):
-        cmd = ["ssh", "-o", "StrictHostKeyChecking=no", "-o", "UserKnownHostsFile=/dev/null"]
+        cmd = ["ssh", "-o", "StrictHostKeyChecking=no", "-o", "UserKnownHostsFile=/dev/null", "-o", "LogLevel=ERROR", "-o", "BatchMode=yes", "-o", "ConnectTimeout=10"]
         if ssh.get("port"):
             cmd += ["-p", str(ssh["port"])]
         if ssh.get("key"):
             cmd += ["-i", ssh["key"]]
         user = ssh.get("user") or "foxos"
-        cmd += [f"{user}@{ssh['host']}", "sh", "-c", f"cd {cwd} && " + " ".join(argv)]
+        import shlex
+        cmd += [f"{user}@{ssh['host']}", f"cd {shlex.quote(cwd)} 2>/dev/null; " + " ".join(shlex.quote(a) for a in argv)]
         return subprocess.run(cmd, capture_output=True, timeout=timeout)
     raise FoxError("DEPENDENCY_MISSING", tr("env.linux_kvm_exec_needs_ssh_or_vsock"), hint=tr("env.configure_ssh_on_the_guest_or_use"))

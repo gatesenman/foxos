@@ -1,0 +1,7 @@
+#!/bin/sh
+# 在串口与 /run/foxos-ready 上报：主机上的 foxos env install / start 等待这一行。
+v=$(cat /etc/foxos-preset 2>/dev/null | tr '\n' ' ')
+msg="FOXOS-PRESET-READY $v node=$(node --version 2>/dev/null) bun=$(bun --version 2>/dev/null) python=$(python3 -c 'import platform;print(platform.python_version())') foxos=$(foxos --version 2>/dev/null | head -1)"
+echo "$msg" > /run/foxos-ready
+for t in /dev/ttyS0 /dev/hvc0 /dev/console; do [ -w "$t" ] && echo "$msg" > "$t" 2>/dev/null; done
+exit 0

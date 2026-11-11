@@ -32,7 +32,7 @@ function planBase() {
   // 环境组件：Linux 检查用户命名空间并预下载 Alpine 镜像；Windows 启用 WSL2；macOS 编译 Virtualization.framework 辅助程序
   const envLinux = `unshare -U true && ${fx} env pull alpine-3.20`;
   const vz = require('node:path').join(require('./paths').corePath(), 'foxos', 'data', 'macos', 'FoxVZ.swift');
-  const envMac = `mkdir -p "$HOME/Library/Application Support/FoxOS/bin" && swiftc -O ${quote(vz)} -framework Virtualization -o "$HOME/Library/Application Support/FoxOS/bin/foxvz"`;
+  const envMac = `mkdir -p "$HOME/Library/Application Support/FoxOS/bin" && swiftc -O ${quote(vz)} -framework Virtualization -o "$HOME/Library/Application Support/FoxOS/bin/foxvz" && codesign --force --entitlements ${quote(vz.replace(/FoxVZ\.swift$/, 'foxvz.entitlements'))} -s - "$HOME/Library/Application Support/FoxOS/bin/foxvz"`;
   if (IS_WIN) {
     const wg = (id) => `winget install --id ${id} -e --accept-package-agreements --accept-source-agreements`;
     const path = require('node:path');

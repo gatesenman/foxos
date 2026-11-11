@@ -427,6 +427,17 @@
           "^test_US62"
         ]
       ]
+    },
+    {
+      "id": "US-63",
+      "title": "在线选择并安装狐狸OS 预设系统（Linux / Windows / macOS）：目录显示下载大小与所需磁盘、主机可用性与原因；分卷断点续传、逐卷与整体 sha256 校验；Windows 应答文件与 Hyper-V 计划；Linux 预设真实下载 + 引导 + 就绪 + SSH 执行",
+      "match": [
+        [
+          "pytest",
+          "test_env_presets.py",
+          "^test_US63"
+        ]
+      ]
     }
   ]
 }

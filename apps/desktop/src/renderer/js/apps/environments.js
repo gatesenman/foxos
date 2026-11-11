@@ -76,8 +76,23 @@
               renderInstall();
             } }, icon('tool'), a.label.split(FX.t('common.paren_open'))[0]))));
         });
+        // 狐狸OS 预设：已经配置好的系统（桌面、中文、Node / Bun / Python、ACP 智能体、foxos 桥）
+        const presets = cat.entries.filter((e) => e.preset);
+        const presetSec = presets.length ? el('div', { class: 'env-cat-sec', 'data-section': 'presets' },
+          el('h3', {}, icon('sparkles'), ` ${FX.t('environments.presets_title')}`),
+          el('div', { class: 'muted small', text: FX.t('environments.presets_intro') }),
+          GUEST.filter(([g]) => presets.some((e) => e.guest_os === g)).map(([g, title, ic]) => el('div', { class: 'env-preset-group' },
+            el('h4', {}, icon(ic), ` ${title}`),
+            el('div', { class: 'env-cat-grid' }, presets.filter((e) => e.guest_os === g).map((e) => el('div', { class: `env-cat preset ${e.installable ? '' : 'disabled'}`, 'data-preset': e.id },
+              el('div', { class: 'row' }, el('b', { class: 'grow', text: e.name }), e.installable ? el('span', { class: 'badge ok', text: (e.host_providers || [])[0] || '' }) : null),
+              el('div', { class: 'muted small', text: e.summary || '' }),
+              el('div', { class: 'row wrap' }, (e.features || []).slice(0, 8).map((f) => el('span', { class: 'badge muted small', text: f }))),
+              el('div', { class: 'small mono', 'data-sizes': e.id, text: FX.t('environments.preset_sizes', fmtMB(e.download_bytes / 1048576), fmtMB(e.disk_bytes / 1048576)) }),
+              e.license ? el('div', { class: 'muted small', text: e.license }) : null,
+              e.installable ? el('button', { class: 'btn primary sm', 'data-install-preset': e.id, onclick: () => presetDialog(e) }, icon('download'), FX.t('common.install'))
+                : el('div', { class: 'small warn-text', text: e.reason || FX.t('environments.unavailable') }))))))) : null;
         const sections = GUEST.map(([g, title, ic]) => {
-          const items = cat.entries.filter((e) => e.guest_os === g);
+          const items = cat.entries.filter((e) => e.guest_os === g && !e.preset);
           if (!items.length) return null;
           return el('div', { class: 'env-cat-sec' }, el('h3', {}, icon(ic), ` ${title}`),
             el('div', { class: 'env-cat-grid' }, items.map((e) => el('div', { class: `env-cat ${e.installable ? '' : 'disabled'}`, 'data-entry': e.id },
@@ -88,7 +103,7 @@
                 : el('div', { class: 'small warn-text', text: e.reason || FX.t('environments.unavailable') })))));
         });
         main.replaceChildren(el('h2', { text: FX.t('environments.install_a_system') }),
-          el('div', { class: 'muted small', text: FX.t('environments.catalog_version_host_every_system_is', cat.version, cat.host) }), banner, ...sections.filter(Boolean));
+          el('div', { class: 'muted small', text: FX.t('environments.catalog_version_host_every_system_is', cat.version, cat.host) }), banner, presetSec, ...sections.filter(Boolean));
       }
 
       function installDialog(e) {
@@ -115,6 +130,32 @@
         document.body.append(overlay); name.focus();
       }
 
+      function presetDialog(e) {
+        const name = el('input', { class: 'input', name: 'env-name', value: e.id.replace(/^foxos-/, '').replace(/[^a-z0-9-]+/g, '-').slice(0, 30).replace(/-+$/, '') });
+        const isWin = e.kind === 'windows-media';
+        const key = isWin ? el('input', { class: 'input mono', name: 'env-product-key', placeholder: FX.t('environments.product_key_optional') }) : null;
+        const iso = isWin ? el('input', { class: 'input mono', name: 'env-iso', placeholder: FX.t('environments.own_iso_optional') }) : null;
+        const kvm = (e.host_providers || [])[0] === 'linux-kvm';
+        const start = kvm ? el('input', { type: 'checkbox', name: 'env-start', checked: true }) : null;
+        const overlay = el('div', { class: 'overlay' });
+        const close = () => overlay.remove();
+        overlay.append(el('form', { class: 'dialog', onsubmit: (ev) => {
+          ev.preventDefault(); const nm = name.value.trim(); if (!nm) return;
+          const args = ['env', 'install', e.id, nm];
+          if (key && key.value.trim()) args.push('--product-key', key.value.trim());
+          if (iso && iso.value.trim()) args.push('--iso', iso.value.trim());
+          if (start && start.checked) args.push('--start', '--wait-ready', '1800');
+          close(); runInstall(e, nm, args);
+        } }, el('div', { class: 'dialog-title', text: FX.t('common.install_2', e.name) }),
+          el('div', { class: 'muted small', text: FX.t('environments.preset_sizes', fmtMB(e.download_bytes / 1048576), fmtMB(e.disk_bytes / 1048576)) }),
+          el('div', { class: 'muted small', text: FX.t('environments.preset_resume_note') }),
+          el('div', { class: 'muted small', text: FX.t('environments.environment_name_lowercase_letters') }), name,
+          isWin ? el('div', { class: 'muted small', text: e.license || '' }) : null, key, iso,
+          start ? el('label', { class: 'row small' }, start, FX.t('environments.start_and_wait_ready')) : null,
+          el('div', { class: 'dialog-actions' }, el('button', { type: 'button', class: 'btn ghost', onclick: close }, FX.t('common.cancel')), el('button', { type: 'submit', class: 'btn primary' }, FX.t('common.start_install')))));
+        document.body.append(overlay); name.focus();
+      }
+
       async function runInstall(e, nm, args) {
         const bar = el('div', { class: 'progress' }, el('div', { class: 'progress-bar', style: 'width:2%' }));
         const status = el('div', { class: 'muted small', 'data-install-status': nm, text: FX.t('environments.preparing') });
@@ -124,7 +165,8 @@
           const frac = p.bytes_total ? p.bytes / p.bytes_total : 0;
           const pct = Math.max(2, Math.round(((p.step || 0) + (p.state === 'done' ? 1 : frac)) / Math.max(1, p.total || p.steps || 1) * 100));
           bar.firstChild.style.width = `${Math.min(100, pct)}%`;
-          status.textContent = `${p.why || ''}${p.bytes_total ? FX.t('environments.progress_bytes', fmtMB(p.bytes / 1048576), fmtMB(p.bytes_total / 1048576)) : ''}`;
+          status.textContent = `${p.why || ''}${p.bytes_total ? FX.t('environments.progress_bytes', fmtMB(p.bytes / 1048576), fmtMB(p.bytes_total / 1048576)) : ''}`
+            + (p.resumed ? FX.t('environments.resumed_times', p.resumed) : '') + (p.phase === 'verify' ? FX.t('environments.verifying') : '');
         }, 1000);
         try {
           await FX.k(args, { timeoutMs: 4 * 3600 * 1000 });

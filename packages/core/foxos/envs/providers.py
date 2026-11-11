@@ -306,7 +306,7 @@ class HyperV(Provider):
             {"id": "enable-hyperv", "label": tr("envs.providers.enable_hyper_v_administrator_a"), "elevate": True,
              "powershell": "Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Hyper-V-All -All -NoRestart"}]
         return {"available": has, "reason": None if has else (tr("envs.providers.hyper_v_is_not_supported_on_home") if not edition_supports_hyperv(ed) else tr("envs.providers.hyper_v_is_not_enabled")),
-                "checks": [{"id": "edition", "ok": edition_supports_hyperv(ed), "detail": f"EditionID={ed or tr("common.unknown")}"}, {"id": "cmdlets", "ok": has, "detail": tr("envs.providers.hyper_v_powershell_module")}], "actions": actions}
+                "checks": [{"id": "edition", "ok": edition_supports_hyperv(ed), "detail": f"EditionID={ed or tr('common.unknown')}"}, {"id": "cmdlets", "ok": has, "detail": tr('envs.providers.hyper_v_powershell_module')}], "actions": actions}
 
     def plan_install(self, entry, name, opts):
         iso = opts.get("iso") or entry["source"].get("iso")
@@ -322,9 +322,15 @@ class HyperV(Provider):
             f"New-VM -Name {ps_quote(vm)} -Generation 2 -MemoryStartupBytes {mem} -NewVHDPath {ps_quote(os.path.join(base, vm + '.vhdx'))} -NewVHDSizeBytes {disk} -Path {ps_quote(base)} -SwitchName 'Default Switch'",
             f"Set-VMProcessor -VMName {ps_quote(vm)} -Count {cpus}",
             f"Add-VMDvdDrive -VMName {ps_quote(vm)} -Path {ps_quote(iso)}",
-            f"Set-VMFirmware -VMName {ps_quote(vm)} -FirstBootDevice (Get-VMDvdDrive -VMName {ps_quote(vm)})" + ("" if entry.get("secure_boot", True) else " -EnableSecureBoot Off"),
+            f"Set-VMFirmware -VMName {ps_quote(vm)} -FirstBootDevice (Get-VMDvdDrive -VMName {ps_quote(vm)} | Select-Object -First 1)" + ("" if entry.get("secure_boot", True) else " -EnableSecureBoot Off"),
+            # 预设的种子光盘（autounattend.xml、首次登录脚本、主机公钥），Windows 安装程序在光盘根目录找到应答文件
+            f"Add-VMDvdDrive -VMName {ps_quote(vm)} -Path {ps_quote(opts['seed_iso'])}" if opts.get("seed_iso") else "$null",
             f"Set-VMKeyProtector -VMName {ps_quote(vm)} -NewLocalKeyProtector; Enable-VMTPM -VMName {ps_quote(vm)}" if entry.get("tpm") else "$null",
             f"Start-VM -Name {ps_quote(vm)}",
+            # 第 2 代虚拟机从光盘引导时提示「Press any key」：无人值守安装时由主机经 Msvm_Keyboard 按几次回车
+            ("$k = Get-CimInstance -Namespace root\\virtualization\\v2 -ClassName Msvm_Keyboard | Where-Object { $_.SystemName -eq (Get-VM -Name " + ps_quote(vm) +
+             ").Id }; 1..20 | ForEach-Object { Start-Sleep -Milliseconds 700; Invoke-CimMethod -InputObject $k -MethodName TypeKey -Arguments @{keyCode=13} | Out-Null }")
+            if opts.get("seed_iso") else "$null",
         ])
         return [{"powershell": ps, "elevate": True, "why": tr("envs.providers.create_and_start_a_hyper_v_virtual")},
                 {"argv": ["vmconnect.exe", "localhost", vm], "why": tr("envs.providers.open_the_virtual_machine_console")}]
