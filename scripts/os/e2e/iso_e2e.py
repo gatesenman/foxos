@@ -458,7 +458,7 @@ def case_install() -> str:
            _x("xdotool search --class calamares 2>/dev/null").stdout.strip():
             break
         time.sleep(5)
-    shots = []
+    shots: list[str] = []
     for kind, arg in CAL_STEPS:
         if kind == "wait":
             time.sleep(20)
@@ -466,6 +466,8 @@ def case_install() -> str:
             time.sleep(arg)
         elif kind == "key":
             _x("w=$(xdotool search --class calamares | tail -1); xdotool windowactivate --sync $w; xdotool key --clearmodifiers " + arg)
+            time.sleep(5)
+            shots.append(str(screendump(WORK / f"e2e-cal-{len(shots):02d}-{int(time.time())}.png")))
         elif kind == "users":
             shots.append(str(screendump(WORK / f"e2e-cal-users-{int(time.time())}.png")))
             pw = shlex.quote(INSTALL_PW)
