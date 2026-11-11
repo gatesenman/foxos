@@ -6,7 +6,7 @@
 
 <p align="center"><a href="README.md">中文</a> · <a href="https://github.com/gatesenman/foxos/releases/tag/v0.2.0-windows-preview">Windows preview download</a> · <a href="AGENTS.md">AGENTS.md</a> · <a href="docs/test-report.md">Test report</a></p>
 
-![FoxOS desktop](docs/screenshots/desktop.png)
+![FoxOS desktop (English UI)](docs/screenshots/desktop-en.png)
 
 ## What it is
 
@@ -16,6 +16,8 @@ FoxOS is a desktop program for Windows and Linux (macOS planned) that gives agen
 - **One operation, three entry points**: GUI, `foxos <app> <resource> <verb> --json`, and MCP tools (stdio and Streamable HTTP) all call the same kernel command.
 - **Traceable and interruptible**: every call goes to a JSONL audit log; single-writer file locks; one-click human takeover pauses all agent writes.
 - **Programs keep their own icons**: Everything apps show their upstream `icon-128.png` (MIT icons bundled, AGPL icons read from the installed upstream component), LibreOffice icons come from the local LibreOffice install, the terminal uses the system terminal icon, the editor VS Code / Code - OSS, the browser Electron, ACP agents the registry `icon`. FoxOS's own apps keep the FoxOS style; font icons are only for controls. See [NOTICE](apps/desktop/src/third-party-icons/NOTICE.md).
+- **Chinese and English**: Simplified Chinese is the default; switch to English in the setup wizard or Settings (applies immediately, saved). The `foxos` CLI, MCP tool descriptions and kernel messages follow `--lang` / `FOXOS_LANG` (JSON field names and error codes never change); the Windows installer and `install.ps1` are bilingual; Everything apps receive the FoxOS language through the Chromium locale (Spreadsheet ships a Chinese UI and follows it; the others are English-only upstream and are marked so in the App Center).
+- **Own scrollbars**: no default OS scrollbars anywhere. The shell, every window and every Everything app webview use a thin FoxOS overlay scrollbar (transparent track, hidden until hover or scroll, wider on hover, accent while dragging, dark/light aware); Monaco and the terminal use matching settings.
 - **Own isolation layer**: no Docker or VM software. Linux namespaces on Linux; one-click WSL2 distros, Windows Sandbox and Hyper-V on Windows.
 
 ## Screenshots
@@ -27,9 +29,10 @@ Captured from the running desktop (xvfb, 1600×1000) with real files created in 
 | ![Start menu](docs/screenshots/start-menu.png)<br>Start menu: built-ins and installed Everything apps in 9 groups, each with its project's own icon | ![App center](docs/screenshots/app-center.png)<br>App center: 51 Everything apps with their upstream icons, plus built-ins, LibreOffice, tools, ACP agents |
 | ![Setup wizard](docs/screenshots/setup-wizard.png)<br>First-run wizard with component picker | ![Terminal](docs/screenshots/terminal.png)<br>Terminal running `foxos` commands |
 | ![Files](docs/screenshots/files.png)<br>File manager, live-synced workspace | ![Editor](docs/screenshots/editor.png)<br>Monaco editor |
-| ![Browser](docs/screenshots/browser.png)<br>Browser | |
+| ![Browser](docs/screenshots/browser.png)<br>Browser | ![Settings → Language](docs/screenshots/settings-language-en.png)<br>Settings → Language: 简体中文 (default) / English, applies immediately |
+| ![App center (English)](docs/screenshots/app-center-en.png)<br>App center in English: group names and app descriptions follow the language | ![Desktop (Chinese, default)](docs/screenshots/desktop.png)<br>The same desktop in the default Chinese UI |
 | ![Writer](docs/screenshots/libreoffice-writer.png)<br>LibreOffice Writer with a generated .docx | ![Calc](docs/screenshots/libreoffice-calc.png)<br>LibreOffice Calc: formulas and a native chart |
-| ![Spreadsheet](docs/screenshots/everything-spreadsheet.png)<br>Everything Spreadsheet opening a workspace .xlsx | ![Documents](docs/screenshots/everything-documents.png)<br>Everything Documents opening a workspace .docx |
+| ![Spreadsheet](docs/screenshots/everything-spreadsheet.png)<br>Everything Spreadsheet opening a workspace .xlsx (Chinese UI, shipped upstream, follows the FoxOS language) | ![Documents](docs/screenshots/everything-documents.png)<br>Everything Documents opening a workspace .docx |
 | ![Whiteboard](docs/screenshots/everything-whiteboard.png)<br>Everything Whiteboard | ![CRM](docs/screenshots/everything-crm.png)<br>Everything CRM |
 | ![Chess](docs/screenshots/everything-chess.png)<br>Everything Chess | ![ACP install](docs/screenshots/acp-agent-install.png)<br>One-click ACP agent install from the official registry |
 | ![Install a system](docs/screenshots/environments-catalog.png)<br>Environments → Install a system (WSL2 distros, rootfs, Windows Sandbox, Hyper-V) | ![Alpine](docs/screenshots/environments-alpine.png)<br>A running Alpine environment with live stats |
@@ -42,7 +45,10 @@ Windows x64 preview: [v0.2.0-windows-preview](https://github.com/gatesenman/foxo
 ```powershell
 irm https://github.com/gatesenman/foxos/releases/download/v0.2.0-windows-preview/install.ps1 | iex      # anonymous download, verifies SHA256SUMS
 $env:FOXOS_PORTABLE = '1'; irm https://github.com/gatesenman/foxos/releases/download/v0.2.0-windows-preview/install.ps1 | iex   # portable
+$env:FOXOS_LANG = 'en-US'; irm https://github.com/gatesenman/foxos/releases/download/v0.2.0-windows-preview/install.ps1 | iex  # English messages (default: Chinese)
 ```
+
+The setup program offers Simplified Chinese (default) and English and picks the one matching the Windows UI language.
 
 `$env:GITHUB_TOKEN` is optional and only helps with GitHub's anonymous API rate limit. The installer is unsigned (SmartScreen warns on first run). Linux: run from source for now; macOS: not released.
 
@@ -57,6 +63,7 @@ cd apps/desktop && npm ci && npm start
 ## For agents: CLI and MCP
 
 See [AGENTS.md](AGENTS.md), `foxos agent-guide`, [agent guide](docs/agent-guide.md), [CLI reference](docs/cli-reference.md), [MCP reference](docs/mcp-reference.md).
+Messages and command descriptions are Chinese by default; use `--lang en-US` or `FOXOS_LANG=en-US` for English (JSON field names, error codes and command names do not change).
 Grammar `foxos <app> <resource> <verb> --json`; MCP tool names `<app>_<resource>_<verb>`; exit codes 0 OK, 1 ERROR, 2 USAGE, 3 NOT_FOUND, 4 PERMISSION_DENIED, 5 LOCKED, 6 DEPENDENCY_MISSING, 7 CONFLICT, 8 PAUSED.
 
 ## Everything apps (51)
@@ -99,6 +106,7 @@ Latest report (Linux): 140 cases — 134 passed, 1 failed, 4 skipped, 1 known up
 
 Done: kernel, audit, locks, takeover, MCP; desktop and real apps; 51 Everything apps (50 run); Linux environment runtime; Windows environment catalog; Windows x64 preview.
 Light sandbox level: Linux Landlock + seccomp (tested); macOS Seatbelt and Windows restricted token / AppContainer + job objects (code and unit tests, not yet verified on hardware).
+Chinese / English UI (Chinese default) and FoxOS scrollbars: done.
 Next: Windows hardware verification; Linux packages; macOS build; code signing.
 
 ## License

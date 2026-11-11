@@ -34,9 +34,10 @@
 | ![开始菜单](docs/screenshots/start-menu.png)<br>**开始菜单**：内置程序与按 9 个分组列出的已安装 Everything 应用，每个程序显示其开源项目自带的图标 | ![应用中心](docs/screenshots/app-center.png)<br>**应用中心**：51 个 Everything 应用显示各自上游的图标；另有内置应用、LibreOffice、开发工具与 ACP 智能体 |
 | ![安装向导](docs/screenshots/setup-wizard.png)<br>**首次运行安装向导**：检测并在线安装 LibreOffice、Python 办公库、Node.js、git、环境与 Everything 分组 | ![终端](docs/screenshots/terminal.png)<br>**终端**：真实 PTY；`foxos` 命令直接读写工作空间里的表格、文档和环境 |
 | ![文件管理器](docs/screenshots/files.png)<br>**文件管理器**：工作空间实时同步，CLI、MCP、智能体的修改立即出现 | ![编辑器](docs/screenshots/editor.png)<br>**Monaco 编辑器**：语法高亮，保存到工作空间 |
-| ![浏览器](docs/screenshots/browser.png)<br>**浏览器**：内置网页浏览器 | |
+| ![浏览器](docs/screenshots/browser.png)<br>**浏览器**：内置网页浏览器 | ![设置 → 语言](docs/screenshots/settings-language.png)<br>**设置 → 语言**：简体中文（默认）/ English，立即切换并保存；安装向导第一步也可选 |
+| ![English 界面：桌面](docs/screenshots/desktop-en.png)<br>**English 界面**：切换后外壳、窗口、会话面板全部为英文 | ![English 界面：应用中心](docs/screenshots/app-center-en.png)<br>**English 界面**：应用中心的分组名与应用说明随语言切换 |
 | ![LibreOffice Writer](docs/screenshots/libreoffice-writer.png)<br>**LibreOffice Writer**：打开由 `foxos docs` 生成的周报 .docx | ![LibreOffice Calc](docs/screenshots/libreoffice-calc.png)<br>**LibreOffice Calc**：`foxos sheets` 写入的公式与原生图表 |
-| ![Everything 表格](docs/screenshots/everything-spreadsheet.png)<br>**Everything · 表格**：打开工作空间里的 `2026年销售.xlsx` | ![Everything 文档](docs/screenshots/everything-documents.png)<br>**Everything · 文档**：打开 `项目周报.docx` |
+| ![Everything 表格](docs/screenshots/everything-spreadsheet.png)<br>**Everything · 表格**：打开工作空间里的 `2026年销售.xlsx`；上游自带中文界面，随狐狸OS 语言切换 | ![Everything 文档](docs/screenshots/everything-documents.png)<br>**Everything · 文档**：打开 `项目周报.docx` |
 | ![Everything 白板](docs/screenshots/everything-whiteboard.png)<br>**Everything · 白板** | ![Everything CRM](docs/screenshots/everything-crm.png)<br>**Everything · CRM** |
 | ![Everything 国际象棋](docs/screenshots/everything-chess.png)<br>**Everything · 国际象棋** | ![ACP 智能体一键安装](docs/screenshots/acp-agent-install.png)<br>**ACP 智能体一键安装**：从 ACP 官方注册表安装 Gemini CLI，卡片内显示安装日志，装好即可“启动会话” |
 | ![安装系统](docs/screenshots/environments-catalog.png)<br>**环境 → 安装系统**：WSL2 发行版、LXC / 官方根文件系统、Windows Sandbox、Hyper-V；顶部是本机能力检查 | ![Alpine 环境](docs/screenshots/environments-alpine.png)<br>**环境**：从目录一键安装并运行中的 Alpine，实时资源、快照、自定义操作 |
@@ -54,6 +55,8 @@
 | 智能体 | ACP 客户端（会话面板、运行位置：宿主或某个环境）、ACP 官方注册表一键安装、MCP 服务（stdio / Streamable HTTP、令牌、compact / full 工具集） |
 | 安全与协作 | 工作空间约束（拒绝 `../`、符号链接逃逸、保留目录）、JSONL 审计日志、文件锁、原子保存与版本、人工接管（`PAUSED`，退出码 8） |
 | 环境 | Linux 命名空间运行时（overlayfs、pivot_root、seccomp、cgroup v2 / rlimit）、`.foxenv` 镜像、快照、克隆、导出；Windows：WSL2、Windows Sandbox、Hyper-V；提供者协议 |
+| 多语言 | 简体中文（默认）与 English：安装向导第一步与设置里切换，立即生效并保存；`foxos` 命令行、MCP 工具说明与内核错误消息跟随 `--lang` / `FOXOS_LANG`（JSON 字段名与错误码不变）；Windows 安装程序与 `install.ps1` 中英双语；Everything 应用通过 Chromium 语言接收狐狸OS 语言，上游提供中文界面的（spreadsheet）随之切换，其余在应用中心标“英文界面”（逐个记录见 [docs/everything-apps.md](docs/everything-apps.md)）。词条在 `apps/desktop/src/locales/` 与 `packages/core/foxos/data/locales/` |
+| 滚动条 | 不用系统默认滚动条：外壳、所有窗口与 Everything 应用（注入到每个 webview）统一用狐狸OS 细滚动条——轨道透明、平时隐藏、指向或滚动时出现、指向时加宽、拖动时为强调色，随深浅色主题变化；Monaco 与终端（xterm）使用相同尺寸与颜色 |
 | 安装 | 首次运行向导按平台在线安装组件；Windows 安装包自带 Python 与办公库 |
 
 ## 下载
@@ -62,7 +65,7 @@
 
 | 文件 | 说明 |
 | --- | --- |
-| `FoxOS-Setup-0.2.0-x64.exe` | 安装程序（可选安装目录，按用户安装） |
+| `FoxOS-Setup-0.2.0-x64.exe` | 安装程序（可选安装目录，按用户安装；简体中文 / English，按系统语言选择，默认中文） |
 | `FoxOS-0.2.0-win-x64.zip` | 便携版 |
 | `install.ps1` | 在线安装：匿名下载、校验 `SHA256SUMS`、安装 |
 | `SHA256SUMS` | 校验值 |
@@ -72,7 +75,7 @@
 irm https://github.com/gatesenman/foxos/releases/download/v0.2.0-windows-preview/install.ps1 | iex
 # 便携版
 $env:FOXOS_PORTABLE = '1'; irm https://github.com/gatesenman/foxos/releases/download/v0.2.0-windows-preview/install.ps1 | iex
-# 下载脚本后带参数：-Portable / -Silent / -Dir <目录> / -DownloadOnly
+# 下载脚本后带参数：-Portable / -Silent / -Dir <目录> / -DownloadOnly / -Lang en-US（提示语言，默认中文；也可设 $env:FOXOS_LANG）
 powershell -ExecutionPolicy Bypass -File install.ps1 -Portable
 ```
 
@@ -104,6 +107,7 @@ python3 -m foxos help --json      # 完整能力目录
 
 - 入门：[AGENTS.md](AGENTS.md)，或在终端运行 `foxos agent-guide`（含 Claude Code、Codex、Gemini CLI 的接入配置）
 - 文档：[智能体指南](docs/agent-guide.md) · [命令参考](docs/cli-reference.md) · [MCP 工具参考](docs/mcp-reference.md)
+- 语言：命令说明与消息默认中文，`--lang en-US` 或 `FOXOS_LANG=en-US` 切换为英文；JSON 字段名、错误码、命令名不随语言变化
 - 约定：`foxos <应用> <资源> <动作> [--json]`；MCP 工具名 `<应用>_<资源>_<动作>`；退出码 0 成功、1 错误、2 用法、3 不存在、4 拒绝、5 被锁、6 缺依赖、7 冲突、8 已暂停
 
 ```bash
@@ -202,6 +206,7 @@ npm run test:all      # 仓库根目录：pytest + 桌面端到端测试（Playw
 - [ ] Windows 实机验收（进行中）
 - [x] 轻量沙箱档：Linux Landlock + seccomp（已测试）；macOS Seatbelt、Windows 受限令牌 / AppContainer + 作业对象（代码与单元测试，待实机验证）
 - [ ] Linux 安装包与发布、macOS 构建
+- [x] 中英文界面（默认中文）与狐狸OS 细滚动条
 - [ ] 代码签名、自动更新
 
 ## 许可
