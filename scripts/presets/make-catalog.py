@@ -19,7 +19,7 @@ a = ap.parse_args()
 
 FEATURES = ["desktop-xfce", "zh-CN", "node", "bun", "python", "acp-gemini-cli", "foxos-cli", "foxos-mcp", "foxos-bridge-ssh"]
 RUNTIME = {"node": "v24.22.2", "bun": "1.3.2", "python": "3.13.9",
-           "companion_install": "https://github.com/gatesenman/foxos/releases/download/v0.2.0-windows-preview/install.ps1"}
+           "companion_install": "https://github.com/gatesenman/foxos/releases/download/v0.3.3-windows-preview/install.ps1"}
 LINUX = [("debian-12", "Debian 12 bookworm", "debian", "12"), ("ubuntu-24.04", "Ubuntu 24.04 LTS", "ubuntu", "24.04")]
 
 entries = []
