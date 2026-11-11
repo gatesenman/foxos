@@ -16,9 +16,9 @@
 
 错误码：USAGE(2) NOT_FOUND(3) PERMISSION_DENIED(4) LOCKED(5) DEPENDENCY_MISSING(6) CONFLICT(7) PAUSED(8) ERROR(1)。
 
-共 4413 个工具。
+共 4415 个工具。
 
-## acp（9 个工具）
+## acp（11 个工具）
 
 ### `acp_agent_list`
 
@@ -122,6 +122,48 @@
 
 ```json
 {"name": "acp_agent_login", "arguments": {"agent": "…", "method": "…"}}
+```
+
+### `acp_agent_config`
+
+查看或修改某个 ACP 智能体的设置：默认模型、模式、额外启动参数、非机密环境变量（机密用 acp key set）。CLI：foxos acp agent config AGENT [--model MODEL] [--mode MODE] [--arg ARG] [--env ENV] [--clear]。示例：foxos acp agent config gemini --json
+
+只读：否 · 破坏性：否 · CLI：`foxos acp agent config`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `agent` | string | 是 | 智能体 ID（如 codex-acp、gemini、claude-acp） |
+| `model` | string |  | 默认模型 ID（会话开始时用 session/set_model 切换；空字符串清除） |
+| `mode` | string |  | 默认模式 ID（session/set_mode；空字符串清除） |
+| `arg` | array |  | 额外启动参数（可重复；替换原有的额外参数） |
+| `env` | object |  | 非机密环境变量 KEY=VALUE（可重复；VALUE 为空表示删除） |
+| `clear` | boolean |  | 先清空全部设置 |
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "acp_agent_config", "arguments": {"agent": "…"}}
+```
+
+### `acp_agent_update`
+
+和官方注册表比较版本并更新 ACP 智能体（装到用户目录，系统预装的也不需要 root）。CLI：foxos acp agent update [AGENT] [--all] [--check] [--accept-license]。示例：foxos acp agent update --all --check --json
+
+只读：否 · 破坏性：否 · CLI：`foxos acp agent update`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `agent` | string |  | 智能体 ID（如 codex-acp、gemini、claude-acp） |
+| `all` | boolean |  | 检查全部已安装的智能体 |
+| `check` | boolean |  | 只检查，不安装 |
+| `accept_license` | boolean |  | 确认不可再分发的许可证（例如专有智能体） |
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "acp_agent_update", "arguments": {}}
 ```
 
 ### `acp_key_set`
