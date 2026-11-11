@@ -26,7 +26,10 @@ def available_x11() -> bool:
 
 
 def _run(argv: list[str], timeout: float = 8.0) -> subprocess.CompletedProcess:
-    return subprocess.run(argv, capture_output=True, text=True, timeout=timeout)
+    try:
+        return subprocess.run(argv, capture_output=True, text=True, timeout=timeout)
+    except subprocess.TimeoutExpired as e:  # 机器负载高时 X 工具会超时：给出结构化错误，调用方可以重试
+        raise FoxError("ERROR", f"{Path(argv[0]).name} timed out after {timeout:g} s") from e
 
 
 def _require(tool: str, missing_key: str, hint_key: str) -> str:

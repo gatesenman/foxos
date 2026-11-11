@@ -99,7 +99,7 @@ class Agent(Loop):
             try:
                 get_backend(self.ctx.workspace).screenshot(f)
             except (subprocess.TimeoutExpired, OSError) as e:  # 负载高时 scrot 会超时：转成可重试的观察错误
-                raise FoxError("TIMEOUT", f"screenshot: {e}") from e
+                raise FoxError("ERROR", f"screenshot: {e}") from e
             return f.read_bytes()
 
     def _observe(self) -> Observation:
@@ -361,7 +361,7 @@ class Agent(Loop):
                 self.event({"type": "observe_error", "error": e.message[:300]})
                 time.sleep(1.0)
                 try:
-                    obs = self.compile()
+                    obs = self._observe()
                 except FoxError as e2:
                     answer, status = f"observation failed: {e2.message}", "error"
                     break
