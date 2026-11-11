@@ -75,7 +75,7 @@ async function kernelRun(args, { json = true, stdin = null, agent = 'human:deskt
   if (!r) return { ok: false, exitCode: -1, data: { ok: false, error: { code: 'NO_GUEST', message: 'NO_GUEST' } }, stdout: '', stderr: 'NO_GUEST' };
   if (r.machine && !r.ssh) return localKernel().runLocal(['--machine', r.machine, ...args], { json, stdin, agent, timeoutMs });
   let p;
-  try { p = await exec(r, ['foxos', '--agent', agent, ...args, ...(json ? ['--json'] : [])], { input: stdin, timeoutMs }); } catch (e) {
+  try { p = await exec(r, ['foxos', '--agent', agent, ...(json ? ['--json'] : []), ...args], { input: stdin, timeoutMs }); } catch (e) {
     return { ok: false, exitCode: -1, data: { ok: false, error: { code: e.code || 'GUEST_UNAVAILABLE', message: e.message } }, stdout: '', stderr: e.message };
   }
   let data = null;

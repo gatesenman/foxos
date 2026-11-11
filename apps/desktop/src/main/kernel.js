@@ -86,7 +86,7 @@ function runLocal(args, { json = true, stdin = null, agent = 'human:desktop', ti
     return Promise.resolve({ ok: false, exitCode: 2, data: null, stdout: '', stderr: t('kernel.args_must_be_an_array_of_strings') });
   }
   return new Promise((resolve) => {
-    const full = ['-m', 'foxos', '--workspace', workspace, '--agent', agent, ...args, ...(json ? ['--json'] : [])];
+    const full = ['-m', 'foxos', '--workspace', workspace, '--agent', agent, ...(json ? ['--json'] : []), ...args];
     const child = spawn(pythonPath(), full, { env: coreEnv(), windowsHide: true });
     let stdout = '';
     let stderr = '';
