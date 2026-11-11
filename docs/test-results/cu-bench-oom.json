@@ -1,0 +1,290 @@
+[
+ {
+  "task": "desk-replace",
+  "surface": "a11y (agent-desktop)",
+  "config": "deepseek",
+  "success": true,
+  "agent_said_success": true,
+  "steps": 5,
+  "s1_steps": 5,
+  "escalations": 0,
+  "mean_policy_ms": 1266,
+  "seconds": 26.7,
+  "wall_seconds": 28.4,
+  "usd": 0.00529,
+  "tokens": {
+   "planner": {
+    "prompt_tokens": 1226,
+    "completion_tokens": 1991
+   },
+   "step_policy": {
+    "prompt_tokens": 3229,
+    "completion_tokens": 86,
+    "total_tokens": 3315,
+    "prompt_cache_hit_tokens": 1280,
+    "prompt_cache_miss_tokens": 1949
+   }
+  },
+  "routed_to": "computer",
+  "route_reason": null,
+  "answer": "已完成：文档内容已替换为“Shopping list: apples, milk”并保存。",
+  "task_id": "task-cb6be7f9b9",
+  "error": null,
+  "at": "2026-11-12 03:02:18 +0800"
+ },
+ {
+  "task": "desk-replace",
+  "surface": "a11y (agent-desktop)",
+  "config": "jev",
+  "success": true,
+  "agent_said_success": true,
+  "steps": 4,
+  "s1_steps": 4,
+  "escalations": 0,
+  "mean_policy_ms": 122,
+  "seconds": 15.4,
+  "wall_seconds": 17.1,
+  "usd": 0.00333,
+  "tokens": {
+   "planner": {
+    "prompt_tokens": 1190,
+    "completion_tokens": 1188
+   },
+   "step_policy": {
+    "input_tokens": 4561,
+    "output_tokens": 1070
+   }
+  },
+  "routed_to": "computer",
+  "route_reason": null,
+  "answer": "Shopping list: apples, milk",
+  "task_id": "task-f13c20e7ee",
+  "error": null,
+  "at": "2026-11-12 03:02:39 +0800"
+ },
+ {
+  "task": "desk-append",
+  "surface": "a11y (agent-desktop)",
+  "config": "deepseek",
+  "success": true,
+  "agent_said_success": false,
+  "steps": 14,
+  "s1_steps": 14,
+  "escalations": 0,
+  "mean_policy_ms": 1186,
+  "seconds": 46.3,
+  "wall_seconds": 48.4,
+  "usd": 0.0078,
+  "tokens": {
+   "planner": {
+    "prompt_tokens": 610,
+    "completion_tokens": 2584
+   },
+   "step_policy": {
+    "prompt_tokens": 14197,
+    "completion_tokens": 250,
+    "total_tokens": 14447,
+    "prompt_cache_hit_tokens": 5504,
+    "prompt_cache_miss_tokens": 8693
+   }
+  },
+  "routed_to": "computer",
+  "route_reason": null,
+  "answer": null,
+  "task_id": "task-3538aa468d",
+  "error": null,
+  "at": "2026-11-12 03:03:30 +0800"
+ },
+ {
+  "task": "desk-append",
+  "surface": "a11y (agent-desktop)",
+  "config": "jev",
+  "success": false,
+  "agent_said_success": false,
+  "steps": 14,
+  "s1_steps": 1,
+  "escalations": 13,
+  "mean_policy_ms": 125,
+  "seconds": 152.2,
+  "wall_seconds": 153.9,
+  "usd": 0.05664,
+  "tokens": {
+   "planner": {
+    "prompt_tokens": 37710,
+    "completion_tokens": 15189
+   },
+   "step_policy": {
+    "input_tokens": 39990,
+    "output_tokens": 6756
+   }
+  },
+  "routed_to": "computer",
+  "route_reason": null,
+  "answer": null,
+  "task_id": "task-53ba1a94d4",
+  "error": null,
+  "at": "2026-11-12 03:06:08 +0800"
+ },
+ {
+  "task": "screen-xedit",
+  "surface": "screen (no a11y → screenshot)",
+  "config": "deepseek",
+  "success": false,
+  "agent_said_success": false,
+  "steps": 5,
+  "s1_steps": 2,
+  "escalations": 3,
+  "mean_policy_ms": 1192,
+  "seconds": 97.4,
+  "wall_seconds": 100.4,
+  "usd": 0.01214,
+  "tokens": {
+   "planner": {
+    "prompt_tokens": 6225,
+    "completion_tokens": 3798
+   },
+   "step_policy": {
+    "prompt_tokens": 3082,
+    "completion_tokens": 87,
+    "total_tokens": 3169,
+    "prompt_cache_hit_tokens": 1408,
+    "prompt_cache_miss_tokens": 1674
+   }
+  },
+  "routed_to": "computer",
+  "route_reason": null,
+  "answer": "observation failed: TimeoutExpired: Command '['/usr/bin/wmctrl', '-lG']' timed out after 8.0 seconds",
+  "task_id": "task-6c5060ae35",
+  "error": null,
+  "at": "2026-11-12 03:07:51 +0800"
+ },
+ {
+  "task": "screen-xedit",
+  "surface": "screen (no a11y → screenshot)",
+  "config": "jev",
+  "success": false,
+  "agent_said_success": false,
+  "steps": 0,
+  "s1_steps": 0,
+  "escalations": 0,
+  "mean_policy_ms": 0,
+  "seconds": 53.4,
+  "wall_seconds": 453.3,
+  "usd": 0.00258,
+  "tokens": {
+   "planner": {
+    "prompt_tokens": 580,
+    "completion_tokens": 1112
+   },
+   "step_policy": {}
+  },
+  "routed_to": "computer",
+  "route_reason": null,
+  "answer": "observation failed: TimeoutExpired: Command '['/usr/bin/wmctrl', '-lG']' timed out after 8.0 seconds",
+  "task_id": "task-5d9b6d1d5b",
+  "error": null,
+  "at": "2026-11-12 03:15:27 +0800"
+ },
+ {
+  "task": "web-local-form",
+  "surface": "browser (fallback: Chrome not in a11y tree)",
+  "config": "deepseek",
+  "success": false,
+  "agent_said_success": null,
+  "steps": null,
+  "s1_steps": null,
+  "escalations": null,
+  "mean_policy_ms": null,
+  "seconds": null,
+  "wall_seconds": 69.1,
+  "usd": 0.0,
+  "tokens": {
+   "planner": {},
+   "step_policy": {}
+  },
+  "routed_to": null,
+  "route_reason": null,
+  "answer": null,
+  "task_id": null,
+  "error": null,
+  "at": "2026-11-12 03:16:36 +0800"
+ },
+ {
+  "task": "web-local-form",
+  "surface": "browser (fallback: Chrome not in a11y tree)",
+  "config": "jev",
+  "success": false,
+  "agent_said_success": null,
+  "steps": null,
+  "s1_steps": null,
+  "escalations": null,
+  "mean_policy_ms": null,
+  "seconds": null,
+  "wall_seconds": 263.6,
+  "usd": 0.0,
+  "tokens": {
+   "planner": {},
+   "step_policy": {}
+  },
+  "routed_to": null,
+  "route_reason": null,
+  "answer": null,
+  "task_id": null,
+  "error": null,
+  "at": "2026-11-12 03:21:00 +0800"
+ },
+ {
+  "task": "web-wikipedia",
+  "surface": "browser (fallback)",
+  "config": "deepseek",
+  "success": false,
+  "agent_said_success": null,
+  "steps": null,
+  "s1_steps": null,
+  "escalations": null,
+  "mean_policy_ms": null,
+  "seconds": null,
+  "wall_seconds": 92.4,
+  "usd": 0.0,
+  "tokens": {
+   "planner": {},
+   "step_policy": {}
+  },
+  "routed_to": null,
+  "route_reason": null,
+  "answer": null,
+  "task_id": null,
+  "error": null,
+  "at": "2026-11-12 03:22:32 +0800"
+ },
+ {
+  "task": "web-wikipedia",
+  "surface": "browser (fallback)",
+  "config": "jev",
+  "success": false,
+  "agent_said_success": false,
+  "steps": 6,
+  "s1_steps": 2,
+  "escalations": 4,
+  "mean_policy_ms": 135,
+  "seconds": 202.8,
+  "wall_seconds": 208.5,
+  "usd": 0.02488,
+  "tokens": {
+   "planner": {
+    "prompt_tokens": 21952,
+    "completion_tokens": 4695
+   },
+   "step_policy": {
+    "input_tokens": 26151,
+    "output_tokens": 10305
+   }
+  },
+  "routed_to": "browser",
+  "route_reason": "no browser exposed to the accessibility tree",
+  "answer": "observation failed: agent-browser tab: CDP connection failed: All CDP discovery methods failed for 127.0.0.1:9333: /json/version: Timeout connecting to CDP at 127.0.0.1:9333; /json/list: Timeout conne",
+  "task_id": "task-8ec8850544",
+  "error": null,
+  "at": "2026-11-12 03:26:01 +0800"
+ }
+]
