@@ -65,11 +65,11 @@ def _patch(cur: dict | None, a: dict) -> dict:
                                     "active", "notifications", "scope")}
     if any(a.get(k) is not None for k in ("icon", "color", "image")):
         p["avatar"] = {"icon": a.get("icon"), "color": a.get("color"), "image": a.get("image")}
-    if a.get("base_url") or (a.get("model") and (cur.get("backend") or {}).get("kind") == "model"):
-        be = cur.get("backend") or {}
-        p["backend"] = {"kind": "model", "base_url": a.get("base_url") or be.get("base_url"), "model": a.get("model") or be.get("model")}
-    elif a.get("agent"):
+    be = cur.get("backend") or {}
+    if a.get("agent") and not a.get("base_url"):
         p["backend"] = {"kind": "acp", "agent": a["agent"]}
+    elif a.get("base_url") or (a.get("model") and be.get("kind") == "model"):
+        p["backend"] = {"kind": "model", "base_url": a.get("base_url") or be.get("base_url"), "model": a.get("model") or be.get("model")}
     if any(a.get(k) is not None for k in ("skills_mode", "skills", "skills_off")):
         s = dict(cur.get("skills") or {})
         if a.get("skills_mode"):
@@ -184,7 +184,8 @@ def message_send(ctx: Context, bot: str, text: str, attachments: list | None = N
         raise FoxError("PERMISSION_DENIED", tr("bot.allow_human_only"))
     r = bots.run_turn(ctx.workspace, bot, text, attachments=attachments, actor=ctx.agent,
                       origin="person" if is_human(ctx.agent) else "handoff",
-                      delegated_by=None if is_human(ctx.agent) else ctx.agent, approval_mode=None if approve == "rules" else approve)
+                      delegated_by=None if is_human(ctx.agent) else ctx.agent, approval_mode=None if approve == "rules" else approve,
+                      keep=ctx.interface == "ui")  # 聊天窗口里复用智能体连接（同一个 ACP 会话，可以中途停止）
     return {"reply": r}
 
 

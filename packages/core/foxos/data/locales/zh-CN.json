@@ -1022,7 +1022,7 @@
   "bots.bad_approval_mode": "审批方式只能是：{0}",
   "bots.bad_backend": "后端类型只能是 acp 或 model",
   "bots.bad_color": "颜色格式是 #RRGGBB",
-  "bots.bad_delegation": "委托设置不合法（深度 0–5，每轮 0–10）",
+  "bots.bad_delegation": "委托设置不合法（深度 0–5，每轮 0–20）",
   "bots.bad_field": "字段 {0} 的值不合法",
   "bots.bad_icon": "图标名只能是小写字母、数字和 -",
   "bots.bad_id": "ID 只能是小写字母、数字和 -（2–40 个字符）",
@@ -1232,5 +1232,6 @@
   "skills.no_such_skill": "没有这个技能：{0}",
   "system.pause_targets": "只暂停这些身份（如 bot:coder）；不填则全部暂停",
   "system.paused_only": "已暂停：{0}",
-  "system.resume_targets": "只恢复这些身份；不填则全部恢复"
+  "system.resume_targets": "只恢复这些身份；不填则全部恢复",
+  "botchat.busy": "{0} 正在回答…"
 }
