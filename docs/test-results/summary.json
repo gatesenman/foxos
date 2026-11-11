@@ -1,18 +1,18 @@
 {
- "generated": "2026-11-11T14:39:27+08:00",
- "commit": "f40a775",
+ "generated": "2026-11-12T07:03:11+08:00",
+ "commit": "b42220a",
  "cases": {
-  "pass": 134,
-  "fail": 1,
-  "skip": 4,
+  "pass": 233,
+  "fail": 0,
+  "skip": 19,
   "known": 1
  },
  "stories": {
-  "pass": 29,
-  "fail": 1,
-  "skip": 1,
+  "pass": 76,
+  "fail": 0,
+  "skip": 13,
   "known": 1,
-  "none": 0
+  "none": 1
  },
  "story_results": [
   {
@@ -234,9 +234,9 @@
   {
    "id": "US-44",
    "title": "Everything 效率类应用",
-   "status": "fail",
-   "pass": 4,
-   "fail": 1,
+   "status": "pass",
+   "pass": 5,
+   "fail": 0,
    "skip": 0,
    "known": 0
   },
@@ -302,19 +302,550 @@
    "fail": 0,
    "skip": 0,
    "known": 0
+  },
+  {
+   "id": "US-54",
+   "title": "滚动条：外壳、应用 webview、Monaco、终端都用狐狸OS 细滚动条（轨道透明、平时隐藏、指向出现），截图逐像素检查",
+   "status": "pass",
+   "pass": 1,
+   "fail": 0,
+   "skip": 0,
+   "known": 0
+  },
+  {
+   "id": "US-55",
+   "title": "多语言：默认简体中文，安装向导与设置里可切换 English（实时生效并保存）；内核 / CLI / MCP 消息跟随 FOXOS_LANG / --lang，JSON 字段名不变",
+   "status": "pass",
+   "pass": 5,
+   "fail": 0,
+   "skip": 0,
+   "known": 0
+  },
+  {
+   "id": "US-60",
+   "title": "真实 XFCE 会话：列出/聚焦/移动/缩放窗口，键入与点击，人工接管（CLI 与 MCP）",
+   "status": "pass",
+   "pass": 4,
+   "fail": 0,
+   "skip": 0,
+   "known": 0
+  },
+  {
+   "id": "US-61",
+   "title": "linux-kvm 来宾与 foxos env run / desktop-attach（至少一个 Linux 来宾路径）",
+   "status": "pass",
+   "pass": 4,
+   "fail": 0,
+   "skip": 0,
+   "known": 0
+  },
+  {
+   "id": "US-62",
+   "title": "Google Chrome：默认浏览器、foxos desktop launch chrome、本机 CDP（127.0.0.1，人开启）打开网页、读标题、截图",
+   "status": "pass",
+   "pass": 3,
+   "fail": 0,
+   "skip": 0,
+   "known": 0
+  },
+  {
+   "id": "US-80",
+   "title": "一行安装 install.sh：识别系统与 CPU，从 Release 下载，校验 SHA256SUMS（被篡改就拒绝安装），安装后 foxos --version 与 sheets create 可用",
+   "status": "skip",
+   "pass": 0,
+   "fail": 0,
+   "skip": 3,
+   "known": 0
+  },
+  {
+   "id": "US-81",
+   "title": "Linux 安装包（AppImage / deb / rpm / tar.gz）：随包 Python 与内核，foxos --version、help --json、sheets create，无头启动桌面并截图",
+   "status": "skip",
+   "pass": 0,
+   "fail": 0,
+   "skip": 1,
+   "known": 0
+  },
+  {
+   "id": "US-82",
+   "title": "包管理器清单草稿：winget（NSIS + MSI，x64 / arm64）、Homebrew cask（Apple 芯片 / Intel）、AUR foxos-bin，按发布的 SHA-256 生成",
+   "status": "pass",
+   "pass": 1,
+   "fail": 0,
+   "skip": 0,
+   "known": 0
+  },
+  {
+   "id": "US-83",
+   "title": "发布矩阵：Windows / macOS / Linux 各 x64 与 arm64、amd64 与 arm64 ISO，runner 直接上传 Release，一行安装在 Ubuntu / Debian / Fedora / openSUSE / Arch / macOS 上验证",
+   "status": "skip",
+   "pass": 0,
+   "fail": 0,
+   "skip": 1,
+   "known": 0
+  },
+  {
+   "id": "US-84",
+   "title": "arm64 系统镜像：Ubuntu ports + UEFI，Google 不提供 arm64 Chrome 时回退到 Firefox",
+   "status": "pass",
+   "pass": 2,
+   "fail": 0,
+   "skip": 0,
+   "known": 0
+  },
+  {
+   "id": "US-85",
+   "title": "Windows 在线安装 install.ps1：x64 / arm64 自动识别，NSIS / MSI / 便携版，纯 ASCII 兼容 PowerShell 5.1",
+   "status": "pass",
+   "pass": 1,
+   "fail": 0,
+   "skip": 0,
+   "known": 0
+  },
+  {
+   "id": "US-100",
+   "title": "智能体：主智能体与多个智能体的创建、复制、改名、删除",
+   "status": "pass",
+   "pass": 1,
+   "fail": 0,
+   "skip": 0,
+   "known": 0
+  },
+  {
+   "id": "US-101",
+   "title": "每个智能体的设置（对照 OpenBot 逐项）：名称、头像、说明、模型、ACP 智能体、范围、权限；密钥不外露",
+   "status": "pass",
+   "pass": 1,
+   "fail": 0,
+   "skip": 0,
+   "known": 0
+  },
+  {
+   "id": "US-102",
+   "title": "真实 ACP 回合：工具调用卡片、审批（允许/拒绝）、diff、终端输出，审计记下是哪个智能体",
+   "status": "pass",
+   "pass": 1,
+   "fail": 0,
+   "skip": 0,
+   "known": 0
+  },
+  {
+   "id": "US-103",
+   "title": "@提及与委托：主智能体把任务交给别的智能体，结果在范围内汇报回来",
+   "status": "pass",
+   "pass": 1,
+   "fail": 0,
+   "skip": 0,
+   "known": 0
+  },
+  {
+   "id": "US-104",
+   "title": "pstack 技能：发现、显示、在对话中运行",
+   "status": "pass",
+   "pass": 1,
+   "fail": 0,
+   "skip": 0,
+   "known": 0
+  },
+  {
+   "id": "US-105",
+   "title": "智能体记忆与例程（定时任务）",
+   "status": "pass",
+   "pass": 1,
+   "fail": 0,
+   "skip": 0,
+   "known": 0
+  },
+  {
+   "id": "US-106",
+   "title": "只暂停一个智能体与人工接管",
+   "status": "pass",
+   "pass": 1,
+   "fail": 0,
+   "skip": 0,
+   "known": 0
+  },
+  {
+   "id": "US-107",
+   "title": "聊天服务：令牌鉴权、发送、SSE 流、重开时回放进行中的回合",
+   "status": "pass",
+   "pass": 1,
+   "fail": 0,
+   "skip": 0,
+   "known": 0
+  },
+  {
+   "id": "US-108",
+   "title": "聊天界面：真实浏览器里发送、审批、中英文切换",
+   "status": "pass",
+   "pass": 1,
+   "fail": 0,
+   "skip": 0,
+   "known": 0
+  },
+  {
+   "id": "US-109",
+   "title": "连接器目录与 stdio MCP 连接器，按智能体授权",
+   "status": "pass",
+   "pass": 1,
+   "fail": 0,
+   "skip": 0,
+   "known": 0
+  },
+  {
+   "id": "US-110",
+   "title": "OAuth 2.1 连接器：发现（RFC 9728/8414）、PKCE、动态注册、刷新，写操作需审批",
+   "status": "pass",
+   "pass": 1,
+   "fail": 0,
+   "skip": 0,
+   "known": 0
+  },
+  {
+   "id": "US-111",
+   "title": "Bearer 令牌连接器：错误令牌不算连上，密钥从不写进日志",
+   "status": "pass",
+   "pass": 1,
+   "fail": 0,
+   "skip": 0,
+   "known": 0
+  },
+  {
+   "id": "US-112",
+   "title": "免密钥的托管连接器真实调用",
+   "status": "pass",
+   "pass": 1,
+   "fail": 0,
+   "skip": 0,
+   "known": 0
+  },
+  {
+   "id": "US-113",
+   "title": "多机配对：一次性配对码、证书指纹、双向 TLS（令牌被偷也连不上）",
+   "status": "pass",
+   "pass": 1,
+   "fail": 0,
+   "skip": 0,
+   "known": 0
+  },
+  {
+   "id": "US-114",
+   "title": "一个智能体控制两台狐狸OS：默认拒绝、按机器授权、两边审计写明控制端与智能体",
+   "status": "pass",
+   "pass": 1,
+   "fail": 0,
+   "skip": 0,
+   "known": 0
+  },
+  {
+   "id": "US-115",
+   "title": "多个智能体共用一台狐狸OS：范围与应用授权、LOCKED、CONFLICT、只暂停一个、撤销授权",
+   "status": "pass",
+   "pass": 1,
+   "fail": 0,
+   "skip": 0,
+   "known": 0
+  },
+  {
+   "id": "US-116",
+   "title": "从官方发布地址安装第三方 ACP 智能体（sha256 校验）并真实握手；智能体设置与更新检查",
+   "status": "pass",
+   "pass": 1,
+   "fail": 0,
+   "skip": 0,
+   "known": 0
+  },
+  {
+   "id": "US-117",
+   "title": "镜像阶段运行环境：以用户 foxos 检查预装版本、PEP 668、专有智能体不进镜像",
+   "status": "skip",
+   "pass": 0,
+   "fail": 0,
+   "skip": 1,
+   "known": 0
+  },
+  {
+   "id": "US-118",
+   "title": "镜像里预装的 ACP 智能体已登记，以用户 foxos 真实握手",
+   "status": "skip",
+   "pass": 0,
+   "fail": 0,
+   "skip": 1,
+   "known": 0
+  },
+  {
+   "id": "US-63",
+   "title": "在线选择并安装狐狸OS 预设系统（Linux / Windows / macOS）：目录显示下载大小与所需磁盘、主机可用性与原因；分卷断点续传、逐卷与整体 sha256 校验；Windows 应答文件与 Hyper-V 计划；Linux 预设真实下载 + 引导 + 就绪 + SSH 执行",
+   "status": "pass",
+   "pass": 6,
+   "fail": 0,
+   "skip": 1,
+   "known": 0
+  },
+  {
+   "id": "US-64",
+   "title": "SSH 远程访问：公钥增删查与 GitHub 导入、智能体不能开门、密码强度检查、MCP ssh_* 对等、虚拟机 SSH 对外开放只限人",
+   "status": "pass",
+   "pass": 4,
+   "fail": 0,
+   "skip": 0,
+   "known": 0
+  },
+  {
+   "id": "US-65",
+   "title": "在真实启动的 ISO 上端到端：SSH 密钥登录 / 密码与 root 被拒 / 经 SSH 运行 foxos 与 MCP、Chrome 安装、在线预设下载并引导、bots 应用与真实 ACP（opencode）对话、runtime doctor、acp list、桌面会话控制、Calamares 装到虚拟磁盘并重启进入",
+   "status": "none",
+   "pass": 0,
+   "fail": 0,
+   "skip": 0,
+   "known": 0
+  },
+  {
+   "id": "US-86",
+   "title": "Windows 伴侣程序不依赖 PATH 上的 foxos：终端 PATH 只保留一个键（Windows 的 Path），应用中心 / 环境终端用 foxos 的绝对路径；安装程序把 foxos.cmd 加到用户 PATH（保留 REG_EXPAND_SZ）",
+   "status": "pass",
+   "pass": 4,
+   "fail": 0,
+   "skip": 0,
+   "known": 0
+  },
+  {
+   "id": "US-87",
+   "title": "Windows / macOS / 普通 Linux 上的桌面程序是“狐狸OS 电脑”的客户端：应用中心安装、打开 Word、终端、文件、智能体、聊天都在狐狸OS 虚拟机或远程狐狸OS 里执行；本机执行默认关闭，打开后每次确认；虚拟机控制台 / 来宾桌面画面（noVNC）",
+   "status": "pass",
+   "pass": 9,
+   "fail": 0,
+   "skip": 0,
+   "known": 0
+  },
+  {
+   "id": "US-120",
+   "title": "电脑操控体检：显示默认栈（agent-desktop + Jev/DeepSeek + 规划器）和两条兜底",
+   "status": "skip",
+   "pass": 0,
+   "fail": 0,
+   "skip": 1,
+   "known": 0
+  },
+  {
+   "id": "US-121",
+   "title": "默认路径真实端到端：agent-desktop 读 Mousepad，Jev 选每一步，DeepSeek 规划，改写并保存文件",
+   "status": "skip",
+   "pass": 0,
+   "fail": 0,
+   "skip": 1,
+   "known": 0
+  },
+  {
+   "id": "US-122",
+   "title": "没有 TypeSafe 密钥时单步策略自动退到 DeepSeek，同样完成真实编辑并保存",
+   "status": "skip",
+   "pass": 0,
+   "fail": 0,
+   "skip": 1,
+   "known": 0
+  },
+  {
+   "id": "US-123",
+   "title": "没有无障碍信息的程序（xedit）自动退到截图操控：Jev Box 定位 + xdotool，真实写入并保存",
+   "status": "skip",
+   "pass": 0,
+   "fail": 0,
+   "skip": 1,
+   "known": 0
+  },
+  {
+   "id": "US-124",
+   "title": "网页内容不在无障碍树里时自动退到浏览器操控（Chrome CDP / agent-browser），在本地网页下单并读出订单号",
+   "status": "skip",
+   "pass": 0,
+   "fail": 0,
+   "skip": 1,
+   "known": 0
+  },
+  {
+   "id": "US-125",
+   "title": "按次（--surface）和按智能体（设置 computer_use）手动选择操控方式",
+   "status": "skip",
+   "pass": 0,
+   "fail": 0,
+   "skip": 1,
+   "known": 0
+  },
+  {
+   "id": "US-126",
+   "title": "TypeSafe Jev 服务商真实调用（provider test）",
+   "status": "skip",
+   "pass": 0,
+   "fail": 0,
+   "skip": 1,
+   "known": 0
+  },
+  {
+   "id": "US-127",
+   "title": "电脑操控离线单元测试：Jev 请求/回答校验、观察编译器、两段式打分、logprob 置信度、agent-desktop 信封、路由、按智能体设置",
+   "status": "pass",
+   "pass": 17,
+   "fail": 0,
+   "skip": 0,
+   "known": 0
+  },
+  {
+   "id": "US-140",
+   "title": "主智能体用 DeepSeek（服务商预设，密钥在密钥库）真实回答",
+   "status": "pass",
+   "pass": 1,
+   "fail": 0,
+   "skip": 0,
+   "known": 0
+  },
+  {
+   "id": "US-141",
+   "title": "主智能体用工具委托给 opencode 编码智能体（DeepSeek），改文件前人批准，卡片带 diff",
+   "status": "pass",
+   "pass": 1,
+   "fail": 0,
+   "skip": 0,
+   "known": 0
+  },
+  {
+   "id": "US-142",
+   "title": "人拒绝真实代理的编辑：文件不变，卡片记为拒绝",
+   "status": "pass",
+   "pass": 1,
+   "fail": 0,
+   "skip": 0,
+   "known": 0
+  },
+  {
+   "id": "US-143",
+   "title": "真实模型回合里用 pstack 技能",
+   "status": "pass",
+   "pass": 1,
+   "fail": 0,
+   "skip": 0,
+   "known": 0
+  },
+  {
+   "id": "US-144",
+   "title": "真实模型的智能体读另一台狐狸OS 上的目录，对方审计写明控制端",
+   "status": "pass",
+   "pass": 1,
+   "fail": 0,
+   "skip": 0,
+   "known": 0
+  },
+  {
+   "id": "US-145",
+   "title": "Qwen Code 经 OpenAI 兼容地址接 DeepSeek，写文件经狐狸OS 内核",
+   "status": "pass",
+   "pass": 1,
+   "fail": 0,
+   "skip": 0,
+   "known": 0
+  },
+  {
+   "id": "US-146",
+   "title": "智能体窗口：新建并配置智能体（含 DeepSeek 服务商预设）",
+   "status": "pass",
+   "pass": 1,
+   "fail": 0,
+   "skip": 0,
+   "known": 0
+  },
+  {
+   "id": "US-147",
+   "title": "智能体窗口：真实 opencode 回合，编辑卡片带 diff，点允许后文件改了",
+   "status": "pass",
+   "pass": 1,
+   "fail": 0,
+   "skip": 0,
+   "known": 0
+  },
+  {
+   "id": "US-148",
+   "title": "智能体窗口：点拒绝，文件不变",
+   "status": "pass",
+   "pass": 1,
+   "fail": 0,
+   "skip": 0,
+   "known": 0
+  },
+  {
+   "id": "US-149",
+   "title": "智能体窗口：@ 委托给第二个智能体，在审批页批准",
+   "status": "pass",
+   "pass": 1,
+   "fail": 0,
+   "skip": 0,
+   "known": 0
+  },
+  {
+   "id": "US-150",
+   "title": "智能体窗口：/ 技能菜单与用过的技能",
+   "status": "pass",
+   "pass": 1,
+   "fail": 0,
+   "skip": 0,
+   "known": 0
+  },
+  {
+   "id": "US-151",
+   "title": "智能体窗口：添加真实的本地 MCP 连接器（HTTP + Bearer）并列出工具",
+   "status": "pass",
+   "pass": 1,
+   "fail": 0,
+   "skip": 0,
+   "known": 0
+  },
+  {
+   "id": "US-152",
+   "title": "停靠窗口占住屏幕边（_NET_WM_STRUT_PARTIAL），最大化窗口不被盖住",
+   "status": "pass",
+   "pass": 1,
+   "fail": 0,
+   "skip": 0,
+   "known": 0
+  },
+  {
+   "id": "US-153",
+   "title": "智能体窗口：配对第二台狐狸OS 并在聊天里切换机器",
+   "status": "pass",
+   "pass": 1,
+   "fail": 0,
+   "skip": 0,
+   "known": 0
+  },
+  {
+   "id": "US-154",
+   "title": "智能体窗口：人工接管让智能体的编辑停下，交还后恢复",
+   "status": "pass",
+   "pass": 1,
+   "fail": 0,
+   "skip": 0,
+   "known": 0
+  },
+  {
+   "id": "US-155",
+   "title": "宿主应用里的智能体只在狐狸OS 虚拟电脑里动手；宿主执行要人明确打开并逐个确认",
+   "status": "pass",
+   "pass": 3,
+   "fail": 0,
+   "skip": 0,
+   "known": 0
   }
  ],
  "everything": {
   "catalog": 51,
   "boot_ok": 50,
-  "parity_equal": 49,
-  "test_pass": 49,
-  "test_fail": 1,
+  "parity_equal": 48,
+  "test_pass": 50,
+  "test_fail": 0,
   "test_skip": 1,
   "known": 1,
   "ops": 3350,
   "ops_bound": 3350,
-  "ops_executed": 50,
+  "ops_executed": 49,
   "mcp_called": 51
  }
 }

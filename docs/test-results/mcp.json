@@ -2,14 +2,56 @@
  "http": {
   "sdk": "1.32.2",
   "transport": "streamable-http",
-  "tools": 69
+  "tools": 256
  },
  "stdio": {
   "sdk": "1.32.2",
   "transport": "stdio",
-  "tools": 4320,
-  "apps": 62,
+  "tools": 4507,
+  "apps": 74,
   "calls": [
+   {
+    "app": "acp",
+    "tool": "acp_agent_list",
+    "ok": true,
+    "error": null
+   },
+   {
+    "app": "bot",
+    "tool": "bot_profile_list",
+    "ok": true,
+    "error": null
+   },
+   {
+    "app": "browser",
+    "tool": "browser_status",
+    "ok": true,
+    "error": null
+   },
+   {
+    "app": "computer",
+    "tool": "computer_doctor",
+    "ok": true,
+    "error": null
+   },
+   {
+    "app": "connector",
+    "tool": "connector_catalog",
+    "ok": true,
+    "error": null
+   },
+   {
+    "app": "desktop",
+    "tool": "desktop_status",
+    "ok": true,
+    "error": null
+   },
+   {
+    "app": "session",
+    "tool": "session_status",
+    "ok": true,
+    "error": null
+   },
    {
     "app": "docs",
     "tool": "docs_create",
@@ -335,6 +377,24 @@
     "error": null
    },
    {
+    "app": "machine",
+    "tool": "machine_list",
+    "ok": true,
+    "error": null
+   },
+   {
+    "app": "model",
+    "tool": "model_catalog",
+    "ok": true,
+    "error": null
+   },
+   {
+    "app": "runtime",
+    "tool": "runtime_list",
+    "ok": true,
+    "error": null
+   },
+   {
     "app": "sandbox",
     "tool": "sandbox_check",
     "ok": true,
@@ -347,8 +407,20 @@
     "error": null
    },
    {
+    "app": "shell",
+    "tool": "shell_session_list",
+    "ok": true,
+    "error": null
+   },
+   {
     "app": "slides",
     "tool": "slides_create",
+    "ok": true,
+    "error": null
+   },
+   {
+    "app": "ssh",
+    "tool": "ssh_status",
     "ok": true,
     "error": null
    },

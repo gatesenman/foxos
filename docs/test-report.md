@@ -2,7 +2,7 @@
 
 由 `npm run test:all`（[scripts/test_all.py](../scripts/test_all.py)）生成，不使用模拟：pytest 调用真实 CLI / 内核，桌面端到端测试用 Playwright 驱动真实的 Electron 桌面，MCP 测试使用官方 MCP SDK 作为客户端。
 
-- 时间：2026-11-11 14:39（UTC+8）　提交：`f40a775`
+- 时间：2026-11-12 07:03（UTC+8）　提交：`b42220a`　用时：38 分 10 秒
 - 环境：Linux 6.12.113+（x86_64），Python 3.13.5，Node v24.22.1，Landlock ABI 6
 - 未覆盖：Windows 与 macOS 实机（本报告在 Linux 上生成；Windows 代码路径另有 wine 下的测试，见 [sandbox.md](sandbox.md)、[windows-test-guide.md](windows-test-guide.md)）
 
@@ -10,12 +10,12 @@
 
 | | 通过 | 失败 | 跳过 | 已知上游缺陷 |
 | --- | --- | --- | --- | --- |
-| 测试用例（140） | 134 | 1 | 4 | 1 |
-| 用户故事（32） | 29 | 1 | 1 | 1 |
+| 测试用例（253） | 233 | 0 | 19 | 1 |
+| 用户故事（91） | 76 | 0 | 13 | 1 |
 
-- Everything 应用：**50/51** 在桌面里本地启动，**49/51** 通过“界面操作与 CLI 等价”检查，**51/51** 通过 MCP（官方 SDK）调用成功；1 个失败，1 个跳过，1 个为已知上游缺陷。
-- 操作清单：51 个应用共 **3350** 项操作，其中 **3350** 项有 CLI / MCP 绑定；测试中实际执行并比对结果的有 **50** 项（每个应用一项等价检查）。
-- MCP：stdio 列出 4320 个工具（62 个应用），逐应用调用 63/63 成功；Streamable HTTP（compact）69 个工具；SDK 1.32.2。
+- Everything 应用：**50/51** 在桌面里本地启动，**48/51** 通过“界面操作与 CLI 等价”检查，**51/51** 通过 MCP（官方 SDK）调用成功；0 个失败，1 个跳过，1 个为已知上游缺陷。
+- 操作清单：51 个应用共 **3350** 项操作，其中 **3350** 项有 CLI / MCP 绑定；测试中实际执行并比对结果的有 **49** 项（每个应用一项等价检查）。
+- MCP：stdio 列出 4507 个工具（74 个应用），逐应用调用 75/75 成功；Streamable HTTP（compact）256 个工具；SDK 1.32.2。
 
 ## 用户故事
 
@@ -45,7 +45,7 @@
 | US-41 | Everything 协作类应用 | 通过 | 6 | 0 | 0 |
 | US-42 | Everything 创作类应用 | 通过（含已知上游缺陷） | 6 | 0 | 0 |
 | US-43 | Everything 工程类应用 | 通过 | 4 | 0 | 0 |
-| US-44 | Everything 效率类应用 | 失败 | 4 | 1 | 0 |
+| US-44 | Everything 效率类应用 | 通过 | 5 | 0 | 0 |
 | US-45 | Everything 财务类应用 | 通过 | 4 | 0 | 0 |
 | US-46 | Everything 商务类应用 | 通过 | 12 | 0 | 1 |
 | US-47 | Everything 开发类应用 | 通过 | 1 | 0 | 0 |
@@ -53,8 +53,65 @@
 | US-50 | 安装系统：目录与一键安装（Linux 宿主上真实安装 Alpine） | 通过 | 1 | 0 | 0 |
 | US-52 | 轻量隔离：Landlock + seccomp 真实限制；智能体在轻量沙箱中运行；Seatbelt / Windows 策略生成 | 通过 | 14 | 0 | 1 |
 | US-53 | 程序图标：每个程序显示其开源项目自带的图标（Everything 上游 / LibreOffice / 系统终端 / Code - OSS / Electron / ACP 注册表），缺失时退回并报告 | 通过 | 1 | 0 | 0 |
+| US-54 | 滚动条：外壳、应用 webview、Monaco、终端都用狐狸OS 细滚动条（轨道透明、平时隐藏、指向出现），截图逐像素检查 | 通过 | 1 | 0 | 0 |
+| US-55 | 多语言：默认简体中文，安装向导与设置里可切换 English（实时生效并保存）；内核 / CLI / MCP 消息跟随 FOXOS_LANG / --lang，JSON 字段名不变 | 通过 | 5 | 0 | 0 |
 | US-60 | 真实 XFCE 会话：列出/聚焦/移动/缩放窗口，键入与点击，人工接管（CLI 与 MCP） | 通过 | 4 | 0 | 0 |
 | US-61 | linux-kvm 来宾与 foxos env run / desktop-attach（至少一个 Linux 来宾路径） | 通过 | 4 | 0 | 0 |
+| US-62 | Google Chrome：默认浏览器、foxos desktop launch chrome、本机 CDP（127.0.0.1，人开启）打开网页、读标题、截图 | 通过 | 3 | 0 | 0 |
+| US-80 | 一行安装 install.sh：识别系统与 CPU，从 Release 下载，校验 SHA256SUMS（被篡改就拒绝安装），安装后 foxos --version 与 sheets create 可用 | 跳过 | 0 | 0 | 3 |
+| US-81 | Linux 安装包（AppImage / deb / rpm / tar.gz）：随包 Python 与内核，foxos --version、help --json、sheets create，无头启动桌面并截图 | 跳过 | 0 | 0 | 1 |
+| US-82 | 包管理器清单草稿：winget（NSIS + MSI，x64 / arm64）、Homebrew cask（Apple 芯片 / Intel）、AUR foxos-bin，按发布的 SHA-256 生成 | 通过 | 1 | 0 | 0 |
+| US-83 | 发布矩阵：Windows / macOS / Linux 各 x64 与 arm64、amd64 与 arm64 ISO，runner 直接上传 Release，一行安装在 Ubuntu / Debian / Fedora / openSUSE / Arch / macOS 上验证 | 跳过 | 0 | 0 | 1 |
+| US-84 | arm64 系统镜像：Ubuntu ports + UEFI，Google 不提供 arm64 Chrome 时回退到 Firefox | 通过 | 2 | 0 | 0 |
+| US-85 | Windows 在线安装 install.ps1：x64 / arm64 自动识别，NSIS / MSI / 便携版，纯 ASCII 兼容 PowerShell 5.1 | 通过 | 1 | 0 | 0 |
+| US-100 | 智能体：主智能体与多个智能体的创建、复制、改名、删除 | 通过 | 1 | 0 | 0 |
+| US-101 | 每个智能体的设置（对照 OpenBot 逐项）：名称、头像、说明、模型、ACP 智能体、范围、权限；密钥不外露 | 通过 | 1 | 0 | 0 |
+| US-102 | 真实 ACP 回合：工具调用卡片、审批（允许/拒绝）、diff、终端输出，审计记下是哪个智能体 | 通过 | 1 | 0 | 0 |
+| US-103 | @提及与委托：主智能体把任务交给别的智能体，结果在范围内汇报回来 | 通过 | 1 | 0 | 0 |
+| US-104 | pstack 技能：发现、显示、在对话中运行 | 通过 | 1 | 0 | 0 |
+| US-105 | 智能体记忆与例程（定时任务） | 通过 | 1 | 0 | 0 |
+| US-106 | 只暂停一个智能体与人工接管 | 通过 | 1 | 0 | 0 |
+| US-107 | 聊天服务：令牌鉴权、发送、SSE 流、重开时回放进行中的回合 | 通过 | 1 | 0 | 0 |
+| US-108 | 聊天界面：真实浏览器里发送、审批、中英文切换 | 通过 | 1 | 0 | 0 |
+| US-109 | 连接器目录与 stdio MCP 连接器，按智能体授权 | 通过 | 1 | 0 | 0 |
+| US-110 | OAuth 2.1 连接器：发现（RFC 9728/8414）、PKCE、动态注册、刷新，写操作需审批 | 通过 | 1 | 0 | 0 |
+| US-111 | Bearer 令牌连接器：错误令牌不算连上，密钥从不写进日志 | 通过 | 1 | 0 | 0 |
+| US-112 | 免密钥的托管连接器真实调用 | 通过 | 1 | 0 | 0 |
+| US-113 | 多机配对：一次性配对码、证书指纹、双向 TLS（令牌被偷也连不上） | 通过 | 1 | 0 | 0 |
+| US-114 | 一个智能体控制两台狐狸OS：默认拒绝、按机器授权、两边审计写明控制端与智能体 | 通过 | 1 | 0 | 0 |
+| US-115 | 多个智能体共用一台狐狸OS：范围与应用授权、LOCKED、CONFLICT、只暂停一个、撤销授权 | 通过 | 1 | 0 | 0 |
+| US-116 | 从官方发布地址安装第三方 ACP 智能体（sha256 校验）并真实握手；智能体设置与更新检查 | 通过 | 1 | 0 | 0 |
+| US-117 | 镜像阶段运行环境：以用户 foxos 检查预装版本、PEP 668、专有智能体不进镜像 | 跳过 | 0 | 0 | 1 |
+| US-118 | 镜像里预装的 ACP 智能体已登记，以用户 foxos 真实握手 | 跳过 | 0 | 0 | 1 |
+| US-63 | 在线选择并安装狐狸OS 预设系统（Linux / Windows / macOS）：目录显示下载大小与所需磁盘、主机可用性与原因；分卷断点续传、逐卷与整体 sha256 校验；Windows 应答文件与 Hyper-V 计划；Linux 预设真实下载 + 引导 + 就绪 + SSH 执行 | 通过 | 6 | 0 | 1 |
+| US-64 | SSH 远程访问：公钥增删查与 GitHub 导入、智能体不能开门、密码强度检查、MCP ssh_* 对等、虚拟机 SSH 对外开放只限人 | 通过 | 4 | 0 | 0 |
+| US-65 | 在真实启动的 ISO 上端到端：SSH 密钥登录 / 密码与 root 被拒 / 经 SSH 运行 foxos 与 MCP、Chrome 安装、在线预设下载并引导、bots 应用与真实 ACP（opencode）对话、runtime doctor、acp list、桌面会话控制、Calamares 装到虚拟磁盘并重启进入 | 未运行 | 0 | 0 | 0 |
+| US-86 | Windows 伴侣程序不依赖 PATH 上的 foxos：终端 PATH 只保留一个键（Windows 的 Path），应用中心 / 环境终端用 foxos 的绝对路径；安装程序把 foxos.cmd 加到用户 PATH（保留 REG_EXPAND_SZ） | 通过 | 4 | 0 | 0 |
+| US-87 | Windows / macOS / 普通 Linux 上的桌面程序是“狐狸OS 电脑”的客户端：应用中心安装、打开 Word、终端、文件、智能体、聊天都在狐狸OS 虚拟机或远程狐狸OS 里执行；本机执行默认关闭，打开后每次确认；虚拟机控制台 / 来宾桌面画面（noVNC） | 通过 | 9 | 0 | 0 |
+| US-120 | 电脑操控体检：显示默认栈（agent-desktop + Jev/DeepSeek + 规划器）和两条兜底 | 跳过 | 0 | 0 | 1 |
+| US-121 | 默认路径真实端到端：agent-desktop 读 Mousepad，Jev 选每一步，DeepSeek 规划，改写并保存文件 | 跳过 | 0 | 0 | 1 |
+| US-122 | 没有 TypeSafe 密钥时单步策略自动退到 DeepSeek，同样完成真实编辑并保存 | 跳过 | 0 | 0 | 1 |
+| US-123 | 没有无障碍信息的程序（xedit）自动退到截图操控：Jev Box 定位 + xdotool，真实写入并保存 | 跳过 | 0 | 0 | 1 |
+| US-124 | 网页内容不在无障碍树里时自动退到浏览器操控（Chrome CDP / agent-browser），在本地网页下单并读出订单号 | 跳过 | 0 | 0 | 1 |
+| US-125 | 按次（--surface）和按智能体（设置 computer_use）手动选择操控方式 | 跳过 | 0 | 0 | 1 |
+| US-126 | TypeSafe Jev 服务商真实调用（provider test） | 跳过 | 0 | 0 | 1 |
+| US-127 | 电脑操控离线单元测试：Jev 请求/回答校验、观察编译器、两段式打分、logprob 置信度、agent-desktop 信封、路由、按智能体设置 | 通过 | 17 | 0 | 0 |
+| US-140 | 主智能体用 DeepSeek（服务商预设，密钥在密钥库）真实回答 | 通过 | 1 | 0 | 0 |
+| US-141 | 主智能体用工具委托给 opencode 编码智能体（DeepSeek），改文件前人批准，卡片带 diff | 通过 | 1 | 0 | 0 |
+| US-142 | 人拒绝真实代理的编辑：文件不变，卡片记为拒绝 | 通过 | 1 | 0 | 0 |
+| US-143 | 真实模型回合里用 pstack 技能 | 通过 | 1 | 0 | 0 |
+| US-144 | 真实模型的智能体读另一台狐狸OS 上的目录，对方审计写明控制端 | 通过 | 1 | 0 | 0 |
+| US-145 | Qwen Code 经 OpenAI 兼容地址接 DeepSeek，写文件经狐狸OS 内核 | 通过 | 1 | 0 | 0 |
+| US-146 | 智能体窗口：新建并配置智能体（含 DeepSeek 服务商预设） | 通过 | 1 | 0 | 0 |
+| US-147 | 智能体窗口：真实 opencode 回合，编辑卡片带 diff，点允许后文件改了 | 通过 | 1 | 0 | 0 |
+| US-148 | 智能体窗口：点拒绝，文件不变 | 通过 | 1 | 0 | 0 |
+| US-149 | 智能体窗口：@ 委托给第二个智能体，在审批页批准 | 通过 | 1 | 0 | 0 |
+| US-150 | 智能体窗口：/ 技能菜单与用过的技能 | 通过 | 1 | 0 | 0 |
+| US-151 | 智能体窗口：添加真实的本地 MCP 连接器（HTTP + Bearer）并列出工具 | 通过 | 1 | 0 | 0 |
+| US-152 | 停靠窗口占住屏幕边（_NET_WM_STRUT_PARTIAL），最大化窗口不被盖住 | 通过 | 1 | 0 | 0 |
+| US-153 | 智能体窗口：配对第二台狐狸OS 并在聊天里切换机器 | 通过 | 1 | 0 | 0 |
+| US-154 | 智能体窗口：人工接管让智能体的编辑停下，交还后恢复 | 通过 | 1 | 0 | 0 |
+| US-155 | 宿主应用里的智能体只在狐狸OS 虚拟电脑里动手；宿主执行要人明确打开并逐个确认 | 通过 | 3 | 0 | 0 |
 
 ### 失败、跳过与已知缺陷的用例
 
@@ -63,69 +120,25 @@
 | US-39 | `test_env_windows.py` test_hw_wsl_install_ubuntu | 跳过 | pending：需要 Windows 实机（见 docs/windows-test-guide.md） |
 | US-39 | `test_env_windows.py` test_hw_doctor | 跳过 | pending：需要 Windows 实机（见 docs/windows-test-guide.md） |
 | US-42 | `everything.e2e.js` US-42 photo-studio：本地打开，界面操作与 CLI 等价 | 通过（含已知上游缺陷） | 上游缺陷：src/app/pointer.ts 中 #viewport 的 pointerdown 处理只排除 button / input / .canvas-ui，开始页的“Describe an edit”文本框（textarea）被鼠标点击时焦点被抢到画布，用鼠标无法输入；CLI 的 set 不经过指针事件，所以结果不同 |
-| US-44 | `everything.e2e.js` US-44 tasks：本地打开，界面操作与 CLI 等价 | 失败 | 只在 CLI 结果中出现：combobox/List/<id>/ |
 | US-46 | `everything.e2e.js` US-46 assets：本地打开，界面操作与 CLI 等价 | 跳过 | 上游提交 0fbb88cd 的 src/assets 只有 index.html/package.json/vite.config.js，缺少 index.html 引用的 /src/main.js（GitHub contents API 对 src/assets/src 返回 404），因此无法构建。 |
 | US-52 | `test_sandbox.py` test_windows_code_path_under_wine | 跳过 | 设置 FOXOS_TEST_WINE / FOXOS_TEST_WINE_PYTHON 后在 wine 中运行 Windows 代码路径 |
+| US-80 | `test_packaging.py` test_US80_install_sh_downloads_verifies_and_installs_the_cli | 跳过 | 没有 out/linux-x64/FoxOS-0.3.3-linux-x64.tar.gz：先运行 npm run dist:linux 与 collect-artifacts.sh |
+| US-80 | `test_packaging.py` test_US80_install_sh_refuses_a_tampered_download | 跳过 | 没有 out/linux-x64/FoxOS-0.3.3-linux-x64.tar.gz：先运行 npm run dist:linux 与 collect-artifacts.sh |
+| US-80 | `test_packaging.py` test_US80_install_sh_download_only_keeps_file | 跳过 | 没有 out/linux-x64/FoxOS-0.3.3-linux-x64.tar.gz：先运行 npm run dist:linux 与 collect-artifacts.sh |
+| US-81 | `test_packaging.py` test_US81_linux_packages_smoke | 跳过 | 没有构建 Linux 安装包 |
+| US-83 | `test_packaging.py` test_US83_release_matrix_covers_every_common_platform | 跳过 | could not import 'yaml': No module named 'yaml' |
+| US-117 | `test_os_runtime.py` test_US117_iso_runtime_versions_as_user_foxos | 跳过 | agent overlay not mounted (scripts/os/tools/agent-overlay.sh up) |
+| US-118 | `test_os_runtime.py` test_US118_iso_acp_agents_registered_and_handshake_as_foxos | 跳过 | agent overlay not mounted (scripts/os/tools/agent-overlay.sh up) |
+| US-63 | `test_env_presets.py` test_US63_real_linux_preset_download_verify_boot | 跳过 | 真实下载与引导：设置 FOXOS_PRESET_E2E=1 |
+| US-120 | `test_cu_real.py` test_US120_doctor_reports_default_stack_and_fallbacks | 跳过 | real computer-use e2e: set FOXOS_CU_E2E=1 on a desktop session |
+| US-121 | `test_cu_real.py` test_US121_default_path_agent_desktop_with_jev_edits_and_saves | 跳过 | needs a TypeSafe key |
+| US-122 | `test_cu_real.py` test_US122_step_policy_falls_back_to_deepseek_without_typesafe_key | 跳过 | real computer-use e2e: set FOXOS_CU_E2E=1 on a desktop session |
+| US-123 | `test_cu_real.py` test_US123_no_a11y_app_falls_back_to_screenshot_computer_use | 跳过 | real computer-use e2e: set FOXOS_CU_E2E=1 on a desktop session |
+| US-124 | `test_cu_real.py` test_US124_web_target_not_in_a11y_tree_falls_back_to_browser_use | 跳过 | real computer-use e2e: set FOXOS_CU_E2E=1 on a desktop session |
+| US-125 | `test_cu_real.py` test_US125_surface_can_be_forced_per_call_and_per_bot | 跳过 | real computer-use e2e: set FOXOS_CU_E2E=1 on a desktop session |
+| US-126 | `test_cu_real.py` test_US126_typesafe_provider_live_call | 跳过 | needs a TypeSafe key |
 
-## 操作系统会话与环境（2026-11-11 21:55，Asia/Shanghai）
-
-本次打磨 XFCE 桌面外观并重做 ISO（0.3.1）后，在同一 Linux 构建盒上重跑了 `npm run test:os`（US-60 / US-61），共 **8 通过、0 失败、0 跳过**（83.11 秒，最后一次在最终 ISO 构建之后运行）。**没有**重跑 Electron 桌面的 Everything 端到端；上表中 US-01–US-53 的 Everything 结果仍是 2026-11-11 14:39 那一次 `test:all`。
-
-- **US-60**（4 通过）：`packages/core/tests/test_os_session.py`。假后端覆盖列出、聚焦、移动、缩放、键入、点击、截图、关闭，以及 `desktop` / `session` 人工接管（智能体写操作返回 `PAUSED`）；新增用例确认不加 `--json` 时 `foxos desktop windows` / `session status` 也给人输出窗口列表与会话状态（之前是空输出）。MCP 工具目录含 `desktop_windows`、`desktop_move`、`session_takeover`。另在本机用 **Xvfb + xfwm4** 启动真实 XFCE 窗口管理器，打开两扇 xfce4-terminal 窗口，经 `wmctrl` 列出/聚焦/关闭/移动/缩放，用 `xdotool` 键入与点击，用 `scrot` 截图。程序化移动与缩放在 X11 上可用。
-- **ISO 0.3.1 引导核对**（手动，非默认测试）：在本机以显式 `FOXOS_ALLOW_TEST_VMM=qemu-tcg`（TCG 软件模拟，KVM 在此宿主不可用）引导最终发布的 `FoxOS-0.3.1-amd64.iso`（1562474496 字节，SHA-256 `7acb74c92d159034966821900d43ddeec1815d0d7456d57232811371c31b4500`，Release v0.3.1-os-preview），Live 会话自动登录进 XFCE：终端里 `whoami` 为 `foxos`，`$XDG_CURRENT_DESKTOP $LANG` 为 `XFCE zh_CN.UTF-8`，`foxos desktop status` 报告 `backend: x11`、`wmctrl` / `xdotool` / `scrot` 齐全；Whisker 开始菜单为中文（收藏夹 / 最近使用 / 全部应用程序），图标为 Papirus。截图见 `docs/screenshots/os-live-boot.png`。
-- **截图**：`docs/screenshots/os-desktop.png`、`os-desktop-session.png`、`os-terminal.png`、`os-editor.png` 由 `scripts/os/tools/shoot-desktop.sh` 生成：在 ISO 构建出的根文件系统上叠一层只读 overlay，以 Live 用户 `foxos`、`zh_CN.UTF-8`、主机名 `foxos` 用 `startxfce4` 启动真实会话（Xvfb 1920×1080），不是合成图。
-- **US-61**（4 通过）：`packages/core/tests/test_os_kvm.py`。`linux-kvm` 已登记为内置提供者；Linux 目录条目（如 Alpine）含该提供者；`foxos env run --iso --no-start` 与 `foxos env desktop-attach` 命令/MCP 已接通。此构建盒的 `/dev/kvm` 存在，但内核曾出现 `kvm_arch_vcpu_create` BUG，`foxos env doctor --provider linux-kvm` 会如实报告不可用；**不会**在未设置 `FOXOS_ALLOW_TEST_VMM=qemu-tcg` 时改用 QEMU。产品路径仍是 cloud-hypervisor + KVM，来宾桌面走 wayvnc。默认测试套件不引导狐狸OS ISO（太慢）；在支持 KVM 的机器上可用该 ISO 或目录中的 Linux 系统做来宾桌面。复现：`npm run test:os`。
-
-## 智能体、连接器、多机与运行环境（2026-11-12 01:00，Asia/Shanghai）
-
-在合并主线（`bf5b1a6`）之后的分支上运行 `packages/core` 的全部 pytest：**111 通过、1 失败、3 跳过**（13 分 33 秒）。失败的是 US-61 `test_os_kvm.py`：这台构建盒上 `/dev/kvm` 存在但当前用户不可读写，是环境原因，以前就是这样。跳过的 3 个仍是 Windows 实机与 wine 用例。Electron 桌面端到端（Playwright）这次**没有**重跑；`apps/desktop` 的 `lint:i18n` 通过（511 个词条，0 错误）。
-
-| 故事 | 测试 | 结果 |
-|---|---|---|
-| US-100–US-108 | `test_bots.py`（9 个）：智能体增删改、每个智能体的设置、真实 ACP 回合与审批卡片、委托、pstack、记忆与例程、暂停、聊天服务 SSE、真实无头 Chrome 里的界面（中英文） | 通过 |
-| US-109–US-112 | `test_connectors.py`（4 个）：目录与 stdio MCP、OAuth 2.1（本地真实授权服务，PKCE、动态注册、刷新）、Bearer 令牌、Exa 真实调用 | 通过 |
-| US-113–US-115 | `test_machines.py`（3 个）：两个真实 `machine serve` 被控端；配对码、指纹、双向 TLS；一个智能体控制两台；两个智能体共用一台（LOCKED、CONFLICT、PAUSED、撤销） | 通过 |
-| US-116 | `test_acp_real.py`：从 GitHub 下载 opencode 2.2.7（sha256 校验），真实 ACP 握手与会话 | 通过 |
-| US-117–US-118 | `test_os_runtime.py`：镜像 chroot 的 overlay 里（同一份 hook 30/35），以用户 foxos 检查版本、PEP 668、ACP 握手 | 通过 |
-
-没有用真实模型账号跑过回答。Gemini CLI、codex-acp、Qwen Code、Cursor CLI 的握手结果是「需要登录」；opencode 和 claude-agent-acp 能建立会话。详见 [agent-runtime.md](agent-runtime.md)。截图在 `docs/screenshots/bots-*.png`，是 overlay 里真实 XFCE 会话中的「智能体」窗口（Firefox 后备浏览器）。
-
-## 最终回归（2026-11-12 05:58，Asia/Shanghai，合并主线 `bb40a85`）
-
-`packages/core` 全部 pytest：**153 通过、0 失败、19 跳过**（15 分 20 秒）。与上一次相比多跳过 1 个：`test_os_session.py` 的真实 XFCE 用例报告 xfwm4 没能在测试显示上启动；单独重跑该文件 4 个全部通过（104 秒）。中间一次运行（`0136016`，负载很高）里 US-116 opencode 的 ACP 会话没有建立起来而失败，这一次通过。
-
-## 合并主线后的完整回归（2026-11-12 05:13，Asia/Shanghai）
-
-合并主线（`41f6920`）后在构建盒上跑 `packages/core` 全部 pytest：**152 通过、0 失败、18 跳过**（12 分 27 秒）。之前 US-32 / US-33 的失败是因为构建盒的系统 Python 缺 `zstandard`（`pyproject.toml`、ISO 的 venv、打包脚本都已声明这个依赖，仓库不缺）；装上 Debian 的 `python3-zstandard` 后通过。跳过的 18 个：电脑操控真实端到端 7 个（需要 `FOXOS_CU_E2E=1`，另跑，见下）、预设真实下载 1、Windows 实机 2、镜像 overlay 2、安装包产物 4、缺 `yaml` 模块 1、wine 1。
-
-随后在同一提交上单独跑真实电脑操控端到端（`FOXOS_CU_E2E=1`，XFCE 会话 :55，真实 Jev / DeepSeek）：**7 通过、0 失败**（162.4 秒）。
-
-## 电脑、浏览器、命令行操控（2026-11-12 03:01，Asia/Shanghai）
-
-默认栈：agent-desktop 1.2.0 读界面并执行（AT-SPI），Jev（TypeSafe）选每一步，DeepSeek v4 pro 做规划；读不到界面时自动退到截图操控（scrot + xdotool + 视觉定位）或浏览器操控（Chrome CDP + agent-browser 0.42.0）。所有动作在狐狸OS 机器里的 XFCE 会话（Xvfb :55）里执行，不碰宿主。删除、发送、支付等动作要求批准，每一步写审计。
-
-先用真实请求核对 Jev 密钥（密钥只在测试时放进环境变量，不打印）：`GET /v1/models` 200，108 毫秒；`POST /v1/systemone`（Choice）200，156 毫秒，模型 jev-1.14.0，置信度 1.0。
-
-真实端到端 `FOXOS_CU_E2E=1 pytest tests/test_cu_real.py`（合并主线后的 `8eb13be`）：**7 通过、0 失败**，134.6 秒。
-
-| 故事 | 用例 | 结果 | 耗时（秒） |
-|---|---|---|---|
-| US-120 | 体检显示默认栈与两条兜底 | 通过 | 1.7 |
-| US-121 | 默认路径：agent-desktop + Jev + DeepSeek 规划，在 Mousepad 改写并保存 | 通过 | 21.4 |
-| US-122 | 没有 TypeSafe 密钥时退到 DeepSeek 单步策略 | 通过 | 39.2 |
-| US-123 | xedit 没有无障碍信息，自动退到截图操控 | 通过 | 31.9 |
-| US-124 | 网页内容读不到，自动退到浏览器操控（本地商店下单并读出订单号） | 通过 | 18.0 |
-| US-125 | 按次 `--surface` 与按智能体设置手动选择 | 通过 | 20.4 |
-| US-126 | TypeSafe 服务商真实调用 | 通过 | 1.9 |
-| US-127 | 离线单元测试 `test_computer_use.py`（20 个） | 通过 | — |
-
-另外 `test_computer_use.py`、`test_catalog_and_mcp.py`、`test_i18n.py`、`test_os_runtime.py` 合并后共 27 通过、2 跳过（`test_os_runtime` 需要镜像 chroot）。
-
-开发过程中出现过、已经修好的失败（都是真实运行）：Mousepad 弹出对话框时 agent-desktop 返回 AMBIGUOUS_TARGET，第一次跑到步数上限（改为多窗口快照）；维基百科走浏览器操控时先后出现“Unknown ref”、答案正确但校验判为未完成、标签页超时（分别修为不重复切换标签、校验带上页面文字、观察出错时重试）。
-
-基准（Jev 与 DeepSeek）见 [computer-use-research.md](computer-use-research.md)：数据没有显示 Jev 在成功率或费用上更好，只在单步延迟上更快（约 0.13 秒对 1.3 秒）；第二轮因为盒子内存耗尽、Chrome 被 OOM 杀掉而作废。
-
-未做：UI-TARS-1.5-7B 本地定位没有跑（需要约 8.3 GB 内存，盒子上只有约 1.3 GB 可用）；`test_envs.py` 的 US-32/US-33 在这台盒子上因缺 `zstandard` 模块失败（与本次改动无关）。截图：`docs/screenshots/cu-bot-settings.png`、`cu-bot-settings-en.png`（智能体设置的“电脑操控”页）；`cu-desktop-default-path.png` 是默认路径一次真实任务后的 XFCE 桌面（04:38 运行：`foxos computer task` 在 Mousepad 写入并保存，6 步，59.0 秒，Jev 平均每步 105 毫秒，交给规划器 6 次）。同一任务前两次在负载约 70–100 时失败：scrot、wmctrl 超时被当成未处理的异常结束了任务。已改为结构化错误并重试观察（`d89d302`、`67ab5ba`），第三次通过。
+未归入故事的用例：2 个（env-install.e2e.js, test_desktop_client.py）
 
 ## Everything 应用覆盖（51 个）
 
@@ -133,7 +146,7 @@
 
 | 应用 | 分组 | 启动 | 等价检查 | 检查的操作 | 清单操作 | 有 CLI / MCP 绑定 | 测试中执行 | MCP 调用 | 说明 |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Spreadsheet (`spreadsheet`) | 办公 | 通过 | 一致 | `foxos spreadsheet cell-reference set foxos parity` | 371 | 371 | 1 | 通过 |  |
+| Spreadsheet (`spreadsheet`) | 办公 | 通过 | 无可检查操作 | — | 371 | 371 | 0 | 通过 | 主界面没有适合做等价检查的操作 |
 | Documents (`documents`) | 办公 | 通过 | 一致 | `foxos documents document-name set foxos parity` | 311 | 311 | 1 | 通过 |  |
 | Presentation (`presentation`) | 办公 | 通过 | 一致 | `foxos presentation speaker-notes set foxos parity` | 284 | 284 | 1 | 通过 |  |
 | Whiteboard (`whiteboard`) | 办公 | 通过 | 一致 | `foxos whiteboard search-boards set foxos parity` | 26 | 26 | 1 | 通过 |  |
@@ -190,16 +203,7 @@
 - Everything 应用：**51/51** 显示上游自带图标（来源：已安装的上游组件 50，随附（MIT） 1）；缺失：无（AGPL 应用未安装时没有图标，安装后从上游组件读取）。
 - 内置程序：**6/6** —— writer：本机 LibreOffice，calc：本机 LibreOffice，impress：本机 LibreOffice，terminal：系统终端，editor：Code - OSS（随附，MIT），browser：Electron（随附）。
 - ACP 智能体：**45/45** 显示注册表 `icon`（45 个在注册表里有 icon）。
-- 狐狸OS 自己的程序保留狐狸OS 风格图标：files, environments, appcenter, settings。
-
-## Windows 客户端（US-86 / US-87，2026-11-12 05:15，Asia/Shanghai）
-
-- US-86（`foxos` 找不到，Path/PATH 重复）：pytest 通过。
-- US-87 单元与结构测试 8/8 通过（`packages/core/tests/test_desktop_client.py`）。
-- US-87 端到端 1/1 通过（`apps/desktop/e2e/client.e2e.js`）：真实 Electron（客户端模式）+ 真实狐狸OS 根文件系统来宾（sshd、Xvfb :0 上的 XFCE）。覆盖：本机执行默认关闭；终端、Everything 应用、文件写入都在来宾里；电脑画面经 SSH 转发的 x11vnc 显示来宾桌面；`FOXOS_E2E_GUEST_APT=1` 时应用中心在来宾里 apt 安装 LibreOffice Writer，「打开 Word」在来宾桌面打开 Writer。
-- 修复中发现的缺陷：`--json` 被放在命令末尾，`desktop launch -- libreoffice --writer --json` 把它传给了 LibreOffice，Writer 打不开；现在 `--json` 放在命令前面（`bc8d9cc`）。
-- 安装包：[v0.3.3-windows-preview](https://github.com/gatesenman/foxos/releases/tag/v0.3.3-windows-preview)（x64 / arm64 的 exe 与 zip，wine 下构建；x64 包内 Python 在 wine 里跑过 `foxos --version`、`env list`、`machine list`、`everything list`、`env catalog`，Windows Electron 在 wine 里默认进入客户端模式；arm64 只核对了 PE 架构）。
-- 未覆盖：Windows 实机（见 [windows-client.md](windows-client.md)）。
+- 狐狸OS 自己的程序保留狐狸OS 风格图标：files, environments, appcenter, settings, bots, computer。
 
 ## 安装包（发布矩阵，v0.3.2-os-preview）
 
@@ -224,6 +228,15 @@
 | 狐狸OS 系统 | amd64 | 单文件 ISO | ❌ 未上传 | — | 分卷 part1 + part2 已在发布里；单文件由 CI 合并上传 |
 
 GitHub Actions 运行：[43057548522](https://github.com/gatesenman/foxos/actions/runs/43057548522)（失败：账户账单锁定，任务未启动）；[43059095200](https://github.com/gatesenman/foxos/actions/runs/43059095200)（失败：账户账单锁定，任务未启动）；[43070332484](https://github.com/gatesenman/foxos/actions/runs/43070332484)（失败：账户账单锁定，任务未启动）
+
+## 说明
+
+- **真实模型（US-140–US-145）：** 这些用例用 DeepSeek 的 OpenAI 兼容接口真实回答。密钥从 `~/.secrets/deepseek_api_key`（或 `FOXOS_TEST_DEEPSEEK_KEY_FILE`）读取，只经标准输入存进测试自己的密钥库，不出现在日志、截图和本报告里。这次运行有密钥文件，6 个都通过。没有密钥文件时它们**跳过**（不算失败），没有密钥的 CI 仍然是绿的。
+- **智能体窗口（US-146–US-154）：** 在自己的 Xvfb + xfwm4 桌面里打开真实的智能体窗口（Chrome 应用模式），用 Playwright 经 CDP 点界面。代码智能体是 opencode，这次用 `deepseek/deepseek-flash`。没有密钥时用 opencode 的默认免费模型，不需要密钥，但 opencode 对免费用量有上限，用完会报 “Free usage limit reached”。停靠用例检查 `_NET_WM_STRUT_PARTIAL`：窗口停靠时占住屏幕右边，最大化的窗口不盖住它，取消停靠后释放。截图在 `docs/screenshots/bots-e2e-*.png`。
+- **宿主保护（US-155）：** 在宿主应用里，智能体只在狐狸OS 虚拟电脑里动手。其余测试用 `FOXOS_PLACE=foxos` 模拟虚拟电脑里面。
+- **US-44 tasks 偶发失败的根因：** 等价检查先按“含数字”过滤控件，再把生成的 ID 归一化。tasks 的 ID 是 `Date.now().toString(36) + '-' + 6 位随机 base36`，有时含数字，有时不含。同一个下拉框因此在一次结果里被丢掉，在另一次里留成 `<id>`。模拟 10 万次，不一致率约 16%。现在先归一化再过滤，不一致率为 0。这次 tasks 通过。
+- **这次运行：** 合并 main（85f21b7）以后，在 06:14–06:52（UTC+8）完整跑了一遍 `npm run test:all`。只有 US-53 失败，原因是 main 新加的「狐狸电脑」程序（computer）不在图标测试的自带图标名单里。已补进名单，单独重跑后通过。本报告汇总的就是这两次的结果。
+- **之前修过的问题：** 构建盒和其他构建共用机器，负载一度到 80–100。那时 US-41 calendar / signatures（桌面控制通道超时）、US-50 和智能体窗口（opencode 首次运行的版本检查超过 60 秒）都失败过。版本检查的超时已放宽到 240 秒。US-50 另有一个真问题：有 KVM 的宿主上，安装 Alpine 这类根文件系统条目时会优先选 linux-kvm，但这类条目没有可引导的磁盘。已改为不优先 linux-kvm。
 
 ## 复现
 

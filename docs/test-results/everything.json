@@ -21,10 +21,10 @@
   "app": "spreadsheet",
   "group": "office",
   "boot": "ok",
-  "parity": "equal",
-  "op": "cell-reference.set",
-  "cli": "foxos spreadsheet cell-reference set foxos parity",
-  "note": null
+  "parity": "no-op",
+  "op": null,
+  "cli": null,
+  "note": "主界面没有适合做等价检查的操作"
  },
  "crm": {
   "app": "crm",
