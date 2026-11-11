@@ -36,7 +36,7 @@ install -d /etc/skel/FoxOS/workspace
 # VMM（cloud-hypervisor，完整虚拟机用）
 if [ -d "$SRC/vmm" ]; then
   install -d /usr/lib/foxos/vmm /usr/share/doc/foxos
-  cp -a "$SRC/vmm/." /usr/lib/foxos/vmm/
+  cp -a --remove-destination "$SRC/vmm/." /usr/lib/foxos/vmm/   # 正在运行的旧二进制不挡路
   if [ -f /usr/lib/foxos/vmm/NOTICE ]; then
     cp /usr/lib/foxos/vmm/NOTICE /usr/share/doc/foxos/NOTICE.vmm
   fi
@@ -48,6 +48,7 @@ fi
 # 见 docs/os.md「浏览器：为什么 Chrome 不在 ISO 里」。
 if [ -d "$SRC/chrome" ]; then
   command -v zenity >/dev/null 2>&1 || DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends zenity || true
+  command -v xorriso >/dev/null 2>&1 || { apt-get update -q >/dev/null 2>&1; DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends xorriso; } || true   # 预设系统的种子光盘
   install -m 755 "$SRC/chrome/foxos-chrome-setup" /usr/lib/foxos/foxos-chrome-setup
   ln -sf /usr/lib/foxos/foxos-chrome-setup /usr/bin/foxos-chrome-setup
   install -m 755 "$SRC/chrome/foxos-chrome" /usr/bin/foxos-chrome
@@ -79,4 +80,31 @@ Name=Google Chrome
 X-XFCE-Commands=/usr/bin/foxos-chrome
 H
   update-alternatives --install /usr/bin/x-www-browser x-www-browser /usr/bin/foxos-chrome 220 || true
+fi
+
+# SSH 远程访问（docs/ssh.md）：默认开启，只允许密钥登录，禁止 root 登录，ufw 放行 22。
+# Live 会话另外生成一次性随机密码并显示在控制台与桌面（foxos-live-ssh）。
+if [ -d "$SRC/ssh" ]; then
+  command -v sshd >/dev/null 2>&1 || [ -x /usr/sbin/sshd ] || { apt-get update -q >/dev/null 2>&1; DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends openssh-server ufw; } || true
+  command -v ufw >/dev/null 2>&1 || DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends ufw || true
+  for f in foxos-ssh-admin foxos-live-ssh foxos-live-ssh-notify foxos-ssh-setup foxos-ssh-install-target; do
+    install -m 755 "$SRC/ssh/$f" /usr/lib/foxos/$f
+  done
+  install -m 440 "$SRC/ssh/foxos-ssh-sudoers" /etc/sudoers.d/foxos-ssh
+  install -m 644 "$SRC/ssh/foxos-ssh-hostkeys.service" "$SRC/ssh/foxos-live-ssh.service" /etc/systemd/system/
+  install -m 644 "$SRC/ssh/foxos-live-ssh-notify.desktop" /etc/xdg/autostart/foxos-live-ssh-notify.desktop
+  install -m 644 "$SRC/ssh/foxos-ssh-firstrun.desktop" /etc/xdg/autostart/foxos-ssh-firstrun.desktop
+  /usr/lib/foxos/foxos-ssh-admin password-off >/dev/null 2>&1 || true   # 写 10-foxos.conf（PasswordAuthentication no，PermitRootLogin no）
+  # Ubuntu 24.04 默认用 ssh.socket 按需启动；狐狸OS 用常驻的 ssh.service，状态更直观
+  systemctl disable ssh.socket >/dev/null 2>&1 || true
+  systemctl enable ssh.service foxos-ssh-hostkeys.service foxos-live-ssh.service >/dev/null 2>&1 || true
+  # 防火墙：开启 ufw，默认拒绝入站，放行 22/tcp（chroot 里不能调 iptables，直接写规则文件）
+  if [ -f /etc/ufw/ufw.conf ]; then
+    sed -i 's/^ENABLED=.*/ENABLED=yes/' /etc/ufw/ufw.conf
+    grep -q 'dport 22 -j ACCEPT' /etc/ufw/user.rules 2>/dev/null || \
+      sed -i 's|^### RULES ###|### RULES ###\n\n### tuple ### allow tcp 22 0.0.0.0/0 any 0.0.0.0/0 in\n-A ufw-user-input -p tcp --dport 22 -j ACCEPT|' /etc/ufw/user.rules
+    grep -q 'dport 22 -j ACCEPT' /etc/ufw/user6.rules 2>/dev/null || \
+      sed -i 's|^### RULES ###|### RULES ###\n\n### tuple ### allow tcp 22 ::/0 any ::/0 in\n-A ufw6-user-input -p tcp --dport 22 -j ACCEPT|' /etc/ufw/user6.rules
+  fi
+  rm -f /etc/ssh/ssh_host_*    # 每台机器首次开机自己生成（foxos-ssh-hostkeys.service）
 fi

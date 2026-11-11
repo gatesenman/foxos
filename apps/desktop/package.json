@@ -191,7 +191,8 @@
         "at-spi2-core",
         "(libuuid or libuuid1)",
         "(alsa-lib or libasound2)",
-        "(mesa-libgbm or libgbm1)"
+        "(mesa-libgbm or libgbm1)",
+        "(liberation-fonts or dejavu-sans-fonts or google-noto-sans-fonts)"
       ]
     },
     "dmg": {

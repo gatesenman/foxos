@@ -187,9 +187,12 @@ def main() -> int:
     if inst:
         L.append(f"## 安装包（发布矩阵，{inst.get('tag', '')}）\n")
         L.append(inst.get("intro", "") + "\n")
-        L.append("| 系统 | CPU | 格式 | 构建 | 构建机上的冒烟 | 从 Release 一行安装 | 说明 |\n| --- | --- | --- | --- | --- | --- | --- |")
+        L.append("| 系统 | CPU | 安装包 | 构建 | 端到端（安装 → 启动桌面 → foxos --version → sheets create → 卸载） | 说明 |\n| --- | --- | --- | --- | --- | --- |")
         for r in inst.get("rows", []):
-            L.append(f"| {r['os']} | {r['arch']} | {r['formats']} | {r['built']} | {r['smoke']} | {r.get('install', '—')} | {r.get('note', '').replace('|', '/')} |")
+            L.append(f"| {r['os']} | {r['arch']} | {r['formats']} | {r['built']} | {r['e2e']} | {r.get('note', '').replace('|', '/')} |")
+        if inst.get("runs"):
+            L.append("")
+            L.append("GitHub Actions 运行：" + "；".join(f"[{x['id']}]({x['url']})（{x['result']}）" for x in inst["runs"]))
         L.append("")
     L.append("## 复现\n")
     L.append("```bash\npython3 -m venv .venv && .venv/bin/pip install -e 'packages/core[test]'\n(cd apps/desktop && npm ci)\n"

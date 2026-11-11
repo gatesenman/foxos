@@ -23,8 +23,8 @@ pstack 的技能原文没有改动，里面提到的工具名与编辑器（例�
 
 ## 电脑操控 / Computer use
 
-作为依赖在安装时获取（npm 固定版本），镜像预装到 `/usr/lib/foxos/tools/<名字>/`，许可证文件随 npm 包（`node_modules/<名字>/LICENSE`）。狐狸OS 只通过命令行 / JSON 调用它们，没有拷贝源代码。
-Installed as pinned npm dependencies (preinstalled in the ISO under `/usr/lib/foxos/tools/<name>/`, license files ship inside each package). FoxOS only calls them as separate processes; no source code is copied.
+作为依赖在安装时获取（npm 固定版本），镜像按运行环境清单全局预装（`npm install -g`，见 docs/agent-runtime.md），许可证文件随 npm 包（`node_modules/<名字>/LICENSE`）。狐狸OS 只通过命令行 / JSON 调用它们，没有拷贝源代码。
+Installed as pinned npm dependencies (preinstalled globally in the ISO from the runtime manifest; license files ship inside each package). FoxOS only calls them as separate processes; no source code is copied.
 
 | 作品 / Work | 版本 / Version | 许可证 / License | 用途 / Use |
 |---|---|---|---|

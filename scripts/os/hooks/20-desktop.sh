@@ -121,6 +121,7 @@ install -m 755 "$SRC/panel/foxos-takeover" /usr/lib/foxos/panel/foxos-takeover
 install -m 755 "$SRC/panel/foxos-takeover-genmon" /usr/lib/foxos/panel/foxos-takeover-genmon
 install -m 644 "$SRC/panel/foxos-system.desktop" /usr/share/applications/foxos-system.desktop
 install -m 755 "$SRC/panel/foxos-system-genmon" /usr/lib/foxos/panel/foxos-system-genmon
+install -m 755 "$SRC/panel/foxos-system-menu" /usr/lib/foxos/panel/foxos-system-menu
 install -m 755 "$SRC/panel/foxos-clock-genmon" /usr/lib/foxos/panel/foxos-clock-genmon
 for id in 7 10; do
   install -m 644 "$SRC/branding/xfce/panel/genmon-$id.rc" /etc/xdg/xfce4/panel/genmon-$id.rc

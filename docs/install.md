@@ -11,7 +11,11 @@
 
 所有文件都在 GitHub Release [v0.3.2-os-preview](https://github.com/gatesenman/foxos/releases/tag/v0.3.2-os-preview)。
 
-> **现状（2026-11-12）**：表里标「待 CI」的文件（MSI、dmg、arm64 ISO、单文件 ISO）要在 GitHub Actions 的 Windows / macOS / arm64 机器上构建。本仓库的 Actions 目前因 GitHub 账户的账单问题无法启动（任务未开始即失败）；账单恢复后手动运行一次 `release` 工作流就会补上。其余文件已在 Linux 构建机上构建并做过安装测试；macOS 的 zip 已 ad-hoc 签名，但还没在真 Mac 上运行过。
+> **现状（2026-11-12）**：
+> - **已端到端验证**（安装 → 启动桌面截图 → `foxos --version` → `foxos sheets create` → 卸载，见 [测试报告](test-report.md#安装包发布矩阵v032-os-preview)）：Linux x64 的 deb（Ubuntu 24.04、Debian 12）、rpm（Fedora 43、openSUSE Tumbleweed）、tar.gz（Ubuntu、Debian、Arch）、AppImage（Ubuntu、Debian、Arch）。
+> - **部分验证**：Linux arm64 的 deb / tar.gz（Debian 12）、rpm（Fedora 43）在 qemu 里装上、命令行可用、卸载干净，但桌面启动只能在真 arm64 机器上验证（qemu 跑不了 Chromium）；AppImage 只验证了内容。
+> - **还没验证**：Windows（NSIS 安装程序、便携 zip）和 macOS（zip）已经构建并上传，但还没有在真 Windows / Mac 上装过，请当作预览版。
+> - **还没有**：标「待 CI」的文件（MSI、dmg、arm64 ISO、单文件 ISO）要在 GitHub Actions 的 Windows / macOS / arm64 机器上构建；本仓库的 Actions 目前因 GitHub 账户的账单问题无法启动（任务未开始即失败）。账单恢复后手动运行一次 `release` 工作流，就会补上这些文件，并在每个系统上跑一遍端到端测试。
 每个文件的 SHA-256 都在同一发布的 `SHA256SUMS` 里；安装脚本会自动校验，校验不通过就停止。
 
 ### 选哪个文件
@@ -39,7 +43,7 @@ Linux 和 macOS（自动识别系统和 CPU，下载、校验、安装，最后�
 curl -fsSL https://github.com/gatesenman/foxos/releases/download/v0.3.2-os-preview/install.sh | sh
 ```
 
-- Ubuntu / Debian 用 `.deb`，Fedora / RHEL / openSUSE 用 `.rpm`（需要 sudo）；Arch 等其他发行版、或没有 sudo 时，装到 `~/.local/share/foxos`，命令链接到 `~/.local/bin/foxos`。
+- Ubuntu / Debian 用 `.deb`，Fedora / RHEL / openSUSE 用 `.rpm`（需要 sudo）；Arch 等其他发行版、或没有 sudo 时，装到 `~/.local/opt/foxos`，命令链接到 `~/.local/bin/foxos`。
 - 指定方式：`curl -fsSL …/install.sh | sh -s -- --method tar`（可选 `deb` / `rpm` / `tar` / `appimage`）；只下载校验：`--download-only`；英文提示：`--lang en`。
 - macOS 装到 `/Applications/FoxOS.app`（没有写权限就装到 `~/Applications`），命令链接到 `/usr/local/bin/foxos` 或 `~/.local/bin/foxos`。
 
@@ -65,7 +69,8 @@ $env:FOXOS_PORTABLE = '1'   # 或 $env:FOXOS_MSI = '1'
 
 **Linux**：
 
-- deb / rpm 会把程序装到 `/opt/FoxOS`，并建立 `/usr/bin/foxos`（命令行）和 `/usr/bin/foxos-desktop`（桌面）。卸载：`sudo apt remove foxos-desktop` 或 `sudo dnf remove foxos-desktop`。
+- deb / rpm 会把程序装到 `/opt/FoxOS`，并建立 `/usr/bin/foxos`（命令行）和 `/usr/bin/foxos-desktop`（桌面）。卸载：`sudo apt remove foxos-desktop`、`sudo dnf remove foxos-desktop` 或 `sudo zypper remove foxos-desktop`。
+- tar.gz / AppImage（install.sh 装在 `~/.local/opt/foxos`）卸载：`rm -rf ~/.local/opt/foxos ~/.local/bin/foxos ~/.local/bin/foxos-desktop ~/.local/share/applications/foxos.desktop`。你的数据在 `~/.local/share/foxos`，卸载不会动它。
 - 中文界面需要中文字体：Ubuntu / Debian 会自动推荐安装 `fonts-noto-cjk`；Fedora 装 `google-noto-sans-cjk-fonts`，Arch 装 `noto-fonts-cjk`。
 - 在没有用户命名空间的系统上（部分加固内核），deb / rpm 会自动给 `chrome-sandbox` 设 SUID；tar.gz / AppImage 可加 `--no-sandbox` 启动。
 
@@ -114,7 +119,11 @@ FoxOS ships two different things:
 
 Everything is on the GitHub release [v0.3.2-os-preview](https://github.com/gatesenman/foxos/releases/tag/v0.3.2-os-preview).
 
-> **Status (2026-11-12)**: files marked "pending CI" (MSI, dmg, arm64 ISO, single-file ISO) need GitHub Actions Windows / macOS / arm64 runners. Actions cannot start on this repository right now because of a GitHub account billing lock; once that is resolved, run the `release` workflow once to add them. Everything else was built and install-tested on a Linux build machine; the macOS zips are ad-hoc signed but not yet run on a real Mac.
+> **Status (2026-11-12)**:
+> - **End-to-end verified** (install → desktop launch screenshot → `foxos --version` → `foxos sheets create` → uninstall): Linux x64 deb (Ubuntu 24.04, Debian 12), rpm (Fedora 43, openSUSE Tumbleweed), tar.gz (Ubuntu, Debian, Arch), AppImage (Ubuntu, Debian, Arch).
+> - **Partly verified**: Linux arm64 deb / tar.gz (Debian 12) and rpm (Fedora 43) install, run the CLI and uninstall cleanly under qemu; the desktop launch needs a real arm64 machine (Chromium does not run under qemu-user). The arm64 AppImage was checked for contents only.
+> - **Not verified yet**: the Windows (NSIS setup, portable zip) and macOS (zip) builds are uploaded but have not been installed on a real Windows PC or Mac. Treat them as previews.
+> - **Missing**: files marked "pending CI" (MSI, dmg, arm64 ISO, single-file ISO) need GitHub Actions Windows / macOS / arm64 runners. Actions cannot start on this repository right now because of a GitHub account billing lock. Once that is fixed, run the `release` workflow once: it builds them and runs the end-to-end tests on every platform.
  `SHA256SUMS` in the same release covers every file; the install scripts verify it and stop on a mismatch.
 
 ### Which file
@@ -152,7 +161,7 @@ irm https://github.com/gatesenman/foxos/releases/download/v0.3.2-os-preview/inst
 
 - **Windows**: not code-signed yet; on first run SmartScreen says "Windows protected your PC" → "More info" → "Run anyway".
 - **macOS**: not notarized yet (needs an Apple Developer account). Control-click (right-click) FoxOS in Applications → Open → Open. On macOS 15 Sequoia and later, open it once, then go to System Settings → Privacy & Security → "Open Anyway". Or run `xattr -dr com.apple.quarantine /Applications/FoxOS.app` (install.sh already does this).
-- **Linux**: deb / rpm install to `/opt/FoxOS` with `/usr/bin/foxos` and `/usr/bin/foxos-desktop`. Install a CJK font for the Chinese UI (`fonts-noto-cjk`, `google-noto-sans-cjk-fonts`, `noto-fonts-cjk`).
+- **Linux**: deb / rpm install to `/opt/FoxOS` with `/usr/bin/foxos` and `/usr/bin/foxos-desktop`; uninstall with `sudo apt remove foxos-desktop` / `sudo dnf remove foxos-desktop` / `sudo zypper remove foxos-desktop`. tar.gz / AppImage (install.sh puts them in `~/.local/opt/foxos`): `rm -rf ~/.local/opt/foxos ~/.local/bin/foxos ~/.local/bin/foxos-desktop ~/.local/share/applications/foxos.desktop`; your data in `~/.local/share/foxos` is kept. Install a CJK font for the Chinese UI (`fonts-noto-cjk`, `google-noto-sans-cjk-fonts`, `noto-fonts-cjk`).
 
 ### Package managers (drafts)
 

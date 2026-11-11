@@ -1,0 +1,41 @@
+#!/bin/sh
+# 狐狸OS Live 会话：开机即可远程登录。
+# - 给用户 foxos 生成一次性随机密码（每次开机不同），只在 Live 会话里允许密码登录；
+# - 从标签为 FOXOSSEED 的光盘 / U 盘读取 authorized_keys（测试与批量部署用）；
+# - 在控制台（tty1、串口）和桌面上显示 IP 与密码，并提醒风险。
+# 内核参数 foxos.live_ssh=off 可关闭这一切；装到硬盘后的系统不运行本服务（默认只允许密钥登录）。
+set -u
+grep -qw 'boot=casper' /proc/cmdline || exit 0
+grep -qw 'foxos.live_ssh=off' /proc/cmdline && { /usr/lib/foxos/foxos-ssh-admin disable; exit 0; }
+U=foxos
+H=$(getent passwd $U | cut -d: -f6); [ -n "$H" ] || exit 0
+install -d -m 700 -o $U -g $U "$H/.ssh"
+# FOXOSSEED 上的公钥
+dev=$(blkid -L FOXOSSEED 2>/dev/null || true)
+if [ -n "$dev" ]; then
+  m=$(mktemp -d); if mount -o ro "$dev" "$m" 2>/dev/null; then
+    for f in "$m/authorized_keys" "$m/foxos/authorized_keys"; do [ -f "$f" ] && cat "$f" >> "$H/.ssh/authorized_keys"; done
+    umount "$m"; fi; rmdir "$m"
+fi
+[ -f "$H/.ssh/authorized_keys" ] && { chown $U:$U "$H/.ssh/authorized_keys"; chmod 600 "$H/.ssh/authorized_keys"; }
+PW=$(tr -dc 'A-HJ-NP-Za-km-z2-9' < /dev/urandom | head -c 16)
+printf '%s:%s\n' $U "$PW" | chpasswd
+/usr/lib/foxos/foxos-ssh-admin password-on
+/usr/lib/foxos/foxos-ssh-admin enable
+sleep 3
+IPS=$(ip -4 -o addr show scope global 2>/dev/null | awk '{sub(/\/.*/,"",$4); print $4}' | tr '\n' ' ')
+install -d -m 755 /run/foxos
+install -d -m 700 -o $U -g $U /run/foxos/ssh-install   # 安装前的 SSH 设置（foxos-ssh-setup --installer）
+{
+  echo "狐狸OS Live：SSH 已开启 / SSH is on"
+  echo "  地址 address: ${IPS:-（还没有网络 / no network yet）}  端口 port 22"
+  echo "  ssh $U@${IPS%% *}"
+  echo "  一次性密码 one-time password: $PW"
+  echo "  警告：同一网络里的人都能用这个密码登录本机，直到关机。不需要时运行 foxos ssh disable。"
+  echo "  WARNING: anyone on this network can log in with this password until shutdown. Run 'foxos ssh disable' if you don't need it."
+} > /run/foxos/live-ssh.txt
+chown root:$U /run/foxos/live-ssh.txt; chmod 640 /run/foxos/live-ssh.txt
+for t in /dev/tty1 /dev/ttyS0 /dev/console; do [ -w "$t" ] && { printf '\n'; cat /run/foxos/live-ssh.txt; } > "$t" 2>/dev/null; done
+# 控制台登录提示里也显示
+cp /run/foxos/live-ssh.txt /etc/issue.d/foxos-live-ssh.issue 2>/dev/null || true
+exit 0

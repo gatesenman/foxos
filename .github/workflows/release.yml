@@ -349,56 +349,188 @@ jobs:
           name: package-manifests
           path: manifests
 
-  install-e2e:
-    name: 一行安装 ${{ matrix.name }}
+  # ── 端到端：每个安装包都要 安装 → 启动桌面（截图）→ foxos --version → foxos sheets create → 卸载 ──
+  e2e-linux:
+    name: e2e ${{ matrix.distro }} ${{ matrix.method }} ${{ matrix.arch }}
     needs: checksums
     if: ${{ always() && needs.checksums.result == 'success' && (github.event_name == 'push' || inputs.desktop) }}
     strategy:
       fail-fast: false
       matrix:
         include:
-          - { name: ubuntu-24.04-x64,  runner: ubuntu-24.04,     container: '' ,                  method: deb }
-          - { name: ubuntu-24.04-arm64, runner: ubuntu-24.04-arm, container: '',                   method: deb }
-          - { name: debian-12,         runner: ubuntu-24.04,     container: 'debian:12',          method: deb }
-          - { name: fedora-42,         runner: ubuntu-24.04,     container: 'fedora:42',          method: rpm }
-          - { name: opensuse-tumbleweed, runner: ubuntu-24.04,   container: 'opensuse/tumbleweed', method: rpm }
-          - { name: archlinux,         runner: ubuntu-24.04,     container: 'archlinux:latest',   method: tar }
-          - { name: macos-14-arm64,    runner: macos-14,         container: '',                   method: auto }
-          - { name: macos-15-x64,      runner: macos-15-intel,   container: '',                   method: auto }
+          - { distro: 'ubuntu:24.04',        method: deb,      arch: x64,   runner: ubuntu-24.04 }
+          - { distro: 'ubuntu:24.04',        method: appimage, arch: x64,   runner: ubuntu-24.04 }
+          - { distro: 'ubuntu:24.04',        method: tar,      arch: x64,   runner: ubuntu-24.04 }
+          - { distro: 'debian:12',           method: deb,      arch: x64,   runner: ubuntu-24.04 }
+          - { distro: 'fedora:43',           method: rpm,      arch: x64,   runner: ubuntu-24.04 }
+          - { distro: 'opensuse/tumbleweed', method: rpm,      arch: x64,   runner: ubuntu-24.04 }
+          - { distro: 'archlinux:latest',    method: tar,      arch: x64,   runner: ubuntu-24.04 }
+          - { distro: 'archlinux:latest',    method: appimage, arch: x64,   runner: ubuntu-24.04 }
+          - { distro: 'ubuntu:24.04',        method: deb,      arch: arm64, runner: ubuntu-24.04-arm }
+          - { distro: 'debian:12',           method: deb,      arch: arm64, runner: ubuntu-24.04-arm }
+          - { distro: 'debian:12',           method: tar,      arch: arm64, runner: ubuntu-24.04-arm }
+          - { distro: 'fedora:43',           method: rpm,      arch: arm64, runner: ubuntu-24.04-arm }
+          - { distro: 'ubuntu:24.04',        method: appimage, arch: arm64, runner: ubuntu-24.04-arm }
     runs-on: ${{ matrix.runner }}
-    container: ${{ matrix.container }}
     steps:
-      - name: 容器里补 curl / sudo 以外的基础工具
-        if: matrix.container != ''
+      - uses: actions/checkout@v4
+      - name: 从发布 ${{ env.TAG }} 下载安装包
+        run: mkdir -p dl && gh release download "$TAG" -D dl -p "FoxOS-*-linux-${{ matrix.arch }}.*"
+      - name: 准备 ${{ matrix.distro }} 根文件系统（docker export，不在容器里跑）
         run: |
-          if command -v apt-get >/dev/null; then apt-get update -q && apt-get install -y -q curl ca-certificates
-          elif command -v dnf >/dev/null; then dnf install -y -q curl tar gzip findutils
-          elif command -v zypper >/dev/null; then zypper --non-interactive install -y curl tar gzip
-          elif command -v pacman >/dev/null; then pacman -Sy --noconfirm curl tar gzip gtk3 nss alsa-lib libxss libxtst; fi
-      - name: curl | sh
-        shell: sh
-        run: |
-          curl -fsSL "https://github.com/${GH_REPO}/releases/download/${TAG}/install.sh" | FOXOS_TAG="$TAG" FOXOS_METHOD=${{ matrix.method }} sh
-          if [ ${{ matrix.method }} = tar ]; then "$HOME/.local/bin/foxos" --version; else command -v foxos >/dev/null && foxos --version || "$HOME/.local/bin/foxos" --version; fi
+          mkdir rootfs
+          docker create --name r '${{ matrix.distro }}' >/dev/null
+          docker export r | sudo tar -x -C rootfs
+      - name: 安装 → 启动 → foxos --version → sheets create → 卸载
+        run: sudo bash scripts/packaging/e2e-rootfs.sh rootfs ${{ matrix.method }} dl ${{ matrix.arch }} out/e2e
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e2e-linux-${{ strategy.job-index }}
+          path: out/e2e
+          if-no-files-found: ignore
 
-  install-e2e-windows:
-    name: 一行安装 windows-${{ matrix.arch }}
+  e2e-oneliner:
+    name: e2e curl | sh（Release 上的 install.sh）${{ matrix.runner }}
+    needs: checksums
+    if: ${{ always() && needs.checksums.result == 'success' && (github.event_name == 'push' || inputs.desktop) }}
+    strategy:
+      fail-fast: false
+      matrix:
+        runner: [ubuntu-24.04, ubuntu-24.04-arm]
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - name: curl | sh → foxos --version → sheets create → apt remove
+        run: |
+          set -eu
+          curl -fsSL "https://github.com/${GH_REPO}/releases/download/${TAG}/install.sh" | FOXOS_TAG="$TAG" sh
+          foxos --version
+          ws=$(mktemp -d); foxos --workspace "$ws" sheets create e2e.xlsx --json >/dev/null; test -s "$ws/e2e.xlsx"
+          sudo apt-get remove -y foxos-desktop
+          test ! -e /usr/bin/foxos && test ! -e /opt/FoxOS
+
+  e2e-mac:
+    name: e2e macOS ${{ matrix.arch }} ${{ matrix.method }}
     needs: checksums
     if: ${{ always() && needs.checksums.result == 'success' && (github.event_name == 'push' || inputs.desktop) }}
     strategy:
       fail-fast: false
       matrix:
         include:
-          - { arch: x64,   runner: windows-2022 }
-          - { arch: arm64, runner: windows-11-arm }
+          - { arch: arm64, runner: macos-14,       method: dmg }
+          - { arch: arm64, runner: macos-14,       method: zip }
+          - { arch: x64,   runner: macos-15-intel, method: dmg }
+          - { arch: x64,   runner: macos-15-intel, method: zip }
     runs-on: ${{ matrix.runner }}
     steps:
-      - name: irm | iex（静默安装）
+      - name: 安装（dmg：挂载后拷进 /Applications；zip：Release 上的 install.sh）
+        run: |
+          set -euo pipefail
+          V=${TAG#v}; V=${V%%-*}
+          echo "V=$V" >> "$GITHUB_ENV"
+          if [ ${{ matrix.method }} = dmg ]; then
+            gh release download "$TAG" -p "FoxOS-$V-mac-${{ matrix.arch }}.dmg"
+            mnt=$(hdiutil attach -nobrowse -readonly FoxOS-$V-mac-${{ matrix.arch }}.dmg | awk -F'\t' '/\/Volumes\//{print $NF; exit}')
+            ditto "$mnt/FoxOS.app" /Applications/FoxOS.app
+            hdiutil detach "$mnt"
+            xattr -dr com.apple.quarantine /Applications/FoxOS.app || true
+            echo "CLI=/Applications/FoxOS.app/Contents/Resources/bin/foxos" >> "$GITHUB_ENV"
+          else
+            curl -fsSL "https://github.com/${GH_REPO}/releases/download/${TAG}/install.sh" | FOXOS_TAG="$TAG" sh
+            echo "CLI=$(command -v foxos || echo "$HOME/.local/bin/foxos")" >> "$GITHUB_ENV"
+          fi
+          test "$(lipo -archs /Applications/FoxOS.app/Contents/MacOS/FoxOS)" = "$([ ${{ matrix.arch }} = x64 ] && echo x86_64 || echo arm64)"
+      - name: 启动桌面并截图
+        run: |
+          set -euo pipefail
+          mkdir -p out/e2e; shot=$PWD/out/e2e/mac-${{ matrix.arch }}-${{ matrix.method }}.png; d=$(mktemp -d)
+          /Applications/FoxOS.app/Contents/MacOS/FoxOS --user-data-dir="$d/ud" --workspace="$d/ws" --screenshot="$shot" & pid=$!
+          for i in $(seq 1 120); do [ -s "$shot" ] && break; sleep 1; done
+          kill $pid 2>/dev/null || true
+          test -s "$shot"
+      - name: foxos --version 与 sheets create
+        run: |
+          set -euo pipefail
+          out=$("$CLI" --version); echo "$out"; test "$out" = "foxos $V"
+          ws=$(mktemp -d); "$CLI" --workspace "$ws" sheets create e2e.xlsx --json >/dev/null; test -s "$ws/e2e.xlsx"
+      - name: 卸载
+        run: |
+          set -eu
+          rm -rf /Applications/FoxOS.app
+          for l in /usr/local/bin/foxos "$HOME/.local/bin/foxos"; do [ -L "$l" ] && rm -f "$l" || true; done
+          test ! -e /Applications/FoxOS.app
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e2e-mac-${{ matrix.arch }}-${{ matrix.method }}
+          path: out/e2e
+          if-no-files-found: ignore
+
+  e2e-windows:
+    name: e2e Windows ${{ matrix.arch }} ${{ matrix.method }}
+    needs: checksums
+    if: ${{ always() && needs.checksums.result == 'success' && (github.event_name == 'push' || inputs.desktop) }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { arch: x64,   runner: windows-latest, method: nsis }
+          - { arch: x64,   runner: windows-latest, method: msi }
+          - { arch: x64,   runner: windows-latest, method: zip }
+          - { arch: arm64, runner: windows-11-arm, method: nsis }
+          - { arch: arm64, runner: windows-11-arm, method: msi }
+          - { arch: arm64, runner: windows-11-arm, method: zip }
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - name: 安装 → 启动 → foxos --version → sheets create → 卸载
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
-          $env:FOXOS_TAG = $env:TAG
-          & ([scriptblock]::Create((Invoke-RestMethod "https://github.com/$env:GH_REPO/releases/download/$env:TAG/install.ps1"))) -Silent
-          $py = "$env:LOCALAPPDATA\Programs\FoxOS\resources\python\python.exe"
+          $V = ($env:TAG -replace '^v', '') -replace '-.*$', ''
+          $A = '${{ matrix.arch }}'; $M = '${{ matrix.method }}'
+          New-Item -ItemType Directory -Force out\e2e | Out-Null
+          switch ($M) {
+            'nsis' {   # Release 上的 install.ps1 一行安装（静默 NSIS，按用户）
+              $env:FOXOS_TAG = $env:TAG
+              & ([scriptblock]::Create((Invoke-RestMethod "https://github.com/$env:GH_REPO/releases/download/$env:TAG/install.ps1"))) -Silent
+              $dir = "$env:LOCALAPPDATA\Programs\FoxOS" }
+            'msi' {    # install.ps1 -Msi（msiexec /qn，按机器）
+              $env:FOXOS_TAG = $env:TAG
+              & ([scriptblock]::Create((Invoke-RestMethod "https://github.com/$env:GH_REPO/releases/download/$env:TAG/install.ps1"))) -Silent -Msi
+              $dir = (Get-ChildItem 'C:\Program Files' -Filter 'FoxOS.exe' -Recurse -Depth 2 | Select-Object -First 1).DirectoryName }
+            'zip' {
+              gh release download $env:TAG -p "FoxOS-$V-win-$A.zip"
+              Expand-Archive "FoxOS-$V-win-$A.zip" -DestinationPath "$env:RUNNER_TEMP\portable"
+              $dir = "$env:RUNNER_TEMP\portable" }
+          }
+          if (-not (Test-Path "$dir\FoxOS.exe")) { throw "没装上：$dir\FoxOS.exe" }
+          # 启动桌面并截图
+          $shot = "$PWD\out\e2e\win-$A-$M.png"
+          $proc = Start-Process "$dir\FoxOS.exe" -ArgumentList "--user-data-dir=$env:RUNNER_TEMP\ud", "--workspace=$env:RUNNER_TEMP\dws", "--screenshot=$shot" -PassThru
+          for ($i = 0; $i -lt 120 -and -not (Test-Path $shot); $i++) { Start-Sleep 1 }
+          Stop-Process -Id $proc.Id -Force -ErrorAction SilentlyContinue
+          if (-not (Test-Path $shot)) { throw '桌面 120 秒内没有出截图' }
+          # 命令行（安装目录里的 foxos.cmd 与随包 Python）
+          $py = "$dir\resources\python\python.exe"
           $out = (& $py -m foxos --version).Trim(); Write-Host $out
-          if ($out -notlike 'foxos *') { throw "foxos --version -> $out" }
+          if ($out -ne "foxos $V") { throw "foxos --version -> $out" }
+          $ws = "$env:RUNNER_TEMP\ws"
+          & $py -m foxos --workspace $ws sheets create e2e.xlsx --json | Out-Null
+          if (-not (Test-Path "$ws\e2e.xlsx")) { throw 'sheets create' }
+          # 卸载
+          switch ($M) {
+            'nsis' { $u = Get-ChildItem $dir -Filter 'Uninstall*.exe' | Select-Object -First 1; Start-Process $u.FullName -ArgumentList '/S' -Wait; Start-Sleep 5 }
+            'msi'  { $code = (Get-CimInstance Win32_Product -Filter "Name LIKE 'FoxOS%'" | Select-Object -First 1).IdentifyingNumber
+                     if (-not $code) { throw '找不到 MSI 产品码' }
+                     $p = Start-Process msiexec.exe -ArgumentList '/x', $code, '/qn', '/norestart' -Wait -PassThru
+                     if ($p.ExitCode -ne 0) { throw "msiexec /x exit $($p.ExitCode)" } }
+            'zip'  { Remove-Item -Recurse -Force $dir }
+          }
+          if (Test-Path "$dir\FoxOS.exe") { throw "卸载后还在：$dir" }
+          Write-Host "通过 windows-$A-$M"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e2e-win-${{ matrix.arch }}-${{ matrix.method }}
+          path: out/e2e
+          if-no-files-found: ignore

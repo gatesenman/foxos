@@ -209,7 +209,7 @@ def register(cmd: Command) -> Command:
 
 def load_apps() -> None:
     # 导入即注册
-    from .apps import acp, bot, browser, connector, desktop, docs, env, everything, machine, runtime, sandbox, sheets, shell, slides, system, computer, model  # noqa: F401
+    from .apps import acp, bot, browser, computer, connector, desktop, docs, env, everything, machine, model, runtime, sandbox, sheets, shell, slides, ssh, system  # noqa: F401
 
 
 def find(command_id: str) -> Command:

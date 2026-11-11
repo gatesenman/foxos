@@ -152,7 +152,7 @@ def aur(v: str, tag: str, sums: dict[str, str], out: pathlib.Path) -> None:
     d = out / "aur" / "foxos-bin"
     d.mkdir(parents=True, exist_ok=True)
     url = f"{HOMEPAGE}/releases/download/{tag}"
-    deps = ["gtk3", "nss", "alsa-lib", "libxss", "libxtst", "libnotify", "libsecret", "xdg-utils", "at-spi2-core"]
+    deps = ["gtk3", "nss", "alsa-lib", "libxss", "libxtst", "libnotify", "libsecret", "xdg-utils", "at-spi2-core", "ttf-font"]
     (d / "PKGBUILD").write_text(f"""# Maintainer: gaosichun <gatesenman@users.noreply.github.com>
 pkgname=foxos-bin
 pkgver={v}

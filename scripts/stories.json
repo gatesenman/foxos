@@ -704,6 +704,39 @@
       ]
     },
     {
+      "id": "US-63",
+      "title": "在线选择并安装狐狸OS 预设系统（Linux / Windows / macOS）：目录显示下载大小与所需磁盘、主机可用性与原因；分卷断点续传、逐卷与整体 sha256 校验；Windows 应答文件与 Hyper-V 计划；Linux 预设真实下载 + 引导 + 就绪 + SSH 执行",
+      "match": [
+        [
+          "pytest",
+          "test_env_presets.py",
+          "^test_US63"
+        ]
+      ]
+    },
+    {
+      "id": "US-64",
+      "title": "SSH 远程访问：公钥增删查与 GitHub 导入、智能体不能开门、密码强度检查、MCP ssh_* 对等、虚拟机 SSH 对外开放只限人",
+      "match": [
+        [
+          "pytest",
+          "test_ssh.py",
+          "^test_US64"
+        ]
+      ]
+    },
+    {
+      "id": "US-65",
+      "title": "在真实启动的 ISO 上端到端：SSH 密钥登录 / 密码与 root 被拒 / 经 SSH 运行 foxos 与 MCP、Chrome 安装、在线预设下载并引导、bots 应用与真实 ACP（opencode）对话、runtime doctor、acp list、桌面会话控制、Calamares 装到虚拟磁盘并重启进入",
+      "match": [
+        [
+          "pytest",
+          "test_os_iso_e2e.py",
+          "^test_US65"
+        ]
+      ]
+    },
+    {
       "id": "US-120",
       "title": "电脑操控体检：显示默认栈（agent-desktop + Jev/DeepSeek + 规划器）和两条兜底",
       "match": [

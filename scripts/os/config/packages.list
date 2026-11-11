@@ -144,3 +144,7 @@ sqlite3
 zenity
 x11-utils
 xz-utils
+xorriso
+# SSH 远程访问（docs/ssh.md）：默认开启、只允许密钥、禁止 root、ufw 放行 22
+openssh-server
+ufw

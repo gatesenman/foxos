@@ -21,7 +21,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from .. import desktop_client
-from ..envs import images
+from ..envs import download, images
 from ..errors import FoxError
 from ..kernel import Command, Context, Param, register, register_app
 
@@ -165,7 +165,24 @@ def _summary(cfg: dict) -> dict:
     return {"name": cfg["name"], "image": cfg["image"], "backend": cfg.get("backend", BACKEND), "state": _state(cfg["name"]), "network": cfg.get("network"),
             "workspace": cfg.get("workspace"), "limits": cfg.get("limits"), "mounts": cfg.get("mounts", []), "created": cfg.get("created"),
             "snapshots": len(cfg.get("snapshots", [])), "actions": list((cfg.get("actions") or {}).keys()),
-            "catalog_id": cfg.get("catalog_id"), "guest_os": cfg.get("guest_os", "linux"), "provider": cfg.get("provider", cfg.get("backend", BACKEND))}
+            "catalog_id": cfg.get("catalog_id"), "guest_os": cfg.get("guest_os", "linux"), "provider": cfg.get("provider", cfg.get("backend", BACKEND)),
+            "ssh": _ssh_summary(cfg)}
+
+
+def _ssh_summary(cfg: dict) -> dict | None:
+    """虚拟机的 SSH 入口（端口转发）：本机命令，以及 env expose --ssh on 之后的对外地址。"""
+    f = env_dir(cfg["name"]) / "run" / "ssh.json"
+    try:
+        s = json.loads(f.read_text(encoding="utf-8")) if _state(cfg["name"]) == "running" else None
+    except (OSError, ValueError):
+        s = None
+    if not s and not cfg.get("ssh_expose"):
+        return None
+    port = (s or {}).get("port") or cfg.get("ssh_port")
+    key = (cfg.get("ssh") or {}).get("key")
+    user = (cfg.get("ssh") or {}).get("user") or "foxos"
+    return {"port": port, "user": user, "exposed": bool(cfg.get("ssh_expose")), "bind": (s or {}).get("bind") or "127.0.0.1",
+            "command": f"ssh -p {port} {('-i ' + key + ' ') if key else ''}{user}@127.0.0.1" if port else None}
 
 
 # ---------------------------------------------------------------- 命令实现
@@ -602,13 +619,23 @@ def env_fix(ctx: Context, provider: str, action: str) -> dict:
     return {"message": tr("env.done", act['label']) + (tr("env.restart_the_computer_for_it_to_take") if reboot else ""), "reboot_required": reboot, "results": res}
 
 
-def env_catalog(ctx: Context, guest: str | None = None, provider: str | None = None, available: bool = False) -> dict:
+def env_catalog(ctx: Context, guest: str | None = None, provider: str | None = None, available: bool = False, presets: bool = False) -> dict:
+    from ..envs import presets as P
     from ..envs import providers
     c = providers.catalog()
     host = providers.host_os()
     provs = providers.providers()
     items = []
-    for e in c["entries"]:
+    for e in P.entries():
+        it = P.describe(e, host)
+        if guest and e.get("guest_os") != guest:
+            continue
+        if provider and provider not in [h.get("provider") for h in (e.get("hosts") or {}).values()]:
+            continue
+        if available and not it["installable"]:
+            continue
+        items.append(it)
+    for e in ([] if presets else c["entries"]):
         if guest and e.get("guest_os") != guest:
             continue
         if provider and provider not in e["providers"]:
@@ -620,7 +647,8 @@ def env_catalog(ctx: Context, guest: str | None = None, provider: str | None = N
         if available and not it["installable"]:
             continue
         items.append(it)
-    return {"format": c["format"], "version": c["version"], "host": host, "count": len(items), "entries": items}
+    return {"format": c["format"], "version": c["version"], "presets_format": P.FORMAT, "host": host, "count": len(items),
+            "presets": sum(1 for i in items if i.get("preset")), "entries": items}
 
 
 def _install_status(name: str, **kw) -> None:
@@ -633,9 +661,15 @@ def _install_status(name: str, **kw) -> None:
 
 
 def env_install(ctx: Context, entry: str, name: str, provider: str | None = None, url: str | None = None, sha256: str | None = None, iso: str | None = None,
-                location: str | None = None, memory_mb: int | None = None, cpus: int | None = None, disk_gb: int | None = None, dry_run: bool = False) -> dict:
+                location: str | None = None, memory_mb: int | None = None, cpus: int | None = None, disk_gb: int | None = None, dry_run: bool = False,
+                product_key: str | None = None, start: bool = False, wait_ready: float = 0) -> dict:
+    from ..envs import presets as P
     from ..envs import providers
     _valid(name)
+    pe = P.get(entry)
+    if pe is not None:
+        return _install_preset(ctx, pe, name, provider=provider, iso=iso, sha256=sha256, memory_mb=memory_mb, cpus=cpus, disk_gb=disk_gb,
+                               product_key=product_key, start=start, wait_ready=wait_ready, location=location, dry_run=dry_run)
     e = providers.entry(entry)
     if e.get("disabled"):
         raise FoxError("DEPENDENCY_MISSING", tr("env.is_unavailable", e['name'], e.get('reason')))
@@ -688,6 +722,154 @@ def env_install(ctx: Context, entry: str, name: str, provider: str | None = None
     return {"message": tr("env.installed_as_environment", e['name'], name, p.id), "plan": plan, "results": res}
 
 
+def _install_preset(ctx: Context, e: dict, name: str, *, provider: str | None, iso: str | None, sha256: str | None, memory_mb: int | None,
+                    cpus: int | None, disk_gb: int | None, product_key: str | None, start: bool, wait_ready: float, location: str | None, dry_run: bool) -> dict:
+    """安装一个狐狸OS 预设：下载（可续传、逐卷校验）→ 拼接校验 → 生成种子 → 注册环境 →（可选）启动并等来宾报告就绪。"""
+    from ..envs import presets as P
+    from ..envs import providers
+    host = providers.host_os()
+    tgt = P.target(e, host)
+    s = P.sizes(e, tgt["artifact"])
+    plan = {"entry": e["id"], "name": name, "kind": e["kind"], "host": host, "provider": provider or tgt["provider"], "artifact": tgt["artifact"],
+            "download_bytes": s["download_bytes"], "disk_bytes": s["disk_bytes"], "features": e.get("features", []),
+            "files": [{k: p.get(k) for k in ("name", "url", "size", "sha256")} for p in ((e.get("artifacts") or {}).get(tgt["artifact"] or "", {}).get("parts") or
+                      ([e["artifacts"][tgt["artifact"]]] if tgt["artifact"] in (e.get("artifacts") or {}) else []))]}
+    if e["kind"] == "windows-media":
+        plan["media"] = {k: (e.get("media") or {}).get(k) for k in ("url", "page", "size", "sha256", "edition", "language")}
+        plan["license"] = e.get("license")
+    if e["kind"] == "macos-ipsw":
+        plan["media"] = e.get("media")
+    if dry_run:
+        return {"message": tr("env.preset_plan", e["name"], name, plan["provider"] or "-", _hsize(s["download_bytes"]), _hsize(s["disk_bytes"])),
+                "plan": plan, "dry_run": True, "available": tgt["available"], **({"reason": tgt["reason"]} if not tgt["available"] else {})}
+    if not tgt["available"]:
+        raise FoxError("DEPENDENCY_MISSING", tr("env.is_unavailable", e["name"], tgt["reason"]))
+    if (env_dir(name) / "env.json").exists():
+        raise FoxError("CONFLICT", tr("env.environment_already_exists", name))
+    pid = provider or tgt["provider"]
+    prov = providers.get(pid)
+    doc = prov.doctor()
+    if not doc.get("available"):
+        acts = tr("common.text").join(tr("env.foxos_env_fix_provider_action", prov.id, a['id'], a['label']) for a in doc.get("actions", []))
+        raise FoxError("DEPENDENCY_MISSING", tr("env.is_unavailable", prov.name, doc.get('reason')), hint=acts or None)
+    d = env_dir(name)
+    cache = home() / "cache" / "presets" / e["id"]
+    P.check_space(d.parent if d.parent.exists() else home(), s["disk_bytes"])
+    d.mkdir(parents=True, exist_ok=True)
+    (d / "logs").mkdir(exist_ok=True); (d / "run").mkdir(exist_ok=True)
+    t0 = time.time()
+    rep = lambda **k: _install_status(name, state="running", entry=e["id"], provider=pid, total=4, step={"download": 0, "verify": 1, "seed": 2, "boot": 3}.get(k.get("phase"), 0),  # noqa: E731
+                                      download_bytes=s["download_bytes"], disk_bytes=s["disk_bytes"], elapsed=round(time.time() - t0, 1), **k)
+    rep(phase="download", why=tr("env.preset_starting", e["name"]), bytes=0, bytes_total=s["download_bytes"])
+    cfg_base = {"name": name, "image": e["id"], "catalog_id": e["id"], "preset": e["id"], "guest_os": e.get("guest_os"),
+                "workspace": {"path": str(ctx.workspace.root), "mode": "rw"}, "mounts": [], "snapshots": [], "actions": {},
+                "limits": {k: v for k, v in {"memory_mb": memory_mb or e.get("memory_mb"), "cpus": cpus or e.get("cpus")}.items() if v},
+                "created": datetime.now(timezone.utc).isoformat(timespec="seconds"), "created_by": ctx.agent, "features": e.get("features", [])}
+    result: dict = {"plan": plan}
+    try:
+        if e["kind"] in ("foxos-image", "foxos-iso") and pid == "linux-kvm":
+            is_iso = e["kind"] == "foxos-iso"
+            target = d / ("install.iso" if is_iso else "disk.qcow2")
+            if iso and is_iso:
+                shutil.copy2(iso, target)
+                fetched = {"parts": [], "assembled": {"sha256": images._sha256(target), "verified": False}}
+            else:
+                fetched = P.fetch_artifact(e, tgt["artifact"], cache, target, rep)
+            result["download"] = fetched
+            rep(phase="seed", why=tr("env.preset_seed"))
+            key = P.make_ssh_key(d / "ssh")
+            seed_dir = d / "seed"; seed_dir.mkdir(exist_ok=True)
+            (seed_dir / "seed.json").write_text(json.dumps(P.seed_json(name, ssh_pub=key["pub"]), ensure_ascii=False, indent=1), encoding="utf-8")
+            seed_iso = P.make_seed_iso(seed_dir, d / "seed.iso") if not is_iso else None
+            cfg = {**cfg_base, "backend": "linux-kvm", "provider": "linux-kvm", "network": "user", "shell": "/bin/bash",
+                   **({"iso": str(target)} if is_iso else {"disk": str(target), "disk_format": "qcow2", "boot": "uefi", "seed": str(seed_iso)}),
+                   "ssh": {"host": "127.0.0.1", "user": "foxos", "key": key["key"]} if key["key"] and not is_iso else {}}
+            _save(cfg)
+        elif e["kind"] == "foxos-image" and pid == "wsl2":
+            target = cache / e["artifacts"]["wsl"]["name"]
+            result["download"] = P.fetch_artifact(e, "wsl", cache, target, rep)
+            loc = location or str(d / "wsl")
+            steps = [{"argv": ["wsl.exe", "--import", providers.wsl_name(name), loc, str(target), "--version", "2"], "registers": providers.wsl_name(name),
+                      "why": tr("env.preset_wsl_import")}]
+            rep(phase="seed", why=tr("env.preset_wsl_import"))
+            result["results"] = providers.execute(steps)
+            cfg = {**cfg_base, "backend": "wsl2", "provider": "wsl2", "wsl_distro": providers.wsl_name(name), "network": "host", "shell": "/bin/bash"}
+            _save(cfg)
+        elif pid == "hyperv":
+            if e["kind"] == "foxos-iso":
+                media = d / "install.iso"
+                result["download"] = P.fetch_artifact(e, tgt["artifact"], cache, media, rep) if not iso else {"local": iso}
+                media_path = iso or str(media)
+                seed_ps = None
+            else:  # windows-media：从微软官方下载安装介质（或用户给的 ISO），再生成应答文件
+                m = e["media"]
+                media_path = iso
+                if not iso:
+                    dest = cache / m.get("filename", f"{e['id']}.iso")
+                    def prog(bytes=0, bytes_total=0, **k):  # noqa: A002
+                        rep(phase="download", part=1, parts=1, bytes=bytes, bytes_total=bytes_total or m.get("size") or 0, why=tr("env.preset_ms_download", m.get("edition", "")), resumed=k.get("resumed", 0))
+                    r = download.fetch(m["url"], dest, size=m.get("size"), sha256=sha256 or m.get("sha256"), progress=prog)
+                    result["download"] = {"parts": [{"name": dest.name, **r}], "assembled": r}
+                    media_path = str(dest)
+                rep(phase="seed", why=tr("env.preset_seed"))
+                key = P.make_ssh_key(d / "ssh")
+                seed_dir = d / "seed"
+                result["windows"] = P.windows_seed(e, seed_dir, name=name, product_key=product_key, ssh_pub=key["pub"])
+                (d / "credentials.json").write_text(json.dumps({k: result["windows"][k] for k in ("user", "password")}), encoding="utf-8")
+                seed_ps = P.ps_seed_iso(str(seed_dir), str(d / "seed.iso"))
+            steps = ([{"powershell": seed_ps, "why": tr("env.preset_seed")}] if seed_ps else []) + prov.plan_install(
+                {**e, "tpm": e.get("tpm", e["kind"] == "windows-media")}, name,
+                {"iso": media_path, "location": location, "memory_mb": memory_mb or e.get("memory_mb"), "cpus": cpus or e.get("cpus"),
+                 "disk_gb": disk_gb or e.get("disk_gb"), "seed_iso": str(d / "seed.iso") if seed_ps else None})
+            rep(phase="boot", why=tr("envs.providers.create_and_start_a_hyper_v_virtual"))
+            result["results"] = providers.execute(steps)
+            vm = providers.wsl_name(name)
+            cfg = {**cfg_base, "backend": "hyperv", "provider": "hyperv", "network": "host", "shell": "powershell",
+                   "start_steps": [{"powershell": f"Start-VM -Name {providers.ps_quote(vm)}", "elevate": True}, {"argv": ["vmconnect.exe", "localhost", vm]}]}
+            _save(cfg)
+        elif e["kind"] == "macos-ipsw" and pid == "macos-vz":
+            from ..envs import macos
+            rep(phase="download", why=tr("env.preset_ipsw"))
+            seed_dir = d / "seed"; seed_dir.mkdir(exist_ok=True)
+            key = P.make_ssh_key(d / "ssh")
+            (seed_dir / "seed.json").write_text(json.dumps(P.seed_json(name, ssh_pub=key["pub"], extra={"node_version": (e.get("runtime") or {}).get("node", "v24.22.2")})), encoding="utf-8")
+            shutil.copy(P.TEMPLATES / "macos-postinstall.sh", seed_dir / "macos-postinstall.sh")
+            helper = Path.home() / "Library" / "Application Support" / "FoxOS" / "bin" / "foxvz"
+            r = subprocess.run([str(helper), "install-macos", "--dir", str(d), "--disk-gb", str(disk_gb or e.get("disk_gb") or 64),
+                                "--share", str(seed_dir)], capture_output=True, text=True)
+            if r.returncode:
+                raise FoxError("ERROR", tr("env.preset_ipsw_failed", (r.stderr or r.stdout)[-600:]))
+            cfg = {**cfg_base, "backend": "macos-vz", "provider": "macos-vz", "network": "nat", "shell": "/bin/zsh", "macos_guest": True,
+                   "postinstall": str(seed_dir / "macos-postinstall.sh")}
+            _save(cfg)
+        else:
+            raise FoxError("USAGE", tr("env.preset_provider_mismatch", e["id"], pid))
+    except FoxError as ex:
+        _install_status(name, state="error", error=ex.message, hint=ex.hint, entry=e["id"], provider=pid)
+        if not (d / "env.json").exists():
+            for f in ("seed", "ssh"):
+                shutil.rmtree(d / f, ignore_errors=True)
+        raise
+    _log(name, f"installed preset {e['id']} via {pid} by {ctx.agent}")
+    ready = None
+    if start and pid == "linux-kvm":
+        rep(phase="boot", why=tr("env.preset_booting"))
+        result["start"] = env_start(ctx, name)
+        if wait_ready:
+            from ..envs import kvm
+            ready = P.wait_ready(d / "logs" / "serial.log", float(wait_ready), proc_alive=lambda: kvm.state(d) == "running")
+            result["ready"] = ready
+            if not ready:
+                _install_status(name, state="error", error=tr("env.preset_not_ready", wait_ready), entry=e["id"], provider=pid)
+                raise FoxError("ERROR", tr("env.preset_not_ready", wait_ready), hint=tr("common.see", d / "logs" / "serial.log"))
+    _install_status(name, state="done", phase="done", ready=ready, elapsed=round(time.time() - t0, 1))
+    return {"message": tr("env.preset_installed", e["name"], name, pid), "env": _summary(_cfg(name)), **result}
+
+
+def _hsize(n: int) -> str:
+    return f"{n / 1024 ** 3:.1f} GB" if n >= 1024 ** 3 else f"{n / 1024 ** 2:.0f} MB"
+
+
 def env_install_status(ctx: Context, name: str) -> dict:
     f = env_dir(_valid(name)) / "install.json"
     if not f.exists():
@@ -709,7 +891,7 @@ register(Command("env", "run", tr("env.pull_if_needed_create_and_start"), env_ru
                          Param("workspace_mode", "string", tr("env.how_the_workspace_is_mounted"), enum=["rw", "ro", "none"], default="rw", cli_flag="--workspace-mode"),
                          Param("memory_mb", "integer", tr("env.memory_limit_mb")), Param("cpus", "number", tr("env.cpu_limit_cores_needs_cgroup")), Param("pids", "integer", tr("env.process_limit")),
                          Param("desktop_attach", "boolean", tr("env.attach_the_guest_desktop_after_start"), cli_flag="--desktop-attach"),
-                         Param("no_start", "boolean", tr("env.only_create_do_not_start"), cli_flag="--no-start")],
+                         Param("no_start", "boolean", tr("env.only_create_do_not_start"), default=False, cli_flag="--no-start")],
                  examples=["foxos env run dev --image alpine-3.20", "foxos env run live --provider linux-kvm --iso FoxOS-0.3.0-amd64.iso --desktop-attach"],
                  permission="run"))
 register(Command("env", "desktop-attach", tr("env.open_the_guest_desktop_as_a_display"), env_desktop_attach,
@@ -751,6 +933,35 @@ register(Command("env", "limits", tr("env.set_resource_limits_network_and"), env
 register(Command("env", "stats", tr("env.resource_usage_processes_cpu_time"), env_stats, params=[Param("name", "string", tr("env.environment_name_all_by_default"), positional=True, metavar="NAME")],
                  examples=["foxos env stats --json"], audited=False))
 register(Command("env", "logs", tr("env.environment_logs"), env_logs, params=[NAME, Param("lines", "integer", tr("env.lines"), default=100, cli_short="-n")], examples=["foxos env logs dev -n 50"]))
+def env_expose(ctx: Context, name: str, ssh: str, port: int | None = None) -> dict:
+    """把虚拟机的 SSH 端口转发开放到主机的所有地址（默认只在 127.0.0.1）。下次启动生效。"""
+    from ..kernel import is_human
+    cfg = _cfg(name)
+    on = str(ssh).strip().lower() in ("on", "true", "1", "yes")
+    if on and not is_human(ctx.agent):
+        raise FoxError("PERMISSION_DENIED", tr("env.expose_human_only"))
+    cfg["ssh_expose"] = on
+    if on:
+        cfg["ssh_port"] = int(port or cfg.get("ssh_port") or 0) or _free_tcp_port()
+    elif port is None:
+        cfg.pop("ssh_port", None)
+    _save(cfg)
+    return {"message": tr("env.expose_ssh_on", name, cfg["ssh_port"]) if on else tr("env.expose_ssh_off", name),
+            "ssh_expose": on, "ssh_port": cfg.get("ssh_port"), "restart_needed": _state(name) == "running"}
+
+
+def _free_tcp_port() -> int:
+    import socket as _s
+    with _s.socket() as s:
+        s.bind(("", 0))
+        return s.getsockname()[1]
+
+
+register(Command("env", "expose", tr("env.expose_summary"), env_expose,
+                 params=[NAME, Param("ssh", "string", tr("env.expose_ssh_param"), required=True, metavar="on|off"),
+                         Param("port", "integer", tr("env.expose_port_param"))],
+                 examples=["foxos env expose dev --ssh on --port 2222", "foxos env expose dev --ssh off"],
+                 limits=[tr("env.expose_limit")], permission="modify"))
 register(Command("env", "action add", tr("env.add_a_custom_action_supports_the"), env_action_add,
                  params=[NAME, Param("action", "string", tr("env.action_name"), required=True, positional=True, metavar="ACTION"), Param("command", "string", tr("env.shell_command_run_inside_the"), required=True)],
                  examples=["foxos env action add dev test --command 'cd ${workspace} && make test'"], permission="modify"))
@@ -764,13 +975,19 @@ register(Command("env", "fix", tr("env.apply_a_fix_suggested_by_doctor"), env_fi
                  examples=["foxos env fix --provider wsl2 --action enable-wsl"], permission="run"))
 register(Command("env", "catalog", tr("env.catalog_of_systems_you_can_install"), env_catalog,
                  params=[Param("guest", "string", tr("env.guest_system"), enum=["linux", "windows", "macos", "any"]), Param("provider", "string", tr("env.show_only_one_provider")),
-                         Param("available", "boolean", tr("env.show_only_what_this_machine_can"))], examples=["foxos env catalog --json", "foxos env catalog --guest windows"], audited=False))
+                         Param("available", "boolean", tr("env.show_only_what_this_machine_can")),
+                         Param("presets", "boolean", tr("env.show_only_presets"))],
+                 examples=["foxos env catalog --json", "foxos env catalog --presets", "foxos env catalog --guest windows"], audited=False))
 register(Command("env", "install", tr("env.install_a_system_from_the_catalog_as"), env_install,
                  params=[Param("entry", "string", tr("env.catalog_entry_id_foxos_env_catalog"), required=True, positional=True, metavar="ENTRY"), NAME,
                          Param("provider", "string", tr("env.use_a_specific_provider")), Param("url", "string", tr("env.custom_root_file_system_url_custom")), Param("sha256", "string", tr("env.sha256_of_the_custom_source")),
                          Param("iso", "string", tr("env.installation_media_iso_path_hyper_v")), Param("location", "string", tr("env.install_location_windows_folder")),
                          Param("memory_mb", "integer", tr("env.memory_mb_hyper_v_sandbox")), Param("cpus", "integer", tr("env.cpu_count_hyper_v")), Param("disk_gb", "integer", tr("env.disk_gb_hyper_v")),
-                         Param("dry_run", "boolean", tr("env.only_print_the_install_plan_do_not"))],
-                 examples=["foxos env install wsl-ubuntu-24.04 ubuntu", "foxos env install alpine tiny --dry-run --json", "foxos env install hyperv-windows-11-eval win11 --iso D:\\iso\\win11.iso"],
+                         Param("dry_run", "boolean", tr("env.only_print_the_install_plan_do_not")),
+                         Param("product_key", "string", tr("env.windows_product_key")),
+                         Param("start", "boolean", tr("env.start_after_install")),
+                         Param("wait_ready", "number", tr("env.wait_ready_seconds"), default=0)],
+                 examples=["foxos env install foxos-debian-12 dev --start --wait-ready 900", "foxos env install windows-11-enterprise-eval win11 --dry-run",
+                           "foxos env install wsl-ubuntu-24.04 ubuntu", "foxos env install alpine tiny --dry-run --json", "foxos env install hyperv-windows-11-eval win11 --iso D:\\iso\\win11.iso"],
                  permission="create"))
 register(Command("env", "progress", tr("env.show_install_progress"), env_install_status, params=[NAME], examples=["foxos env progress ubuntu --json"], audited=False))

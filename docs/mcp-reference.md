@@ -16,9 +16,9 @@
 
 错误码：USAGE(2) NOT_FOUND(3) PERMISSION_DENIED(4) LOCKED(5) DEPENDENCY_MISSING(6) CONFLICT(7) PAUSED(8) ERROR(1)。
 
-共 4497 个工具。
+共 4506 个工具。
 
-## acp（11 个工具）
+## acp（12 个工具）
 
 ### `acp_agent_list`
 
@@ -35,6 +35,23 @@
 
 ```json
 {"name": "acp_agent_list", "arguments": {}}
+```
+
+### `acp_list`
+
+列出已安装的 ACP 智能体（--available 列出注册表）。CLI：foxos acp list [--available]。示例：foxos acp list
+
+只读：是 · 破坏性：否 · CLI：`foxos acp list`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `available` | boolean |  | 列出注册表中全部可安装的智能体 |
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "acp_list", "arguments": {}}
 ```
 
 ### `acp_agent_install`
@@ -1375,6 +1392,161 @@ Chrome 是否安装、版本、CDP 开关与端口。CLI：foxos browser status�
 {"name": "browser_engine_call", "arguments": {"engine": "agent-browser", "tool": "…"}}
 ```
 
+## computer（8 个工具）
+
+### `computer_doctor`
+
+体检默认电脑操控栈：agent-desktop + Jev 单步策略 + 截图 / xdotool 兜底 + 规划器。CLI：foxos computer doctor。示例：foxos computer doctor
+
+只读：是 · 破坏性：否 · CLI：`foxos computer doctor`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "computer_doctor", "arguments": {}}
+```
+
+### `computer_backend_install`
+
+安装电脑操控后端 agent-desktop（Vercel Labs，Apache-2.0）。CLI：foxos computer backend install。示例：foxos computer backend install
+
+只读：否 · 破坏性：否 · CLI：`foxos computer backend install`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "computer_backend_install", "arguments": {}}
+```
+
+### `computer_backend_status`
+
+查看 agent-desktop 状态。CLI：foxos computer backend status。示例：foxos computer backend status --json
+
+只读：是 · 破坏性：否 · CLI：`foxos computer backend status`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "computer_backend_status", "arguments": {}}
+```
+
+### `computer_model_show`
+
+查看操控用的模型设置。CLI：foxos computer model show。示例：foxos computer model show --json
+
+只读：是 · 破坏性：否 · CLI：`foxos computer model show`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "computer_model_show", "arguments": {}}
+```
+
+### `computer_model_set`
+
+设置操控用的模型、视觉模型与视觉定位。CLI：foxos computer model set [--provider PROVIDER] [--model MODEL] [--vision-model VISION_MODEL] [--base-url BASE_URL] [--vision {auto,off}] [--grounding {auto,vlm,ui-tars,omniparser,typesafe,none}] [--grounding-url GROUNDING_URL] [--grounding-model GROUNDING_MODEL] [--max-steps MAX_STEPS] [--step-policy {auto,typesafe,deepseek}] [--gate-high GATE_HIGH] [--gate-low GATE_LOW]。限制：只有人（human 身份）能改。示例：foxos computer model set --provider deepseek
+
+只读：否 · 破坏性：否 · CLI：`foxos computer model set`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `provider` | string |  | 服务商：deepseek、openai、dashscope、zhipu、moonshot、local |
+| `model` | string |  | 文字模型 |
+| `vision_model` | string |  | 视觉模型（收图片），空字符串表示没有 |
+| `base_url` | string |  | OpenAI 兼容接口地址 |
+| `vision` | string |  | 视觉：auto 或 off 可选：auto / off |
+| `grounding` | string |  | 视觉定位方式 可选：auto / vlm / ui-tars / omniparser / typesafe / none |
+| `grounding_url` | string |  | 定位服务地址（vLLM / Ollama / OmniParser） |
+| `grounding_model` | string |  | 定位模型名（如 ByteDance-Seed/UI-TARS-1.5-7B） |
+| `max_steps` | integer |  | 最多多少步 |
+| `step_policy` | string |  | 默认单步策略 可选：auto / typesafe / deepseek |
+| `gate_high` | number |  | 高置信度门槛（≥ 直接执行） |
+| `gate_low` | number |  | 低置信度门槛（< 升级给规划器） |
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "computer_model_set", "arguments": {}}
+```
+
+### `computer_model_key`
+
+保存模型服务的 API 密钥（只存本机密钥库）。CLI：foxos computer model key KEY [--provider PROVIDER]。限制：只有人（human 身份）能改。示例：cat deepseek.key | foxos computer model key --value-stdin
+
+只读：否 · 破坏性：否 · CLI：`foxos computer model key`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `value` | string | 是 | API 密钥（建议用 --value-stdin） |
+| `provider` | string |  | 服务商：deepseek、openai、dashscope、zhipu、moonshot、local |
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "computer_model_key", "arguments": {"value": "…"}}
+```
+
+### `computer_model_test`
+
+真实调用一次模型，检查密钥与网络。CLI：foxos computer model test [--vision]。示例：foxos computer model test
+
+只读：是 · 破坏性：否 · CLI：`foxos computer model test`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `vision` | boolean |  | 测试视觉模型 |
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "computer_model_test", "arguments": {}}
+```
+
+### `computer_task`
+
+电脑操控智能体：一句话任务，模型看无障碍树（可选截图）一步步操作桌面程序。CLI：foxos computer task TASK [--app APP] [--launch ARG] [--max-steps MAX_STEPS] [--approve {risky,ask,auto,deny}] [--vision {auto,on,off}] [--mode {s1s2,llm}] [--policy {auto,typesafe,deepseek}] [--surface {auto,a11y,screen,browser}] [--url URL]。限制：需要 foxos computer model 配好模型与密钥（DeepSeek 等）；纯文字模型也能用；risky：删除、发送、支付、提交等高风险动作要人批准（foxos bot approval answer）；ask：每个改动都要批准；人工接管时暂停，恢复后继续。示例：foxos computer task '在 Mousepad 里写一行 hello 并保存' --launch mousepad --launch notes.txt --app mousepad --vision off
+
+只读：否 · 破坏性：否 · CLI：`foxos computer task`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `task` | string | 是 | 任务（一句话） |
+| `app` | string |  | 只看这个程序的无障碍树 |
+| `launch` | array |  | 先启动的程序与参数（可重复） |
+| `max_steps` | integer |  | 最多多少步 |
+| `approve` | string |  | 审批：risky（缺省）/ ask / auto / deny 可选：risky / ask / auto / deny |
+| `vision` | string |  | 截图：auto（配了视觉模型就用）/ on / off 可选：auto / on / off |
+| `mode` | string |  | 做法：s1s2（快决策 + 规划器，默认）/ llm（只用大模型） 可选：s1s2 / llm |
+| `policy` | string |  | 单步策略：auto（有 TypeSafe 密钥用 Jev，否则 DeepSeek）/ typesafe / deepseek 可选：auto / typesafe / deepseek |
+| `surface` | string |  | 操作面：auto（网页 → 浏览器；桌面程序 → agent-desktop；没有无障碍信息 → 截图）/ a11y / screen / browser 可选：auto / a11y / screen / browser |
+| `url` | string |  | 网页任务的起始网址（会路由到浏览器） |
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "computer_task", "arguments": {"task": "…"}}
+```
+
 ## connector（8 个工具）
 
 ### `connector_catalog`
@@ -2627,7 +2799,7 @@ AT-SPI 无障碍树（文字快照，每个元素一个引用 e1、e2…）。CL
 {"name": "docs_export", "arguments": {"file": "…", "output": "…"}}
 ```
 
-## env（30 个工具）
+## env（31 个工具）
 
 ### `env_images`
 
@@ -3037,6 +3209,25 @@ AT-SPI 无障碍树（文字快照，每个元素一个引用 e1、e2…）。CL
 {"name": "env_logs", "arguments": {"name": "…"}}
 ```
 
+### `env_expose`
+
+把虚拟机的 SSH 端口转发开放到主机的所有地址，或收回到本机。CLI：foxos env expose NAME --ssh on|off [--port PORT]。限制：开放只有人能执行；下次启动生效；主机防火墙需放行该端口。示例：foxos env expose dev --ssh on --port 2222
+
+只读：否 · 破坏性：否 · CLI：`foxos env expose`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `name` | string | 是 | 环境名 |
+| `ssh` | string | 是 | on（对外开放）或 off（只在本机） |
+| `port` | integer |  | 主机上的固定端口（默认自动挑一个） |
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "env_expose", "arguments": {"name": "…", "ssh": "…"}}
+```
+
 ### `env_action_add`
 
 添加自定义操作（支持 ${env} ${image} ${workspace} ${host_workspace} ${hostname} 变量）。CLI：foxos env action add NAME ACTION --command COMMAND。示例：foxos env action add dev test --command 'cd ${workspace} && make test'
@@ -3127,7 +3318,7 @@ AT-SPI 无障碍树（文字快照，每个元素一个引用 e1、e2…）。CL
 
 ### `env_catalog`
 
-可一键安装的系统目录（WSL 发行版、LXC/官方根文件系统、Windows Sandbox、Hyper-V、macOS）。CLI：foxos env catalog [--guest {linux,windows,macos,any}] [--provider PROVIDER] [--available]。示例：foxos env catalog --json
+可一键安装的系统目录（WSL 发行版、LXC/官方根文件系统、Windows Sandbox、Hyper-V、macOS）。CLI：foxos env catalog [--guest {linux,windows,macos,any}] [--provider PROVIDER] [--available] [--presets]。示例：foxos env catalog --json
 
 只读：是 · 破坏性：否 · CLI：`foxos env catalog`
 
@@ -3136,6 +3327,7 @@ AT-SPI 无障碍树（文字快照，每个元素一个引用 e1、e2…）。CL
 | `guest` | string |  | 来宾系统 可选：linux / windows / macos / any |
 | `provider` | string |  | 只看某个提供者 |
 | `available` | boolean |  | 只显示本机可安装的 |
+| `presets` | boolean |  | 只显示狐狸OS 预设系统 |
 | `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
 
 调用示例：
@@ -3146,7 +3338,7 @@ AT-SPI 无障碍树（文字快照，每个元素一个引用 e1、e2…）。CL
 
 ### `env_install`
 
-从目录一键安装一个系统为新环境（下载、校验 sha256、导入）。CLI：foxos env install ENTRY NAME [--provider PROVIDER] [--url URL] [--sha256 SHA256] [--iso ISO] [--location LOCATION] [--memory-mb MEMORY_MB] [--cpus CPUS] [--disk-gb DISK_GB] [--dry-run]。示例：foxos env install wsl-ubuntu-24.04 ubuntu
+从目录一键安装一个系统为新环境（下载、校验 sha256、导入）。CLI：foxos env install ENTRY NAME [--provider PROVIDER] [--url URL] [--sha256 SHA256] [--iso ISO] [--location LOCATION] [--memory-mb MEMORY_MB] [--cpus CPUS] [--disk-gb DISK_GB] [--dry-run] [--product-key PRODUCT_KEY] [--start] [--wait-ready WAIT_READY]。示例：foxos env install foxos-debian-12 dev --start --wait-ready 900
 
 只读：否 · 破坏性：否 · CLI：`foxos env install`
 
@@ -3163,6 +3355,9 @@ AT-SPI 无障碍树（文字快照，每个元素一个引用 e1、e2…）。CL
 | `cpus` | integer |  | CPU 数（Hyper-V） |
 | `disk_gb` | integer |  | 磁盘 GB（Hyper-V） |
 | `dry_run` | boolean |  | 只输出安装计划，不执行 |
+| `product_key` | string |  | Windows 产品密钥（可选；评估版不需要） |
+| `start` | boolean |  | 装好后启动（Linux KVM） |
+| `wait_ready` | number |  | 启动后等待来宾报告就绪的秒数（0 = 不等） |
 | `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
 
 调用示例：
@@ -10950,6 +11145,202 @@ RGBA。CLI：foxos 3d rgba activate。界面：Compositing > main > RGBA。效�
 {"name": "machine_host_unpair", "arguments": {"client": "…"}}
 ```
 
+## model（11 个工具）
+
+### `model_catalog`
+
+列出可一键安装的本地模型（只有 UI-TARS-1.5-7B）和硬件是否够用。CLI：foxos model catalog。示例：foxos model catalog --json
+
+只读：是 · 破坏性：否 · CLI：`foxos model catalog`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "model_catalog", "arguments": {}}
+```
+
+### `model_install`
+
+下载本地模型（断点续传 + sha256 校验，国内优先魔搭）。CLI：foxos model install MODEL [--source {auto,hf,hf-mirror,modelscope}] [--force]。限制：约 5.6 GB 下载；权重不随系统镜像分发。示例：foxos model install ui-tars-1.5-7b
+
+只读：否 · 破坏性：否 · CLI：`foxos model install`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `model` | string | 是 | 模型 id 可选：ui-tars-1.5-7b |
+| `source` | string |  | 下载源：auto / hf / hf-mirror / modelscope 可选：auto / hf / hf-mirror / modelscope |
+| `force` | boolean |  | 硬件不够也装 |
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "model_install", "arguments": {"model": "ui-tars-1.5-7b"}}
+```
+
+### `model_run`
+
+启动本地模型服务（llama.cpp 或 vLLM，OpenAI 兼容接口）。CLI：foxos model run MODEL [--backend {auto,llama.cpp,vllm}] [--port PORT] [--ctx-size CTX_SIZE] [--threads THREADS] [--use]。限制：CPU 上很慢（每步几十秒）；有 GPU 更好。示例：foxos model run ui-tars-1.5-7b
+
+只读：否 · 破坏性：否 · CLI：`foxos model run`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `model` | string | 是 | 模型 id 可选：ui-tars-1.5-7b |
+| `backend` | string |  | 推理后端：auto / llama.cpp / vllm 可选：auto / llama.cpp / vllm |
+| `port` | integer |  | 端口 |
+| `ctx_size` | integer |  | 上下文长度 |
+| `threads` | integer |  | CPU 线程数 |
+| `use` | boolean |  | 启动后设为视觉定位 |
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "model_run", "arguments": {"model": "ui-tars-1.5-7b"}}
+```
+
+### `model_stop`
+
+停止本地模型服务。CLI：foxos model stop MODEL。示例：foxos model stop ui-tars-1.5-7b
+
+只读：否 · 破坏性：否 · CLI：`foxos model stop`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `model` | string | 是 | 模型 id 可选：ui-tars-1.5-7b |
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "model_stop", "arguments": {"model": "ui-tars-1.5-7b"}}
+```
+
+### `model_status`
+
+本地模型安装 / 运行状态。CLI：foxos model status。示例：foxos model status --json
+
+只读：是 · 破坏性：否 · CLI：`foxos model status`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "model_status", "arguments": {}}
+```
+
+### `model_remove`
+
+删除已下载的本地模型。CLI：foxos model remove MODEL。示例：foxos model remove ui-tars-1.5-7b
+
+只读：否 · 破坏性：否 · CLI：`foxos model remove`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `model` | string | 是 | 模型 id 可选：ui-tars-1.5-7b |
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "model_remove", "arguments": {"model": "ui-tars-1.5-7b"}}
+```
+
+### `model_use`
+
+把运行中的本地模型设为视觉定位。CLI：foxos model use MODEL。示例：foxos model use ui-tars-1.5-7b
+
+只读：否 · 破坏性：否 · CLI：`foxos model use`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `model` | string | 是 | 模型 id 可选：ui-tars-1.5-7b |
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "model_use", "arguments": {"model": "ui-tars-1.5-7b"}}
+```
+
+### `model_provider_list`
+
+列出模型服务商和是否配了密钥。CLI：foxos model provider list。示例：foxos model provider list --json
+
+只读：是 · 破坏性：否 · CLI：`foxos model provider list`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "model_provider_list", "arguments": {}}
+```
+
+### `model_provider_add`
+
+添加模型服务商密钥（只能人来做，从标准输入读）。CLI：foxos model provider add PROVIDER --key KEY [--base-url BASE_URL] [--model MODEL]。限制：只有人（human 身份）能改。示例：cat typesafe.key | foxos model provider add typesafe --key-stdin
+
+只读：否 · 破坏性：否 · CLI：`foxos model provider add`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `provider` | string | 是 | 服务商：deepseek / typesafe 可选：deepseek / typesafe |
+| `key` | string | 是 | 从标准输入读密钥 |
+| `base_url` | string |  | OpenAI 兼容接口地址 |
+| `model` | string |  | 文字模型 |
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "model_provider_add", "arguments": {"provider": "deepseek", "key": "…"}}
+```
+
+### `model_provider_remove`
+
+删除模型服务商密钥。CLI：foxos model provider remove PROVIDER。限制：只有人（human 身份）能改。示例：foxos model provider remove typesafe
+
+只读：否 · 破坏性：否 · CLI：`foxos model provider remove`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `provider` | string | 是 | 服务商：deepseek / typesafe 可选：deepseek / typesafe |
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "model_provider_remove", "arguments": {"provider": "deepseek"}}
+```
+
+### `model_provider_test`
+
+用一次真实调用测试服务商（报状态和延迟）。CLI：foxos model provider test PROVIDER。示例：foxos model provider test deepseek
+
+只读：是 · 破坏性：否 · CLI：`foxos model provider test`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `provider` | string | 是 | 服务商：deepseek / typesafe 可选：deepseek / typesafe |
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "model_provider_test", "arguments": {"provider": "deepseek"}}
+```
+
 ## runtime（3 个工具）
 
 ### `runtime_list`
@@ -11476,6 +11867,130 @@ RGBA。CLI：foxos 3d rgba activate。界面：Compositing > main > RGBA。效�
 {"name": "slides_export", "arguments": {"file": "…", "output": "…"}}
 ```
 
+## ssh（7 个工具）
+
+### `ssh_status`
+
+SSH 是否开启、地址、端口、密码登录、root 登录、防火墙、公钥数量与连接命令。CLI：foxos ssh status [--user USER]。示例：foxos ssh status
+
+只读：是 · 破坏性：否 · CLI：`foxos ssh status`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `user` | string |  | 用户（默认当前用户） |
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "ssh_status", "arguments": {}}
+```
+
+### `ssh_enable`
+
+开启 SSH（只允许密钥登录，防火墙放行 22）。CLI：foxos ssh enable。限制：只有人（human 身份）能执行。示例：foxos ssh enable
+
+只读：否 · 破坏性：否 · CLI：`foxos ssh enable`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "ssh_enable", "arguments": {}}
+```
+
+### `ssh_disable`
+
+关闭 SSH 服务。CLI：foxos ssh disable。示例：foxos ssh disable
+
+只读：否 · 破坏性：否 · CLI：`foxos ssh disable`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "ssh_disable", "arguments": {}}
+```
+
+### `ssh_keys_add`
+
+添加 SSH 公钥到 authorized_keys：粘贴、文件或 GitHub 用户名。CLI：foxos ssh keys add [--key KEY] [--file FILE] [--github GITHUB] [--user USER]。限制：只有人（human 身份）能执行。示例：foxos ssh keys add --github octocat
+
+只读：否 · 破坏性：否 · CLI：`foxos ssh keys add`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `key` | string |  | 公钥文本（一行或多行） |
+| `file` | string |  | 公钥文件路径 |
+| `github` | string |  | 从 https://github.com/<用户名>.keys 导入 |
+| `user` | string |  | 用户（默认当前用户） |
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "ssh_keys_add", "arguments": {}}
+```
+
+### `ssh_keys_list`
+
+列出 authorized_keys 里的公钥（类型、注释、指纹）。CLI：foxos ssh keys list [--user USER]。示例：foxos ssh keys list
+
+只读：是 · 破坏性：否 · CLI：`foxos ssh keys list`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `user` | string |  | 用户（默认当前用户） |
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "ssh_keys_list", "arguments": {}}
+```
+
+### `ssh_keys_remove`
+
+按序号或指纹删除一个公钥。CLI：foxos ssh keys remove INDEX|SHA256:... [--user USER]。示例：foxos ssh keys remove 2
+
+只读：否 · 破坏性：否 · CLI：`foxos ssh keys remove`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `key` | string | 是 | 序号、指纹（SHA256:…）或注释 |
+| `user` | string |  | 用户（默认当前用户） |
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "ssh_keys_remove", "arguments": {"key": "…"}}
+```
+
+### `ssh_password`
+
+打开或关闭 SSH 密码登录（打开时可同时设置一个足够强的新密码）。CLI：foxos ssh password on|off [--new-password NEW_PASSWORD]。限制：打开密码登录只有人能执行，并需要 sudo 密码；关闭任何人都可以。示例：foxos ssh password off
+
+只读：否 · 破坏性：否 · CLI：`foxos ssh password`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `state` | string | 是 | on 或 off |
+| `new_password` | string |  | 新密码（至少 12 位，三类字符） |
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "ssh_password", "arguments": {"state": "…"}}
+```
+
 ## workspace（1 个工具）
 
 ### `workspace_info`
@@ -11741,356 +12256,5 @@ RGBA。CLI：foxos 3d rgba activate。界面：Compositing > main > RGBA。效�
 
 ```json
 {"name": "control_resume", "arguments": {}}
-```
-
-## computer（8 个工具）
-
-### `computer_doctor`
-
-体检默认电脑操控栈：agent-desktop + Jev 单步策略 + 截图 / xdotool 兜底 + 规划器。CLI：foxos computer doctor。示例：foxos computer doctor
-
-只读：是 · 破坏性：否 · CLI：`foxos computer doctor`
-
-| 参数 | 类型 | 必填 | 说明 |
-|---|---|---|---|
-| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
-
-调用示例：
-
-```json
-{"name": "computer_doctor", "arguments": {}}
-```
-
-### `computer_backend_install`
-
-安装电脑操控后端 agent-desktop（Vercel Labs，Apache-2.0）。CLI：foxos computer backend install。示例：foxos computer backend install
-
-只读：否 · 破坏性：否 · CLI：`foxos computer backend install`
-
-| 参数 | 类型 | 必填 | 说明 |
-|---|---|---|---|
-| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
-
-调用示例：
-
-```json
-{"name": "computer_backend_install", "arguments": {}}
-```
-
-### `computer_backend_status`
-
-查看 agent-desktop 状态。CLI：foxos computer backend status。示例：foxos computer backend status --json
-
-只读：是 · 破坏性：否 · CLI：`foxos computer backend status`
-
-| 参数 | 类型 | 必填 | 说明 |
-|---|---|---|---|
-| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
-
-调用示例：
-
-```json
-{"name": "computer_backend_status", "arguments": {}}
-```
-
-### `computer_model_show`
-
-查看操控用的模型设置。CLI：foxos computer model show。示例：foxos computer model show --json
-
-只读：是 · 破坏性：否 · CLI：`foxos computer model show`
-
-| 参数 | 类型 | 必填 | 说明 |
-|---|---|---|---|
-| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
-
-调用示例：
-
-```json
-{"name": "computer_model_show", "arguments": {}}
-```
-
-### `computer_model_set`
-
-设置操控用的模型、视觉模型与视觉定位。CLI：foxos computer model set [--provider PROVIDER] [--model MODEL] [--vision-model VISION_MODEL] [--base-url BASE_URL] [--vision {auto,off}] [--grounding {auto,vlm,ui-tars,omniparser,typesafe,none}] [--grounding-url GROUNDING_URL] [--grounding-model GROUNDING_MODEL] [--max-steps MAX_STEPS] [--step-policy {auto,typesafe,deepseek}] [--gate-high GATE_HIGH] [--gate-low GATE_LOW]。限制：只有人（human 身份）能改。示例：foxos computer model set --provider deepseek
-
-只读：否 · 破坏性：否 · CLI：`foxos computer model set`
-
-| 参数 | 类型 | 必填 | 说明 |
-|---|---|---|---|
-| `provider` | string |  | 服务商：deepseek、openai、dashscope、zhipu、moonshot、local |
-| `model` | string |  | 文字模型 |
-| `vision_model` | string |  | 视觉模型（收图片），空字符串表示没有 |
-| `base_url` | string |  | OpenAI 兼容接口地址 |
-| `vision` | string |  | 视觉：auto 或 off 可选：auto / off |
-| `grounding` | string |  | 视觉定位方式 可选：auto / vlm / ui-tars / omniparser / typesafe / none |
-| `grounding_url` | string |  | 定位服务地址（vLLM / Ollama / OmniParser） |
-| `grounding_model` | string |  | 定位模型名（如 ByteDance-Seed/UI-TARS-1.5-7B） |
-| `max_steps` | integer |  | 最多多少步 |
-| `step_policy` | string |  | 默认单步策略 可选：auto / typesafe / deepseek |
-| `gate_high` | number |  | 高置信度门槛（≥ 直接执行） |
-| `gate_low` | number |  | 低置信度门槛（< 升级给规划器） |
-| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
-
-调用示例：
-
-```json
-{"name": "computer_model_set", "arguments": {}}
-```
-
-### `computer_model_key`
-
-保存模型服务的 API 密钥（只存本机密钥库）。CLI：foxos computer model key KEY [--provider PROVIDER]。限制：只有人（human 身份）能改。示例：cat deepseek.key | foxos computer model key --value-stdin
-
-只读：否 · 破坏性：否 · CLI：`foxos computer model key`
-
-| 参数 | 类型 | 必填 | 说明 |
-|---|---|---|---|
-| `value` | string | 是 | API 密钥（建议用 --value-stdin） |
-| `provider` | string |  | 服务商：deepseek、openai、dashscope、zhipu、moonshot、local |
-| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
-
-调用示例：
-
-```json
-{"name": "computer_model_key", "arguments": {"value": "…"}}
-```
-
-### `computer_model_test`
-
-真实调用一次模型，检查密钥与网络。CLI：foxos computer model test [--vision]。示例：foxos computer model test
-
-只读：是 · 破坏性：否 · CLI：`foxos computer model test`
-
-| 参数 | 类型 | 必填 | 说明 |
-|---|---|---|---|
-| `vision` | boolean |  | 测试视觉模型 |
-| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
-
-调用示例：
-
-```json
-{"name": "computer_model_test", "arguments": {}}
-```
-
-### `computer_task`
-
-电脑操控智能体：一句话任务，模型看无障碍树（可选截图）一步步操作桌面程序。CLI：foxos computer task TASK [--app APP] [--launch ARG] [--max-steps MAX_STEPS] [--approve {risky,ask,auto,deny}] [--vision {auto,on,off}] [--mode {s1s2,llm}] [--policy {auto,typesafe,deepseek}] [--surface {auto,a11y,screen,browser}] [--url URL]。限制：需要 foxos computer model 配好模型与密钥（DeepSeek 等）；纯文字模型也能用；risky：删除、发送、支付、提交等高风险动作要人批准（foxos bot approval answer）；ask：每个改动都要批准；人工接管时暂停，恢复后继续。示例：foxos computer task '在 Mousepad 里写一行 hello 并保存' --launch mousepad --launch notes.txt --app mousepad --vision off
-
-只读：否 · 破坏性：否 · CLI：`foxos computer task`
-
-| 参数 | 类型 | 必填 | 说明 |
-|---|---|---|---|
-| `task` | string | 是 | 任务（一句话） |
-| `app` | string |  | 只看这个程序的无障碍树 |
-| `launch` | array |  | 先启动的程序与参数（可重复） |
-| `max_steps` | integer |  | 最多多少步 |
-| `approve` | string |  | 审批：risky（缺省）/ ask / auto / deny 可选：risky / ask / auto / deny |
-| `vision` | string |  | 截图：auto（配了视觉模型就用）/ on / off 可选：auto / on / off |
-| `mode` | string |  | 做法：s1s2（快决策 + 规划器，默认）/ llm（只用大模型） 可选：s1s2 / llm |
-| `policy` | string |  | 单步策略：auto（有 TypeSafe 密钥用 Jev，否则 DeepSeek）/ typesafe / deepseek 可选：auto / typesafe / deepseek |
-| `surface` | string |  | 操作面：auto（网页 → 浏览器；桌面程序 → agent-desktop；没有无障碍信息 → 截图）/ a11y / screen / browser 可选：auto / a11y / screen / browser |
-| `url` | string |  | 网页任务的起始网址（会路由到浏览器） |
-| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
-
-调用示例：
-
-```json
-{"name": "computer_task", "arguments": {"task": "…"}}
-```
-
-## model（11 个工具）
-
-### `model_catalog`
-
-列出可一键安装的本地模型（只有 UI-TARS-1.5-7B）和硬件是否够用。CLI：foxos model catalog。示例：foxos model catalog --json
-
-只读：是 · 破坏性：否 · CLI：`foxos model catalog`
-
-| 参数 | 类型 | 必填 | 说明 |
-|---|---|---|---|
-| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
-
-调用示例：
-
-```json
-{"name": "model_catalog", "arguments": {}}
-```
-
-### `model_install`
-
-下载本地模型（断点续传 + sha256 校验，国内优先魔搭）。CLI：foxos model install MODEL [--source {auto,hf,hf-mirror,modelscope}] [--force]。限制：约 5.6 GB 下载；权重不随系统镜像分发。示例：foxos model install ui-tars-1.5-7b
-
-只读：否 · 破坏性：否 · CLI：`foxos model install`
-
-| 参数 | 类型 | 必填 | 说明 |
-|---|---|---|---|
-| `model` | string | 是 | 模型 id 可选：ui-tars-1.5-7b |
-| `source` | string |  | 下载源：auto / hf / hf-mirror / modelscope 可选：auto / hf / hf-mirror / modelscope |
-| `force` | boolean |  | 硬件不够也装 |
-| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
-
-调用示例：
-
-```json
-{"name": "model_install", "arguments": {"model": "ui-tars-1.5-7b"}}
-```
-
-### `model_run`
-
-启动本地模型服务（llama.cpp 或 vLLM，OpenAI 兼容接口）。CLI：foxos model run MODEL [--backend {auto,llama.cpp,vllm}] [--port PORT] [--ctx-size CTX_SIZE] [--threads THREADS] [--use]。限制：CPU 上很慢（每步几十秒）；有 GPU 更好。示例：foxos model run ui-tars-1.5-7b
-
-只读：否 · 破坏性：否 · CLI：`foxos model run`
-
-| 参数 | 类型 | 必填 | 说明 |
-|---|---|---|---|
-| `model` | string | 是 | 模型 id 可选：ui-tars-1.5-7b |
-| `backend` | string |  | 推理后端：auto / llama.cpp / vllm 可选：auto / llama.cpp / vllm |
-| `port` | integer |  | 端口 |
-| `ctx_size` | integer |  | 上下文长度 |
-| `threads` | integer |  | CPU 线程数 |
-| `use` | boolean |  | 启动后设为视觉定位 |
-| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
-
-调用示例：
-
-```json
-{"name": "model_run", "arguments": {"model": "ui-tars-1.5-7b"}}
-```
-
-### `model_stop`
-
-停止本地模型服务。CLI：foxos model stop MODEL。示例：foxos model stop ui-tars-1.5-7b
-
-只读：否 · 破坏性：否 · CLI：`foxos model stop`
-
-| 参数 | 类型 | 必填 | 说明 |
-|---|---|---|---|
-| `model` | string | 是 | 模型 id 可选：ui-tars-1.5-7b |
-| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
-
-调用示例：
-
-```json
-{"name": "model_stop", "arguments": {"model": "ui-tars-1.5-7b"}}
-```
-
-### `model_status`
-
-本地模型安装 / 运行状态。CLI：foxos model status。示例：foxos model status --json
-
-只读：是 · 破坏性：否 · CLI：`foxos model status`
-
-| 参数 | 类型 | 必填 | 说明 |
-|---|---|---|---|
-| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
-
-调用示例：
-
-```json
-{"name": "model_status", "arguments": {}}
-```
-
-### `model_remove`
-
-删除已下载的本地模型。CLI：foxos model remove MODEL。示例：foxos model remove ui-tars-1.5-7b
-
-只读：否 · 破坏性：否 · CLI：`foxos model remove`
-
-| 参数 | 类型 | 必填 | 说明 |
-|---|---|---|---|
-| `model` | string | 是 | 模型 id 可选：ui-tars-1.5-7b |
-| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
-
-调用示例：
-
-```json
-{"name": "model_remove", "arguments": {"model": "ui-tars-1.5-7b"}}
-```
-
-### `model_use`
-
-把运行中的本地模型设为视觉定位。CLI：foxos model use MODEL。示例：foxos model use ui-tars-1.5-7b
-
-只读：否 · 破坏性：否 · CLI：`foxos model use`
-
-| 参数 | 类型 | 必填 | 说明 |
-|---|---|---|---|
-| `model` | string | 是 | 模型 id 可选：ui-tars-1.5-7b |
-| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
-
-调用示例：
-
-```json
-{"name": "model_use", "arguments": {"model": "ui-tars-1.5-7b"}}
-```
-
-### `model_provider_list`
-
-列出模型服务商和是否配了密钥。CLI：foxos model provider list。示例：foxos model provider list --json
-
-只读：是 · 破坏性：否 · CLI：`foxos model provider list`
-
-| 参数 | 类型 | 必填 | 说明 |
-|---|---|---|---|
-| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
-
-调用示例：
-
-```json
-{"name": "model_provider_list", "arguments": {}}
-```
-
-### `model_provider_add`
-
-添加模型服务商密钥（只能人来做，从标准输入读）。CLI：foxos model provider add PROVIDER --key KEY [--base-url BASE_URL] [--model MODEL]。限制：只有人（human 身份）能改。示例：cat typesafe.key | foxos model provider add typesafe --key-stdin
-
-只读：否 · 破坏性：否 · CLI：`foxos model provider add`
-
-| 参数 | 类型 | 必填 | 说明 |
-|---|---|---|---|
-| `provider` | string | 是 | 服务商：deepseek / typesafe 可选：deepseek / typesafe |
-| `key` | string | 是 | 从标准输入读密钥 |
-| `base_url` | string |  | OpenAI 兼容接口地址 |
-| `model` | string |  | 文字模型 |
-| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
-
-调用示例：
-
-```json
-{"name": "model_provider_add", "arguments": {"provider": "deepseek", "key": "…"}}
-```
-
-### `model_provider_remove`
-
-删除模型服务商密钥。CLI：foxos model provider remove PROVIDER。限制：只有人（human 身份）能改。示例：foxos model provider remove typesafe
-
-只读：否 · 破坏性：否 · CLI：`foxos model provider remove`
-
-| 参数 | 类型 | 必填 | 说明 |
-|---|---|---|---|
-| `provider` | string | 是 | 服务商：deepseek / typesafe 可选：deepseek / typesafe |
-| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
-
-调用示例：
-
-```json
-{"name": "model_provider_remove", "arguments": {"provider": "deepseek"}}
-```
-
-### `model_provider_test`
-
-用一次真实调用测试服务商（报状态和延迟）。CLI：foxos model provider test PROVIDER。示例：foxos model provider test deepseek
-
-只读：是 · 破坏性：否 · CLI：`foxos model provider test`
-
-| 参数 | 类型 | 必填 | 说明 |
-|---|---|---|---|
-| `provider` | string | 是 | 服务商：deepseek / typesafe 可选：deepseek / typesafe |
-| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
-
-调用示例：
-
-```json
-{"name": "model_provider_test", "arguments": {"provider": "deepseek"}}
 ```
 

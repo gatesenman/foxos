@@ -1,0 +1,19 @@
+# yaml-language-server: $schema=https://aka.ms/winget-manifest.locale.1.6.0.schema.json
+
+PackageIdentifier: gatesenman.FoxOS
+PackageVersion: 0.3.2
+PackageLocale: zh-CN
+Publisher: gaosichun
+PublisherUrl: https://github.com/gatesenman
+PackageName: 狐狸OS
+PackageUrl: https://github.com/gatesenman/foxos
+License: Proprietary
+ShortDescription: 狐狸OS 桌面伴侣程序与 foxos 命令行（自带 Python 3.12 与内核）
+Moniker: foxos
+Tags:
+- agent
+- mcp
+- desktop
+ReleaseNotesUrl: https://github.com/gatesenman/foxos/releases/tag/v0.3.2-os-preview
+ManifestType: locale
+ManifestVersion: 1.6.0

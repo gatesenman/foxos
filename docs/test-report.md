@@ -155,6 +155,30 @@
 - ACP 智能体：**45/45** 显示注册表 `icon`（45 个在注册表里有 icon）。
 - 狐狸OS 自己的程序保留狐狸OS 风格图标：files, environments, appcenter, settings。
 
+## 安装包（发布矩阵，v0.3.2-os-preview）
+
+2026-11-12 01:00–02:30（Asia/Shanghai）。Linux 用 `scripts/packaging/e2e-rootfs.sh` 在各发行版官方根文件系统里（chroot，不用容器）真实走一遍：Release 同款 `install.sh` 一行安装（从 file:// 发布目录下载并校验 SHA256SUMS）→ 以普通用户无头启动桌面并截图 → `foxos --version` → `foxos sheets create` → 卸载并确认 `/usr/bin/foxos`、`/opt/FoxOS`、`~/.local/opt/foxos` 都已删除。arm64 在 x86_64 上用 qemu-user 运行。Windows / macOS 的端到端要在 GitHub Actions 的真机上跑（`release.yml` 的 e2e-windows / e2e-mac 任务），仓库 Actions 因账户账单被锁，任务未开始即失败，所以这两个平台**未验证**。
+
+| 系统 | CPU | 安装包 | 构建 | 端到端（安装 → 启动桌面 → foxos --version → sheets create → 卸载） | 说明 |
+| --- | --- | --- | --- | --- | --- |
+| Ubuntu 24.04 | x64 | deb · tar.gz · AppImage | ✅ 本地 | ✅ 通过 ×3 | 截图 e2e-ubuntu-24.04-{deb,tar,appimage}-x64.png |
+| Debian 12 | x64 | deb · tar.gz · AppImage | ✅ 本地 | ✅ 通过 ×3 |  |
+| Fedora 43 | x64 | rpm | ✅ 本地 | ✅ 通过 | 测试机连不上 Cisco openh264 源，测试时关掉（与 FoxOS 无关） |
+| openSUSE Tumbleweed | x64 | rpm | ✅ 本地 | ✅ 通过 | 第一次失败：最小系统没有字体，Chromium 启动崩溃；rpm 加了字体依赖后重建并通过 |
+| Arch Linux | x64 | tar.gz · AppImage | ✅ 本地 | ✅ 通过 ×2 | AUR PKGBUILD 加了 ttf-font 依赖 |
+| Debian 12 | arm64 | deb · tar.gz | ✅ 本地 | ⚠️ 部分：安装、CLI、卸载通过；桌面启动未验证 | qemu-user 下 Chromium 崩溃（GPU 进程起不来、SIGTRAP），需真 arm64 机器 |
+| Fedora 43 | arm64 | rpm | ✅ 本地 | ⚠️ 部分：安装、CLI、卸载通过；桌面启动未验证 | 同上 |
+| Linux | arm64 | AppImage | ✅ 本地 | ⚠️ 只验证内容（unsquashfs 后 foxos --version、sheets create） | AppImage 头里的魔数让 qemu 的 binfmt 不匹配，无法在 qemu 下执行 |
+| Windows 10/11 | x64 | NSIS exe · 便携 zip | ✅ 本地（wine 交叉构建） | ❌ 未验证 | wine 下解包 payload，python -m foxos --version 正常；真机静默安装 / 启动 / 卸载要等 CI |
+| Windows 11 | arm64 | NSIS exe · 便携 zip | ✅ 本地（wine 交叉构建） | ❌ 未验证 | 只检查了 PE 架构为 ARM64 |
+| Windows | x64 · arm64 | MSI | ❌ 未构建 | ❌ | WiX 在 wine 下崩溃，只能在 CI 的 Windows 机器上构建 |
+| macOS 11+ | arm64 · x64 | zip | ✅ 本地（ad-hoc 签名） | ❌ 未验证 | 没有 Mac；CI 的 macos-14 / macos-15-intel 任务被账单锁挡住 |
+| macOS 11+ | arm64 · x64 | dmg | ❌ 未构建 | ❌ | dmg 需要 macOS 工具链（CI） |
+| 狐狸OS 系统 | arm64 | ISO | ❌ 未构建 | ❌ | 构建机出口连不上 ports.ubuntu.com（所有 ubuntu-ports 镜像返回 500）；CI 的 ubuntu-24.04-arm 任务被账单锁挡住 |
+| 狐狸OS 系统 | amd64 | 单文件 ISO | ❌ 未上传 | — | 分卷 part1 + part2 已在发布里；单文件由 CI 合并上传 |
+
+GitHub Actions 运行：[43057548522](https://github.com/gatesenman/foxos/actions/runs/43057548522)（失败：账户账单锁定，任务未启动）；[43059095200](https://github.com/gatesenman/foxos/actions/runs/43059095200)（失败：账户账单锁定，任务未启动）；[43070332484](https://github.com/gatesenman/foxos/actions/runs/43070332484)（失败：账户账单锁定，任务未启动）
+
 ## 复现
 
 ```bash

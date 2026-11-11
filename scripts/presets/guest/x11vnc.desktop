@@ -1,0 +1,6 @@
+[Desktop Entry]
+Type=Application
+Name=FoxOS guest display (x11vnc)
+Exec=sh -c "x11vnc -display :0 -forever -shared -nopw -quiet -rfbport 5900 >/tmp/x11vnc.log 2>&1"
+X-GNOME-Autostart-enabled=true
+NoDisplay=true

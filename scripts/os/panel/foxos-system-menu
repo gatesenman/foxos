@@ -1,0 +1,24 @@
+#!/bin/sh
+# 底栏「系统」菜单：第一项是 SSH 远程登录地址，其余是注销 / 关机。
+ip=$(ip -4 -o addr show scope global 2>/dev/null | awk '{sub(/\/.*/,"",$4); print $4}' | tr '\n' ' ')
+first=${ip%% *}
+if systemctl is-active -q ssh.service 2>/dev/null || systemctl is-active -q ssh.socket 2>/dev/null; then
+  row="SSH 远程登录：ssh ${USER:-foxos}@${first:-（无网络）}"
+else
+  row="SSH 远程登录：未开启"
+fi
+choice=$(zenity --list --title "系统" --width 480 --height 260 --hide-header --column "操作" \
+  "$row" "注销、锁定、关机或重新启动…" 2>/dev/null) || exit 0
+case "$choice" in
+  SSH*)
+    info=$(foxos ssh status 2>&1)
+    [ -r /run/foxos/live-ssh.txt ] && info="$info
+
+$(cat /run/foxos/live-ssh.txt)"
+    zenity --info --title "SSH 远程登录" --width 620 --no-wrap --text "$info
+
+地址：${ip:-无}
+智能体也可以通过 SSH 使用 MCP：ssh ${USER:-foxos}@${first:-主机} foxos mcp
+管理：foxos ssh status / enable / disable / keys add --github 用户名 / password on|off" ;;
+  *) exec xfce4-session-logout ;;
+esac

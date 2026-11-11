@@ -1,0 +1,19 @@
+# yaml-language-server: $schema=https://aka.ms/winget-manifest.defaultLocale.1.6.0.schema.json
+
+PackageIdentifier: gatesenman.FoxOS
+PackageVersion: 0.3.2
+PackageLocale: en-US
+Publisher: gaosichun
+PublisherUrl: https://github.com/gatesenman
+PackageName: FoxOS
+PackageUrl: https://github.com/gatesenman/foxos
+License: Proprietary
+ShortDescription: FoxOS desktop companion and foxos CLI for agents (bundled Python 3.12 and kernel)
+Moniker: foxos
+Tags:
+- agent
+- mcp
+- desktop
+ReleaseNotesUrl: https://github.com/gatesenman/foxos/releases/tag/v0.3.2-os-preview
+ManifestType: defaultLocale
+ManifestVersion: 1.6.0

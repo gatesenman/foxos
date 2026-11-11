@@ -70,7 +70,7 @@
 
 ## 3. 许可
 
-agent-desktop、agent-browser、Playwright MCP 在安装时作为依赖（npm 固定版本）获取，ISO 预装到 `/usr/lib/foxos/tools`，
+agent-desktop、agent-browser、Playwright MCP 在安装时作为依赖（npm 固定版本）获取，agent-desktop、agent-browser 由 ISO 按运行环境清单全局预装（Playwright MCP 不预装），
 许可证随包；llama.cpp（MIT）运行时按 sha256 下载；UI-TARS 权重（Apache-2.0）不进 ISO，用户自己一键下载。
 xdotool / scrot 是独立进程，不复制代码。见 `THIRD_PARTY_NOTICES.md`。
 
@@ -107,4 +107,4 @@ See `docs/test-report.md` (US-120+) and the benchmark table above (`scripts/cu_b
 
 ## Licenses
 
-agent-desktop, agent-browser and Playwright MCP are installed as pinned npm dependencies (preinstalled in the ISO under `/usr/lib/foxos/tools`); llama.cpp (MIT) is downloaded with sha256 checks; UI-TARS weights are never shipped. xdotool/scrot run as separate processes. See `THIRD_PARTY_NOTICES.md`.
+agent-desktop, agent-browser and Playwright MCP are installed as pinned npm dependencies (agent-desktop and agent-browser preinstalled globally in the ISO from the runtime manifest; Playwright MCP is not); llama.cpp (MIT) is downloaded with sha256 checks; UI-TARS weights are never shipped. xdotool/scrot run as separate processes. See `THIRD_PARTY_NOTICES.md`.

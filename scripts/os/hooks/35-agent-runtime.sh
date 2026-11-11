@@ -10,13 +10,6 @@ export npm_config_cache=/var/tmp/foxos-npm-cache UV_CACHE_DIR=/var/tmp/foxos-uv-
 "$PY" -m foxos.runtime install --phase iso --system
 echo "35-agent-runtime: installed"
 "$PY" -m foxos.runtime check || { echo "35-agent-runtime: an ISO-phase tool failed its --version check" >&2; exit 1; }
-# 电脑操控后端（Apache-2.0，版本固定）：agent-desktop（默认：无障碍树观察 / 操作）、agent-browser（兜底：网页，经 CDP 连自带 Chrome）
-for pkg in agent-desktop@1.2.0 agent-browser@0.42.0; do
-  name=${pkg%@*}
-  install -d "/usr/lib/foxos/tools/$name"
-  npm install --prefix "/usr/lib/foxos/tools/$name" --no-audit --no-fund "$pkg"
-  "/usr/lib/foxos/tools/$name/node_modules/.bin/$name" --version
-done
 rm -rf /var/tmp/foxos-npm-cache /var/tmp/foxos-uv-cache /root/.foxos-build /root/.npm /root/.cache/node-gyp
 # 用户 PATH：~/.local/bin（首次登录与 foxos runtime install 装在这里），/usr/local/bin 已在默认 PATH
 cat > /etc/profile.d/foxos-runtime.sh <<'P'
@@ -35,6 +28,21 @@ gtk-update-icon-cache -f /usr/share/icons/hicolor 2>/dev/null || true
 install -d /usr/share/doc/foxos
 install -m 644 /usr/lib/foxos/python/foxos/data/pstack/NOTICE /usr/share/doc/foxos/NOTICE.pstack
 install -m 644 /usr/lib/foxos/python/foxos/botchat/static/vendor/tabler/LICENSE /usr/share/doc/foxos/LICENSE.tabler-icons
+# agent-browser（Vercel，Apache-2.0）：浏览器操控兜底，经 CDP 连自带 Chrome（运行环境清单 iso 阶段装）
+cat > /usr/share/doc/foxos/NOTICE.agent-browser <<'N'
+agent-browser 0.42.0 — https://github.com/vercel-labs/agent-browser (npm: agent-browser)
+Copyright Vercel, Inc. and the agent-browser contributors.
+Licensed under the Apache License, Version 2.0; the full text ships in the npm package (LICENSE).
+N
+# agent-desktop（Vercel，Apache-2.0）：默认的电脑操作（computer use）栈，适配代码在 foxos 的 computer-use 部分
+cat > /usr/share/doc/foxos/NOTICE.agent-desktop <<'N'
+agent-desktop 1.2.0 — https://github.com/vercel-labs/agent-desktop (npm: agent-desktop)
+Copyright Vercel, Inc. and the agent-desktop contributors.
+Licensed under the Apache License, Version 2.0 (https://www.apache.org/licenses/LICENSE-2.0).
+狐狸OS ships the unmodified npm package and its official prebuilt linux-x64 binary
+(installed with npm install -g agent-desktop@1.2.0; the binary's sha256 is checked by the package's postinstall).
+It is the default computer-use stack together with Jev.
+N
 "$PY" - <<'J' > /usr/share/doc/foxos/agent-runtime.txt
 import json
 from foxos import runtime

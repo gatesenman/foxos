@@ -60,7 +60,7 @@ Windows 伴侣程序的截图在下方单独一节：[Windows 伴侣程序](#win
 | Everything 应用 | 51 个开源应用（9 个分组），本机构建运行；每个应用有从界面实际遍历出的语义命令（`foxos <应用> <资源> <动作>`），见 [docs/everything-apps.md](docs/everything-apps.md) 与 [docs/operations/](docs/operations/) |
 | 智能体 | ACP 客户端（会话面板、运行位置：宿主或某个环境）、ACP 官方注册表一键安装、MCP 服务（stdio / Streamable HTTP、令牌、compact / full 工具集） |
 | 安全与协作 | 工作空间约束（拒绝 `../`、符号链接逃逸、保留目录）、JSONL 审计日志、文件锁、原子保存与版本、人工接管（`PAUSED`，退出码 8） |
-| 环境 | Linux 命名空间运行时（overlayfs、pivot_root、seccomp、cgroup v2 / rlimit）、`.foxenv` 镜像、快照、克隆、导出；Windows：WSL2、Windows Sandbox、Hyper-V；提供者协议 |
+| 环境 | Linux 命名空间运行时（overlayfs、pivot_root、seccomp、cgroup v2 / rlimit）、`.foxenv` 镜像、快照、克隆、导出；Windows：WSL2、Windows Sandbox、Hyper-V；提供者协议；**在线安装预设系统**（已配好桌面、中文、Node / Bun / Python、ACP 智能体与 foxos 桥的 Debian 12 / Ubuntu 24.04 / 狐狸OS，以及按微软 / Apple 官方介质自动配置的 Windows 评估版与 macOS，分卷断点续传、sha256 校验），见 [docs/presets.md](docs/presets.md) 与[截图](docs/screenshots/env-presets-032.png) |
 | 多语言 | 简体中文（默认）与 English：安装向导第一步与设置里切换，立即生效并保存；`foxos` 命令行、MCP 工具说明与内核错误消息跟随 `--lang` / `FOXOS_LANG`（JSON 字段名与错误码不变）；Windows 安装程序与 `install.ps1` 中英双语；Everything 应用通过 Chromium 语言接收狐狸OS 语言，上游提供中文界面的（spreadsheet）随之切换，其余在应用中心标“英文界面”（逐个记录见 [docs/everything-apps.md](docs/everything-apps.md)）。词条在 `apps/desktop/src/locales/` 与 `packages/core/foxos/data/locales/` |
 | 滚动条 | 不用系统默认滚动条：外壳、所有窗口与 Everything 应用（注入到每个 webview）统一用狐狸OS 细滚动条——轨道透明、平时隐藏、指向或滚动时出现、指向时加宽、拖动时为强调色，随深浅色主题变化；Monaco 与终端（xterm）使用相同尺寸与颜色 |
 | 安装 | Windows / macOS / Linux 各 x64 与 arm64 的安装包（exe、msi、dmg、deb、rpm、AppImage、tar.gz）都自带 Python 3.12 与办公库，一行安装脚本校验 SHA-256（见 [docs/install.md](docs/install.md)）；首次运行向导按平台在线安装组件 |
@@ -82,7 +82,7 @@ Windows 伴侣程序的截图在下方单独一节：[Windows 伴侣程序](#win
 | **狐狸OS 系统 ISO** | `FoxOS-0.3.2-amd64.iso.part1` + `.part2`（合并成 ISO，UEFI + BIOS） | 构建脚本已支持（`FOXOS_OS_ARCH=arm64`），等 GitHub Actions 恢复后在 arm64 机器上构建 |
 | 包管理器（草稿，未提交） | winget `gatesenman.FoxOS` · Homebrew cask `foxos` · AUR `foxos-bin`，见 `FoxOS-0.3.2-package-manifests.zip` 与 [`packaging/`](packaging/) | 同左 |
 
-MSI、dmg、arm64 ISO 和单文件 ISO 由 GitHub Actions（[`release.yml`](.github/workflows/release.yml)）在 Windows / macOS / arm64 机器上构建；仓库的 Actions 目前因 GitHub 账户账单问题无法启动，恢复后重新运行即可补上。macOS 的 zip 已做 ad-hoc 签名，但还没在真 Mac 上验证过。
+端到端测试（安装 → 启动桌面 → `foxos --version` → `foxos sheets create` → 卸载）：Linux x64 的 deb / rpm / tar.gz / AppImage 已在 Ubuntu 24.04、Debian 12、Fedora 43、openSUSE Tumbleweed、Arch 上全部通过；Linux arm64 在 qemu 里验证了安装、命令行与卸载，桌面启动还要在真 arm64 机器上验证；**Windows 与 macOS 的安装包还没有在真机上测过，请当作预览**。MSI、dmg、arm64 ISO 和单文件 ISO 由 GitHub Actions（[`release.yml`](.github/workflows/release.yml)）构建并在各系统上跑端到端测试；仓库的 Actions 目前因 GitHub 账户账单问题无法启动，恢复后重新运行即可补上。详见 [docs/install.md](docs/install.md) 与[测试报告](docs/test-report.md)。
 
 一行安装（自动识别系统与 CPU，下载、校验 SHA-256、安装，最后运行 `foxos --version`）：
 
@@ -161,6 +161,8 @@ foxos --workspace ~/FoxOS/workspace mcp                                    # std
 FOXOS_MCP_TOKEN=<令牌> foxos --workspace ~/FoxOS/workspace mcp --http 127.0.0.1:8765   # Streamable HTTP（POST /mcp）
 foxos mcp --profile compact                                                # 精简工具集（通用 + everything_run）
 ```
+
+- SSH：系统默认开 OpenSSH，只认密钥（密码登录默认关、root 禁止、防火墙放行 22）。智能体从别的电脑 `ssh foxos@<地址> foxos …`，或 MCP over SSH：`ssh -T foxos@<地址> foxos mcp`。现场会话会在桌面和控制台显示地址与一次性密码。详见 [docs/ssh.md](docs/ssh.md)
 
 ## Everything 应用（51 个）
 

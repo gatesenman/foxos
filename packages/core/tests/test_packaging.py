@@ -139,8 +139,17 @@ def test_US83_release_matrix_covers_every_common_platform():
     assert desk == {(o, a) for o in ("linux", "mac", "win") for a in ("x64", "arm64")}
     iso = {m["arch"]: m["runner"] for m in wf["jobs"]["iso"]["strategy"]["matrix"]["include"]}
     assert iso == {"amd64": "ubuntu-24.04", "arm64": "ubuntu-24.04-arm"}
-    distros = {m["name"].split("-")[0] for m in wf["jobs"]["install-e2e"]["strategy"]["matrix"]["include"]}
-    assert {"ubuntu", "debian", "fedora", "opensuse", "archlinux", "macos"} <= distros
+    # 每个安装包都有端到端任务（安装 → 启动截图 → foxos --version → sheets create → 卸载）
+    lin = wf["jobs"]["e2e-linux"]["strategy"]["matrix"]["include"]
+    assert {m["distro"].split(":")[0].split("/")[0] for m in lin} == {"ubuntu", "debian", "fedora", "opensuse", "archlinux"}
+    for arch in ("x64", "arm64"):
+        assert {m["method"] for m in lin if m["arch"] == arch} == {"deb", "rpm", "tar", "appimage"}
+    assert all(m["runner"] == ("ubuntu-24.04-arm" if m["arch"] == "arm64" else "ubuntu-24.04") for m in lin)
+    mac = {(m["arch"], m["method"]) for m in wf["jobs"]["e2e-mac"]["strategy"]["matrix"]["include"]}
+    assert mac == {(a, f) for a in ("x64", "arm64") for f in ("dmg", "zip")}
+    win = {(m["arch"], m["method"]) for m in wf["jobs"]["e2e-windows"]["strategy"]["matrix"]["include"]}
+    assert win == {(a, f) for a in ("x64", "arm64") for f in ("nsis", "msi", "zip")}
+    assert "e2e-rootfs.sh" in str(wf["jobs"]["e2e-linux"]["steps"])
     assert wf["permissions"] == {"contents": "write"}
     text = (ROOT / ".github/workflows/release.yml").read_text(encoding="utf-8")
     assert "secrets.GH_" not in text and "gh_foxos_token" not in text   # 只用内置 GITHUB_TOKEN

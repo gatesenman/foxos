@@ -61,7 +61,7 @@ Everything is on [v0.3.2-os-preview](https://github.com/gatesenman/foxos/release
 | **FoxOS OS ISO** | `FoxOS-0.3.2-amd64.iso.part1` + `.part2` (join into the ISO; UEFI + BIOS) | build script ready (`FOXOS_OS_ARCH=arm64`); built on an arm64 runner once GitHub Actions is available |
 | Package managers (drafts, not submitted) | winget `gatesenman.FoxOS` · Homebrew cask `foxos` · AUR `foxos-bin`, see `FoxOS-0.3.2-package-manifests.zip` and [`packaging/`](packaging/) | same |
 
-The MSI, dmg, arm64 ISO and single-file ISO are built by GitHub Actions ([`release.yml`](.github/workflows/release.yml)) on Windows / macOS / arm64 runners. Actions currently cannot start on this repository because of a GitHub account billing lock; re-running the workflow afterwards adds them. The macOS zips are ad-hoc signed but not yet tested on a real Mac.
+End-to-end tests (install → desktop launch → `foxos --version` → `foxos sheets create` → uninstall): the Linux x64 deb / rpm / tar.gz / AppImage pass on Ubuntu 24.04, Debian 12, Fedora 43, openSUSE Tumbleweed and Arch. Linux arm64 install, CLI and uninstall pass under qemu; the desktop launch still needs a real arm64 machine. **The Windows and macOS builds have not been tested on real machines yet, so treat them as previews.** The MSI, dmg, arm64 ISO and single-file ISO are built by GitHub Actions ([`release.yml`](.github/workflows/release.yml)), which also runs the end-to-end tests on every platform. Actions cannot start on this repository right now because of a GitHub account billing lock; re-run the workflow once that is fixed. See [docs/install.md](docs/install.md) and the [test report](docs/test-report.md).
 
 One-line install (detects OS and CPU, downloads, verifies SHA-256, installs, then runs `foxos --version`):
 
@@ -120,6 +120,7 @@ cd apps/desktop && npm ci && npm start
 
 See [AGENTS.md](AGENTS.md), `foxos agent-guide`, [agent guide](docs/agent-guide.md), [CLI reference](docs/cli-reference.md), [MCP reference](docs/mcp-reference.md).
 Messages and command descriptions are Chinese by default; use `--lang en-US` or `FOXOS_LANG=en-US` for English (JSON field names, error codes and command names do not change).
+SSH is on by default (keys only; password login off, root login off, ufw allows 22). Agents connect with `ssh foxos@HOST foxos …` or MCP over SSH stdio `ssh -T foxos@HOST foxos mcp`; the live session shows its address and a one-time password. See [docs/ssh.md](docs/ssh.md).
 Grammar `foxos <app> <resource> <verb> --json`; MCP tool names `<app>_<resource>_<verb>`; exit codes 0 OK, 1 ERROR, 2 USAGE, 3 NOT_FOUND, 4 PERMISSION_DENIED, 5 LOCKED, 6 DEPENDENCY_MISSING, 7 CONFLICT, 8 PAUSED.
 
 ## Everything apps (51)
@@ -144,7 +145,7 @@ Runs locally: **50/51** · semantic CLI/MCP commands: **50/51** · boot e2e pass
 
 ## Environments
 
-Linux: unprivileged user namespaces + overlayfs + pivot_root + seccomp, cgroup v2 when delegated (rlimit otherwise), snapshots, clones, `.foxenv` export, agents can run inside. Windows: WSL2 distro catalog with automatic WSL enablement, Windows Sandbox, Hyper-V. macOS: Virtualization.framework backend (untested on hardware). See [docs/environments.md](docs/environments.md) and the [provider protocol](docs/environment-provider-protocol.md).
+Linux: unprivileged user namespaces + overlayfs + pivot_root + seccomp, cgroup v2 when delegated (rlimit otherwise), snapshots, clones, `.foxenv` export, agents can run inside. Windows: WSL2 distro catalog with automatic WSL enablement, Windows Sandbox, Hyper-V. macOS: Virtualization.framework backend (untested on hardware). See [docs/environments.md](docs/environments.md) and the [provider protocol](docs/environment-provider-protocol.md). **Online preset systems**: preconfigured Debian 12 / Ubuntu 24.04 / FoxOS guests (desktop, Chinese, Node / Bun / Python, ACP agents, the foxos bridge) plus Windows evaluation and macOS recipes that download the official Microsoft / Apple media at install time; split downloads resume and are checked against sha256. See [docs/presets.md](docs/presets.md) and the [screenshot](docs/screenshots/env-presets-032.png).
 
 Light isolation (`foxos sandbox`): run host tools directly, but only the workspace is readable/writable and network can be turned off (Linux Landlock + seccomp, macOS Seatbelt, Windows restricted token / AppContainer + job objects). Pick "轻量沙箱" as the run location in the session panel. See [docs/sandbox.md](docs/sandbox.md).
 
