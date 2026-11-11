@@ -353,13 +353,13 @@ def case_bots() -> str:
     # 「智能体」窗口启动
     ssh("foxos desktop launch -- foxos-bots", check=True)
     seen = ""
-    for _ in range(60):
-        w = ssh("foxos desktop windows --json").stdout
-        m = re.search(r'"title":\s*"([^"]*(智能体|Bots|FoxOS Bots)[^"]*)"', w)
-        if m:
-            seen = m.group(1)
+    for _ in range(90):
+        # 「智能体」窗口是 Chrome 的 --app 窗口，WM_CLASS 为 foxos-bots（首次登录的「安装智能体命令行」对话框不算）
+        w = ssh("wmctrl -lx | grep -i 'foxos-bots' | head -1").stdout.strip()
+        if w:
+            seen = w.split(None, 4)[-1]
             break
-        time.sleep(5)
+        time.sleep(10)
     assert seen, "智能体窗口没有出现"
     shot = screendump(WORK / f"e2e-bots-{int(time.time())}.png")
     ssh("foxos bot profile delete e2e-opencode --json >/dev/null 2>&1; true")

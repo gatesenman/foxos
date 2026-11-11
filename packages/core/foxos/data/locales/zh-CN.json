@@ -1560,6 +1560,7 @@
   "ssh.app_summary": "OpenSSH：状态、开关、公钥（authorized_keys）、密码登录；默认只允许密钥登录、禁止 root",
   "ssh.human_only": "只有人（human 身份）能执行 {0}：智能体不能给自己或别人开远程登录的门",
   "ssh.no_such_user": "没有用户 {0}",
+  "ssh.posix_only": "SSH 设置只在狐狸OS / Linux 上可用；在 Windows 上请到狐狸OS 电脑（来宾）里管理。",
   "ssh.no_admin_helper": "找不到 SSH 管理助手 {0}（只在狐狸OS 系统里提供）",
   "ssh.admin_timeout": "SSH 管理助手超时",
   "ssh.admin_failed": "SSH 管理操作 {0} 失败：{1}",

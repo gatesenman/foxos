@@ -49,7 +49,7 @@
 已在构建机上测过（US-87）：
 
 - 单元 / 结构测试：执行模式判定、命令路由（`env` / `machine` 在本机，其余在来宾）、SSH 参数与引号、主进程把 Office / 终端 / 智能体 / Everything / 聊天都转给来宾、本机执行闸门（默认关、每次原生对话框）、QEMU 控制台参数、`foxos acp stdio`。
-- 端到端（`apps/desktop/e2e/client.e2e.js`，Playwright 驱动真实 Electron，客户端模式）：来宾是真实的狐狸OS 根文件系统（ISO 里的 chroot：sshd + Xvfb :0 上的 XFCE + foxos，`scripts/e2e/foxos-guest-chroot.sh`），见测试报告里的结果。
+- 端到端（`apps/desktop/e2e/client.e2e.js`，Playwright 驱动真实 Electron，客户端模式）：来宾是真实的狐狸OS 根文件系统（ISO 里的 chroot：sshd + Xvfb :0 上的 XFCE + foxos，`scripts/e2e/foxos-guest-chroot.sh`）。2026-11-12 通过：本机执行默认关闭、终端在来宾里跑、Everything 应用在来宾里装/开、文件写在来宾里、电脑画面（noVNC）显示来宾桌面、应用中心在来宾里 `apt-get install libreoffice-writer` 后「打开 Word」在来宾桌面打开 LibreOffice Writer（`FOXOS_E2E_GUEST_APT=1`）。
 
 **没有在真正的 Windows 上测过**：
 
@@ -118,7 +118,7 @@ In 0.2.0, clicking Install in the app center ran `foxos everything install …` 
   - `foxos acp stdio`.
 - **End to end** (`apps/desktop/e2e/client.e2e.js`, Playwright driving the real Electron app in client mode):
   - The guest is a real FoxOS root filesystem: the ISO chroot with sshd, XFCE on Xvfb :0, and foxos (`scripts/e2e/foxos-guest-chroot.sh`).
-  - See the test report for results.
+  - Passed on 2026-11-12. Covered: host execution off by default, terminals running in the guest, Everything apps installed and opened in the guest, files written in the guest, and the computer view (noVNC) showing the guest desktop. With `FOXOS_E2E_GUEST_APT=1`, the app center ran `apt-get install libreoffice-writer` in the guest, and "Open Word" then opened LibreOffice Writer on the guest desktop.
 
 **Not tested on real Windows:**
 
