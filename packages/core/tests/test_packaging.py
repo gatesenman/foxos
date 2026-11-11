@@ -184,4 +184,4 @@ def test_US85_install_ps1_is_ascii_and_supports_arm64_and_msi():
     s.decode("ascii")                                       # irm | iex 在 Windows PowerShell 5.1 下要求纯 ASCII
     t = s.decode()
     assert "FoxOS-Setup-*-$Arch.exe" in t and "FoxOS-*-win-$Arch.msi" in t and "FoxOS-*-win-$Arch.zip" in t
-    assert "'ARM64'" in t and "msiexec.exe" in t and "v0.3.2-os-preview" in t
+    assert "'ARM64'" in t and "msiexec.exe" in t and "v0.3.3-windows-preview" in t

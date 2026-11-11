@@ -90,6 +90,43 @@
 
 没有用真实模型账号跑过回答。Gemini CLI、codex-acp、Qwen Code、Cursor CLI 的握手结果是「需要登录」；opencode 和 claude-agent-acp 能建立会话。详见 [agent-runtime.md](agent-runtime.md)。截图在 `docs/screenshots/bots-*.png`，是 overlay 里真实 XFCE 会话中的「智能体」窗口（Firefox 后备浏览器）。
 
+## 最终回归（2026-11-12 05:58，Asia/Shanghai，合并主线 `bb40a85`）
+
+`packages/core` 全部 pytest：**153 通过、0 失败、19 跳过**（15 分 20 秒）。与上一次相比多跳过 1 个：`test_os_session.py` 的真实 XFCE 用例报告 xfwm4 没能在测试显示上启动；单独重跑该文件 4 个全部通过（104 秒）。中间一次运行（`0136016`，负载很高）里 US-116 opencode 的 ACP 会话没有建立起来而失败，这一次通过。
+
+## 合并主线后的完整回归（2026-11-12 05:13，Asia/Shanghai）
+
+合并主线（`41f6920`）后在构建盒上跑 `packages/core` 全部 pytest：**152 通过、0 失败、18 跳过**（12 分 27 秒）。之前 US-32 / US-33 的失败是因为构建盒的系统 Python 缺 `zstandard`（`pyproject.toml`、ISO 的 venv、打包脚本都已声明这个依赖，仓库不缺）；装上 Debian 的 `python3-zstandard` 后通过。跳过的 18 个：电脑操控真实端到端 7 个（需要 `FOXOS_CU_E2E=1`，另跑，见下）、预设真实下载 1、Windows 实机 2、镜像 overlay 2、安装包产物 4、缺 `yaml` 模块 1、wine 1。
+
+随后在同一提交上单独跑真实电脑操控端到端（`FOXOS_CU_E2E=1`，XFCE 会话 :55，真实 Jev / DeepSeek）：**7 通过、0 失败**（162.4 秒）。
+
+## 电脑、浏览器、命令行操控（2026-11-12 03:01，Asia/Shanghai）
+
+默认栈：agent-desktop 1.2.0 读界面并执行（AT-SPI），Jev（TypeSafe）选每一步，DeepSeek v4 pro 做规划；读不到界面时自动退到截图操控（scrot + xdotool + 视觉定位）或浏览器操控（Chrome CDP + agent-browser 0.42.0）。所有动作在狐狸OS 机器里的 XFCE 会话（Xvfb :55）里执行，不碰宿主。删除、发送、支付等动作要求批准，每一步写审计。
+
+先用真实请求核对 Jev 密钥（密钥只在测试时放进环境变量，不打印）：`GET /v1/models` 200，108 毫秒；`POST /v1/systemone`（Choice）200，156 毫秒，模型 jev-1.14.0，置信度 1.0。
+
+真实端到端 `FOXOS_CU_E2E=1 pytest tests/test_cu_real.py`（合并主线后的 `8eb13be`）：**7 通过、0 失败**，134.6 秒。
+
+| 故事 | 用例 | 结果 | 耗时（秒） |
+|---|---|---|---|
+| US-120 | 体检显示默认栈与两条兜底 | 通过 | 1.7 |
+| US-121 | 默认路径：agent-desktop + Jev + DeepSeek 规划，在 Mousepad 改写并保存 | 通过 | 21.4 |
+| US-122 | 没有 TypeSafe 密钥时退到 DeepSeek 单步策略 | 通过 | 39.2 |
+| US-123 | xedit 没有无障碍信息，自动退到截图操控 | 通过 | 31.9 |
+| US-124 | 网页内容读不到，自动退到浏览器操控（本地商店下单并读出订单号） | 通过 | 18.0 |
+| US-125 | 按次 `--surface` 与按智能体设置手动选择 | 通过 | 20.4 |
+| US-126 | TypeSafe 服务商真实调用 | 通过 | 1.9 |
+| US-127 | 离线单元测试 `test_computer_use.py`（20 个） | 通过 | — |
+
+另外 `test_computer_use.py`、`test_catalog_and_mcp.py`、`test_i18n.py`、`test_os_runtime.py` 合并后共 27 通过、2 跳过（`test_os_runtime` 需要镜像 chroot）。
+
+开发过程中出现过、已经修好的失败（都是真实运行）：Mousepad 弹出对话框时 agent-desktop 返回 AMBIGUOUS_TARGET，第一次跑到步数上限（改为多窗口快照）；维基百科走浏览器操控时先后出现“Unknown ref”、答案正确但校验判为未完成、标签页超时（分别修为不重复切换标签、校验带上页面文字、观察出错时重试）。
+
+基准（Jev 与 DeepSeek）见 [computer-use-research.md](computer-use-research.md)：数据没有显示 Jev 在成功率或费用上更好，只在单步延迟上更快（约 0.13 秒对 1.3 秒）；第二轮因为盒子内存耗尽、Chrome 被 OOM 杀掉而作废。
+
+未做：UI-TARS-1.5-7B 本地定位没有跑（需要约 8.3 GB 内存，盒子上只有约 1.3 GB 可用）；`test_envs.py` 的 US-32/US-33 在这台盒子上因缺 `zstandard` 模块失败（与本次改动无关）。截图：`docs/screenshots/cu-bot-settings.png`、`cu-bot-settings-en.png`（智能体设置的“电脑操控”页）；`cu-desktop-default-path.png` 是默认路径一次真实任务后的 XFCE 桌面（04:38 运行：`foxos computer task` 在 Mousepad 写入并保存，6 步，59.0 秒，Jev 平均每步 105 毫秒，交给规划器 6 次）。同一任务前两次在负载约 70–100 时失败：scrot、wmctrl 超时被当成未处理的异常结束了任务。已改为结构化错误并重试观察（`d89d302`、`67ab5ba`），第三次通过。
+
 ## Everything 应用覆盖（51 个）
 
 等价检查：同一个操作分别用真实鼠标 / 键盘事件（GUI）和 `foxos` CLI 执行，两次结束后的界面状态与应用数据必须一致。操作数来自 [操作清单](operations/)。
@@ -154,6 +191,15 @@
 - 内置程序：**6/6** —— writer：本机 LibreOffice，calc：本机 LibreOffice，impress：本机 LibreOffice，terminal：系统终端，editor：Code - OSS（随附，MIT），browser：Electron（随附）。
 - ACP 智能体：**45/45** 显示注册表 `icon`（45 个在注册表里有 icon）。
 - 狐狸OS 自己的程序保留狐狸OS 风格图标：files, environments, appcenter, settings。
+
+## Windows 客户端（US-86 / US-87，2026-11-12 05:15，Asia/Shanghai）
+
+- US-86（`foxos` 找不到，Path/PATH 重复）：pytest 通过。
+- US-87 单元与结构测试 8/8 通过（`packages/core/tests/test_desktop_client.py`）。
+- US-87 端到端 1/1 通过（`apps/desktop/e2e/client.e2e.js`）：真实 Electron（客户端模式）+ 真实狐狸OS 根文件系统来宾（sshd、Xvfb :0 上的 XFCE）。覆盖：本机执行默认关闭；终端、Everything 应用、文件写入都在来宾里；电脑画面经 SSH 转发的 x11vnc 显示来宾桌面；`FOXOS_E2E_GUEST_APT=1` 时应用中心在来宾里 apt 安装 LibreOffice Writer，「打开 Word」在来宾桌面打开 Writer。
+- 修复中发现的缺陷：`--json` 被放在命令末尾，`desktop launch -- libreoffice --writer --json` 把它传给了 LibreOffice，Writer 打不开；现在 `--json` 放在命令前面（`bc8d9cc`）。
+- 安装包：[v0.3.3-windows-preview](https://github.com/gatesenman/foxos/releases/tag/v0.3.3-windows-preview)（x64 / arm64 的 exe 与 zip，wine 下构建；x64 包内 Python 在 wine 里跑过 `foxos --version`、`env list`、`machine list`、`everything list`、`env catalog`，Windows Electron 在 wine 里默认进入客户端模式；arm64 只核对了 PE 架构）。
+- 未覆盖：Windows 实机（见 [windows-client.md](windows-client.md)）。
 
 ## 安装包（发布矩阵，v0.3.2-os-preview）
 

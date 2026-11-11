@@ -737,178 +737,293 @@
       ]
     },
     {
-      "id": "US-119",
-      "title": "主智能体用 DeepSeek（服务商预设，密钥在密钥库）真实回答",
+      "id": "US-86",
+      "title": "Windows 伴侣程序不依赖 PATH 上的 foxos：终端 PATH 只保留一个键（Windows 的 Path），应用中心 / 环境终端用 foxos 的绝对路径；安装程序把 foxos.cmd 加到用户 PATH（保留 REG_EXPAND_SZ）",
       "match": [
         [
           "pytest",
-          "test_bots_deepseek.py",
-          "^test_US119"
+          "test_desktop_cli.py",
+          "^test_US86"
+        ]
+      ]
+    },
+    {
+      "id": "US-87",
+      "title": "Windows / macOS / 普通 Linux 上的桌面程序是“狐狸OS 电脑”的客户端：应用中心安装、打开 Word、终端、文件、智能体、聊天都在狐狸OS 虚拟机或远程狐狸OS 里执行；本机执行默认关闭，打开后每次确认；虚拟机控制台 / 来宾桌面画面（noVNC）",
+      "match": [
+        [
+          "pytest",
+          "test_desktop_client.py",
+          "^test_US87"
+        ],
+        [
+          "e2e",
+          "client.e2e.js",
+          "US-87"
         ]
       ]
     },
     {
       "id": "US-120",
-      "title": "主智能体用工具委托给 opencode 编码智能体（DeepSeek），改文件前人批准，卡片带 diff",
+      "title": "电脑操控体检：显示默认栈（agent-desktop + Jev/DeepSeek + 规划器）和两条兜底",
       "match": [
         [
           "pytest",
-          "test_bots_deepseek.py",
+          "test_cu_real.py",
           "^test_US120"
         ]
       ]
     },
     {
       "id": "US-121",
-      "title": "人拒绝真实代理的编辑：文件不变，卡片记为拒绝",
+      "title": "默认路径真实端到端：agent-desktop 读 Mousepad，Jev 选每一步，DeepSeek 规划，改写并保存文件",
       "match": [
         [
           "pytest",
-          "test_bots_deepseek.py",
+          "test_cu_real.py",
           "^test_US121"
         ]
       ]
     },
     {
       "id": "US-122",
-      "title": "真实模型回合里用 pstack 技能",
+      "title": "没有 TypeSafe 密钥时单步策略自动退到 DeepSeek，同样完成真实编辑并保存",
       "match": [
         [
           "pytest",
-          "test_bots_deepseek.py",
+          "test_cu_real.py",
           "^test_US122"
         ]
       ]
     },
     {
       "id": "US-123",
-      "title": "真实模型的智能体读另一台狐狸OS 上的目录，对方审计写明控制端",
+      "title": "没有无障碍信息的程序（xedit）自动退到截图操控：Jev Box 定位 + xdotool，真实写入并保存",
       "match": [
         [
           "pytest",
-          "test_bots_deepseek.py",
+          "test_cu_real.py",
           "^test_US123"
         ]
       ]
     },
     {
       "id": "US-124",
-      "title": "Qwen Code 经 OpenAI 兼容地址接 DeepSeek，写文件经狐狸OS 内核",
+      "title": "网页内容不在无障碍树里时自动退到浏览器操控（Chrome CDP / agent-browser），在本地网页下单并读出订单号",
       "match": [
         [
           "pytest",
-          "test_bots_deepseek.py",
+          "test_cu_real.py",
           "^test_US124"
         ]
       ]
     },
     {
       "id": "US-125",
-      "title": "智能体窗口：新建并配置智能体（含 DeepSeek 服务商预设）",
+      "title": "按次（--surface）和按智能体（设置 computer_use）手动选择操控方式",
       "match": [
         [
-          "e2e",
-          "bots.e2e.mjs",
-          "^US-125 "
+          "pytest",
+          "test_cu_real.py",
+          "^test_US125"
         ]
       ]
     },
     {
       "id": "US-126",
-      "title": "智能体窗口：真实 opencode 回合，编辑卡片带 diff，点允许后文件改了",
+      "title": "TypeSafe Jev 服务商真实调用（provider test）",
       "match": [
         [
-          "e2e",
-          "bots.e2e.mjs",
-          "^US-126 "
+          "pytest",
+          "test_cu_real.py",
+          "^test_US126"
         ]
       ]
     },
     {
       "id": "US-127",
+      "title": "电脑操控离线单元测试：Jev 请求/回答校验、观察编译器、两段式打分、logprob 置信度、agent-desktop 信封、路由、按智能体设置",
+      "match": [
+        [
+          "pytest",
+          "test_computer_use.py",
+          ""
+        ]
+      ]
+    },
+    {
+      "id": "US-140",
+      "title": "主智能体用 DeepSeek（服务商预设，密钥在密钥库）真实回答",
+      "match": [
+        [
+          "pytest",
+          "test_bots_deepseek.py",
+          "^test_US140"
+        ]
+      ]
+    },
+    {
+      "id": "US-141",
+      "title": "主智能体用工具委托给 opencode 编码智能体（DeepSeek），改文件前人批准，卡片带 diff",
+      "match": [
+        [
+          "pytest",
+          "test_bots_deepseek.py",
+          "^test_US141"
+        ]
+      ]
+    },
+    {
+      "id": "US-142",
+      "title": "人拒绝真实代理的编辑：文件不变，卡片记为拒绝",
+      "match": [
+        [
+          "pytest",
+          "test_bots_deepseek.py",
+          "^test_US142"
+        ]
+      ]
+    },
+    {
+      "id": "US-143",
+      "title": "真实模型回合里用 pstack 技能",
+      "match": [
+        [
+          "pytest",
+          "test_bots_deepseek.py",
+          "^test_US143"
+        ]
+      ]
+    },
+    {
+      "id": "US-144",
+      "title": "真实模型的智能体读另一台狐狸OS 上的目录，对方审计写明控制端",
+      "match": [
+        [
+          "pytest",
+          "test_bots_deepseek.py",
+          "^test_US144"
+        ]
+      ]
+    },
+    {
+      "id": "US-145",
+      "title": "Qwen Code 经 OpenAI 兼容地址接 DeepSeek，写文件经狐狸OS 内核",
+      "match": [
+        [
+          "pytest",
+          "test_bots_deepseek.py",
+          "^test_US145"
+        ]
+      ]
+    },
+    {
+      "id": "US-146",
+      "title": "智能体窗口：新建并配置智能体（含 DeepSeek 服务商预设）",
+      "match": [
+        [
+          "e2e",
+          "bots.e2e.mjs",
+          "^US-146 "
+        ]
+      ]
+    },
+    {
+      "id": "US-147",
+      "title": "智能体窗口：真实 opencode 回合，编辑卡片带 diff，点允许后文件改了",
+      "match": [
+        [
+          "e2e",
+          "bots.e2e.mjs",
+          "^US-147 "
+        ]
+      ]
+    },
+    {
+      "id": "US-148",
       "title": "智能体窗口：点拒绝，文件不变",
       "match": [
         [
           "e2e",
           "bots.e2e.mjs",
-          "^US-127 "
+          "^US-148 "
         ]
       ]
     },
     {
-      "id": "US-128",
+      "id": "US-149",
       "title": "智能体窗口：@ 委托给第二个智能体，在审批页批准",
       "match": [
         [
           "e2e",
           "bots.e2e.mjs",
-          "^US-128 "
+          "^US-149 "
         ]
       ]
     },
     {
-      "id": "US-129",
+      "id": "US-150",
       "title": "智能体窗口：/ 技能菜单与用过的技能",
       "match": [
         [
           "e2e",
           "bots.e2e.mjs",
-          "^US-129 "
+          "^US-150 "
         ]
       ]
     },
     {
-      "id": "US-130",
+      "id": "US-151",
       "title": "智能体窗口：添加真实的本地 MCP 连接器（HTTP + Bearer）并列出工具",
       "match": [
         [
           "e2e",
           "bots.e2e.mjs",
-          "^US-130 "
+          "^US-151 "
         ]
       ]
     },
     {
-      "id": "US-131",
+      "id": "US-152",
       "title": "停靠窗口占住屏幕边（_NET_WM_STRUT_PARTIAL），最大化窗口不被盖住",
       "match": [
         [
           "e2e",
           "bots.e2e.mjs",
-          "^US-131 "
+          "^US-152 "
         ]
       ]
     },
     {
-      "id": "US-132",
+      "id": "US-153",
       "title": "智能体窗口：配对第二台狐狸OS 并在聊天里切换机器",
       "match": [
         [
           "e2e",
           "bots.e2e.mjs",
-          "^US-132 "
+          "^US-153 "
         ]
       ]
     },
     {
-      "id": "US-133",
+      "id": "US-154",
       "title": "智能体窗口：人工接管让智能体的编辑停下，交还后恢复",
       "match": [
         [
           "e2e",
           "bots.e2e.mjs",
-          "^US-133 "
+          "^US-154 "
         ]
       ]
     },
     {
-      "id": "US-134",
+      "id": "US-155",
       "title": "宿主应用里的智能体只在狐狸OS 虚拟电脑里动手；宿主执行要人明确打开并逐个确认",
       "match": [
         [
           "pytest",
           "test_hostguard.py",
-          "^test_US134"
+          "^test_US155"
         ]
       ]
     }

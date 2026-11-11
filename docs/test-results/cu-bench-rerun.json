@@ -1,0 +1,65 @@
+[
+ {
+  "task": "web-wikipedia",
+  "surface": "browser (fallback)",
+  "config": "jev",
+  "success": true,
+  "agent_said_success": true,
+  "steps": 5,
+  "s1_steps": 1,
+  "escalations": 4,
+  "mean_policy_ms": 100,
+  "seconds": 92.1,
+  "wall_seconds": 98.2,
+  "usd": 0.0421,
+  "tokens": {
+   "planner": {
+    "prompt_tokens": 31812,
+    "completion_tokens": 10144
+   },
+   "step_policy": {
+    "input_tokens": 24242,
+    "output_tokens": 9488
+   }
+  },
+  "routed_to": "browser",
+  "route_reason": "no browser exposed to the accessibility tree",
+  "answer": "Graydon Hoare",
+  "task_id": "task-afc8eceed1",
+  "error": null,
+  "at": "2026-11-12 02:53:02 +0800"
+ },
+ {
+  "task": "web-wikipedia",
+  "surface": "browser (fallback)",
+  "config": "deepseek",
+  "success": false,
+  "agent_said_success": false,
+  "steps": 14,
+  "s1_steps": 13,
+  "escalations": 1,
+  "mean_policy_ms": 1239,
+  "seconds": 52.8,
+  "wall_seconds": 55.7,
+  "usd": 0.01634,
+  "tokens": {
+   "planner": {
+    "prompt_tokens": 8182,
+    "completion_tokens": 2457
+   },
+   "step_policy": {
+    "prompt_tokens": 39566,
+    "completion_tokens": 237,
+    "total_tokens": 39803,
+    "prompt_cache_hit_tokens": 6144,
+    "prompt_cache_miss_tokens": 33422
+   }
+  },
+  "routed_to": "browser",
+  "route_reason": "no browser exposed to the accessibility tree",
+  "answer": null,
+  "task_id": "task-f48ead45a5",
+  "error": null,
+  "at": "2026-11-12 02:53:58 +0800"
+ }
+]

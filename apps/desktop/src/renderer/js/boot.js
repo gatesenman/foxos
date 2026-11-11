@@ -23,6 +23,7 @@
     { id: 'calc', name: 'Calc', icon: 'file-spreadsheet', office: true, run: () => FX.launchOffice('calc') },
     { id: 'impress', name: 'Impress', icon: 'presentation', office: true, run: () => FX.launchOffice('impress') },
     { id: 'bots', name: FX.t('bots.title'), icon: 'sparkles', run: () => FX.openWindow('bots', {}) },
+    { id: 'computer', name: FX.t('client.computer_title'), icon: 'device-desktop', run: () => FX.openWindow('computer', {}) },
     { id: 'environments', name: FX.t('common.environments'), icon: 'box-multiple', run: () => FX.openWindow('environments', {}) },
     { id: 'appcenter', name: FX.t('common.app_center'), icon: 'apps', run: () => FX.openWindow('appcenter', {}) },
     { id: 'settings', name: FX.t('common.settings'), icon: 'settings', run: () => FX.openWindow('settings', {}) },
@@ -134,7 +135,10 @@
       try { FX.openWindow(w.app, w.params, w.geom); } catch { /* 忽略 */ }
     }
   } catch { /* 忽略 */ }
-  if (!FX.env.setupDone && !FX.env.screenshot) FX.openWindow('setup', {});
+  if (FX.env.mode === 'client') {
+    // 客户端模式：首先打开“狐狸OS 电脑”（连接 / 新建虚拟机，看画面）；安装向导只管本机，不再自动弹出
+    if (!document.querySelector('.window[data-app="computer"]')) FX.openWindow('computer', {});
+  } else if (!FX.env.setupDone && !FX.env.screenshot) FX.openWindow('setup', {});
   document.body.classList.add('ready');
   window.foxos.ready();
 })();

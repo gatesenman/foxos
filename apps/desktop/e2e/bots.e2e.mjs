@@ -1,4 +1,4 @@
-// US-125..US-132：驱动真实的智能体窗口（foxos-bots 用 Chrome 应用模式打开，窗口类名 foxos-bots），
+// US-146..US-153：驱动真实的智能体窗口（foxos-bots 用 Chrome 应用模式打开，窗口类名 foxos-bots），
 // 在自己的 Xvfb + xfwm4 桌面里用 Playwright（CDP 连到这个窗口）点界面：
 // 新建并配置智能体、和真实的 opencode（ACP，默认免费模型，不需要密钥）对话、工具卡片和 diff、批准 / 拒绝、
 // @ 委托给第二个智能体、/ 技能、添加真实的本地 MCP 连接器（foxos mcp --http + Bearer）、停靠 / 独立窗口（_NET_WM_STRUT_PARTIAL）、
@@ -47,7 +47,7 @@ class Env {
     this.env = { ...process.env, PYTHONPATH: path.join(ROOT, 'packages', 'core'), PYTHONIOENCODING: 'utf-8', DISPLAY: this.display,
       FOXOS_HOME: path.join(this.root, 'home'), XDG_DATA_HOME: path.join(this.root, 'data'), XDG_STATE_HOME: path.join(this.root, 'state'),
       XDG_CONFIG_HOME: path.join(this.root, 'config'), FOXOS_RUNTIME_BIN: path.join(this.root, 'bin'), FOXOS_BOTS_BROWSER: BROWSER,
-      // 这个窗口模拟狐狸OS 虚拟电脑里的智能体窗口；宿主上的限制见 test_hostguard.py（US-134）
+      // 这个窗口模拟狐狸OS 虚拟电脑里的智能体窗口；宿主上的限制见 test_hostguard.py（US-155）
       FOXOS_PLACE: 'foxos' };
     if (fs.existsSync(CACHE)) this.env.FOXOS_RUNTIME_PREFIX = CACHE;
     delete this.env.FOXOS_AGENT; delete this.env.FOXOS_WORKSPACE; delete this.env.DEEPSEEK_API_KEY;
@@ -71,7 +71,7 @@ class Env {
   }
 }
 
-test('US-125..US-133 智能体窗口：真实 Chrome 窗口里的完整流程', { skip: SKIP, timeout: 1800000 }, async t => {
+test('US-146..US-154 智能体窗口：真实 Chrome 窗口里的完整流程', { skip: SKIP, timeout: 1800000 }, async t => {
   const E = new Env();
   let browser;
   try {
@@ -95,7 +95,7 @@ test('US-125..US-133 智能体窗口：真实 Chrome 窗口里的完整流程', 
     assert.ok(win.w > 600, 'separate window is a normal-sized window');
     await shot(page, 'bots-e2e-start.png');
 
-    await t.test('US-125 新建智能体并在设置里配置（含 DeepSeek 服务商预设）', async () => {
+    await t.test('US-146 新建智能体并在设置里配置（含 DeepSeek 服务商预设）', async () => {
       for (const [name, title] of [['Coder', 'writes code'], ['Helper', 'second bot']]) {
         await page.click('#btn-new-bot');
         await page.fill('#n-name', name);
@@ -174,7 +174,7 @@ test('US-125..US-133 智能体窗口：真实 Chrome 窗口里的完整流程', 
     };
     fs.mkdirSync(path.join(E.ws, 'gui'));
 
-    await t.test('US-126 真实 opencode 回合：编辑卡片带 diff，点「允许」后文件改了', async () => {
+    await t.test('US-147 真实 opencode 回合：编辑卡片带 diff，点「允许」后文件改了', async () => {
       fs.writeFileSync(path.join(E.ws, 'gui', 'hello.txt'), 'hello alpha\n');
       const done = await say('coder', 'Use your edit tool to change the word alpha to beta in gui/hello.txt. Change nothing else.');
       const { btn } = await answer('coder', true);
@@ -189,7 +189,7 @@ test('US-125..US-133 智能体窗口：真实 Chrome 窗口里的完整流程', 
       await page.waitForSelector('#messages .approval .chip.ok');
     });
 
-    await t.test('US-127 点「拒绝」：文件不变，卡片显示已拒绝', async () => {
+    await t.test('US-148 点「拒绝」：文件不变，卡片显示已拒绝', async () => {
       const done = await say('coder', 'Use your edit tool to change the word beta to gamma in gui/hello.txt.');
       const { btn } = await answer('coder', false);
       await btn.click();
@@ -199,7 +199,7 @@ test('US-125..US-133 智能体窗口：真实 Chrome 窗口里的完整流程', 
       await page.waitForSelector('#messages .approval .chip.bad');
     });
 
-    await t.test('US-128 @ 委托给第二个智能体：弹出菜单选中 Helper，委托卡片完成，Helper 的编辑在审批页批准', async () => {
+    await t.test('US-149 @ 委托给第二个智能体：弹出菜单选中 Helper，委托卡片完成，Helper 的编辑在审批页批准', async () => {
       await page.click('.bot-item[data-id="coder"]');
       await page.click('#btn-mention');
       await page.waitForSelector('#popup .opt');
@@ -221,7 +221,7 @@ test('US-125..US-133 智能体窗口：真实 Chrome 窗口里的完整流程', 
       assert.equal(E.botMessages('helper').filter(m => m.role === 'bot').pop().delegated_by, 'bot:coder');
     });
 
-    await t.test('US-129 / 技能：弹出菜单列出 pstack 技能，用了的技能显示在回答下面', async () => {
+    await t.test('US-150 / 技能：弹出菜单列出 pstack 技能，用了的技能显示在回答下面', async () => {
       await page.click('.bot-item[data-id="coder"]');
       await page.click('#btn-skill');
       await page.keyboard.type('unsl');
@@ -238,7 +238,7 @@ test('US-125..US-133 智能体窗口：真实 Chrome 窗口里的完整流程', 
       assert.match(await page.locator('#messages .skills-used').last().textContent(), /unslop/);
     });
 
-    await t.test('US-130 添加真实的本地 MCP 连接器（Streamable HTTP + Bearer），连接后列出工具', async () => {
+    await t.test('US-151 添加真实的本地 MCP 连接器（Streamable HTTP + Bearer），连接后列出工具', async () => {
       const port = await freePort();
       const token = 'gui-' + Math.random().toString(36).slice(2);
       const mws = path.join(E.root, 'mcp-ws'); fs.mkdirSync(mws);
@@ -264,7 +264,7 @@ test('US-125..US-133 智能体窗口：真实 Chrome 窗口里的完整流程', 
       assert.ok(!JSON.stringify(E.cli(['connector', 'list'])).includes(token), 'token never leaves the secret store');
     });
 
-    await t.test('US-131 停靠：占住屏幕右边（_NET_WM_STRUT_PARTIAL），最大化的窗口不被盖住；取消停靠后释放', async () => {
+    await t.test('US-152 停靠：占住屏幕右边（_NET_WM_STRUT_PARTIAL），最大化的窗口不被盖住；取消停靠后释放', async () => {
       E.bg('xclock', ['-title', 'foxos-max-probe']);
       const probe = await until(() => E.windows().find(w => w.title === 'foxos-max-probe'), 60000, 'probe window');
       await page.click('#btn-dock');
@@ -286,7 +286,7 @@ test('US-125..US-133 智能体窗口：真实 Chrome 窗口里的完整流程', 
       assert.ok(max2.w >= SW - 20);
     });
 
-    await t.test('US-132 两台机器：在「机器」页配对另一台狐狸OS，聊天里切到它', async () => {
+    await t.test('US-153 两台机器：在「机器」页配对另一台狐狸OS，聊天里切到它', async () => {
       const hws = path.join(E.root, 'alpha-ws'); fs.mkdirSync(hws);
       const henv = { ...E.env, FOXOS_HOME: path.join(E.root, 'alpha-home') };
       const host = E.bg(PY, ['-m', 'foxos', '--workspace', hws, 'machine', 'serve', '--listen', '127.0.0.1:0', '--name', 'alpha-host'], henv);
@@ -312,7 +312,7 @@ test('US-125..US-133 智能体窗口：真实 Chrome 窗口里的完整流程', 
       await until(() => (E.cli(['bot', 'config', 'get', 'coder']).config.machines || {}).default === 'local', 10000, 'back to local');
     });
 
-    await t.test('US-133 人工接管：点「人工接管」后智能体的编辑被拦下（记为接管），点「交还」恢复', async () => {
+    await t.test('US-154 人工接管：点「人工接管」后智能体的编辑被拦下（记为接管），点「交还」恢复', async () => {
       await page.click('#btn-takeover');
       await until(() => E.cli(['control', 'status']).paused, 10000, 'paused');
       await page.waitForSelector('#acting .chip.bad');

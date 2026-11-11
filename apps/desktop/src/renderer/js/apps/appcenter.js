@@ -50,7 +50,17 @@
 
       function section(title, items) { return el('section', {}, el('h3', { text: title }), el('div', { class: 'card-grid' }, items)); }
 
+      // 客户端模式：软件装进狐狸OS 电脑（Debian 系），在来宾终端里用 apt 安装，sudo 密码在终端里输入
+      const GUEST_PKGS = { libreoffice: ['libreoffice-writer', 'libreoffice-calc', 'libreoffice-impress'], python: ['python3'], 'python-deps': ['python3-openpyxl', 'python3-docx'], node: ['nodejs', 'npm'], git: ['git'], wmctrl: ['wmctrl'] };
       async function setupCmd(id) {
+        if (FX.env.mode === 'client') {
+          const pkgs = GUEST_PKGS[SETUP_KEY[id]];
+          if (!pkgs) { FX.toast(FX.t('appcenter.no_automatic_install_on_this'), 'error'); return; }
+          const code = await new Promise((resolve) => FX.openWindow('terminal', { title: FX.t('common.install_2', id), guestArgv: ['sh', '-c', 'sudo apt-get update -q && sudo apt-get install -y "$@"', 'apt', ...pkgs], onExit: resolve }));
+          FX.toast(code === 0 ? FX.t('appcenter.installed') : FX.t('appcenter.install_command_exited_with_code', code), code === 0 ? 'ok' : 'error');
+          FX.apps = null; refresh();
+          return;
+        }
         const plan = await window.foxos.setup.plan();
         const cmd = plan.components[SETUP_KEY[id]];
         if (!cmd) { FX.toast(FX.t('appcenter.no_automatic_install_on_this'), 'error'); return; }
@@ -98,7 +108,7 @@
       // Everything 应用（HeyPuter/everything，按上游的 9 个分组），在本机从上游源码构建
       const evBox = el('section', { class: 'ev-section' });
       async function evInstall(ids, label) {
-        const code = await FX.runInTerminal(FX.t('common.install_2', label), `foxos everything install ${ids.join(' ')}`);
+        const code = await FX.runFoxosInTerminal(FX.t('common.install_2', label), ['everything', 'install', ...ids]);
         FX.toast(code === 0 ? FX.t('common.installed_2', label) : FX.t('appcenter.install_command_exited_with_code', code), code === 0 ? 'ok' : 'error');
         await FX.loadEverything(true); renderEverything(); FX.emit('everything-changed');
       }

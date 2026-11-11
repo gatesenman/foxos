@@ -1,0 +1,447 @@
+[
+ {
+  "task": "desk-replace",
+  "surface": "a11y (agent-desktop)",
+  "config": "jev",
+  "success": true,
+  "agent_said_success": true,
+  "steps": 11,
+  "s1_steps": 9,
+  "escalations": 2,
+  "mean_policy_ms": 119,
+  "seconds": 40.3,
+  "wall_seconds": 43.1,
+  "usd": 0.01111,
+  "tokens": {
+   "planner": {
+    "prompt_tokens": 5500,
+    "completion_tokens": 3489
+   },
+   "step_policy": {
+    "input_tokens": 13619,
+    "output_tokens": 2876
+   }
+  },
+  "routed_to": "computer",
+  "route_reason": null,
+  "answer": "已完成：文档内容已替换为“Shopping list: apples, milk”并保存。",
+  "task_id": "task-406f3b356e",
+  "error": null,
+  "at": "2026-11-12 02:38:30 +0800"
+ },
+ {
+  "task": "desk-replace",
+  "surface": "a11y (agent-desktop)",
+  "config": "deepseek",
+  "success": true,
+  "agent_said_success": true,
+  "steps": 6,
+  "s1_steps": 6,
+  "escalations": 0,
+  "mean_policy_ms": 1342,
+  "seconds": 24.2,
+  "wall_seconds": 26.0,
+  "usd": 0.00429,
+  "tokens": {
+   "planner": {
+    "prompt_tokens": 1290,
+    "completion_tokens": 1409
+   },
+   "step_policy": {
+    "prompt_tokens": 3928,
+    "completion_tokens": 102,
+    "total_tokens": 4030,
+    "prompt_cache_hit_tokens": 1536,
+    "prompt_cache_miss_tokens": 2392
+   }
+  },
+  "routed_to": "computer",
+  "route_reason": null,
+  "answer": "Shopping list: apples, milk",
+  "task_id": "task-b3cf78f488",
+  "error": null,
+  "at": "2026-11-12 02:38:59 +0800"
+ },
+ {
+  "task": "desk-replace",
+  "surface": "a11y (agent-desktop)",
+  "config": "llm",
+  "success": true,
+  "agent_said_success": true,
+  "steps": 4,
+  "s1_steps": null,
+  "escalations": null,
+  "mean_policy_ms": null,
+  "seconds": 10.5,
+  "wall_seconds": 12.3,
+  "usd": 0.00667,
+  "tokens": {
+   "planner": {
+    "prompt_tokens": 8209,
+    "completion_tokens": 631
+   }
+  },
+  "routed_to": null,
+  "route_reason": null,
+  "answer": "已将 Mousepad 中 bench1.txt 的整个文档替换为 \"Shopping list: apples, milk\" 并保存。",
+  "task_id": "task-85a49269b1",
+  "error": null,
+  "at": "2026-11-12 02:39:15 +0800"
+ },
+ {
+  "task": "desk-append",
+  "surface": "a11y (agent-desktop)",
+  "config": "jev",
+  "success": true,
+  "agent_said_success": true,
+  "steps": 4,
+  "s1_steps": 4,
+  "escalations": 0,
+  "mean_policy_ms": 116,
+  "seconds": 20.9,
+  "wall_seconds": 22.5,
+  "usd": 0.00499,
+  "tokens": {
+   "planner": {
+    "prompt_tokens": 1252,
+    "completion_tokens": 2005
+   },
+   "step_policy": {
+    "input_tokens": 4535,
+    "output_tokens": 1071
+   }
+  },
+  "routed_to": "computer",
+  "route_reason": null,
+  "answer": "文档已保存，内容为两行：milk 和 eggs。",
+  "task_id": "task-37f3dabd4a",
+  "error": null,
+  "at": "2026-11-12 02:39:41 +0800"
+ },
+ {
+  "task": "desk-append",
+  "surface": "a11y (agent-desktop)",
+  "config": "deepseek",
+  "success": true,
+  "agent_said_success": true,
+  "steps": 4,
+  "s1_steps": 4,
+  "escalations": 0,
+  "mean_policy_ms": 1428,
+  "seconds": 17.8,
+  "wall_seconds": 20.0,
+  "usd": 0.00313,
+  "tokens": {
+   "planner": {
+    "prompt_tokens": 1246,
+    "completion_tokens": 953
+   },
+   "step_policy": {
+    "prompt_tokens": 2552,
+    "completion_tokens": 68,
+    "total_tokens": 2620,
+    "prompt_cache_hit_tokens": 1152,
+    "prompt_cache_miss_tokens": 1400
+   }
+  },
+  "routed_to": "computer",
+  "route_reason": null,
+  "answer": "文档已包含两行：milk 和 eggs，并已保存。",
+  "task_id": "task-d5d5f1aba9",
+  "error": null,
+  "at": "2026-11-12 02:40:05 +0800"
+ },
+ {
+  "task": "desk-append",
+  "surface": "a11y (agent-desktop)",
+  "config": "llm",
+  "success": true,
+  "agent_said_success": true,
+  "steps": 7,
+  "s1_steps": null,
+  "escalations": null,
+  "mean_policy_ms": null,
+  "seconds": 34.2,
+  "wall_seconds": 36.1,
+  "usd": 0.01949,
+  "tokens": {
+   "planner": {
+    "prompt_tokens": 21242,
+    "completion_tokens": 2763
+   }
+  },
+  "routed_to": null,
+  "route_reason": null,
+  "answer": "已在 Mousepad 中把 bench2.txt 的内容设为两行：milk 和 eggs，并已保存文件（窗口标题不再显示未保存的星号标记）。",
+  "task_id": "task-b305cbd4e5",
+  "error": null,
+  "at": "2026-11-12 02:40:44 +0800"
+ },
+ {
+  "task": "screen-xedit",
+  "surface": "screen (no a11y → screenshot)",
+  "config": "jev",
+  "success": true,
+  "agent_said_success": true,
+  "steps": 7,
+  "s1_steps": 4,
+  "escalations": 3,
+  "mean_policy_ms": 142,
+  "seconds": 25.6,
+  "wall_seconds": 27.5,
+  "usd": 0.00926,
+  "tokens": {
+   "planner": {
+    "prompt_tokens": 5834,
+    "completion_tokens": 2069
+   },
+   "step_policy": {
+    "input_tokens": 31272,
+    "output_tokens": 1172
+   }
+  },
+  "routed_to": "computer",
+  "route_reason": null,
+  "answer": null,
+  "task_id": "task-46a43f25e7",
+  "error": null,
+  "at": "2026-11-12 02:41:14 +0800"
+ },
+ {
+  "task": "screen-xedit",
+  "surface": "screen (no a11y → screenshot)",
+  "config": "deepseek",
+  "success": true,
+  "agent_said_success": true,
+  "steps": 10,
+  "s1_steps": 4,
+  "escalations": 6,
+  "mean_policy_ms": 1057,
+  "seconds": 54.2,
+  "wall_seconds": 56.4,
+  "usd": 0.0171,
+  "tokens": {
+   "planner": {
+    "prompt_tokens": 12349,
+    "completion_tokens": 3988
+   },
+   "step_policy": {
+    "prompt_tokens": 6340,
+    "completion_tokens": 168,
+    "total_tokens": 6508,
+    "prompt_cache_hit_tokens": 2560,
+    "prompt_cache_miss_tokens": 3780
+   }
+  },
+  "routed_to": "computer",
+  "route_reason": null,
+  "answer": "已在 xedit 的大文本区域输入 'hello from screen mode' 并点击 Save 按钮",
+  "task_id": "task-e50aa8dcad",
+  "error": null,
+  "at": "2026-11-12 02:42:13 +0800"
+ },
+ {
+  "task": "screen-xedit",
+  "surface": "screen (no a11y → screenshot)",
+  "config": "llm",
+  "success": false,
+  "agent_said_success": false,
+  "steps": 14,
+  "s1_steps": null,
+  "escalations": null,
+  "mean_policy_ms": null,
+  "seconds": 102.6,
+  "wall_seconds": 104.4,
+  "usd": 0.07644,
+  "tokens": {
+   "planner": {
+    "prompt_tokens": 92381,
+    "completion_tokens": 7814
+   }
+  },
+  "routed_to": null,
+  "route_reason": null,
+  "answer": null,
+  "task_id": "task-c5885f238d",
+  "error": null,
+  "at": "2026-11-12 02:44:00 +0800"
+ },
+ {
+  "task": "web-local-form",
+  "surface": "browser (fallback: Chrome not in a11y tree)",
+  "config": "jev",
+  "success": true,
+  "agent_said_success": true,
+  "steps": 8,
+  "s1_steps": 7,
+  "escalations": 1,
+  "mean_policy_ms": 117,
+  "seconds": 15.9,
+  "wall_seconds": 19.0,
+  "usd": 0.00394,
+  "tokens": {
+   "planner": {
+    "prompt_tokens": 2560,
+    "completion_tokens": 950
+   },
+   "step_policy": {
+    "input_tokens": 8872,
+    "output_tokens": 1676
+   }
+  },
+  "routed_to": "browser",
+  "route_reason": "no browser exposed to the accessibility tree",
+  "answer": "FOX-Ada-green",
+  "task_id": "task-37526cb980",
+  "error": null,
+  "at": "2026-11-12 02:44:19 +0800"
+ },
+ {
+  "task": "web-local-form",
+  "surface": "browser (fallback: Chrome not in a11y tree)",
+  "config": "deepseek",
+  "success": true,
+  "agent_said_success": true,
+  "steps": 6,
+  "s1_steps": 6,
+  "escalations": 0,
+  "mean_policy_ms": 1332,
+  "seconds": 17.1,
+  "wall_seconds": 20.1,
+  "usd": 0.00258,
+  "tokens": {
+   "planner": {
+    "prompt_tokens": 1103,
+    "completion_tokens": 614
+   },
+   "step_policy": {
+    "prompt_tokens": 3801,
+    "completion_tokens": 102,
+    "total_tokens": 3903,
+    "prompt_cache_hit_tokens": 1280,
+    "prompt_cache_miss_tokens": 2521
+   }
+  },
+  "routed_to": "browser",
+  "route_reason": "no browser exposed to the accessibility tree",
+  "answer": "FOX-Ada-green",
+  "task_id": "task-977495bdc1",
+  "error": null,
+  "at": "2026-11-12 02:44:39 +0800"
+ },
+ {
+  "task": "web-local-form",
+  "surface": "browser (fallback: Chrome not in a11y tree)",
+  "config": "llm",
+  "success": true,
+  "agent_said_success": true,
+  "steps": 4,
+  "s1_steps": null,
+  "escalations": null,
+  "mean_policy_ms": null,
+  "seconds": 6.2,
+  "wall_seconds": 9.1,
+  "usd": 0.00384,
+  "tokens": {
+   "planner": {
+    "prompt_tokens": 4724,
+    "completion_tokens": 364
+   }
+  },
+  "routed_to": "browser",
+  "route_reason": "no browser exposed to the accessibility tree",
+  "answer": "FOX-Ada-green",
+  "task_id": "task-4aafbc79ec",
+  "error": null,
+  "at": "2026-11-12 02:44:48 +0800"
+ },
+ {
+  "task": "web-wikipedia",
+  "surface": "browser (fallback)",
+  "config": "jev",
+  "success": false,
+  "agent_said_success": false,
+  "steps": 14,
+  "s1_steps": 3,
+  "escalations": 11,
+  "mean_policy_ms": 139,
+  "seconds": 158.2,
+  "wall_seconds": 161.1,
+  "usd": 0.07544,
+  "tokens": {
+   "planner": {
+    "prompt_tokens": 60622,
+    "completion_tokens": 16420
+   },
+   "step_policy": {
+    "input_tokens": 69390,
+    "output_tokens": 25210
+   }
+  },
+  "routed_to": "browser",
+  "route_reason": "no browser exposed to the accessibility tree",
+  "answer": null,
+  "task_id": "task-5b5578b669",
+  "error": null,
+  "at": "2026-11-12 02:47:29 +0800"
+ },
+ {
+  "task": "web-wikipedia",
+  "surface": "browser (fallback)",
+  "config": "deepseek",
+  "success": true,
+  "agent_said_success": true,
+  "steps": 7,
+  "s1_steps": 6,
+  "escalations": 1,
+  "mean_policy_ms": 1289,
+  "seconds": 48.4,
+  "wall_seconds": 51.5,
+  "usd": 0.01973,
+  "tokens": {
+   "planner": {
+    "prompt_tokens": 14558,
+    "completion_tokens": 3637
+   },
+   "step_policy": {
+    "prompt_tokens": 18947,
+    "completion_tokens": 125,
+    "total_tokens": 19072,
+    "prompt_cache_hit_tokens": 1536,
+    "prompt_cache_miss_tokens": 17411
+   }
+  },
+  "routed_to": "browser",
+  "route_reason": "no browser exposed to the accessibility tree",
+  "answer": "Graydon Hoare",
+  "task_id": "task-60b54507d3",
+  "error": null,
+  "at": "2026-11-12 02:48:21 +0800"
+ },
+ {
+  "task": "web-wikipedia",
+  "surface": "browser (fallback)",
+  "config": "llm",
+  "success": true,
+  "agent_said_success": true,
+  "steps": 9,
+  "s1_steps": null,
+  "escalations": null,
+  "mean_policy_ms": null,
+  "seconds": 112.2,
+  "wall_seconds": 115.1,
+  "usd": 0.08592,
+  "tokens": {
+   "planner": {
+    "prompt_tokens": 97436,
+    "completion_tokens": 10914
+   }
+  },
+  "routed_to": "browser",
+  "route_reason": "no browser exposed to the accessibility tree",
+  "answer": "Graydon Hoare",
+  "task_id": "task-df24d5b8dc",
+  "error": null,
+  "at": "2026-11-12 02:50:16 +0800"
+ }
+]

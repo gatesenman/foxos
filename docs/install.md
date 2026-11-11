@@ -61,6 +61,8 @@ $env:FOXOS_PORTABLE = '1'   # 或 $env:FOXOS_MSI = '1'
 
 **Windows**：安装包还没有代码签名，首次运行时 SmartScreen 会提示「Windows 已保护你的电脑」，点「更多信息 → 仍要运行」。
 
+从 0.3.3 起，Windows（以及 macOS、普通 Linux）上的 FoxOS 是「狐狸OS 电脑」的客户端：智能体、应用中心安装、打开 Word、终端和文件都在狐狸OS 虚拟机或远程狐狸OS 里执行，不碰你自己的电脑。第一次打开会进入「狐狸OS 电脑」窗口，新建虚拟机或连接一台狐狸OS，见 [windows-client.md](windows-client.md)。
+
 **macOS**：安装包还没有经过 Apple 公证（需要 Apple 开发者账号）。第一次打开时：
 
 1. 在「访达 → 应用程序」里**按住 Control 点按**（或右键）FoxOS，选「打开」，在弹窗里再点「打开」。
@@ -159,7 +161,7 @@ irm https://github.com/gatesenman/foxos/releases/download/v0.3.2-os-preview/inst
 
 ### Platform notes
 
-- **Windows**: not code-signed yet; on first run SmartScreen says "Windows protected your PC" → "More info" → "Run anyway".
+- **Windows**: not code-signed yet; on first run SmartScreen says "Windows protected your PC" → "More info" → "Run anyway". Since 0.3.3 the Windows (and macOS / plain Linux) app is a client of a "FoxOS computer": agents, app-center installs, Open Word, terminals and files run in a FoxOS VM or a remote FoxOS, never on your PC. See [windows-client.md](windows-client.md).
 - **macOS**: not notarized yet (needs an Apple Developer account). Control-click (right-click) FoxOS in Applications → Open → Open. On macOS 15 Sequoia and later, open it once, then go to System Settings → Privacy & Security → "Open Anyway". Or run `xattr -dr com.apple.quarantine /Applications/FoxOS.app` (install.sh already does this).
 - **Linux**: deb / rpm install to `/opt/FoxOS` with `/usr/bin/foxos` and `/usr/bin/foxos-desktop`; uninstall with `sudo apt remove foxos-desktop` / `sudo dnf remove foxos-desktop` / `sudo zypper remove foxos-desktop`. tar.gz / AppImage (install.sh puts them in `~/.local/opt/foxos`): `rm -rf ~/.local/opt/foxos ~/.local/bin/foxos ~/.local/bin/foxos-desktop ~/.local/share/applications/foxos.desktop`; your data in `~/.local/share/foxos` is kept. Install a CJK font for the Chinese UI (`fonts-noto-cjk`, `google-noto-sans-cjk-fonts`, `noto-fonts-cjk`).
 

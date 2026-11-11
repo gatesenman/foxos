@@ -16,7 +16,7 @@
 
 错误码：USAGE(2) NOT_FOUND(3) PERMISSION_DENIED(4) LOCKED(5) DEPENDENCY_MISSING(6) CONFLICT(7) PAUSED(8) ERROR(1)。
 
-共 4433 个工具。
+共 4507 个工具。
 
 ## acp（12 个工具）
 
@@ -275,7 +275,7 @@
 
 ### `bot_profile_create`
 
-新建智能体。CLI：foxos bot profile create NAME [--title TITLE] [--role ROLE] [--instructions INSTRUCTIONS] [--icon ICON] [--color COLOR] [--image IMAGE] [--acp-agent AGENT] [--provider {deepseek,openai,dashscope,ollama,custom}] [--base-url BASE_URL] [--model MODEL] [--api-key API_KEY] [--scope SCOPE] [--isolated] [--visibility {private,public}] [--pinned] [--hidden] [--active] [--notifications] [--skills-mode {all,selected}] [--skills SKILLS] [--skills-off SKILLS_OFF] [--connectors CONNECTORS] [--machines MACHINES] [--default-machine DEFAULT_MACHINE] [--approval-mode {ask,allow_reads,allow_all}] [--rule RULES] [--delegate-to DELEGATE_TO] [--max-depth MAX_DEPTH] [--max-per-turn MAX_PER_TURN] [--id ID]。限制：这个操作只有人可以做。示例：foxos bot profile create Coder --title Coding --acp-agent codex-acp --icon code --color '#3B82F6' --isolated
+新建智能体。CLI：foxos bot profile create NAME [--title TITLE] [--role ROLE] [--instructions INSTRUCTIONS] [--icon ICON] [--color COLOR] [--image IMAGE] [--acp-agent AGENT] [--provider {deepseek,openai,dashscope,ollama,custom}] [--base-url BASE_URL] [--model MODEL] [--api-key API_KEY] [--scope SCOPE] [--isolated] [--visibility {private,public}] [--pinned] [--hidden] [--active] [--notifications] [--skills-mode {all,selected}] [--skills SKILLS] [--skills-off SKILLS_OFF] [--connectors CONNECTORS] [--machines MACHINES] [--default-machine DEFAULT_MACHINE] [--approval-mode {ask,allow_reads,allow_all}] [--rule RULES] [--delegate-to DELEGATE_TO] [--max-depth MAX_DEPTH] [--max-per-turn MAX_PER_TURN] [--cu-surface {auto,a11y,screen,browser}] [--cu-step-policy {auto,typesafe,deepseek}] [--id ID]。限制：这个操作只有人可以做。示例：foxos bot profile create Coder --title Coding --acp-agent codex-acp --icon code --color '#3B82F6' --isolated
 
 只读：否 · 破坏性：否 · CLI：`foxos bot profile create`
 
@@ -311,6 +311,8 @@
 | `delegate_to` | array |  | 可以委托给哪些智能体（* 表示全部） |
 | `max_depth` | integer |  | 委托最大深度 |
 | `max_per_turn` | integer |  | 每轮最多委托几次 |
+| `cu_surface` | string |  | 电脑操控方式：auto（默认 agent-desktop，读不到时退到截图 / 浏览器）/ a11y / screen / browser 可选：auto / a11y / screen / browser |
+| `cu_step_policy` | string |  | 电脑操控单步策略：auto / typesafe / deepseek 可选：auto / typesafe / deepseek |
 | `id` | string |  | 指定 ID（小写字母数字与 -） |
 | `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
 
@@ -322,7 +324,7 @@
 
 ### `bot_profile_update`
 
-修改智能体资料（同 bot config set）。CLI：foxos bot profile update BOT [--name NAME] [--title TITLE] [--role ROLE] [--instructions INSTRUCTIONS] [--icon ICON] [--color COLOR] [--image IMAGE] [--acp-agent AGENT] [--provider {deepseek,openai,dashscope,ollama,custom}] [--base-url BASE_URL] [--model MODEL] [--api-key API_KEY] [--scope SCOPE] [--isolated] [--visibility {private,public}] [--pinned] [--hidden] [--active] [--notifications] [--skills-mode {all,selected}] [--skills SKILLS] [--skills-off SKILLS_OFF] [--connectors CONNECTORS] [--machines MACHINES] [--default-machine DEFAULT_MACHINE] [--approval-mode {ask,allow_reads,allow_all}] [--rule RULES] [--delegate-to DELEGATE_TO] [--max-depth MAX_DEPTH] [--max-per-turn MAX_PER_TURN]。限制：这个操作只有人可以做。示例：foxos bot profile update coder --title Backend
+修改智能体资料（同 bot config set）。CLI：foxos bot profile update BOT [--name NAME] [--title TITLE] [--role ROLE] [--instructions INSTRUCTIONS] [--icon ICON] [--color COLOR] [--image IMAGE] [--acp-agent AGENT] [--provider {deepseek,openai,dashscope,ollama,custom}] [--base-url BASE_URL] [--model MODEL] [--api-key API_KEY] [--scope SCOPE] [--isolated] [--visibility {private,public}] [--pinned] [--hidden] [--active] [--notifications] [--skills-mode {all,selected}] [--skills SKILLS] [--skills-off SKILLS_OFF] [--connectors CONNECTORS] [--machines MACHINES] [--default-machine DEFAULT_MACHINE] [--approval-mode {ask,allow_reads,allow_all}] [--rule RULES] [--delegate-to DELEGATE_TO] [--max-depth MAX_DEPTH] [--max-per-turn MAX_PER_TURN] [--cu-surface {auto,a11y,screen,browser}] [--cu-step-policy {auto,typesafe,deepseek}]。限制：这个操作只有人可以做。示例：foxos bot profile update coder --title Backend
 
 只读：否 · 破坏性：否 · CLI：`foxos bot profile update`
 
@@ -359,6 +361,8 @@
 | `delegate_to` | array |  | 可以委托给哪些智能体（* 表示全部） |
 | `max_depth` | integer |  | 委托最大深度 |
 | `max_per_turn` | integer |  | 每轮最多委托几次 |
+| `cu_surface` | string |  | 电脑操控方式：auto（默认 agent-desktop，读不到时退到截图 / 浏览器）/ a11y / screen / browser 可选：auto / a11y / screen / browser |
+| `cu_step_policy` | string |  | 电脑操控单步策略：auto / typesafe / deepseek 可选：auto / typesafe / deepseek |
 | `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
 
 调用示例：
@@ -439,7 +443,7 @@
 
 ### `bot_config_set`
 
-修改智能体设置（与 OpenBot 的 Bot 设置逐项对应）。CLI：foxos bot config set BOT [--name NAME] [--title TITLE] [--role ROLE] [--instructions INSTRUCTIONS] [--icon ICON] [--color COLOR] [--image IMAGE] [--acp-agent AGENT] [--provider {deepseek,openai,dashscope,ollama,custom}] [--base-url BASE_URL] [--model MODEL] [--api-key API_KEY] [--scope SCOPE] [--isolated] [--visibility {private,public}] [--pinned] [--hidden] [--active] [--notifications] [--skills-mode {all,selected}] [--skills SKILLS] [--skills-off SKILLS_OFF] [--connectors CONNECTORS] [--machines MACHINES] [--default-machine DEFAULT_MACHINE] [--approval-mode {ask,allow_reads,allow_all}] [--rule RULES] [--delegate-to DELEGATE_TO] [--max-depth MAX_DEPTH] [--max-per-turn MAX_PER_TURN]。限制：这个操作只有人可以做。示例：foxos bot config set coder --acp-agent claude-acp --skills tdd,architect --approval-mode allow_reads --rule execute=ask
+修改智能体设置（与 OpenBot 的 Bot 设置逐项对应）。CLI：foxos bot config set BOT [--name NAME] [--title TITLE] [--role ROLE] [--instructions INSTRUCTIONS] [--icon ICON] [--color COLOR] [--image IMAGE] [--acp-agent AGENT] [--provider {deepseek,openai,dashscope,ollama,custom}] [--base-url BASE_URL] [--model MODEL] [--api-key API_KEY] [--scope SCOPE] [--isolated] [--visibility {private,public}] [--pinned] [--hidden] [--active] [--notifications] [--skills-mode {all,selected}] [--skills SKILLS] [--skills-off SKILLS_OFF] [--connectors CONNECTORS] [--machines MACHINES] [--default-machine DEFAULT_MACHINE] [--approval-mode {ask,allow_reads,allow_all}] [--rule RULES] [--delegate-to DELEGATE_TO] [--max-depth MAX_DEPTH] [--max-per-turn MAX_PER_TURN] [--cu-surface {auto,a11y,screen,browser}] [--cu-step-policy {auto,typesafe,deepseek}]。限制：这个操作只有人可以做。示例：foxos bot config set coder --acp-agent claude-acp --skills tdd,architect --approval-mode allow_reads --rule execute=ask
 
 只读：否 · 破坏性：否 · CLI：`foxos bot config set`
 
@@ -476,6 +480,8 @@
 | `delegate_to` | array |  | 可以委托给哪些智能体（* 表示全部） |
 | `max_depth` | integer |  | 委托最大深度 |
 | `max_per_turn` | integer |  | 每轮最多委托几次 |
+| `cu_surface` | string |  | 电脑操控方式：auto（默认 agent-desktop，读不到时退到截图 / 浏览器）/ a11y / screen / browser 可选：auto / a11y / screen / browser |
+| `cu_step_policy` | string |  | 电脑操控单步策略：auto / typesafe / deepseek 可选：auto / typesafe / deepseek |
 | `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
 
 调用示例：
@@ -880,7 +886,7 @@
 {"name": "bot_channel_poll", "arguments": {}}
 ```
 
-## browser（8 个工具）
+## browser（29 个工具）
 
 ### `browser_status`
 
@@ -1019,6 +1025,546 @@ Chrome 是否安装、版本、CDP 开关与端口。CLI：foxos browser status�
 
 ```json
 {"name": "browser_close", "arguments": {"tab": "…"}}
+```
+
+### `browser_snapshot`
+
+网页的无障碍快照（文字），每个元素一个 ref；纯文字模型也能据此操作。CLI：foxos browser snapshot [--tab TAB] [--max-chars MAX_CHARS] [--interactive]。限制：ref 在下一次快照前有效；需要先由人运行 foxos browser cdp on。示例：foxos browser snapshot
+
+只读：是 · 破坏性：否 · CLI：`foxos browser snapshot`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `tab` | string |  | 标签页 id（foxos browser tabs 里的 id，可写前缀；默认第一个） |
+| `max_chars` | integer |  | 最多多少字符 |
+| `interactive` | boolean |  | 只列可操作的元素 |
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "browser_snapshot", "arguments": {}}
+```
+
+### `browser_click`
+
+按快照里的 ref 点击网页元素（真实鼠标事件）。CLI：foxos browser click REF [--tab TAB] [--double] [--button {left,right,middle}]。示例：foxos browser click e12
+
+只读：否 · 破坏性：否 · CLI：`foxos browser click`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `ref` | string | 是 | 快照里的 ref（e12） |
+| `tab` | string |  | 标签页 id（foxos browser tabs 里的 id，可写前缀；默认第一个） |
+| `double` | boolean |  | 双击 |
+| `button` | string |  | 鼠标键 可选：left / right / middle |
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "browser_click", "arguments": {"ref": "…"}}
+```
+
+### `browser_type`
+
+在输入框里输入文字（可回车提交）。CLI：foxos browser type REF TEXT [--tab TAB] [--submit] [--append]。示例：foxos browser type e5 'FoxOS' --submit
+
+只读：否 · 破坏性：否 · CLI：`foxos browser type`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `ref` | string | 是 | 快照里的 ref（e12） |
+| `text` | string | 是 | 文字 |
+| `tab` | string |  | 标签页 id（foxos browser tabs 里的 id，可写前缀；默认第一个） |
+| `submit` | boolean |  | 输入后按回车 |
+| `append` | boolean |  | 追加而不是替换 |
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "browser_type", "arguments": {"ref": "…", "text": "…"}}
+```
+
+### `browser_press`
+
+在网页里按键。CLI：foxos browser press KEY [--tab TAB]。示例：foxos browser press Enter
+
+只读：否 · 破坏性：否 · CLI：`foxos browser press`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `key` | string | 是 | 按键（Enter、Escape、ArrowDown、ctrl+a …） |
+| `tab` | string |  | 标签页 id（foxos browser tabs 里的 id，可写前缀；默认第一个） |
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "browser_press", "arguments": {"key": "…"}}
+```
+
+### `browser_select`
+
+选择下拉框（<select>）的选项。CLI：foxos browser select REF VALUE [--tab TAB]。示例：foxos browser select e9 '中文'
+
+只读：否 · 破坏性：否 · CLI：`foxos browser select`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `ref` | string | 是 | 快照里的 ref（e12） |
+| `value` | string | 是 | 选项的值或文字 |
+| `tab` | string |  | 标签页 id（foxos browser tabs 里的 id，可写前缀；默认第一个） |
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "browser_select", "arguments": {"ref": "…", "value": "…"}}
+```
+
+### `browser_scroll`
+
+滚动网页。CLI：foxos browser scroll [DIR] [--amount AMOUNT] [--tab TAB]。示例：foxos browser scroll down
+
+只读：是 · 破坏性：否 · CLI：`foxos browser scroll`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `direction` | string |  | 方向 可选：down / up / left / right |
+| `amount` | integer |  | 像素 |
+| `tab` | string |  | 标签页 id（foxos browser tabs 里的 id，可写前缀；默认第一个） |
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "browser_scroll", "arguments": {}}
+```
+
+### `browser_back`
+
+后退。CLI：foxos browser back [--tab TAB]。示例：foxos browser back
+
+只读：否 · 破坏性：否 · CLI：`foxos browser back`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `tab` | string |  | 标签页 id（foxos browser tabs 里的 id，可写前缀；默认第一个） |
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "browser_back", "arguments": {}}
+```
+
+### `browser_forward`
+
+前进。CLI：foxos browser forward [--tab TAB]。示例：foxos browser forward
+
+只读：否 · 破坏性：否 · CLI：`foxos browser forward`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `tab` | string |  | 标签页 id（foxos browser tabs 里的 id，可写前缀；默认第一个） |
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "browser_forward", "arguments": {}}
+```
+
+### `browser_text`
+
+网页（或某个元素）的可见文字。CLI：foxos browser text [--tab TAB] [--ref REF] [--max-chars MAX_CHARS]。示例：foxos browser text
+
+只读：是 · 破坏性：否 · CLI：`foxos browser text`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `tab` | string |  | 标签页 id（foxos browser tabs 里的 id，可写前缀；默认第一个） |
+| `ref` | string |  | 快照里的 ref（可选） |
+| `max_chars` | integer |  | 最多多少字符 |
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "browser_text", "arguments": {}}
+```
+
+### `browser_wait`
+
+等待文字出现或等几秒。CLI：foxos browser wait [--text TEXT] [--seconds SECONDS] [--tab TAB] [--timeout TIMEOUT]。示例：foxos browser wait --text '结果'
+
+只读：是 · 破坏性：否 · CLI：`foxos browser wait`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `text` | string |  | 等这段文字出现 |
+| `seconds` | number |  | 等几秒 |
+| `tab` | string |  | 标签页 id（foxos browser tabs 里的 id，可写前缀；默认第一个） |
+| `timeout` | number |  | 超时秒数 |
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "browser_wait", "arguments": {}}
+```
+
+### `browser_download`
+
+在浏览器里下载文件到工作空间 downloads/。CLI：foxos browser download [--url URL] [--ref REF] [--tab TAB] [--timeout TIMEOUT]。限制：只存到工作空间 downloads/。示例：foxos browser download --url https://example.com/file.pdf
+
+只读：否 · 破坏性：否 · CLI：`foxos browser download`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `url` | string |  | 网址 |
+| `ref` | string |  | 快照里的 ref（可选） |
+| `tab` | string |  | 标签页 id（foxos browser tabs 里的 id，可写前缀；默认第一个） |
+| `timeout` | number |  | 超时秒数 |
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "browser_download", "arguments": {}}
+```
+
+### `browser_downloads`
+
+列出已下载的文件。CLI：foxos browser downloads。示例：foxos browser downloads --json
+
+只读：是 · 破坏性：否 · CLI：`foxos browser downloads`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "browser_downloads", "arguments": {}}
+```
+
+### `browser_tab_select`
+
+切换到标签页。CLI：foxos browser tab select TAB。示例：foxos browser tab select 3F2A
+
+只读：否 · 破坏性：否 · CLI：`foxos browser tab select`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `tab` | string | 是 | 标签页 id（foxos browser tabs 里的 id，可写前缀；默认第一个） |
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "browser_tab_select", "arguments": {"tab": "…"}}
+```
+
+### `browser_tab_new`
+
+新开标签页。CLI：foxos browser tab new [URL]。示例：foxos browser tab new https://example.com
+
+只读：否 · 破坏性：否 · CLI：`foxos browser tab new`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `url` | string |  | 网址 |
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "browser_tab_new", "arguments": {}}
+```
+
+### `browser_task`
+
+浏览器智能体：一句话任务，模型看快照、按 ref 操作 Chrome，直到给出答案。CLI：foxos browser task TASK [--url URL] [--mode {s1s2,llm}] [--policy {auto,typesafe,deepseek}] [--max-steps MAX_STEPS] [--approve {risky,ask,auto,deny}] [--vision {auto,on,off}] [--tab TAB]。限制：需要 foxos computer model 配好模型与密钥（DeepSeek 等）；纯文字模型也能用；risky：删除、发送、支付、提交等高风险动作要人批准（foxos bot approval answer）；ask：每个改动都要批准。示例：foxos browser task '在维基百科查珠穆朗玛峰的海拔' --url https://zh.wikipedia.org --vision off
+
+只读：否 · 破坏性：否 · CLI：`foxos browser task`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `task` | string | 是 | 任务（一句话） |
+| `url` | string |  | 先打开的网址 |
+| `mode` | string |  | 做法：s1s2（快决策 + 规划器，默认）/ llm（只用大模型） 可选：s1s2 / llm |
+| `policy` | string |  | 单步策略：auto（有 TypeSafe 密钥用 Jev，否则 DeepSeek）/ typesafe / deepseek 可选：auto / typesafe / deepseek |
+| `max_steps` | integer |  | 最多多少步 |
+| `approve` | string |  | 审批：risky（缺省）/ ask / auto / deny 可选：risky / ask / auto / deny |
+| `vision` | string |  | 截图：auto（配了视觉模型就用）/ on / off 可选：auto / on / off |
+| `tab` | string |  | 标签页 id（foxos browser tabs 里的 id，可写前缀；默认第一个） |
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "browser_task", "arguments": {"task": "…"}}
+```
+
+### `browser_backend_set`
+
+选择网页操作后端：auto（装了 agent-browser 就用它）/ agent-browser / builtin（内置 CDP）。CLI：foxos browser backend set BACKEND。示例：foxos browser backend set agent-browser
+
+只读：否 · 破坏性：否 · CLI：`foxos browser backend set`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `backend` | string | 是 | 后端 可选：auto / agent-browser / builtin |
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "browser_backend_set", "arguments": {"backend": "auto"}}
+```
+
+### `browser_backend_status`
+
+查看网页操作后端与 agent-browser 安装情况。CLI：foxos browser backend status。示例：foxos browser backend status --json
+
+只读：是 · 破坏性：否 · CLI：`foxos browser backend status`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "browser_backend_status", "arguments": {}}
+```
+
+### `browser_engine_status`
+
+浏览器引擎的安装状态、版本、许可证。CLI：foxos browser engine status。示例：foxos browser engine status --json
+
+只读：是 · 破坏性：否 · CLI：`foxos browser engine status`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "browser_engine_status", "arguments": {}}
+```
+
+### `browser_engine_install`
+
+安装开源浏览器引擎（Playwright MCP、Chrome DevTools MCP、browser-use）。CLI：foxos browser engine install ENGINE。示例：foxos browser engine install agent-browser
+
+只读：否 · 破坏性：否 · CLI：`foxos browser engine install`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `engine` | string | 是 | 引擎名 可选：agent-browser / playwright-mcp |
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "browser_engine_install", "arguments": {"engine": "agent-browser"}}
+```
+
+### `browser_engine_tools`
+
+列出引擎提供的 MCP 工具。CLI：foxos browser engine tools ENGINE。示例：foxos browser engine tools playwright-mcp
+
+只读：是 · 破坏性：否 · CLI：`foxos browser engine tools`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `engine` | string | 是 | 引擎名 可选：agent-browser / playwright-mcp |
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "browser_engine_tools", "arguments": {"engine": "agent-browser"}}
+```
+
+### `browser_engine_call`
+
+调用 Playwright MCP / Chrome DevTools MCP 的一个工具（连同一个 Chrome）。CLI：foxos browser engine call ENGINE TOOL [--args ARGS]。示例：foxos browser engine call playwright-mcp browser_snapshot
+
+只读：否 · 破坏性：否 · CLI：`foxos browser engine call`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `engine` | string | 是 | 引擎名 可选：agent-browser / playwright-mcp |
+| `tool` | string | 是 | 工具名 |
+| `args` | object |  | 工具参数（JSON） |
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "browser_engine_call", "arguments": {"engine": "agent-browser", "tool": "…"}}
+```
+
+## computer（8 个工具）
+
+### `computer_doctor`
+
+体检默认电脑操控栈：agent-desktop + Jev 单步策略 + 截图 / xdotool 兜底 + 规划器。CLI：foxos computer doctor。示例：foxos computer doctor
+
+只读：是 · 破坏性：否 · CLI：`foxos computer doctor`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "computer_doctor", "arguments": {}}
+```
+
+### `computer_backend_install`
+
+安装电脑操控后端 agent-desktop（Vercel Labs，Apache-2.0）。CLI：foxos computer backend install。示例：foxos computer backend install
+
+只读：否 · 破坏性：否 · CLI：`foxos computer backend install`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "computer_backend_install", "arguments": {}}
+```
+
+### `computer_backend_status`
+
+查看 agent-desktop 状态。CLI：foxos computer backend status。示例：foxos computer backend status --json
+
+只读：是 · 破坏性：否 · CLI：`foxos computer backend status`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "computer_backend_status", "arguments": {}}
+```
+
+### `computer_model_show`
+
+查看操控用的模型设置。CLI：foxos computer model show。示例：foxos computer model show --json
+
+只读：是 · 破坏性：否 · CLI：`foxos computer model show`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "computer_model_show", "arguments": {}}
+```
+
+### `computer_model_set`
+
+设置操控用的模型、视觉模型与视觉定位。CLI：foxos computer model set [--provider PROVIDER] [--model MODEL] [--vision-model VISION_MODEL] [--base-url BASE_URL] [--vision {auto,off}] [--grounding {auto,vlm,ui-tars,omniparser,typesafe,none}] [--grounding-url GROUNDING_URL] [--grounding-model GROUNDING_MODEL] [--max-steps MAX_STEPS] [--step-policy {auto,typesafe,deepseek}] [--gate-high GATE_HIGH] [--gate-low GATE_LOW]。限制：只有人（human 身份）能改。示例：foxos computer model set --provider deepseek
+
+只读：否 · 破坏性：否 · CLI：`foxos computer model set`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `provider` | string |  | 服务商：deepseek、openai、dashscope、zhipu、moonshot、local |
+| `model` | string |  | 文字模型 |
+| `vision_model` | string |  | 视觉模型（收图片），空字符串表示没有 |
+| `base_url` | string |  | OpenAI 兼容接口地址 |
+| `vision` | string |  | 视觉：auto 或 off 可选：auto / off |
+| `grounding` | string |  | 视觉定位方式 可选：auto / vlm / ui-tars / omniparser / typesafe / none |
+| `grounding_url` | string |  | 定位服务地址（vLLM / Ollama / OmniParser） |
+| `grounding_model` | string |  | 定位模型名（如 ByteDance-Seed/UI-TARS-1.5-7B） |
+| `max_steps` | integer |  | 最多多少步 |
+| `step_policy` | string |  | 默认单步策略 可选：auto / typesafe / deepseek |
+| `gate_high` | number |  | 高置信度门槛（≥ 直接执行） |
+| `gate_low` | number |  | 低置信度门槛（< 升级给规划器） |
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "computer_model_set", "arguments": {}}
+```
+
+### `computer_model_key`
+
+保存模型服务的 API 密钥（只存本机密钥库）。CLI：foxos computer model key KEY [--provider PROVIDER]。限制：只有人（human 身份）能改。示例：cat deepseek.key | foxos computer model key --value-stdin
+
+只读：否 · 破坏性：否 · CLI：`foxos computer model key`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `value` | string | 是 | API 密钥（建议用 --value-stdin） |
+| `provider` | string |  | 服务商：deepseek、openai、dashscope、zhipu、moonshot、local |
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "computer_model_key", "arguments": {"value": "…"}}
+```
+
+### `computer_model_test`
+
+真实调用一次模型，检查密钥与网络。CLI：foxos computer model test [--vision]。示例：foxos computer model test
+
+只读：是 · 破坏性：否 · CLI：`foxos computer model test`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `vision` | boolean |  | 测试视觉模型 |
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "computer_model_test", "arguments": {}}
+```
+
+### `computer_task`
+
+电脑操控智能体：一句话任务，模型看无障碍树（可选截图）一步步操作桌面程序。CLI：foxos computer task TASK [--app APP] [--launch ARG] [--max-steps MAX_STEPS] [--approve {risky,ask,auto,deny}] [--vision {auto,on,off}] [--mode {s1s2,llm}] [--policy {auto,typesafe,deepseek}] [--surface {auto,a11y,screen,browser}] [--url URL]。限制：需要 foxos computer model 配好模型与密钥（DeepSeek 等）；纯文字模型也能用；risky：删除、发送、支付、提交等高风险动作要人批准（foxos bot approval answer）；ask：每个改动都要批准；人工接管时暂停，恢复后继续。示例：foxos computer task '在 Mousepad 里写一行 hello 并保存' --launch mousepad --launch notes.txt --app mousepad --vision off
+
+只读：否 · 破坏性：否 · CLI：`foxos computer task`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `task` | string | 是 | 任务（一句话） |
+| `app` | string |  | 只看这个程序的无障碍树 |
+| `launch` | array |  | 先启动的程序与参数（可重复） |
+| `max_steps` | integer |  | 最多多少步 |
+| `approve` | string |  | 审批：risky（缺省）/ ask / auto / deny 可选：risky / ask / auto / deny |
+| `vision` | string |  | 截图：auto（配了视觉模型就用）/ on / off 可选：auto / on / off |
+| `mode` | string |  | 做法：s1s2（快决策 + 规划器，默认）/ llm（只用大模型） 可选：s1s2 / llm |
+| `policy` | string |  | 单步策略：auto（有 TypeSafe 密钥用 Jev，否则 DeepSeek）/ typesafe / deepseek 可选：auto / typesafe / deepseek |
+| `surface` | string |  | 操作面：auto（网页 → 浏览器；桌面程序 → agent-desktop；没有无障碍信息 → 截图）/ a11y / screen / browser 可选：auto / a11y / screen / browser |
+| `url` | string |  | 网页任务的起始网址（会路由到浏览器） |
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "computer_task", "arguments": {"task": "…"}}
 ```
 
 ## connector（8 个工具）
@@ -1170,7 +1716,7 @@ Chrome 是否安装、版本、CDP 开关与端口。CLI：foxos browser status�
 {"name": "connector_tool_call", "arguments": {"connector": "…", "tool": "…"}}
 ```
 
-## desktop（15 个工具）
+## desktop（28 个工具）
 
 ### `desktop_status`
 
@@ -1329,21 +1875,22 @@ Chrome 是否安装、版本、CDP 开关与端口。CLI：foxos browser status�
 
 ### `desktop_click`
 
-在屏幕坐标处点击。CLI：foxos desktop click --x X --y Y [--button BUTTON]。示例：foxos desktop click --x 400 --y 300
+在屏幕坐标处点击。CLI：foxos desktop click [--x X] [--y Y] [--button BUTTON] [--element ELEMENT]。示例：foxos desktop click --x 400 --y 300
 
 只读：否 · 破坏性：否 · CLI：`foxos desktop click`
 
 | 参数 | 类型 | 必填 | 说明 |
 |---|---|---|---|
-| `x` | integer | 是 | X 坐标（像素） |
-| `y` | integer | 是 | Y 坐标（像素） |
+| `x` | integer |  | X 坐标（像素） |
+| `y` | integer |  | Y 坐标（像素） |
 | `button` | integer |  | 鼠标按钮：1 左键、2 中键、3 右键 |
+| `element` | string |  | 按无障碍引用点击（来自 desktop tree / find） |
 | `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
 
 调用示例：
 
 ```json
-{"name": "desktop_click", "arguments": {"x": 1, "y": 1}}
+{"name": "desktop_click", "arguments": {}}
 ```
 
 ### `desktop_screenshot`
@@ -1430,7 +1977,249 @@ Chrome 是否安装、版本、CDP 开关与端口。CLI：foxos browser status�
 {"name": "desktop_resume", "arguments": {}}
 ```
 
-## session（15 个工具）
+### `desktop_tree`
+
+AT-SPI 无障碍树（文字快照，每个元素一个引用 e1、e2…）。CLI：foxos desktop tree [--app APP] [--window-id WINDOW_ID] [--interactive] [--max-depth MAX_DEPTH] [--offscreen] [--full]。限制：缺省只看当前活动窗口所属的程序、只列可见元素；引用在下一次 tree / find 之前有效。示例：foxos desktop tree
+
+只读：是 · 破坏性：否 · CLI：`foxos desktop tree`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `app` | string |  | 程序名（如 mousepad、Thunar、Google Chrome） |
+| `window_id` | string |  | 窗口 id（来自 desktop windows 或 agent-desktop） |
+| `interactive` | boolean |  | 只列出可操作的元素 |
+| `max_depth` | integer |  | 最大深度 |
+| `offscreen` | boolean |  | 也列出屏幕外的元素 |
+| `full` | boolean |  | 同时返回结构化节点列表 |
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "desktop_tree", "arguments": {}}
+```
+
+### `desktop_find`
+
+按角色 / 名字在所有程序里找元素。CLI：foxos desktop find [--role ROLE] [--name NAME] [--app APP] [--regex] [--limit LIMIT]。示例：foxos desktop find --role button --name Save
+
+只读：是 · 破坏性：否 · CLI：`foxos desktop find`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `role` | string |  | 角色（push button、menu item、text、check box …） |
+| `name` | string |  | 名字或文字包含（--regex 时为正则） |
+| `app` | string |  | 程序名（如 mousepad、Thunar、Google Chrome） |
+| `regex` | boolean |  | --name 按正则匹配 |
+| `limit` | integer |  | 最多返回几个 |
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "desktop_find", "arguments": {}}
+```
+
+### `desktop_apps`
+
+列出有无障碍信息的程序与窗口。CLI：foxos desktop apps。示例：foxos desktop apps --json
+
+只读：是 · 破坏性：否 · CLI：`foxos desktop apps`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "desktop_apps", "arguments": {}}
+```
+
+### `desktop_press`
+
+向程序发送按键组合（agent-desktop）。CLI：foxos desktop press COMBO [--window-id WINDOW_ID] [--app APP]。示例：foxos desktop press ctrl+s
+
+只读：否 · 破坏性：否 · CLI：`foxos desktop press`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `keys` | string | 是 | 按键组合，例如 ctrl+s、return |
+| `window_id` | string |  | 窗口 id（来自 desktop windows 或 agent-desktop） |
+| `app` | string |  | 程序名（如 mousepad、Thunar、Google Chrome） |
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "desktop_press", "arguments": {"keys": "…"}}
+```
+
+### `desktop_element_click`
+
+按无障碍引用点击元素（菜单、按钮、菜单项、标签页…）。CLI：foxos desktop element click REF。示例：foxos desktop element click e12
+
+只读：否 · 破坏性：否 · CLI：`foxos desktop element click`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `ref` | string | 是 | 元素引用（e12，或 进程号:路径） |
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "desktop_element_click", "arguments": {"ref": "…"}}
+```
+
+### `desktop_element_focus`
+
+让元素获得焦点。CLI：foxos desktop element focus REF。示例：foxos desktop element focus e7
+
+只读：否 · 破坏性：否 · CLI：`foxos desktop element focus`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `ref` | string | 是 | 元素引用（e12，或 进程号:路径） |
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "desktop_element_focus", "arguments": {"ref": "…"}}
+```
+
+### `desktop_element_read`
+
+读元素的文字、值、状态、位置与可用动作。CLI：foxos desktop element read REF [--property {text,value,title,bounds,role,states}]。示例：foxos desktop element read e7
+
+只读：是 · 破坏性：否 · CLI：`foxos desktop element read`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `ref` | string | 是 | 元素引用（e12，或 进程号:路径） |
+| `property` | string |  | 要读取的属性（text、value、name、states、bounds…） 可选：text / value / title / bounds / role / states |
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "desktop_element_read", "arguments": {"ref": "…"}}
+```
+
+### `desktop_element_set-text`
+
+设置可编辑元素的文字（替换或追加）。CLI：foxos desktop element set-text REF TEXT [--append]。示例：foxos desktop element set-text e7 'hello'
+
+只读：否 · 破坏性：否 · CLI：`foxos desktop element set-text`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `ref` | string | 是 | 元素引用（e12，或 进程号:路径） |
+| `text` | string | 是 | 文字 |
+| `append` | boolean |  | 追加到末尾而不是替换 |
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "desktop_element_set-text", "arguments": {"ref": "…", "text": "…"}}
+```
+
+### `desktop_element_type`
+
+在元素里按键输入文字。CLI：foxos desktop element type REF TEXT。示例：foxos desktop element type e7 'more text'
+
+只读：否 · 破坏性：否 · CLI：`foxos desktop element type`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `ref` | string | 是 | 元素引用（e12，或 进程号:路径） |
+| `text` | string | 是 | 文字 |
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "desktop_element_type", "arguments": {"ref": "…", "text": "…"}}
+```
+
+### `desktop_element_select`
+
+在组合框 / 列表里选择一项。CLI：foxos desktop element select REF VALUE。示例：foxos desktop element select e9 'UTF-8'
+
+只读：否 · 破坏性：否 · CLI：`foxos desktop element select`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `ref` | string | 是 | 元素引用（e12，或 进程号:路径） |
+| `value` | string | 是 | 值 / 选项文字 |
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "desktop_element_select", "arguments": {"ref": "…", "value": "…"}}
+```
+
+### `desktop_element_scroll`
+
+滚动一个元素。CLI：foxos desktop element scroll REF [--direction {up,down,left,right}] [--amount AMOUNT]。示例：foxos desktop element scroll e30 --direction down
+
+只读：否 · 破坏性：否 · CLI：`foxos desktop element scroll`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `ref` | string | 是 | 元素引用（e12，或 进程号:路径） |
+| `direction` | string |  | 方向：up / down / left / right 可选：up / down / left / right |
+| `amount` | integer |  | 滚动量 |
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "desktop_element_scroll", "arguments": {"ref": "…"}}
+```
+
+### `desktop_element_action`
+
+对元素执行指定的无障碍动作（activate、press、expand …）。CLI：foxos desktop element action REF ACTION。示例：foxos desktop element action e9 toggle
+
+只读：否 · 破坏性：否 · CLI：`foxos desktop element action`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `ref` | string | 是 | 元素引用（e12，或 进程号:路径） |
+| `name` | string | 是 | 动作名（element read 可以看到可用动作） 可选：double-click / right-click / triple-click / toggle / check / uncheck / expand / collapse / clear / scroll-to |
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "desktop_element_action", "arguments": {"ref": "…", "name": "double-click"}}
+```
+
+### `desktop_ground`
+
+视觉定位：截图 + 视觉模型，按一句话描述找坐标（可直接点击）。CLI：foxos desktop ground DESCRIPTION [--click] [--kind {vlm,ui-tars,omniparser,typesafe}] [--button BUTTON]。限制：需要视觉模型（foxos computer model set --vision-model …）或 UI-TARS / OmniParser 服务。示例：foxos desktop ground 'the Save button in the toolbar' --click
+
+只读：否 · 破坏性：否 · CLI：`foxos desktop ground`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `description` | string | 是 | 要找的东西，一句话描述 |
+| `click` | boolean |  | 找到后直接点击 |
+| `kind` | string |  | 定位方式（缺省用 computer model 的设置） 可选：vlm / ui-tars / omniparser / typesafe |
+| `button` | integer |  | 鼠标按钮：1 左键、2 中键、3 右键 |
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "desktop_ground", "arguments": {"description": "…"}}
+```
+
+## session（28 个工具）
 
 ### `session_status`
 
@@ -1589,21 +2378,22 @@ Chrome 是否安装、版本、CDP 开关与端口。CLI：foxos browser status�
 
 ### `session_click`
 
-在屏幕坐标处点击。CLI：foxos session click --x X --y Y [--button BUTTON]。示例：foxos session click --x 400 --y 300
+在屏幕坐标处点击。CLI：foxos session click [--x X] [--y Y] [--button BUTTON] [--element ELEMENT]。示例：foxos session click --x 400 --y 300
 
 只读：否 · 破坏性：否 · CLI：`foxos session click`
 
 | 参数 | 类型 | 必填 | 说明 |
 |---|---|---|---|
-| `x` | integer | 是 | X 坐标（像素） |
-| `y` | integer | 是 | Y 坐标（像素） |
+| `x` | integer |  | X 坐标（像素） |
+| `y` | integer |  | Y 坐标（像素） |
 | `button` | integer |  | 鼠标按钮：1 左键、2 中键、3 右键 |
+| `element` | string |  | 按无障碍引用点击（来自 desktop tree / find） |
 | `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
 
 调用示例：
 
 ```json
-{"name": "session_click", "arguments": {"x": 1, "y": 1}}
+{"name": "session_click", "arguments": {}}
 ```
 
 ### `session_screenshot`
@@ -1688,6 +2478,248 @@ Chrome 是否安装、版本、CDP 开关与端口。CLI：foxos browser status�
 
 ```json
 {"name": "session_resume", "arguments": {}}
+```
+
+### `session_tree`
+
+AT-SPI 无障碍树（文字快照，每个元素一个引用 e1、e2…）。CLI：foxos session tree [--app APP] [--window-id WINDOW_ID] [--interactive] [--max-depth MAX_DEPTH] [--offscreen] [--full]。限制：缺省只看当前活动窗口所属的程序、只列可见元素；引用在下一次 tree / find 之前有效。示例：foxos session tree
+
+只读：是 · 破坏性：否 · CLI：`foxos session tree`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `app` | string |  | 程序名（如 mousepad、Thunar、Google Chrome） |
+| `window_id` | string |  | 窗口 id（来自 desktop windows 或 agent-desktop） |
+| `interactive` | boolean |  | 只列出可操作的元素 |
+| `max_depth` | integer |  | 最大深度 |
+| `offscreen` | boolean |  | 也列出屏幕外的元素 |
+| `full` | boolean |  | 同时返回结构化节点列表 |
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "session_tree", "arguments": {}}
+```
+
+### `session_find`
+
+按角色 / 名字在所有程序里找元素。CLI：foxos session find [--role ROLE] [--name NAME] [--app APP] [--regex] [--limit LIMIT]。示例：foxos session find --role button --name Save
+
+只读：是 · 破坏性：否 · CLI：`foxos session find`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `role` | string |  | 角色（push button、menu item、text、check box …） |
+| `name` | string |  | 名字或文字包含（--regex 时为正则） |
+| `app` | string |  | 程序名（如 mousepad、Thunar、Google Chrome） |
+| `regex` | boolean |  | --name 按正则匹配 |
+| `limit` | integer |  | 最多返回几个 |
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "session_find", "arguments": {}}
+```
+
+### `session_apps`
+
+列出有无障碍信息的程序与窗口。CLI：foxos session apps。示例：foxos session apps --json
+
+只读：是 · 破坏性：否 · CLI：`foxos session apps`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "session_apps", "arguments": {}}
+```
+
+### `session_press`
+
+向程序发送按键组合（agent-desktop）。CLI：foxos session press COMBO [--window-id WINDOW_ID] [--app APP]。示例：foxos session press ctrl+s
+
+只读：否 · 破坏性：否 · CLI：`foxos session press`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `keys` | string | 是 | 按键组合，例如 ctrl+s、return |
+| `window_id` | string |  | 窗口 id（来自 desktop windows 或 agent-desktop） |
+| `app` | string |  | 程序名（如 mousepad、Thunar、Google Chrome） |
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "session_press", "arguments": {"keys": "…"}}
+```
+
+### `session_element_click`
+
+按无障碍引用点击元素（菜单、按钮、菜单项、标签页…）。CLI：foxos session element click REF。示例：foxos session element click e12
+
+只读：否 · 破坏性：否 · CLI：`foxos session element click`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `ref` | string | 是 | 元素引用（e12，或 进程号:路径） |
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "session_element_click", "arguments": {"ref": "…"}}
+```
+
+### `session_element_focus`
+
+让元素获得焦点。CLI：foxos session element focus REF。示例：foxos session element focus e7
+
+只读：否 · 破坏性：否 · CLI：`foxos session element focus`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `ref` | string | 是 | 元素引用（e12，或 进程号:路径） |
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "session_element_focus", "arguments": {"ref": "…"}}
+```
+
+### `session_element_read`
+
+读元素的文字、值、状态、位置与可用动作。CLI：foxos session element read REF [--property {text,value,title,bounds,role,states}]。示例：foxos session element read e7
+
+只读：是 · 破坏性：否 · CLI：`foxos session element read`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `ref` | string | 是 | 元素引用（e12，或 进程号:路径） |
+| `property` | string |  | 要读取的属性（text、value、name、states、bounds…） 可选：text / value / title / bounds / role / states |
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "session_element_read", "arguments": {"ref": "…"}}
+```
+
+### `session_element_set-text`
+
+设置可编辑元素的文字（替换或追加）。CLI：foxos session element set-text REF TEXT [--append]。示例：foxos session element set-text e7 'hello'
+
+只读：否 · 破坏性：否 · CLI：`foxos session element set-text`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `ref` | string | 是 | 元素引用（e12，或 进程号:路径） |
+| `text` | string | 是 | 文字 |
+| `append` | boolean |  | 追加到末尾而不是替换 |
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "session_element_set-text", "arguments": {"ref": "…", "text": "…"}}
+```
+
+### `session_element_type`
+
+在元素里按键输入文字。CLI：foxos session element type REF TEXT。示例：foxos session element type e7 'more text'
+
+只读：否 · 破坏性：否 · CLI：`foxos session element type`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `ref` | string | 是 | 元素引用（e12，或 进程号:路径） |
+| `text` | string | 是 | 文字 |
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "session_element_type", "arguments": {"ref": "…", "text": "…"}}
+```
+
+### `session_element_select`
+
+在组合框 / 列表里选择一项。CLI：foxos session element select REF VALUE。示例：foxos session element select e9 'UTF-8'
+
+只读：否 · 破坏性：否 · CLI：`foxos session element select`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `ref` | string | 是 | 元素引用（e12，或 进程号:路径） |
+| `value` | string | 是 | 值 / 选项文字 |
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "session_element_select", "arguments": {"ref": "…", "value": "…"}}
+```
+
+### `session_element_scroll`
+
+滚动一个元素。CLI：foxos session element scroll REF [--direction {up,down,left,right}] [--amount AMOUNT]。示例：foxos session element scroll e30 --direction down
+
+只读：否 · 破坏性：否 · CLI：`foxos session element scroll`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `ref` | string | 是 | 元素引用（e12，或 进程号:路径） |
+| `direction` | string |  | 方向：up / down / left / right 可选：up / down / left / right |
+| `amount` | integer |  | 滚动量 |
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "session_element_scroll", "arguments": {"ref": "…"}}
+```
+
+### `session_element_action`
+
+对元素执行指定的无障碍动作（activate、press、expand …）。CLI：foxos session element action REF ACTION。示例：foxos session element action e9 toggle
+
+只读：否 · 破坏性：否 · CLI：`foxos session element action`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `ref` | string | 是 | 元素引用（e12，或 进程号:路径） |
+| `name` | string | 是 | 动作名（element read 可以看到可用动作） 可选：double-click / right-click / triple-click / toggle / check / uncheck / expand / collapse / clear / scroll-to |
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "session_element_action", "arguments": {"ref": "…", "name": "double-click"}}
+```
+
+### `session_ground`
+
+视觉定位：截图 + 视觉模型，按一句话描述找坐标（可直接点击）。CLI：foxos session ground DESCRIPTION [--click] [--kind {vlm,ui-tars,omniparser,typesafe}] [--button BUTTON]。限制：需要视觉模型（foxos computer model set --vision-model …）或 UI-TARS / OmniParser 服务。示例：foxos session ground 'the Save button in the toolbar' --click
+
+只读：否 · 破坏性：否 · CLI：`foxos session ground`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `description` | string | 是 | 要找的东西，一句话描述 |
+| `click` | boolean |  | 找到后直接点击 |
+| `kind` | string |  | 定位方式（缺省用 computer model 的设置） 可选：vlm / ui-tars / omniparser / typesafe |
+| `button` | integer |  | 鼠标按钮：1 左键、2 中键、3 右键 |
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "session_ground", "arguments": {"description": "…"}}
 ```
 
 ## docs（5 个工具）
@@ -10133,6 +11165,202 @@ RGBA。CLI：foxos 3d rgba activate。界面：Compositing > main > RGBA。效�
 {"name": "machine_host_unpair", "arguments": {"client": "…"}}
 ```
 
+## model（11 个工具）
+
+### `model_catalog`
+
+列出可一键安装的本地模型（只有 UI-TARS-1.5-7B）和硬件是否够用。CLI：foxos model catalog。示例：foxos model catalog --json
+
+只读：是 · 破坏性：否 · CLI：`foxos model catalog`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "model_catalog", "arguments": {}}
+```
+
+### `model_install`
+
+下载本地模型（断点续传 + sha256 校验，国内优先魔搭）。CLI：foxos model install MODEL [--source {auto,hf,hf-mirror,modelscope}] [--force]。限制：约 5.6 GB 下载；权重不随系统镜像分发。示例：foxos model install ui-tars-1.5-7b
+
+只读：否 · 破坏性：否 · CLI：`foxos model install`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `model` | string | 是 | 模型 id 可选：ui-tars-1.5-7b |
+| `source` | string |  | 下载源：auto / hf / hf-mirror / modelscope 可选：auto / hf / hf-mirror / modelscope |
+| `force` | boolean |  | 硬件不够也装 |
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "model_install", "arguments": {"model": "ui-tars-1.5-7b"}}
+```
+
+### `model_run`
+
+启动本地模型服务（llama.cpp 或 vLLM，OpenAI 兼容接口）。CLI：foxos model run MODEL [--backend {auto,llama.cpp,vllm}] [--port PORT] [--ctx-size CTX_SIZE] [--threads THREADS] [--use]。限制：CPU 上很慢（每步几十秒）；有 GPU 更好。示例：foxos model run ui-tars-1.5-7b
+
+只读：否 · 破坏性：否 · CLI：`foxos model run`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `model` | string | 是 | 模型 id 可选：ui-tars-1.5-7b |
+| `backend` | string |  | 推理后端：auto / llama.cpp / vllm 可选：auto / llama.cpp / vllm |
+| `port` | integer |  | 端口 |
+| `ctx_size` | integer |  | 上下文长度 |
+| `threads` | integer |  | CPU 线程数 |
+| `use` | boolean |  | 启动后设为视觉定位 |
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "model_run", "arguments": {"model": "ui-tars-1.5-7b"}}
+```
+
+### `model_stop`
+
+停止本地模型服务。CLI：foxos model stop MODEL。示例：foxos model stop ui-tars-1.5-7b
+
+只读：否 · 破坏性：否 · CLI：`foxos model stop`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `model` | string | 是 | 模型 id 可选：ui-tars-1.5-7b |
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "model_stop", "arguments": {"model": "ui-tars-1.5-7b"}}
+```
+
+### `model_status`
+
+本地模型安装 / 运行状态。CLI：foxos model status。示例：foxos model status --json
+
+只读：是 · 破坏性：否 · CLI：`foxos model status`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "model_status", "arguments": {}}
+```
+
+### `model_remove`
+
+删除已下载的本地模型。CLI：foxos model remove MODEL。示例：foxos model remove ui-tars-1.5-7b
+
+只读：否 · 破坏性：否 · CLI：`foxos model remove`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `model` | string | 是 | 模型 id 可选：ui-tars-1.5-7b |
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "model_remove", "arguments": {"model": "ui-tars-1.5-7b"}}
+```
+
+### `model_use`
+
+把运行中的本地模型设为视觉定位。CLI：foxos model use MODEL。示例：foxos model use ui-tars-1.5-7b
+
+只读：否 · 破坏性：否 · CLI：`foxos model use`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `model` | string | 是 | 模型 id 可选：ui-tars-1.5-7b |
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "model_use", "arguments": {"model": "ui-tars-1.5-7b"}}
+```
+
+### `model_provider_list`
+
+列出模型服务商和是否配了密钥。CLI：foxos model provider list。示例：foxos model provider list --json
+
+只读：是 · 破坏性：否 · CLI：`foxos model provider list`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "model_provider_list", "arguments": {}}
+```
+
+### `model_provider_add`
+
+添加模型服务商密钥（只能人来做，从标准输入读）。CLI：foxos model provider add PROVIDER --key KEY [--base-url BASE_URL] [--model MODEL]。限制：只有人（human 身份）能改。示例：cat typesafe.key | foxos model provider add typesafe --key-stdin
+
+只读：否 · 破坏性：否 · CLI：`foxos model provider add`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `provider` | string | 是 | 服务商：deepseek / typesafe 可选：deepseek / typesafe |
+| `key` | string | 是 | 从标准输入读密钥 |
+| `base_url` | string |  | OpenAI 兼容接口地址 |
+| `model` | string |  | 文字模型 |
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "model_provider_add", "arguments": {"provider": "deepseek", "key": "…"}}
+```
+
+### `model_provider_remove`
+
+删除模型服务商密钥。CLI：foxos model provider remove PROVIDER。限制：只有人（human 身份）能改。示例：foxos model provider remove typesafe
+
+只读：否 · 破坏性：否 · CLI：`foxos model provider remove`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `provider` | string | 是 | 服务商：deepseek / typesafe 可选：deepseek / typesafe |
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "model_provider_remove", "arguments": {"provider": "deepseek"}}
+```
+
+### `model_provider_test`
+
+用一次真实调用测试服务商（报状态和延迟）。CLI：foxos model provider test PROVIDER。示例：foxos model provider test deepseek
+
+只读：是 · 破坏性：否 · CLI：`foxos model provider test`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `provider` | string | 是 | 服务商：deepseek / typesafe 可选：deepseek / typesafe |
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "model_provider_test", "arguments": {"provider": "deepseek"}}
+```
+
 ## runtime（3 个工具）
 
 ### `runtime_list`
@@ -10378,6 +11606,162 @@ RGBA。CLI：foxos 3d rgba activate。界面：Compositing > main > RGBA。效�
 
 ```json
 {"name": "sheets_export", "arguments": {"file": "…", "output": "…"}}
+```
+
+## shell（8 个工具）
+
+### `shell_session_new`
+
+开一个持久终端会话。CLI：foxos shell session new [NAME] [--cwd CWD] [--isolation {light,none}] [--network] [--record] [--shared] [--env ENV]。限制：智能体的会话默认在轻量沙箱里：只能写工作空间、私有 HOME 与临时目录；起始目录必须在工作空间内；人工接管时 exec 返回 PAUSED。示例：foxos shell session new dev --cwd .
+
+只读：否 · 破坏性：否 · CLI：`foxos shell session new`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `name` | string |  | 会话名（缺省自动生成） |
+| `cwd` | string |  | 起始目录（工作空间内） |
+| `isolation` | string |  | 隔离：light（Landlock 沙箱，智能体默认）或 none（只有人能用） 可选：light / none |
+| `network` | boolean |  | 允许联网（缺省允许；--no-network 断网） |
+| `record` | boolean |  | 录制为 asciicast（缺省录制；--no-record 不录） |
+| `shared` | boolean |  | 其他智能体也能用这个会话 |
+| `env` | object |  | 额外环境变量 KEY=VALUE |
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "shell_session_new", "arguments": {}}
+```
+
+### `shell_session_exec`
+
+在会话里执行命令，返回输出、退出码、用时与当前目录。CLI：foxos shell session exec SESSION COMMAND [--timeout TIMEOUT] [--max-output MAX_OUTPUT]。限制：超时返回 timed_out=true，命令继续运行；同一会话一次只跑一条命令。示例：foxos shell session exec dev 'python3 -m venv .venv && . .venv/bin/activate'
+
+只读：否 · 破坏性：否 · CLI：`foxos shell session exec`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `session` | string | 是 | 会话名 |
+| `command` | string | 是 | 要执行的命令（bash，可多行） |
+| `timeout` | number |  | 最多等待秒数；超时不杀进程 |
+| `max_output` | integer |  | 输出最多返回多少字符（超出时保留开头与结尾） |
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "shell_session_exec", "arguments": {"session": "…", "command": "…"}}
+```
+
+### `shell_session_wait`
+
+继续等待超时的命令。CLI：foxos shell session wait SESSION [--id ID] [--timeout TIMEOUT] [--max-output MAX_OUTPUT]。示例：foxos shell session wait dev --timeout 300
+
+只读：是 · 破坏性：否 · CLI：`foxos shell session wait`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `session` | string | 是 | 会话名 |
+| `id` | string |  | 命令 id（exec 返回） |
+| `timeout` | number |  | 最多等待秒数；超时不杀进程 |
+| `max_output` | integer |  | 输出最多返回多少字符（超出时保留开头与结尾） |
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "shell_session_wait", "arguments": {"session": "…"}}
+```
+
+### `shell_session_read`
+
+读会话屏幕或输出日志。CLI：foxos shell session read SESSION [--mode {screen,log}] [--lines LINES] [--since SINCE]。示例：foxos shell session read dev
+
+只读：是 · 破坏性：否 · CLI：`foxos shell session read`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `session` | string | 是 | 会话名 |
+| `mode` | string |  | screen：当前屏幕；log：输出日志 可选：screen / log |
+| `lines` | integer |  | 行数 |
+| `since` | integer |  | 从日志的这个字节位置读起（log 模式） |
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "shell_session_read", "arguments": {"session": "…"}}
+```
+
+### `shell_session_send-keys`
+
+向会话发送按键或文字（交互程序、Ctrl-C）。CLI：foxos shell session send-keys SESSION [KEY...] [--text TEXT] [--enter]。示例：foxos shell session send-keys dev C-c
+
+只读：否 · 破坏性：否 · CLI：`foxos shell session send-keys`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `session` | string | 是 | 会话名 |
+| `keys` | array |  | tmux 按键名：C-c、Enter、Up、Tab、q … |
+| `text` | string |  | 原样输入的文字 |
+| `enter` | boolean |  | 最后按回车 |
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "shell_session_send-keys", "arguments": {"session": "…"}}
+```
+
+### `shell_session_kill`
+
+结束会话。CLI：foxos shell session kill SESSION。示例：foxos shell session kill dev
+
+只读：否 · 破坏性：否 · CLI：`foxos shell session kill`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `session` | string | 是 | 会话名 |
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "shell_session_kill", "arguments": {"session": "…"}}
+```
+
+### `shell_session_list`
+
+列出终端会话。CLI：foxos shell session list。示例：foxos shell session list --json
+
+只读：是 · 破坏性：否 · CLI：`foxos shell session list`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "shell_session_list", "arguments": {}}
+```
+
+### `shell_session_history`
+
+会话里执行过的命令（退出码、用时）与录制文件。CLI：foxos shell session history SESSION [--limit LIMIT]。示例：foxos shell session history dev
+
+只读：是 · 破坏性：否 · CLI：`foxos shell session history`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `session` | string | 是 | 会话名 |
+| `limit` | integer |  | 最多返回几条 |
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "shell_session_history", "arguments": {"session": "…"}}
 ```
 
 ## slides（6 个工具）

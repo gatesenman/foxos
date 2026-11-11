@@ -1,4 +1,4 @@
-"""US-134：宿主应用里的智能体只在狐狸OS 虚拟电脑里动手。
+"""US-155：宿主应用里的智能体只在狐狸OS 虚拟电脑里动手。
 
 FOXOS_PLACE=host 模拟宿主（Windows 伴侣程序等）；被控的“虚拟电脑”是另一个 machine serve，FOXOS_PLACE=foxos。
 - 默认：智能体对本机的任何调用（读也算）被拒绝，提示改用虚拟电脑；人照常可用。
@@ -23,7 +23,7 @@ class Host(Node):
         return _env({"FOXOS_HOME": str(self.home), **HOST, **(extra or {})})
 
 
-def test_US134_place_detection(tmp_path, monkeypatch):
+def test_US155_place_detection(tmp_path, monkeypatch):
     from foxos import hostguard
     rel = tmp_path / "os-release"
     rel.write_text('NAME="狐狸OS"\nID=foxos\nID_LIKE="ubuntu debian"\n')
@@ -38,7 +38,7 @@ def test_US134_place_detection(tmp_path, monkeypatch):
     assert not hostguard.on_host()
 
 
-def test_US134_bots_act_in_the_vm_never_on_the_host(tmp_path):
+def test_US155_bots_act_in_the_vm_never_on_the_host(tmp_path):
     host = Host(tmp_path, "host")
     vm = Node(tmp_path, "foxos-vm")  # FOXOS_PLACE=foxos（conftest 默认）
     vm.serve()
@@ -92,7 +92,7 @@ def _send_answering(host: Host, bot: str, text: str, allow: bool):
     return json.loads(out)["result"]["reply"], seen
 
 
-def test_US134_opt_in_host_execution_asks_per_action(tmp_path):
+def test_US155_opt_in_host_execution_asks_per_action(tmp_path):
     host = Host(tmp_path, "host")
     host.ok("bot", "host-access", "enable")
     # 已有“全部允许”规则也不能代替人逐个确认

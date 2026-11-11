@@ -8,6 +8,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
+from ..errors import FoxError
 from ..i18n import tr
 from ..kernel import Command, Context, Param, register, register_app
 from ..session import get_backend
@@ -97,8 +98,13 @@ def desktop_key(ctx: Context, keys: str) -> dict:
     return {"message": tr("desktop.sent_keys", keys), **r}
 
 
-def desktop_click(ctx: Context, x: int, y: int, button: int = 1) -> dict:
+def desktop_click(ctx: Context, x: int | None = None, y: int | None = None, button: int = 1, element: str | None = None) -> dict:
     _claim(ctx)
+    if element:
+        return element_click(ctx, element)
+    if x is None or y is None:
+        from ..errors import FoxError
+        raise FoxError("USAGE", tr("a11y.click_needs_target"))
     r = _backend(ctx).click(int(x), int(y), int(button or 1))
     return {"message": tr("desktop.clicked", x, y, button or 1), **r}
 
@@ -167,9 +173,10 @@ def _register_for(app: str) -> None:
                      params=[Param("keys", "string", tr("desktop.key_names_for_example_return_or"), required=True, positional=True, metavar="KEYS")],
                      examples=[f"foxos {app} key Return", f"foxos {app} key ctrl+c"], permission="modify"))
     register(Command(app, "click", tr("desktop.click_at_screen_coordinates"), desktop_click,
-                     params=[Param("x", "integer", tr("desktop.x_pixels"), required=True), Param("y", "integer", tr("desktop.y_pixels"), required=True),
-                             Param("button", "integer", tr("desktop.mouse_button_1_left_2_middle_3"), default=1)],
-                     examples=[f"foxos {app} click --x 400 --y 300"], permission="modify"))
+                     params=[Param("x", "integer", tr("desktop.x_pixels")), Param("y", "integer", tr("desktop.y_pixels")),
+                             Param("button", "integer", tr("desktop.mouse_button_1_left_2_middle_3"), default=1),
+                             Param("element", "string", tr("a11y.p_element"))],
+                     examples=[f"foxos {app} click --x 400 --y 300", f"foxos {app} click --element e12"], permission="modify"))
     register(Command(app, "screenshot", tr("desktop.capture_the_session"), desktop_screenshot,
                      params=[Param("path", "string", tr("desktop.workspace_relative_png_path"), path="write")],
                      examples=[f"foxos {app} screenshot --path shots/desk.png"], permission="read"))
@@ -188,7 +195,181 @@ def _register_for(app: str) -> None:
                      limits=[tr("system.only_the_human_identity_can_run_this")], permission="modify"))
 
 
+# ------------------------------------------------------------------ 无障碍树（agent-desktop 后端）与视觉定位
+# 主后端：Vercel Labs agent-desktop（AT-SPI，JSON 快照 + @快照:eN 引用，默认不动鼠标不抢焦点）。
+# 没有无障碍信息的程序退回截图 + xdotool：desktop click --x/--y、desktop type、desktop key、desktop ground（视觉定位）。
+
+def _ad():
+    from ..cu import agent_desktop
+    return agent_desktop
+
+
+def desktop_tree(ctx: Context, app: str | None = None, window_id: str | None = None, interactive: bool = False,
+                 max_depth: int = 14, offscreen: bool = False, full: bool = False) -> dict:
+    ad = _ad()
+    r = ad.snapshot(ctx.workspace, app=app, window_id=window_id, interactive=interactive, max_depth=max_depth)
+    if offscreen:
+        r["snapshot"] = ad.render(r["nodes"], hide_offscreen=False)
+    r["backend"] = ad.PIN
+    if not full:
+        r.pop("nodes", None)
+    return r
+
+
+def desktop_find(ctx: Context, role: str | None = None, name: str | None = None, app: str | None = None, regex: bool = False,
+                 limit: int = 20) -> dict:
+    import re as _re
+    ad = _ad()
+    nodes = ad.snapshot(ctx.workspace, app=app)["nodes"]
+    pat = _re.compile(name, _re.I) if (name and regex) else None
+    out = []
+    for n in nodes:
+        if not n.get("ref") or (role and n["role"] != role):
+            continue
+        if name and not (pat.search(n["name"]) if pat else name.lower() in n["name"].lower()):
+            continue
+        out.append({k: v for k, v in n.items() if k != "depth"})
+        if len(out) >= limit:
+            break
+    return {"count": len(out), "matches": out}
+
+
+def desktop_apps(ctx: Context) -> dict:
+    apps = _ad().apps()
+    return {"count": len(apps), "apps": apps}
+
+
+def _act(ctx: Context, action: str, ref: str, value: str | None = None, **kw) -> dict:
+    _claim(ctx)
+    r = _ad().act(ctx.workspace, action, ref, value, **kw)
+    return {"ref": ref, "action": action, "result": r}
+
+
+def element_click(ctx: Context, ref: str) -> dict:
+    r = _act(ctx, "click", ref)
+    r["message"] = tr("a11y.clicked", ref, "", "")
+    return r
+
+
+def element_focus(ctx: Context, ref: str) -> dict:
+    return _act(ctx, "focus", ref)
+
+
+def element_read(ctx: Context, ref: str, property: str = "text") -> dict:
+    r = _ad().act(ctx.workspace, "get", ref, property=property)
+    return {"ref": ref, "property": property, **(r if isinstance(r, dict) else {"value": r})}
+
+
+def element_set_text(ctx: Context, ref: str, text: str, append: bool = False) -> dict:
+    r = _act(ctx, "type" if append else "set-value", ref, text)
+    r["message"] = tr("a11y.set_text", ref, len(text))
+    return r
+
+
+def element_type(ctx: Context, ref: str, text: str) -> dict:
+    return _act(ctx, "type", ref, text)
+
+
+def element_select(ctx: Context, ref: str, value: str) -> dict:
+    return _act(ctx, "select", ref, value)
+
+
+def element_scroll(ctx: Context, ref: str, direction: str = "down", amount: int = 3) -> dict:
+    return _act(ctx, "scroll", ref, direction=direction, amount=amount)
+
+
+ELEMENT_ACTIONS = ("double-click", "right-click", "triple-click", "toggle", "check", "uncheck", "expand", "collapse", "clear", "scroll-to")
+
+
+def element_action(ctx: Context, ref: str, name: str) -> dict:
+    if name not in ELEMENT_ACTIONS:
+        raise FoxError("USAGE", tr("a11y.bad_action", name, ", ".join(ELEMENT_ACTIONS)))
+    return _act(ctx, name, ref)
+
+
+def desktop_press(ctx: Context, keys: str, window_id: str | None = None, app: str | None = None) -> dict:
+    _claim(ctx)
+    return {"keys": keys, "result": _ad().press(keys, window_id, app)}
+
+
+def desktop_ground(ctx: Context, description: str, click: bool = False, kind: str | None = None, button: int = 1) -> dict:
+    """截图 → 视觉定位模型 → 坐标（可直接点击）。给没有无障碍信息的程序用。"""
+    import tempfile
+    from ..cu import grounding
+    with tempfile.TemporaryDirectory() as td:
+        shot = Path(td) / "screen.png"
+        _backend(ctx).screenshot(shot)
+        png = shot.read_bytes()
+    r = grounding.ground(png, description, kind=kind)
+    r["description"] = description
+    if click:
+        _claim(ctx)
+        _backend(ctx).click(int(r["x"]), int(r["y"]), int(button or 1))
+        r["clicked"] = True
+        r["message"] = tr("a11y.ground_clicked", description, r["x"], r["y"])
+    return r
+
+
+def _register_a11y(app: str) -> None:
+    REF = Param("ref", "string", tr("a11y.p_ref"), required=True, positional=True, metavar="REF")
+    register(Command(app, "tree", tr("a11y.c_tree"), desktop_tree,
+                     params=[Param("app", "string", tr("a11y.p_app")), Param("window_id", "string", tr("a11y.p_window_id")),
+                             Param("interactive", "boolean", tr("a11y.p_interactive"), default=False),
+                             Param("max_depth", "integer", tr("a11y.p_max_depth"), default=14),
+                             Param("offscreen", "boolean", tr("a11y.p_offscreen"), default=False),
+                             Param("full", "boolean", tr("a11y.p_full"), default=False)],
+                     examples=[f"foxos {app} tree", f"foxos {app} tree --app mousepad --json"],
+                     limits=[tr("a11y.l_tree")], permission="read", audited=False))
+    register(Command(app, "find", tr("a11y.c_find"), desktop_find,
+                     params=[Param("role", "string", tr("a11y.p_role")), Param("name", "string", tr("a11y.p_name")),
+                             Param("app", "string", tr("a11y.p_app")), Param("regex", "boolean", tr("a11y.p_regex"), default=False),
+                             Param("limit", "integer", tr("a11y.p_limit"), default=20)],
+                     examples=[f"foxos {app} find --role button --name Save", f"foxos {app} find --app mousepad --role textfield"],
+                     permission="read", audited=False))
+    register(Command(app, "apps", tr("a11y.c_apps"), desktop_apps, examples=[f"foxos {app} apps --json"], permission="read", audited=False))
+    register(Command(app, "press", tr("a11y.c_press"), desktop_press,
+                     params=[Param("keys", "string", tr("a11y.p_keys"), required=True, positional=True, metavar="COMBO"),
+                             Param("window_id", "string", tr("a11y.p_window_id")),
+                             Param("app", "string", tr("a11y.p_app"))],
+                     examples=[f"foxos {app} press ctrl+s"], permission="modify"))
+    register(Command(app, "element click", tr("a11y.c_click"), element_click, params=[REF],
+                     examples=[f"foxos {app} element click e12"], permission="modify"))
+    register(Command(app, "element focus", tr("a11y.c_focus"), element_focus, params=[REF],
+                     examples=[f"foxos {app} element focus e7"], permission="modify"))
+    register(Command(app, "element read", tr("a11y.c_read"), element_read,
+                     params=[REF, Param("property", "string", tr("a11y.p_property"), enum=["text", "value", "title", "bounds", "role", "states"],
+                                        default="text")],
+                     examples=[f"foxos {app} element read e7"], permission="read"))
+    register(Command(app, "element set-text", tr("a11y.c_set_text"), element_set_text,
+                     params=[REF, Param("text", "string", tr("a11y.p_text"), required=True, positional=True, metavar="TEXT", cli_stdin=True),
+                             Param("append", "boolean", tr("a11y.p_append"), default=False)],
+                     examples=[f"foxos {app} element set-text e7 'hello'"], permission="modify"))
+    register(Command(app, "element type", tr("a11y.c_type"), element_type,
+                     params=[REF, Param("text", "string", tr("a11y.p_text"), required=True, positional=True, metavar="TEXT", cli_stdin=True)],
+                     examples=[f"foxos {app} element type e7 'more text'"], permission="modify"))
+    register(Command(app, "element select", tr("a11y.c_select"), element_select,
+                     params=[REF, Param("value", "string", tr("a11y.p_value"), required=True, positional=True, metavar="VALUE")],
+                     examples=[f"foxos {app} element select e9 'UTF-8'"], permission="modify"))
+    register(Command(app, "element scroll", tr("a11y.c_scroll"), element_scroll,
+                     params=[REF, Param("direction", "string", tr("a11y.p_direction"), enum=["up", "down", "left", "right"], default="down"),
+                             Param("amount", "integer", tr("a11y.p_amount"), default=3)],
+                     examples=[f"foxos {app} element scroll e30 --direction down"], permission="modify"))
+    register(Command(app, "element action", tr("a11y.c_action"), element_action,
+                     params=[REF, Param("name", "string", tr("a11y.p_action_name"), required=True, positional=True, metavar="ACTION",
+                                        enum=list(ELEMENT_ACTIONS))],
+                     examples=[f"foxos {app} element action e9 toggle"], permission="modify"))
+    register(Command(app, "ground", tr("a11y.c_ground"), desktop_ground,
+                     params=[Param("description", "string", tr("a11y.p_description"), required=True, positional=True, metavar="DESCRIPTION"),
+                             Param("click", "boolean", tr("a11y.p_click"), default=False),
+                             Param("kind", "string", tr("a11y.p_kind"), enum=["vlm", "ui-tars", "omniparser", "typesafe"]),
+                             Param("button", "integer", tr("desktop.mouse_button_1_left_2_middle_3"), default=1)],
+                     examples=[f"foxos {app} ground 'the Save button in the toolbar' --click"],
+                     limits=[tr("a11y.l_ground")], permission="modify"))
+
+
 register_app("desktop", tr("desktop.real_desktop_session"), tr("desktop.list_focus_move_and_input_on_the"))
 register_app("session", tr("desktop.real_desktop_session"), tr("desktop.list_focus_move_and_input_on_the"))
 _register_for("desktop")
 _register_for("session")
+_register_a11y("desktop")
+_register_a11y("session")

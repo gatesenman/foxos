@@ -101,8 +101,11 @@ def _add_command(sub, cmd, parents):
                 continue
             if prm.type == "array":
                 kw["nargs"] = "*" if not prm.required else "+"
-            elif not prm.required:
+            elif not prm.required or prm.cli_stdin:
                 kw["nargs"] = "?"
+            if prm.cli_stdin:  # 位置参数也可以从标准输入读（大文本、密钥）：--<name>-stdin
+                p.add_argument(f"--{prm.name.replace('_', '-')}-stdin", dest=f"{DEST}{prm.name}__stdin",
+                               action="store_true", help=tr("cli.read_from_standard_input", prm.name))
             p.add_argument(DEST + prm.name, metavar=prm.metavar or prm.name.upper(), **kw)
             continue
         flags = [prm.flag] + ([prm.cli_short] if prm.cli_short else [])
@@ -194,6 +197,11 @@ def build_parser() -> argparse.ArgumentParser:
         bs.add_argument("--open", action="store_true", help=tr("cli.bot_serve_open"))
         bs.add_argument("--ready-file", default=None, metavar="PATH", help=tr("cli.bot_serve_ready"))
         bs.set_defaults(_special="bot-serve")
+    if "acp" in app_subs:
+        # 只在命令行：在本机启动一个已安装的 ACP 智能体并把 stdio 直接交给调用者（桌面客户端经 SSH 在狐狸OS 电脑里运行智能体）
+        st = app_subs["acp"].add_parser("stdio", help=tr("cli.acp_stdio"), parents=parents)
+        st.add_argument("acp_id", metavar="AGENT")
+        st.set_defaults(_special="acp-stdio")
     if "machine" in app_subs:
         ms = app_subs["machine"].add_parser("serve", help=tr("cli.machine_serve"), parents=parents)
         ms.add_argument("--listen", default="0.0.0.0:7443", metavar="HOST:PORT")
@@ -268,6 +276,8 @@ def print_human(cmd_id: str, result: dict) -> None:
         for a in result["apps"]:
             print(tr("cli.ops", tr("cli.installed") if a['installed'] else tr("cli.not_installed"), a['group_name'], a['id'], a['name'], a['license'], a['ops']), file=out)
         print(tr("cli.in_total_installed_upstream", result['count'], result['installed'], result['commit'][:8]), file=out)
+    if isinstance(result.get("snapshot"), str) and cmd_id.endswith((".tree", "browser.snapshot")):
+        print(result["snapshot"], file=out)
     if cmd_id.endswith(".ui.snapshot"):
         print(f"# {result['title']}  {result['url']}", file=out)
         for e in result["elements"]:
@@ -324,7 +334,15 @@ def print_human(cmd_id: str, result: dict) -> None:
             print("  skills: " + ", ".join(r["skills_used"]), file=out)
         print(r.get("text", ""), file=out)
         return
-    if cmd_id.split(".")[0] in ("bot", "connector", "machine", "runtime", "acp") and not result.get("message"):
+    if isinstance(result.get("checks"), list):
+        for c in result["checks"]:
+            mark = "+" if c.get("ok") else ("-" if c.get("required") else "~")
+            print(f"{mark} {c.get('check')}: {c.get('detail') or ''}" + ("" if c.get("ok") or not c.get("hint") else f"  ({c['hint']})"), file=out)
+        for k, v in result.items():
+            if k not in ("checks", "ok") and v not in (None, [], {}):
+                print(f"  {k}: {json.dumps(v, ensure_ascii=False) if isinstance(v, (dict, list)) else v}", file=out)
+        return
+    if cmd_id.split(".")[0] in ("bot", "connector", "machine", "runtime", "acp", "computer") and not result.get("message"):
         print(json.dumps(result, ensure_ascii=False, indent=2, default=str), file=out)
         return
     skip = {"message", "rows", "values", "charts", "files", "entries", "tasks", "note", "content", "stdout", "stderr", "apps", "envs", "elements"}
@@ -396,6 +414,14 @@ def main(argv: list[str] | None = None) -> int:
             host, _, port = ns.listen.rpartition(":")
             return bot_serve(ws, host or "127.0.0.1", int(port or 0), token=ns.token or os.environ.get("FOXOS_BOTS_TOKEN"),
                              open_ui=ns.open, ready_file=ns.ready_file)
+        if special == "acp-stdio":
+            from .apps import acp as acp_app
+            info = acp_app.installed_info(ns.acp_id)
+            if not info:
+                raise FoxError("NOT_FOUND", tr("acp.not_installed", ns.acp_id), hint=f"foxos acp agent install {ns.acp_id}")
+            env = {**os.environ, **acp_app.agent_env(ns.acp_id, info), "FOXOS_WORKSPACE": str(ws.root), "FOXOS_AGENT": f"acp:{ns.acp_id}"}
+            os.chdir(ws.root)
+            os.execvpe(info["command"], [info["command"], *(info.get("args") or [])], env)
         if special == "machine-serve":
             from .machines import serve as machine_serve
             host, _, port = ns.listen.rpartition(":")

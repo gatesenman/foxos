@@ -56,6 +56,8 @@ def _cfg_params(with_name: bool) -> list[Param]:
         Param("delegate_to", "array", tr("bot.p_delegate_to"), items={"type": "string"}),
         Param("max_depth", "integer", tr("bot.p_max_depth")),
         Param("max_per_turn", "integer", tr("bot.p_max_per_turn")),
+        Param("cu_surface", "string", tr("bot.p_cu_surface"), enum=list(bots.CU_SURFACES)),
+        Param("cu_step_policy", "string", tr("bot.p_cu_step_policy"), enum=list(bots.CU_POLICIES)),
     ]
     return ps
 
@@ -124,6 +126,13 @@ def _patch(cur: dict | None, a: dict) -> dict:
         if a.get("max_per_turn") is not None:
             dl["max_per_turn"] = a["max_per_turn"]
         p["delegation"] = dl
+    if a.get("cu_surface") or a.get("cu_step_policy"):
+        cu = dict(cur.get("computer_use") or {"surface": "auto", "step_policy": "auto"})
+        if a.get("cu_surface"):
+            cu["surface"] = a["cu_surface"]
+        if a.get("cu_step_policy"):
+            cu["step_policy"] = a["cu_step_policy"]
+        p["computer_use"] = cu
     return {k: v for k, v in p.items() if v is not None}
 
 

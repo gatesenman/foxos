@@ -166,7 +166,17 @@ def _summary(cfg: dict) -> dict:
             "workspace": cfg.get("workspace"), "limits": cfg.get("limits"), "mounts": cfg.get("mounts", []), "created": cfg.get("created"),
             "snapshots": len(cfg.get("snapshots", [])), "actions": list((cfg.get("actions") or {}).keys()),
             "catalog_id": cfg.get("catalog_id"), "guest_os": cfg.get("guest_os", "linux"), "provider": cfg.get("provider", cfg.get("backend", BACKEND)),
-            "ssh": _ssh_summary(cfg)}
+            "ssh": _ssh_summary(cfg), "console": _console_summary(cfg)}
+
+
+def _console_summary(cfg: dict) -> dict | None:
+    """虚拟机控制台（QEMU -vnc，只听本机回环）：桌面客户端用它显示虚拟机画面。"""
+    f = env_dir(cfg["name"]) / "run" / "display.json"
+    try:
+        c = json.loads(f.read_text(encoding="utf-8")).get("console") if f.exists() else None
+    except (OSError, ValueError):
+        c = None
+    return c if isinstance(c, dict) and c.get("port") else None
 
 
 def _ssh_summary(cfg: dict) -> dict | None:
@@ -181,7 +191,7 @@ def _ssh_summary(cfg: dict) -> dict | None:
     port = (s or {}).get("port") or cfg.get("ssh_port")
     key = (cfg.get("ssh") or {}).get("key")
     user = (cfg.get("ssh") or {}).get("user") or "foxos"
-    return {"port": port, "user": user, "exposed": bool(cfg.get("ssh_expose")), "bind": (s or {}).get("bind") or "127.0.0.1",
+    return {"port": port, "user": user, "key": key, "exposed": bool(cfg.get("ssh_expose")), "bind": (s or {}).get("bind") or "127.0.0.1",
             "command": f"ssh -p {port} {('-i ' + key + ' ') if key else ''}{user}@127.0.0.1" if port else None}
 
 

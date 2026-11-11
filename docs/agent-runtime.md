@@ -30,6 +30,7 @@
 | Qwen Code（带 ACP） | 0.27.2 | iso | Apache-2.0 | npm |
 | opencode（带 ACP） | 2.2.7 | iso | MIT | GitHub 发布 |
 | agent-desktop（Vercel，电脑操作；与 Jev 一起是默认的 computer-use 栈） | 1.2.0 | iso | Apache-2.0 | npm `agent-desktop`（官方预编译 linux-x64 二进制；声明见 `/usr/share/doc/foxos/NOTICE.agent-desktop`） |
+| agent-browser（Vercel，浏览器操控兜底，经 CDP 连自带 Chrome） | 0.42.0 | iso | Apache-2.0 | npm `agent-browser`（官方预编译二进制；声明见 `/usr/share/doc/foxos/NOTICE.agent-browser`） |
 | Aider | 0.86.2 | firstboot | Apache-2.0 | PyPI（uv tool；体积大、依赖多，不进镜像） |
 | Claude Code | 2.1.322 | firstboot | 专有（Anthropic 商业条款） | npm，用户同意后 |
 | claude-agent-acp | 0.106.0 | firstboot | 专有（注册表元数据） | GitHub 发布，用户同意后 |

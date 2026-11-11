@@ -28,6 +28,12 @@ gtk-update-icon-cache -f /usr/share/icons/hicolor 2>/dev/null || true
 install -d /usr/share/doc/foxos
 install -m 644 /usr/lib/foxos/python/foxos/data/pstack/NOTICE /usr/share/doc/foxos/NOTICE.pstack
 install -m 644 /usr/lib/foxos/python/foxos/botchat/static/vendor/tabler/LICENSE /usr/share/doc/foxos/LICENSE.tabler-icons
+# agent-browser（Vercel，Apache-2.0）：浏览器操控兜底，经 CDP 连自带 Chrome（运行环境清单 iso 阶段装）
+cat > /usr/share/doc/foxos/NOTICE.agent-browser <<'N'
+agent-browser 0.42.0 — https://github.com/vercel-labs/agent-browser (npm: agent-browser)
+Copyright Vercel, Inc. and the agent-browser contributors.
+Licensed under the Apache License, Version 2.0; the full text ships in the npm package (LICENSE).
+N
 # agent-desktop（Vercel，Apache-2.0）：默认的电脑操作（computer use）栈，适配代码在 foxos 的 computer-use 部分
 cat > /usr/share/doc/foxos/NOTICE.agent-desktop <<'N'
 agent-desktop 1.2.0 — https://github.com/vercel-labs/agent-desktop (npm: agent-desktop)

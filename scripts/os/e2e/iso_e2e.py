@@ -2,7 +2,7 @@
 """在真实启动的狐狸OS ISO 上跑端到端用例（US-65），结果写进 JSON，再生成 docs/test-report.md 的一节。
 
 用法（宿主机，Linux + qemu）：
-  FOXOS_E2E_ACCEL=tcg python3 scripts/os/e2e/iso_e2e.py boot  --iso build/os/FoxOS-0.3.2-amd64.iso
+  FOXOS_E2E_ACCEL=tcg python3 scripts/os/e2e/iso_e2e.py boot  --iso build/os/FoxOS-0.3.3-amd64.iso
   python3 scripts/os/e2e/iso_e2e.py run ssh foxos_over_ssh runtime acp desktop chrome bots preset
   python3 scripts/os/e2e/iso_e2e.py install        # Calamares 装到虚拟磁盘（图形界面里按键操作）
   python3 scripts/os/e2e/iso_e2e.py boot --disk    # 从装好的磁盘启动（不挂 ISO）
@@ -236,7 +236,7 @@ def case_ssh() -> str:
     assert bad2.returncode != 0 and "LOGGED-IN" not in bad2.stdout
     root = subprocess.run(ssh_base("root") + ["true"], capture_output=True, text=True, timeout=60)
     assert root.returncode != 0, "root 用密钥登录成功了"
-    fw = ssh("LC_ALL=C sudo -n ufw status", check=True).stdout
+    fw = ssh("sudo -n env LANGUAGE=C LC_ALL=C ufw status", check=True).stdout
     assert "Status: active" in fw and "22/tcp" in fw, fw
     live = "passwordauthentication yes" in eff
     msg = f"开机后 {took:.0f}s 密钥登录成功；sshd -T：{' '.join(eff.split())}；默认 / 错误密码被拒；root 被拒；ufw active 放行 22/tcp"
@@ -269,7 +269,7 @@ def case_foxos_over_ssh() -> str:
     tools = {t["name"] for t in replies[2]["result"]["tools"]}
     assert {"ssh_status", "env_catalog", "bot_message_send"} <= tools, sorted(tools)[:20]
     assert not replies[3]["result"].get("isError"), replies[3]
-    return f"{v}；foxos ssh status：active、root_login=false、password_login={st['password_login']}；MCP over SSH：{len(tools)} 个工具，tools/call ssh_status 成功"
+    return f"{v}；foxos ssh status：active、root_login={st['root_login']}、password_login={st['password_login']}；MCP over SSH：{len(tools)} 个工具，tools/call ssh_status 成功"
 
 
 def case_runtime() -> str:
@@ -295,12 +295,13 @@ def case_acp() -> str:
 def case_desktop() -> str:
     shot = WORK / f"e2e-desktop-{int(time.time())}.png"
     st = j(ssh("foxos desktop status --json", check=True))["result"]
-    ssh("foxos desktop launch -- xfce4-terminal -T foxos-e2e-term", check=True)
+    title = f"foxos-e2e-term-{int(time.time())}"
+    ssh(f"foxos desktop launch -- xfce4-terminal -T {title}", check=True)
     ok = False
     for _ in range(40):
         w = j(ssh("foxos desktop windows --json", check=True))["result"]
         wins = w.get("windows", w if isinstance(w, list) else [])
-        hit = [x for x in wins if "foxos-e2e-term" in (x.get("title") or "")]
+        hit = [x for x in wins if title in (x.get("title") or "")]
         if hit:
             ok = True
             break
@@ -311,12 +312,15 @@ def case_desktop() -> str:
     ssh("foxos desktop type 'echo FOXOS-E2E-TYPED'", check=True)
     ssh("foxos desktop key Return", check=True)
     time.sleep(5)
-    ssh(f"foxos desktop screenshot --path {shlex.quote('/tmp/' + shot.name)}", check=True)
+    ssh(f"foxos desktop screenshot --path shots/{shot.name}", check=True)
     screendump(shot)
     ssh(f"foxos desktop close {shlex.quote(wid)}", check=True)
-    time.sleep(5)
-    left = j(ssh("foxos desktop windows --json", check=True))["result"]
-    assert "foxos-e2e-term" not in json.dumps(left, ensure_ascii=False)
+    for _ in range(24):
+        time.sleep(5)
+        left = j(ssh("foxos desktop windows --json", check=True))["result"]
+        if title not in json.dumps(left, ensure_ascii=False):
+            break
+    assert title not in json.dumps(left, ensure_ascii=False), "关闭后窗口还在"
     return f"desktop status：{json.dumps(st, ensure_ascii=False)[:160]}；launch → windows 里出现 → focus → type → key → screenshot → close 全部成功", [str(shot)]
 
 
@@ -349,13 +353,13 @@ def case_bots() -> str:
     # 「智能体」窗口启动
     ssh("foxos desktop launch -- foxos-bots", check=True)
     seen = ""
-    for _ in range(60):
-        w = ssh("foxos desktop windows --json").stdout
-        m = re.search(r'"title":\s*"([^"]*(智能体|Bots|FoxOS Bots)[^"]*)"', w)
-        if m:
-            seen = m.group(1)
+    for _ in range(90):
+        # 「智能体」窗口是 Chrome 的 --app 窗口，WM_CLASS 为 foxos-bots（首次登录的「安装智能体命令行」对话框不算）
+        w = ssh("wmctrl -lx | grep -i 'foxos-bots' | head -1").stdout.strip()
+        if w:
+            seen = w.split(None, 4)[-1]
             break
-        time.sleep(5)
+        time.sleep(10)
     assert seen, "智能体窗口没有出现"
     shot = screendump(WORK / f"e2e-bots-{int(time.time())}.png")
     ssh("foxos bot profile delete e2e-opencode --json >/dev/null 2>&1; true")
@@ -454,7 +458,7 @@ def case_install() -> str:
            _x("xdotool search --class calamares 2>/dev/null").stdout.strip():
             break
         time.sleep(5)
-    shots = []
+    shots: list[str] = []
     for kind, arg in CAL_STEPS:
         if kind == "wait":
             time.sleep(20)
@@ -462,6 +466,8 @@ def case_install() -> str:
             time.sleep(arg)
         elif kind == "key":
             _x("w=$(xdotool search --class calamares | tail -1); xdotool windowactivate --sync $w; xdotool key --clearmodifiers " + arg)
+            time.sleep(5)
+            shots.append(str(screendump(WORK / f"e2e-cal-{len(shots):02d}-{int(time.time())}.png")))
         elif kind == "users":
             shots.append(str(screendump(WORK / f"e2e-cal-users-{int(time.time())}.png")))
             pw = shlex.quote(INSTALL_PW)
@@ -493,6 +499,12 @@ CASES = {"ssh": case_ssh, "foxos_over_ssh": case_foxos_over_ssh, "runtime": case
 
 def run(names: list[str]) -> int:
     bad = 0
+    if os.environ.get("FOXOS_E2E_QUIET", "1") == "1" and names != ["ssh"] and names != ["installed_ssh"]:
+        # TCG 下每分钟一次的例程定时器（每次启动一个 Python）会占满来宾 CPU；测试期间停掉（不影响被测功能）
+        try:
+            ssh("systemctl --user stop foxos-bots-routines.timer 2>/dev/null; true", timeout=900)
+        except subprocess.TimeoutExpired:
+            pass
     for n in names:
         started = now()
         log(f"开始 {n}")
@@ -547,7 +559,7 @@ def main() -> int:
     rec = sub.add_parser("record"); rec.add_argument("case"); rec.add_argument("status", choices=["PASS", "FAIL"]); rec.add_argument("started"); rec.add_argument("detail")
     rec.add_argument("--evidence", action="append", default=[])
     sub.add_parser("stop"); sub.add_parser("shot")
-    rp = sub.add_parser("report"); rp.add_argument("path"); rp.add_argument("--heading", default="0.3.2 ISO 端到端（US-65）")
+    rp = sub.add_parser("report"); rp.add_argument("path"); rp.add_argument("--heading", default="0.3.3 ISO 端到端（US-65）")
     a = ap.parse_args()
     if a.cmd == "boot":
         if not a.disk and not a.iso:

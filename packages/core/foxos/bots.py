@@ -155,6 +155,10 @@ def _slug(name: str) -> str:
     return s or "bot-" + uuid.uuid4().hex[:6]
 
 
+CU_SURFACES = ("auto", "a11y", "screen", "browser")
+CU_POLICIES = ("auto", "typesafe", "deepseek")
+
+
 def validate_patch(ws, patch: dict, cur: dict | None = None) -> dict:
     out = {}
     for k, v in patch.items():
@@ -238,6 +242,13 @@ def validate_patch(ws, patch: dict, cur: dict | None = None) -> dict:
             if dflt != machines.LOCAL and dflt not in reg:
                 raise FoxError("NOT_FOUND", tr("machines.no_such_machine", dflt))
             out[k] = {"default": dflt, "allowed": allowed}
+        elif k == "computer_use":
+            # 电脑操控：默认 agent-desktop + Jev；截图（screen）和浏览器（browser）是兜底，也可以按机器人手动指定
+            surf = v.get("surface", "auto")
+            pol = v.get("step_policy", "auto")
+            if surf not in CU_SURFACES or pol not in CU_POLICIES:
+                raise FoxError("USAGE", tr("bots.bad_computer_use", ", ".join(CU_SURFACES), ", ".join(CU_POLICIES)))
+            out[k] = {"surface": surf, "step_policy": pol}
         elif k == "approvals":
             mode = v.get("mode", "ask")
             if mode not in APPROVAL_MODES:
@@ -964,6 +975,11 @@ def _run_acp(ws, bot, turn: _Turn, text, skill_block, envelope, attachments, ide
     mcp_env = {"FOXOS_BOT_DEPTH": str(turn.depth), "FOXOS_BOT_TURN": turn.turn, "FOXOS_BOT_MACHINE": turn.machine,
                "FOXOS_BOT_MACHINES": ",".join(mach.get("allowed") or [machines.LOCAL]), "FOXOS_TASK": f"turn:{turn.turn}",
                **({"FOXOS_BOT_APPROVE": approval_mode} if approval_mode in ("allow", "deny") else {})}
+    cu = bot.get("computer_use") or {}
+    if cu.get("surface", "auto") != "auto":
+        mcp_env["FOXOS_CU_SURFACE"] = cu["surface"]
+    if cu.get("step_policy", "auto") != "auto":
+        mcp_env["FOXOS_CU_POLICY"] = cu["step_policy"]
     keep = keep and not approval_mode  # 带一次性审批方式的轮次不复用连接（MCP 环境变量随连接固定）
     pooled = None
     with _pool_lock:

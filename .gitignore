@@ -18,3 +18,4 @@ Thumbs.db
 # 安装包（scripts/packaging/collect-artifacts.sh 的输出）
 /out/
 /dist-*/
+scripts/os/e2e/__pycache__/
