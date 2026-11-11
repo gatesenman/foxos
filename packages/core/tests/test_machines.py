@@ -85,7 +85,7 @@ def pair(host: Node, ctl: Node, name: str):
     return code
 
 
-def test_US75_pairing_code_fingerprint_and_mutual_tls(net):
+def test_US113_pairing_code_fingerprint_and_mutual_tls(net):
     alpha, beta, ctl = net
     # 指纹不对：拒绝（防中间人），什么都不登记
     code = alpha.ok("machine", "host", "code")
@@ -135,7 +135,7 @@ def test_US75_pairing_code_fingerprint_and_mutual_tls(net):
     assert p["ok"] and p["host"] == "alpha-host" and p["client"] == "ctl"
 
 
-def test_US76_one_bot_controls_two_foxos_machines(net):
+def test_US114_one_bot_controls_two_foxos_machines(net):
     alpha, beta, ctl = net
     pair(alpha, ctl, "alpha")
     pair(beta, ctl, "beta")
@@ -177,7 +177,7 @@ def test_US76_one_bot_controls_two_foxos_machines(net):
     assert {"local", "alpha", "beta"} <= set(ms)
 
 
-def test_US77_many_bots_share_one_foxos_with_locks_conflict_and_takeover(net):
+def test_US115_many_bots_share_one_foxos_with_locks_conflict_and_takeover(net):
     alpha, _, ctl = net
     pair(alpha, ctl, "alpha")
     alpha.ok("machine", "host", "grant", "--client", "ctl", "--bot", "fox", "--permissions", "read,create,modify")
