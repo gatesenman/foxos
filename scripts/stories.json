@@ -32,6 +32,7 @@
   {"id": "US-48", "title": "Everything 游戏类应用", "match": [["e2e", "everything.e2e.js", "^US-48 "]]},
   {"id": "US-50", "title": "安装系统：目录与一键安装（Linux 宿主上真实安装 Alpine）", "match": [["e2e", "env-install.e2e.js", "^US-50"]]},
   {"id": "US-52", "title": "轻量隔离：Landlock + seccomp 真实限制；智能体在轻量沙箱中运行；Seatbelt / Windows 策略生成", "match": [["pytest", "test_sandbox.py", ""], ["e2e", "sandbox.e2e.js", "^US-52"]]},
-  {"id": "US-53", "title": "程序图标：每个程序显示其开源项目自带的图标（Everything 上游 / LibreOffice / 系统终端 / Code - OSS / Electron / ACP 注册表），缺失时退回并报告", "match": [["e2e", "icons.e2e.js", "^US-53"]]}
+  {"id": "US-53", "title": "程序图标：每个程序显示其开源项目自带的图标（Everything 上游 / LibreOffice / 系统终端 / Code - OSS / Electron / ACP 注册表），缺失时退回并报告", "match": [["e2e", "icons.e2e.js", "^US-53"]]},
+  {"id": "US-54", "title": "滚动条：外壳、应用 webview、Monaco、终端都用狐狸OS 细滚动条（轨道透明、平时隐藏、指向出现），截图逐像素检查", "match": [["e2e", "scrollbars.e2e.js", "^US-54"]]}
  ]
 }

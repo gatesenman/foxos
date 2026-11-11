@@ -65,6 +65,8 @@ function createWindow() {
   apps.onChange(() => send('office:changed'));
 }
 
+const SCROLLBAR_CSS = fs.readFileSync(path.join(__dirname, '..', 'scrollbars.css'), 'utf8');
+const SCROLLBAR_JS = fs.readFileSync(path.join(__dirname, '..', 'scrollbars.js'), 'utf8');
 // 浏览器 webview：禁止注入 preload、强制隔离
 app.on('web-contents-created', (_e, contents) => {
   contents.on('will-attach-webview', (_ev, webPreferences, params) => {
@@ -76,6 +78,13 @@ app.on('web-contents-created', (_e, contents) => {
     webPreferences.sandbox = true;
     if (!/^(https?:|about:blank|file:|foxapp:)/.test(params.src || 'about:blank')) _ev.preventDefault();
   });
+  // 每个应用 webview（Everything 应用、浏览器）注入狐狸OS 滚动条样式
+  if (contents.getType() === 'webview') {
+    contents.on('dom-ready', () => {
+      contents.insertCSS(SCROLLBAR_CSS).catch(() => {});
+      contents.executeJavaScript(SCROLLBAR_JS, false).catch(() => {});
+    });
+  }
   contents.setWindowOpenHandler(({ url }) => {
     if (contents.getType() === 'webview') { contents.loadURL(url); return { action: 'deny' }; }
     return { action: 'deny' };

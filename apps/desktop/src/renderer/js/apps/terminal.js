@@ -16,7 +16,8 @@
       const term = new window.Terminal({
         fontFamily: '"JetBrains Mono", "Cascadia Mono", "DejaVu Sans Mono", "Noto Sans Mono CJK SC", monospace',
         fontSize: 13, cursorBlink: true, allowProposedApi: true, scrollback: 5000,
-        theme: { background: '#0d1016', foreground: '#d7dae0', cursor: '#ff8a3d', selectionBackground: '#33415e' },
+        theme: { background: '#0d1016', foreground: '#d7dae0', cursor: '#ff8a3d', selectionBackground: '#33415e', scrollbarSliderBackground: 'rgba(128,134,150,.32)', scrollbarSliderHoverBackground: 'rgba(150,156,172,.6)', scrollbarSliderActiveBackground: 'rgba(255,138,61,.7)' },
+        overviewRuler: { width: 0 },
       });
       const fit = new window.FitAddon.FitAddon();
       term.loadAddon(fit);

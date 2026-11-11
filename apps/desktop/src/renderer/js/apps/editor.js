@@ -18,7 +18,7 @@
         window.require(['vs/editor/editor.main'], () => {
           window.monaco.editor.defineTheme('foxos', {
             base: 'vs-dark', inherit: true, rules: [],
-            colors: { 'editor.background': '#10131a', 'editorLineNumber.foreground': '#4a5163', 'editor.lineHighlightBackground': '#171b24' },
+            colors: { 'editor.background': '#10131a', 'editorLineNumber.foreground': '#4a5163', 'editor.lineHighlightBackground': '#171b24', 'scrollbar.shadow': '#00000000', 'scrollbarSlider.background': '#80869650', 'scrollbarSlider.hoverBackground': '#969cacA0', 'scrollbarSlider.activeBackground': '#ff8a3dB0', 'editorOverviewRuler.border': '#00000000' },
           });
           resolve(window.monaco);
         }, reject);
@@ -104,7 +104,7 @@
       }
 
       loadMonaco().then((m) => {
-        editor = m.editor.create(host, { value: '', language: 'plaintext', theme: 'foxos', automaticLayout: true, fontSize: 13, minimap: { enabled: false }, scrollBeyondLastLine: false, wordWrap: 'on' });
+        editor = m.editor.create(host, { value: '', language: 'plaintext', theme: 'foxos', automaticLayout: true, fontSize: 13, minimap: { enabled: false }, scrollBeyondLastLine: false, wordWrap: 'on', overviewRulerLanes: 0, hideCursorInOverviewRuler: true, scrollbar: { useShadows: false, verticalScrollbarSize: 10, horizontalScrollbarSize: 10, verticalSliderSize: 6, horizontalSliderSize: 6, vertical: 'auto', horizontal: 'auto' } });
         editor.onDidChangeModelContent(() => setDirty(editor.getModel().getAlternativeVersionId() !== savedVersion));
         editor.addCommand(m.KeyMod.CtrlCmd | m.KeyCode.KeyS, () => save());
         win.editor = editor;

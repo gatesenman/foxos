@@ -1,0 +1,23 @@
+/* 狐狸OS 滚动条：细、悬浮式（轨道透明）、平时隐藏，指向或滚动时出现，指向滑块时变宽。
+   桌面外壳直接引用；每个应用窗口 / webview（Everything 应用、浏览器）由主进程注入同一份样式。
+   不设置 scrollbar-width / scrollbar-color：Chromium 121+ 中它们一旦生效会覆盖 ::-webkit-scrollbar 的样式。 */
+:root {
+  --fx-sb-size: 10px;
+  --fx-sb-thumb: rgba(128, 134, 150, .42);
+  --fx-sb-thumb-hover: rgba(150, 156, 172, .7);
+  --fx-sb-thumb-active: rgba(255, 138, 61, .75);
+}
+@media (prefers-color-scheme: light) {
+  :root { --fx-sb-thumb: rgba(60, 64, 76, .32); --fx-sb-thumb-hover: rgba(60, 64, 76, .55); --fx-sb-thumb-active: rgba(230, 110, 30, .75); }
+}
+*::-webkit-scrollbar { width: var(--fx-sb-size); height: var(--fx-sb-size); background: transparent; }
+*::-webkit-scrollbar-track, *::-webkit-scrollbar-track-piece, *::-webkit-scrollbar-corner { background: transparent; border: 0; }
+*::-webkit-scrollbar-button { display: none; width: 0; height: 0; }
+/* 平时：滑块透明（自动隐藏）；3px 透明边 + padding-box 让可见部分只有 4px 宽 */
+*::-webkit-scrollbar-thumb { background-color: transparent; border: 3px solid transparent; background-clip: padding-box; border-radius: 999px; min-height: 32px; min-width: 32px; }
+/* 指向滚动区域或正在滚动：出现 */
+*:hover::-webkit-scrollbar-thumb, .fx-scrolling::-webkit-scrollbar-thumb, html.fx-scrolling::-webkit-scrollbar-thumb { background-color: var(--fx-sb-thumb); }
+/* 指向滑块：变宽（边变窄）、变亮；拖动时为强调色 */
+*::-webkit-scrollbar-thumb:hover { background-color: var(--fx-sb-thumb-hover); border-width: 1px; }
+*::-webkit-scrollbar-thumb:active { background-color: var(--fx-sb-thumb-active); border-width: 1px; }
+html { scroll-behavior: smooth; }
