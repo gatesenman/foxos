@@ -161,6 +161,7 @@
 - US-87 单元与结构测试 8/8 通过（`packages/core/tests/test_desktop_client.py`）。
 - US-87 端到端 1/1 通过（`apps/desktop/e2e/client.e2e.js`）：真实 Electron（客户端模式）+ 真实狐狸OS 根文件系统来宾（sshd、Xvfb :0 上的 XFCE）。覆盖：本机执行默认关闭；终端、Everything 应用、文件写入都在来宾里；电脑画面经 SSH 转发的 x11vnc 显示来宾桌面；`FOXOS_E2E_GUEST_APT=1` 时应用中心在来宾里 apt 安装 LibreOffice Writer，「打开 Word」在来宾桌面打开 Writer。
 - 修复中发现的缺陷：`--json` 被放在命令末尾，`desktop launch -- libreoffice --writer --json` 把它传给了 LibreOffice，Writer 打不开；现在 `--json` 放在命令前面（`bc8d9cc`）。
+- 安装包：[v0.3.3-windows-preview](https://github.com/gatesenman/foxos/releases/tag/v0.3.3-windows-preview)（x64 / arm64 的 exe 与 zip，wine 下构建；x64 包内 Python 在 wine 里跑过 `foxos --version`、`env list`、`machine list`、`everything list`、`env catalog`，Windows Electron 在 wine 里默认进入客户端模式；arm64 只核对了 PE 架构）。
 - 未覆盖：Windows 实机（见 [windows-client.md](windows-client.md)）。
 
 ## 安装包（发布矩阵，v0.3.2-os-preview）
