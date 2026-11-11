@@ -1022,7 +1022,7 @@
   "bots.bad_approval_mode": "Approval mode must be one of: {0}",
   "bots.bad_backend": "Backend kind must be acp or model",
   "bots.bad_color": "Color format is #RRGGBB",
-  "bots.bad_delegation": "Invalid delegation settings (depth 0–5, per turn 0–10)",
+  "bots.bad_delegation": "Invalid delegation settings (depth 0–5, per turn 0–20)",
   "bots.bad_field": "Invalid value for field {0}",
   "bots.bad_icon": "Icon names may only contain lowercase letters, digits and -",
   "bots.bad_id": "IDs may only contain lowercase letters, digits and - (2–40 characters)",
@@ -1232,5 +1232,6 @@
   "skills.no_such_skill": "No such skill: {0}",
   "system.pause_targets": "Pause only these identities (for example bot:coder); empty pauses everyone",
   "system.paused_only": "Paused: {0}",
-  "system.resume_targets": "Resume only these identities; empty resumes everyone"
+  "system.resume_targets": "Resume only these identities; empty resumes everyone",
+  "botchat.busy": "{0} is still answering…"
 }

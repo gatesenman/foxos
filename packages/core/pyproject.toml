@@ -18,5 +18,8 @@ foxos = "foxos.cli:main"
 [tool.setuptools.packages.find]
 include = ["foxos*"]
 
+[tool.setuptools.package-data]
+foxos = ["data/**/*", "botchat/static/**/*"]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
