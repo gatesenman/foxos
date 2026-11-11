@@ -1,0 +1,9 @@
+# 狐狸OS 在线安装助手：只下载 GitHub Release 里的 ISO 并校验 sha256，不启动虚拟机。
+FROM debian:bookworm-slim
+ARG DEBIAN_FRONTEND=noninteractive
+RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates wget \
+    && rm -rf /var/lib/apt/lists/*
+COPY docker/os/entrypoint-installer.sh /usr/local/bin/foxos-docker-installer
+RUN chmod 755 /usr/local/bin/foxos-docker-installer
+VOLUME ["/out"]
+ENTRYPOINT ["/usr/local/bin/foxos-docker-installer"]

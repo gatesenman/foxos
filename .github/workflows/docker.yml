@@ -1,0 +1,44 @@
+# 构建狐狸OS 的 Docker Hub 镜像。默认只 build，不 login、不 push。
+# 推送需要 Sarah 提供 Docker Hub 账号，并在仓库 Secrets 里配置
+# DOCKERHUB_USERNAME / DOCKERHUB_TOKEN。不要把密码写进仓库或提交记录。
+name: docker
+
+on:
+  workflow_dispatch:
+    inputs:
+      push:
+        description: '推送到 Docker Hub（必须已配置 secrets，且已得到 Sarah 明确同意）'
+        type: boolean
+        default: false
+      tag:
+        description: '镜像标签（与 GitHub Release 版本一致，例如 0.3.0-os-preview）'
+        type: string
+        default: '0.3.0-os-preview'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build trial image
+        run: docker build -f docker/os/Dockerfile -t gatesenman/foxos:${{ inputs.tag }} .
+      - name: Build installer image
+        run: docker build -f docker/os/Dockerfile.installer -t gatesenman/foxos:${{ inputs.tag }}-installer .
+      - name: Log in to Docker Hub
+        if: ${{ inputs.push }}
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Push
+        if: ${{ inputs.push }}
+        run: |
+          if [ -z "${{ secrets.DOCKERHUB_USERNAME }}" ]; then
+            echo "未配置 DOCKERHUB_USERNAME，跳过推送。"
+            exit 1
+          fi
+          docker tag "gatesenman/foxos:${{ inputs.tag }}" gatesenman/foxos:os-preview
+          docker push "gatesenman/foxos:${{ inputs.tag }}"
+          docker push "gatesenman/foxos:${{ inputs.tag }}-installer"
