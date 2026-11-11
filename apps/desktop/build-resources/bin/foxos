@@ -1,0 +1,16 @@
+#!/bin/sh
+# 狐狸OS 命令行（随桌面安装包提供）：用随包的 Python 3.12 运行 resources/core 里的 foxos 内核。
+# deb / rpm 安装后链接到 /usr/bin/foxos；tar.gz / macOS 由 install.sh 链接到 ~/.local/bin 或 /usr/local/bin。
+SELF=$0
+# 解析符号链接（macOS 12.3 之前的 readlink 没有 -f，逐级解析）
+while [ -L "$SELF" ]; do
+  LINK=$(readlink "$SELF")
+  case $LINK in /*) SELF=$LINK ;; *) SELF=$(dirname "$SELF")/$LINK ;; esac
+done
+RES=$(cd "$(dirname "$SELF")/.." && pwd)
+PY="$RES/python/bin/python3"
+[ -x "$PY" ] || PY=${FOXOS_PYTHON:-python3}
+# 字节码缓存写到用户缓存目录，不写进安装目录（root 运行时也不会在 /opt 里留下卸载不掉的 __pycache__）
+: "${PYTHONPYCACHEPREFIX:=${XDG_CACHE_HOME:-${HOME:-/tmp}/.cache}/foxos/pycache}"
+export PYTHONPYCACHEPREFIX
+PYTHONPATH="$RES/core${PYTHONPATH:+:$PYTHONPATH}" PYTHONUTF8=1 PYTHONIOENCODING=utf-8 exec "$PY" -m foxos "$@"

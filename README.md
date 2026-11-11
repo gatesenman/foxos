@@ -63,63 +63,52 @@ Windows 伴侣程序的截图在下方单独一节：[Windows 伴侣程序](#win
 | 环境 | Linux 命名空间运行时（overlayfs、pivot_root、seccomp、cgroup v2 / rlimit）、`.foxenv` 镜像、快照、克隆、导出；Windows：WSL2、Windows Sandbox、Hyper-V；提供者协议 |
 | 多语言 | 简体中文（默认）与 English：安装向导第一步与设置里切换，立即生效并保存；`foxos` 命令行、MCP 工具说明与内核错误消息跟随 `--lang` / `FOXOS_LANG`（JSON 字段名与错误码不变）；Windows 安装程序与 `install.ps1` 中英双语；Everything 应用通过 Chromium 语言接收狐狸OS 语言，上游提供中文界面的（spreadsheet）随之切换，其余在应用中心标“英文界面”（逐个记录见 [docs/everything-apps.md](docs/everything-apps.md)）。词条在 `apps/desktop/src/locales/` 与 `packages/core/foxos/data/locales/` |
 | 滚动条 | 不用系统默认滚动条：外壳、所有窗口与 Everything 应用（注入到每个 webview）统一用狐狸OS 细滚动条——轨道透明、平时隐藏、指向或滚动时出现、指向时加宽、拖动时为强调色，随深浅色主题变化；Monaco 与终端（xterm）使用相同尺寸与颜色 |
-| 安装 | 首次运行向导按平台在线安装组件；Windows 安装包自带 Python 与办公库 |
+| 安装 | Windows / macOS / Linux 各 x64 与 arm64 的安装包（exe、msi、dmg、deb、rpm、AppImage、tar.gz）都自带 Python 3.12 与办公库，一行安装脚本校验 SHA-256（见 [docs/install.md](docs/install.md)）；首次运行向导按平台在线安装组件 |
 
 ## 下载
 
-所有版本都在 [Releases](https://github.com/gatesenman/foxos/releases)。两种东西不要混淆：
+所有文件都在 [v0.3.2-os-preview](https://github.com/gatesenman/foxos/releases/tag/v0.3.2-os-preview)（预发布），每个文件的 SHA-256 在同一发布的 `SHA256SUMS` 里。两种东西不要混淆：
 
-- **狐狸OS 操作系统** = `v0.3.2-os-preview` 里的可引导 ISO（两个分卷 `part1` + `part2`，拼接后校验 SHA-256 `8e6a9e65f5e39f22170a23c9dde583056663e26c298e936bdbda4524f1110e39`）。上面的截图就是它。0.3.2 起默认浏览器是 Google Chrome（首次登录时从 Google 官方源安装，见 [docs/os.md](docs/os.md#浏览器为什么-chrome-不在-iso-里怎么装)）。旧版本 `v0.3.1-os-preview`、`v0.3.0-os-preview` 仍在 Releases 页面。
-- **Windows 伴侣程序** = `v0.2.0-windows-preview` 里的 `FoxOS-Setup-0.2.0-x64.exe` / `FoxOS-0.2.0-win-x64.zip` / `install.ps1`。它是在现有 Windows 桌面上运行的应用程序，不是操作系统。
+- **狐狸OS 操作系统**：可引导 ISO（Ubuntu 24.04 + XFCE），上面的截图就是它。0.3.2 起默认浏览器是 Google Chrome（首次登录时从 Google 官方源安装，见 [docs/os.md](docs/os.md#浏览器为什么-chrome-不在-iso-里怎么装)）。
+- **桌面伴侣程序 + `foxos` 命令行**：装在现有 Windows / macOS / Linux 上的应用程序，自带 Python 3.12 与内核，装好就能在终端里用 `foxos`。
 
-**可引导 ISO（推荐）**：[v0.3.2-os-preview](https://github.com/gatesenman/foxos/releases/tag/v0.3.2-os-preview)（预发布）。写到 U 盘或在 Hyper-V 里启动，步骤见 [ISO 测试指南](docs/os-test-guide.md)。
+| 系统 | x64 | arm64 |
+| --- | --- | --- |
+| Windows 10 1809+ / 11 | `FoxOS-Setup-0.3.2-x64.exe`（安装程序）· `FoxOS-0.3.2-win-x64.msi`（MSI）· `FoxOS-0.3.2-win-x64.zip`（便携版） | `FoxOS-Setup-0.3.2-arm64.exe` · `FoxOS-0.3.2-win-arm64.msi` · `FoxOS-0.3.2-win-arm64.zip` |
+| macOS 11+ | Intel：`FoxOS-0.3.2-mac-x64.dmg` / `.zip` | Apple 芯片：`FoxOS-0.3.2-mac-arm64.dmg` / `.zip` |
+| Ubuntu / Debian / Mint / deepin / UOS | `FoxOS-0.3.2-linux-x64.deb` | `FoxOS-0.3.2-linux-arm64.deb` |
+| Fedora / RHEL / Rocky / Alma / openEuler / openSUSE | `FoxOS-0.3.2-linux-x64.rpm` | `FoxOS-0.3.2-linux-arm64.rpm` |
+| Arch / Manjaro / 其他发行版 | `FoxOS-0.3.2-linux-x64.tar.gz` · `.AppImage` | `FoxOS-0.3.2-linux-arm64.tar.gz` · `.AppImage` |
+| **狐狸OS 系统 ISO** | `FoxOS-0.3.2-amd64.iso`（UEFI + BIOS；也有 `.part1` + `.part2` 分卷） | `FoxOS-0.3.2-arm64.iso`（UEFI；ARM 电脑、Apple 芯片上的 UTM、ARM 服务器） |
+| 包管理器（草稿，未提交） | winget `gatesenman.FoxOS` · Homebrew cask `foxos` · AUR `foxos-bin`，见 `FoxOS-0.3.2-package-manifests.zip` 与 [`packaging/`](packaging/) | 同左 |
 
-| 文件 | 说明 |
-| --- | --- |
-| `FoxOS-0.3.2-amd64.iso.part1` / `.part2` | 完整 ISO 的两个分卷（838860800 + 724301824 字节，拼接后 1563162624 字节，约 1.46 GiB） |
-| `FoxOS-0.3.2-amd64.iso` | 拼接得到的 Live + 安装镜像（UEFI + BIOS），amd64，小于 2 GB，SHA-256 `8e6a9e65f5e39f22170a23c9dde583056663e26c298e936bdbda4524f1110e39` |
-| `SHA256SUMS` | 校验和（含完整 ISO 与两个分卷） |
-
-Release 上只有两个分卷：本构建环境单个上传约 1.46 GiB 的完整 ISO 时连接在中途断开，所以请把分卷拼起来再校验。
+一行安装（自动识别系统与 CPU，下载、校验 SHA-256、安装，最后运行 `foxos --version`）：
 
 ```bash
-# 下载两个分卷和校验和，拼回 ISO（版本号以 Release 页面为准）
-base=https://github.com/gatesenman/foxos/releases/download/v0.3.2-os-preview
-curl -L -O "$base/FoxOS-0.3.2-amd64.iso.part1"
-curl -L -O "$base/FoxOS-0.3.2-amd64.iso.part2"
-curl -L -O "$base/SHA256SUMS"
+# Linux / macOS：Ubuntu / Debian 用 deb，Fedora / RHEL / openSUSE 用 rpm，其他发行版或没有 sudo 时装到 ~/.local
+curl -fsSL https://github.com/gatesenman/foxos/releases/download/v0.3.2-os-preview/install.sh | sh
+```
+
+```powershell
+# Windows（x64 / arm64）；便携版先设 $env:FOXOS_PORTABLE = '1'，MSI 先设 $env:FOXOS_MSI = '1'
+irm https://github.com/gatesenman/foxos/releases/download/v0.3.2-os-preview/install.ps1 | iex
+```
+
+安装包还没有代码签名：Windows 首次运行时 SmartScreen 选「更多信息 → 仍要运行」；macOS 首次打开时在「应用程序」里按住 Control 点按 FoxOS → 「打开」（macOS 15 起到「系统设置 → 隐私与安全性」点「仍要打开」）。每个系统的细节、AppImage 与 ISO 的用法见 **[docs/install.md](docs/install.md)**。
+
+ISO 单个文件小于 2 GiB，可以直接下载；网络不稳时下载分卷再合并、校验：
+
+```bash
 cat FoxOS-0.3.2-amd64.iso.part1 FoxOS-0.3.2-amd64.iso.part2 > FoxOS-0.3.2-amd64.iso
 sha256sum -c SHA256SUMS --ignore-missing
 ```
-
-Windows（PowerShell）：
 
 ```powershell
 cmd /c copy /b FoxOS-0.3.2-amd64.iso.part1+FoxOS-0.3.2-amd64.iso.part2 FoxOS-0.3.2-amd64.iso
 Get-FileHash -Algorithm SHA256 .\FoxOS-0.3.2-amd64.iso
 ```
 
-**Windows x64 伴侣程序（不是操作系统）**：[v0.2.0-windows-preview](https://github.com/gatesenman/foxos/releases/tag/v0.2.0-windows-preview)（预发布，尚未在 Windows 实机上验收，见 [Windows 测试清单](docs/windows-test-guide.md)）
-
-| 文件 | 说明 |
-| --- | --- |
-| `FoxOS-Setup-0.2.0-x64.exe` | 安装程序（可选安装目录，按用户安装；简体中文 / English，按系统语言选择，默认中文） |
-| `FoxOS-0.2.0-win-x64.zip` | 便携版 |
-| `install.ps1` | 在线安装：匿名下载、校验 `SHA256SUMS`、安装 |
-| `SHA256SUMS` | 校验值 |
-
-```powershell
-# 一行安装（匿名下载，不需要令牌）
-irm https://github.com/gatesenman/foxos/releases/download/v0.2.0-windows-preview/install.ps1 | iex
-# 便携版
-$env:FOXOS_PORTABLE = '1'; irm https://github.com/gatesenman/foxos/releases/download/v0.2.0-windows-preview/install.ps1 | iex
-# 下载脚本后带参数：-Portable / -Silent / -Dir <目录> / -DownloadOnly / -Lang en-US（提示语言，默认中文；也可设 $env:FOXOS_LANG）
-powershell -ExecutionPolicy Bypass -File install.ps1 -Portable
-```
-
-`$env:GITHUB_TOKEN` 可选，只在遇到 GitHub 匿名 API 频率限制（每小时 60 次）时设置。安装包未签名，首次运行时 SmartScreen 会提示，选“更多信息 → 仍要运行”。
-
-Linux：请使用上面的可引导 ISO，或从源码运行伴侣程序。我们不会在非 Apple 硬件上提供 macOS 系统镜像。
+写 U 盘或在 Hyper-V 里启动见 [ISO 测试指南](docs/os-test-guide.md)。所有安装包和 arm64 ISO 都由 GitHub Actions（[`release.yml`](.github/workflows/release.yml)）在对应系统的机器上构建、真装验证后直接上传到 Release。旧版本（`v0.3.1-os-preview`、`v0.3.0-os-preview`、Windows 伴侣程序 `v0.2.0-windows-preview`）仍在 [Releases](https://github.com/gatesenman/foxos/releases) 页面。
 
 ## Windows 伴侣程序（在现有 Windows 桌面上运行，v0.2.0） / Windows companion app
 

@@ -14,3 +14,7 @@ demo-workspace/
 # 系统文件
 .DS_Store
 Thumbs.db
+
+# 安装包（scripts/packaging/collect-artifacts.sh 的输出）
+/out/
+/dist-*/

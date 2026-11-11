@@ -427,6 +427,72 @@
           "^test_US62"
         ]
       ]
+    },
+    {
+      "id": "US-80",
+      "title": "一行安装 install.sh：识别系统与 CPU，从 Release 下载，校验 SHA256SUMS（被篡改就拒绝安装），安装后 foxos --version 与 sheets create 可用",
+      "match": [
+        [
+          "pytest",
+          "test_packaging.py",
+          "^test_US80"
+        ]
+      ]
+    },
+    {
+      "id": "US-81",
+      "title": "Linux 安装包（AppImage / deb / rpm / tar.gz）：随包 Python 与内核，foxos --version、help --json、sheets create，无头启动桌面并截图",
+      "match": [
+        [
+          "pytest",
+          "test_packaging.py",
+          "^test_US81"
+        ]
+      ]
+    },
+    {
+      "id": "US-82",
+      "title": "包管理器清单草稿：winget（NSIS + MSI，x64 / arm64）、Homebrew cask（Apple 芯片 / Intel）、AUR foxos-bin，按发布的 SHA-256 生成",
+      "match": [
+        [
+          "pytest",
+          "test_packaging.py",
+          "^test_US82"
+        ]
+      ]
+    },
+    {
+      "id": "US-83",
+      "title": "发布矩阵：Windows / macOS / Linux 各 x64 与 arm64、amd64 与 arm64 ISO，runner 直接上传 Release，一行安装在 Ubuntu / Debian / Fedora / openSUSE / Arch / macOS 上验证",
+      "match": [
+        [
+          "pytest",
+          "test_packaging.py",
+          "^test_US83"
+        ]
+      ]
+    },
+    {
+      "id": "US-84",
+      "title": "arm64 系统镜像：Ubuntu ports + UEFI，Google 不提供 arm64 Chrome 时回退到 Firefox",
+      "match": [
+        [
+          "pytest",
+          "test_packaging.py",
+          "^test_US84"
+        ]
+      ]
+    },
+    {
+      "id": "US-85",
+      "title": "Windows 在线安装 install.ps1：x64 / arm64 自动识别，NSIS / MSI / 便携版，纯 ASCII 兼容 PowerShell 5.1",
+      "match": [
+        [
+          "pytest",
+          "test_packaging.py",
+          "^test_US85"
+        ]
+      ]
     }
   ]
 }

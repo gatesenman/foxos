@@ -19,8 +19,9 @@ done
 if [ -n "$missing" ]; then
   DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends -o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confold $missing
 fi
-for f in /usr/lib/x86_64-linux-gnu/xfce4/panel/plugins/libwhiskermenu.so \
-  /usr/lib/x86_64-linux-gnu/xfce4/panel/plugins/libgenmon.so \
+case "$(dpkg --print-architecture)" in arm64) MA=aarch64-linux-gnu ;; *) MA=x86_64-linux-gnu ;; esac
+for f in /usr/lib/$MA/xfce4/panel/plugins/libwhiskermenu.so \
+  /usr/lib/$MA/xfce4/panel/plugins/libgenmon.so \
   /usr/share/icons/Papirus/index.theme \
   /usr/share/locale/zh_CN/LC_MESSAGES/xfce4-whiskermenu-plugin.mo \
   /usr/share/locale/zh_CN/LC_MESSAGES/xfce4-terminal.mo; do

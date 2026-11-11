@@ -183,6 +183,14 @@ def main() -> int:
         L.append(f"- 内置程序：**{sum(1 for x in b if x['rendered'])}/{len(b)}** —— " + "，".join(f"{x['id']}：{SRC.get(x['source'], x['source'])}" for x in b) + "。")
         L.append(f"- ACP 智能体：**{g['rendered']}/{g['total']}** 显示注册表 `icon`（{g['withRegistryIcon']} 个在注册表里有 icon）" + (f"；未加载：{', '.join(g['missing'])}" if g["missing"] else "") + "。")
         L.append(f"- 狐狸OS 自己的程序保留狐狸OS 风格图标：{', '.join(icons.get('foxosOwn', []))}。\n")
+    inst = load(TR / "installers.json", {})
+    if inst:
+        L.append(f"## 安装包（发布矩阵，{inst.get('tag', '')}）\n")
+        L.append(inst.get("intro", "") + "\n")
+        L.append("| 系统 | CPU | 格式 | 构建 | 构建机上的冒烟 | 从 Release 一行安装 | 说明 |\n| --- | --- | --- | --- | --- | --- | --- |")
+        for r in inst.get("rows", []):
+            L.append(f"| {r['os']} | {r['arch']} | {r['formats']} | {r['built']} | {r['smoke']} | {r.get('install', '—')} | {r.get('note', '').replace('|', '/')} |")
+        L.append("")
     L.append("## 复现\n")
     L.append("```bash\npython3 -m venv .venv && .venv/bin/pip install -e 'packages/core[test]'\n(cd apps/desktop && npm ci)\n"
              "FOXOS_HOME=~/.local/share/FoxOS npm run test:all          # 全部\npython3 scripts/test_all.py --only e2e --e2e mcp,sandbox  # 只跑部分\n```\n")

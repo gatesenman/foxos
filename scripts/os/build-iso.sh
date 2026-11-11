@@ -4,7 +4,8 @@
 # 环境变量：
 #   FOXOS_OS_WORK    工作目录（默认 /var/tmp/foxos-os）
 #   FOXOS_OS_OUT     输出目录（默认 <仓库>/build/os）
-#   FOXOS_OS_MIRROR  Ubuntu 软件源（默认 http://archive.ubuntu.com/ubuntu）
+#   FOXOS_OS_ARCH    amd64（默认，UEFI + BIOS）或 arm64（UEFI，Ubuntu ports 源；在 arm64 机器上构建，例如 GitHub 的 ubuntu-24.04-arm）
+#   FOXOS_OS_MIRROR  Ubuntu 软件源（默认 amd64 用 http://archive.ubuntu.com/ubuntu，arm64 用 http://ports.ubuntu.com/ubuntu-ports）
 #   FOXOS_OS_KEEP=1  结束后保留 chroot，方便排查
 #   FOXOS_OS_REPACK=1  复用已有 chroot，跳过 apt / Firefox / VMM 下载，只重跑 hook 并打包
 set -euo pipefail
@@ -13,12 +14,14 @@ SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
 ROOT=$(cd "$SCRIPT_DIR/../.." && pwd)
 VERSION=0.3.2
 SUITE=noble
-ARCH=amd64
-ISO_NAME="FoxOS-${VERSION}-amd64.iso"
+ARCH=${FOXOS_OS_ARCH:-amd64}
+case "$ARCH" in amd64|arm64) ;; *) echo "FOXOS_OS_ARCH 只支持 amd64 / arm64" >&2; exit 2 ;; esac
+ISO_NAME="FoxOS-${VERSION}-${ARCH}.iso"
 VOLID="FOXOS_032"
 WORK=${FOXOS_OS_WORK:-/var/tmp/foxos-os}
 OUT=${FOXOS_OS_OUT:-"$ROOT/build/os"}
-MIRROR=${FOXOS_OS_MIRROR:-http://archive.ubuntu.com/ubuntu}
+if [ "$ARCH" = arm64 ]; then DEFAULT_MIRROR=http://ports.ubuntu.com/ubuntu-ports; else DEFAULT_MIRROR=http://archive.ubuntu.com/ubuntu; fi
+MIRROR=${FOXOS_OS_MIRROR:-$DEFAULT_MIRROR}
 CHROOT="$WORK/chroot"
 ISO="$WORK/iso"
 STAGING="$WORK/staging"   # 拷进 chroot 的 /usr/src/foxos-os
@@ -27,7 +30,7 @@ log() { printf '[foxos-os] %s\n' "$*"; }
 die() { printf '[foxos-os] 错误：%s\n' "$*" >&2; exit 1; }
 
 if [ "$(id -u)" -ne 0 ]; then
-  exec sudo --preserve-env=FOXOS_OS_WORK,FOXOS_OS_OUT,FOXOS_OS_MIRROR,FOXOS_OS_KEEP,FOXOS_OS_REPACK,FOXOS_CH_VERSION,http_proxy,https_proxy,HTTP_PROXY,HTTPS_PROXY "$0" "$@"
+  exec sudo --preserve-env=FOXOS_OS_ARCH,FOXOS_OS_WORK,FOXOS_OS_OUT,FOXOS_OS_MIRROR,FOXOS_OS_KEEP,FOXOS_OS_REPACK,FOXOS_CH_VERSION,http_proxy,https_proxy,HTTP_PROXY,HTTPS_PROXY "$0" "$@"
 fi
 
 # 构建机 apt 若需代理，chroot 里同样用（收尾 hook 会删掉，不带进 ISO）
@@ -93,9 +96,12 @@ fi
 mount_chroot
 maybe_proxy
 cp "$SCRIPT_DIR/config/sources.list" "$CHROOT/etc/apt/sources.list"
-# 若用户换了镜像，改写源
-if [ "$MIRROR" != "http://archive.ubuntu.com/ubuntu" ]; then
-  sed -i "s|http://archive.ubuntu.com/ubuntu|$MIRROR|g" "$CHROOT/etc/apt/sources.list"
+# arm64 用 ports 源（安全更新也在 ports 上）；若用户换了镜像，再改写
+if [ "$ARCH" = arm64 ]; then
+  sed -i "s|http://archive.ubuntu.com/ubuntu|http://ports.ubuntu.com/ubuntu-ports|g; s|http://security.ubuntu.com/ubuntu|http://ports.ubuntu.com/ubuntu-ports|g" "$CHROOT/etc/apt/sources.list"
+fi
+if [ "$MIRROR" != "$DEFAULT_MIRROR" ]; then
+  sed -i "s|$DEFAULT_MIRROR|$MIRROR|g" "$CHROOT/etc/apt/sources.list"
 fi
 
 REPACK=0
@@ -109,14 +115,20 @@ log "安装软件包"
 chroot_run apt-get update
 # shellcheck disable=SC2046
 PACKAGES=$(grep -vE '^\s*(#|$)' "$SCRIPT_DIR/config/packages.list" | tr '\n' ' ')
+if [ "$ARCH" = arm64 ]; then
+  # arm64 只有 UEFI：换成 arm64 的 grub EFI 包，去掉 BIOS 引导和 Hyper-V 来宾工具
+  PACKAGES=$(printf '%s\n' $PACKAGES | sed -e 's/^grub-efi-amd64-signed$/grub-efi-arm64-signed/' -e 's/^grub-efi-amd64-bin$/grub-efi-arm64-bin/' \
+    | grep -vE '^(grub-pc-bin|linux-cloud-tools-generic|linux-cloud-tools-common)$' | tr '\n' ' ')
+fi
 chroot_run apt-get install -y --no-install-recommends -o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confold $PACKAGES
 
 # ------------------------------------------------------------------ 第三方（许可允许）：Firefox .deb/tarball 与 cloud-hypervisor
 log "安装 Firefox（Mozilla 官方 tarball，不用 Snap）"
-FF="$WORK/cache/firefox.tar.xz"
+FF="$WORK/cache/firefox-$ARCH.tar.xz"
 mkdir -p "$WORK/cache"
 if [ ! -f "$FF" ]; then
-  wget -O "$FF" "https://download.mozilla.org/?product=firefox-latest-ssl&os=linux64&lang=zh-CN"
+  if [ "$ARCH" = arm64 ]; then FF_OS=linux64-aarch64; else FF_OS=linux64; fi
+  wget -O "$FF" "https://download.mozilla.org/?product=firefox-latest-ssl&os=$FF_OS&lang=zh-CN"
 fi
 rm -rf "$CHROOT/opt/firefox"
 tar -C "$CHROOT/opt" -xJf "$FF"
@@ -136,8 +148,9 @@ EOF
 
 log "安装 cloud-hypervisor（Apache-2.0 VMM，完整虚拟机用）"
 CH_VER=${FOXOS_CH_VERSION:-v46.0}
-CH_URL="https://github.com/cloud-hypervisor/cloud-hypervisor/releases/download/${CH_VER}/cloud-hypervisor-static"
-CH_BIN="$WORK/cache/cloud-hypervisor-static"
+if [ "$ARCH" = arm64 ]; then CH_ASSET=cloud-hypervisor-static-aarch64; else CH_ASSET=cloud-hypervisor-static; fi
+CH_URL="https://github.com/cloud-hypervisor/cloud-hypervisor/releases/download/${CH_VER}/${CH_ASSET}"
+CH_BIN="$WORK/cache/${CH_ASSET}"
 if [ ! -f "$CH_BIN" ]; then
   wget -O "$CH_BIN" "$CH_URL"
   chmod +x "$CH_BIN"
@@ -189,7 +202,7 @@ rm -f "$ISO/casper/filesystem.squashfs"
 # 不要用 -e run / -e proc 把目录本身排除掉。
 mkdir -p "$CHROOT/run" "$CHROOT/proc" "$CHROOT/sys" "$CHROOT/dev" "$CHROOT/tmp" "$CHROOT/var/tmp"
 mksquashfs "$CHROOT" "$ISO/casper/filesystem.squashfs" \
-  -comp xz -Xbcj x86 -b 1M -quiet \
+  -comp xz $([ "$ARCH" = amd64 ] && echo "-Xbcj x86") -b 1M -quiet \
   -wildcards -e 'usr/src/foxos-os' -e 'tmp/*' -e 'var/tmp/*' -e 'run/*' -e 'proc/*' -e 'sys/*'
 
 du -sx --block-size=1 "$CHROOT" | cut -f1 > "$ISO/casper/filesystem.size"
@@ -199,17 +212,24 @@ if [ -x "$CHROOT/usr/bin/dpkg-query" ]; then
 fi
 
 cp "$SCRIPT_DIR/iso/grub.cfg" "$ISO/boot/grub/grub.cfg"
-echo "狐狸OS ${VERSION} amd64" > "$ISO/.disk/info"
+# arm64（QEMU virt / 多数 ARM 服务器）的串口是 ttyAMA0
+[ "$ARCH" = arm64 ] && sed -i 's/console=ttyS0,115200n8/console=ttyAMA0,115200n8/g' "$ISO/boot/grub/grub.cfg"
+echo "狐狸OS ${VERSION} ${ARCH}" > "$ISO/.disk/info"
 echo "full_cd/single" > "$ISO/.disk/cd_type"
 echo "$ISO_NAME" > "$ISO/.disk/casper-uuid-helper" 2>/dev/null || true
 # README
 cat > "$ISO/README.txt" <<EOF
 狐狸OS（FoxOS）${VERSION}
 https://github.com/gatesenman/foxos
-这是一张可试用、可安装的系统光盘。请从 UEFI（或传统 BIOS）引导。
+这是一张可试用、可安装的系统光盘（${ARCH}）。请从 UEFI$([ "$ARCH" = amd64 ] && echo "（或传统 BIOS）")引导。
 EOF
 
-log "grub-mkrescue 生成混合 ISO（UEFI + BIOS）"
+if [ "$ARCH" = arm64 ]; then
+  [ -d /usr/lib/grub/arm64-efi ] || die "构建机缺少 /usr/lib/grub/arm64-efi（apt install grub-efi-arm64-bin）"
+  log "grub-mkrescue 生成 ISO（arm64 UEFI）"
+else
+  log "grub-mkrescue 生成混合 ISO（UEFI + BIOS）"
+fi
 mkdir -p "$OUT"
 rm -f "$OUT/$ISO_NAME"
 grub-mkrescue -o "$OUT/$ISO_NAME" "$ISO" \

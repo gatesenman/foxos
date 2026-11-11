@@ -93,6 +93,16 @@ Chrome 会从 Google 官方软件源（dl.google.com）下载，约 120 MB，需
   installed
 }
 
+# Google 只发布 x86-64 的 Linux 版 Chrome。arm64 版狐狸OS 不装 Chrome，入口 foxos-chrome 直接用 Firefox。
+if [ "$(dpkg --print-architecture 2>/dev/null || echo amd64)" != amd64 ]; then
+  case "${1:-}" in
+    --status) echo unsupported-arch; exit 0 ;;
+    --install) echo "Google Chrome 没有 Linux $(dpkg --print-architecture) 版本；狐狸OS 在这台机器上使用 Firefox。" >&2; exit 6 ;;
+    --firstrun|--if-accepted) exit 0 ;;
+    *) exit 1 ;;   # --gui：返回 1，foxos-chrome 改用 Firefox
+  esac
+fi
+
 case "${1:-}" in
   --install) do_install ;;
   --status) installed && echo installed || echo not-installed ;;

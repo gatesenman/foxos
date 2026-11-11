@@ -1,18 +1,20 @@
 <#
 .SYNOPSIS
-  FoxOS online installer for Windows x64: downloads from GitHub Releases, verifies SHA256SUMS, installs.
+  FoxOS online installer for Windows (x64 and arm64): downloads from GitHub Releases, verifies SHA256SUMS, installs.
   (ASCII-only on purpose so it works with "irm ... | iex" on Windows PowerShell 5.1.)
 
 .EXAMPLE
-  irm https://github.com/gatesenman/foxos/releases/download/v0.2.0-windows-preview/install.ps1 | iex
+  irm https://github.com/gatesenman/foxos/releases/download/v0.3.2-os-preview/install.ps1 | iex
 
 .EXAMPLE
   powershell -ExecutionPolicy Bypass -File install.ps1 -Portable
 
-.PARAMETER Tag          Release tag. Default v0.2.0-windows-preview; "latest" = newest non-prerelease.
+.PARAMETER Tag          Release tag. Default v0.3.2-os-preview; "latest" = newest non-prerelease.
 .PARAMETER Token        Optional GitHub token (defaults to $env:GITHUB_TOKEN / $env:GH_TOKEN). Only needed to avoid API rate limits.
 .PARAMETER Portable     Install the portable zip into %LOCALAPPDATA%\FoxOS-Portable instead of running the setup program.
-.PARAMETER Silent       Silent install (NSIS /S).
+.PARAMETER Msi          Install the per-machine MSI package (msiexec; needs admin) instead of the NSIS setup.
+.PARAMETER Arch         x64 or arm64. Default: detected from the OS (an x64 build also runs on Windows 11 arm64 under emulation).
+.PARAMETER Silent       Silent install (NSIS /S, msiexec /qn).
 .PARAMETER Dir          Target directory (portable) or install directory (NSIS /D=).
 .PARAMETER Repo         Repository, default gatesenman/foxos.
 .PARAMETER DownloadOnly Download and verify only; save the file into the current directory.
@@ -20,9 +22,11 @@
 #>
 [CmdletBinding()]
 param(
-  [string]$Tag = 'v0.2.0-windows-preview',
+  [string]$Tag = 'v0.3.2-os-preview',
   [string]$Token = $(if ($env:GITHUB_TOKEN) { $env:GITHUB_TOKEN } else { $env:GH_TOKEN }),
   [switch]$Portable,
+  [switch]$Msi,
+  [string]$Arch,
   [switch]$Silent,
   [string]$Dir,
   [string]$Repo = 'gatesenman/foxos',
@@ -34,7 +38,7 @@ $ErrorActionPreference = 'Stop'
 $FoxLang = if ($Lang) { $Lang } elseif ($env:FOXOS_LANG) { $env:FOXOS_LANG } else { 'zh-CN' }
 $FoxZh = -not ($FoxLang -like 'en*')
 $FoxMsg = @{
-  'x64only' = @('FoxOS currently ships Windows x64 builds only.', '\u72d0\u72f8OS \u76ee\u524d\u53ea\u63d0\u4f9b Windows x64 \u7248\u672c\u3002')
+  'x64only' = @('FoxOS needs 64-bit Windows (x64 or arm64).', '\u72d0\u72f8OS \u9700\u8981 64 \u4f4d Windows\uff08x64 \u6216 arm64\uff09\u3002')
   'oldwin' = @('Windows build {0} detected; Windows 10 1809 (17763) or newer is recommended.', '\u68c0\u6d4b\u5230 Windows \u7248\u672c\u53f7 {0}\uff1b\u5efa\u8bae\u4f7f\u7528 Windows 10 1809\uff0817763\uff09\u6216\u66f4\u65b0\u7248\u672c\u3002')
   'ratelimit' = @('GitHub anonymous API rate limit reached (60 requests/hour). Retry later or set $env:GITHUB_TOKEN.', 'GitHub \u533f\u540d API \u8fbe\u5230\u9891\u7387\u4e0a\u9650\uff08\u6bcf\u5c0f\u65f6 60 \u6b21\uff09\u3002\u8bf7\u7a0d\u540e\u91cd\u8bd5\uff0c\u6216\u8bbe\u7f6e $env:GITHUB_TOKEN\u3002')
   'norelease' = @('Release {0} not found in {1}.', '\u5728 {1} \u4e2d\u627e\u4e0d\u5230\u53d1\u5e03\u7248\u672c {0}\u3002')
@@ -58,11 +62,18 @@ function M([string]$key) {
 # With "irm | iex" no parameters can be passed: FOXOS_PORTABLE=1 / FOXOS_DOWNLOAD_ONLY=1 / FOXOS_TAG=... do the same
 if ($env:FOXOS_PORTABLE -eq '1') { $Portable = [switch]$true }
 if ($env:FOXOS_DOWNLOAD_ONLY -eq '1') { $DownloadOnly = [switch]$true }
+if ($env:FOXOS_MSI -eq '1') { $Msi = [switch]$true }
+if ($env:FOXOS_ARCH) { $Arch = $env:FOXOS_ARCH }
 if ($env:FOXOS_TAG) { $Tag = $env:FOXOS_TAG }
 $ProgressPreference = 'SilentlyContinue'   # the progress bar makes downloads very slow on PowerShell 5.1
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
 if (-not [Environment]::Is64BitOperatingSystem) { throw (M 'x64only') }
+if (-not $Arch) {
+  $cpu = if ($env:PROCESSOR_ARCHITEW6432) { $env:PROCESSOR_ARCHITEW6432 } else { $env:PROCESSOR_ARCHITECTURE }
+  $Arch = if ($cpu -eq 'ARM64') { 'arm64' } else { 'x64' }
+}
+if ($Arch -notin @('x64', 'arm64')) { throw (M 'x64only') }
 if ($IsWindows -or $env:OS -eq 'Windows_NT') {
   $build = [Environment]::OSVersion.Version.Build
   if ($build -lt 17763) { Write-Warning (M 'oldwin' $build) }
@@ -78,7 +89,7 @@ catch {
   if ($code -eq 404) { throw (M 'norelease' $Tag $Repo) }
   throw (M 'relfail' $code $_.Exception.Message)
 }
-Write-Host "FoxOS $($rel.tag_name)"
+Write-Host "FoxOS $($rel.tag_name) (windows-$Arch)"
 
 function Get-Asset([string]$pattern) {
   $a = $rel.assets | Where-Object { $_.name -like $pattern } | Select-Object -First 1
@@ -99,7 +110,7 @@ $tmpRoot = if ($env:TEMP) { $env:TEMP } else { [IO.Path]::GetTempPath() }
 $tmp = Join-Path $tmpRoot ('foxos-install-' + [guid]::NewGuid().ToString('N').Substring(0, 8))
 New-Item -ItemType Directory -Path $tmp | Out-Null
 try {
-  $asset = if ($Portable) { Get-Asset 'FoxOS-*-win-x64.zip' } else { Get-Asset 'FoxOS-Setup-*-x64.exe' }
+  $asset = if ($Portable) { Get-Asset "FoxOS-*-win-$Arch.zip" } elseif ($Msi) { Get-Asset "FoxOS-*-win-$Arch.msi" } else { Get-Asset "FoxOS-Setup-*-$Arch.exe" }
   $sums = Get-Asset 'SHA256SUMS'
   $file = Join-Path $tmp $asset.name
   Save-Asset $sums (Join-Path $tmp 'SHA256SUMS')
@@ -126,6 +137,13 @@ try {
     $s = $ws.CreateShortcut($lnk); $s.TargetPath = $exe.FullName; $s.WorkingDirectory = $exe.DirectoryName; $s.Save()
     Write-Host (M 'extracted' $target $lnk)
     Start-Process $exe.FullName
+  } elseif ($Msi) {
+    $msiArgs = @('/i', "`"$file`"", $(if ($Silent) { '/qn' } else { '/passive' }), '/norestart')
+    if ($Dir) { $msiArgs += "APPLICATIONFOLDER=`"$Dir`"" }
+    Write-Host (M 'running')
+    $p = Start-Process -FilePath 'msiexec.exe' -ArgumentList $msiArgs -Wait -PassThru
+    if ($p.ExitCode -ne 0 -and $p.ExitCode -ne 3010) { throw (M 'setupexit' $p.ExitCode) }
+    Write-Host (M 'done')
   } else {
     $instArgs = @()
     if ($Silent) { $instArgs += '/S' }

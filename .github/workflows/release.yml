@@ -1,0 +1,404 @@
+# 狐狸OS 发布矩阵：所有常见系统的安装包 + 系统镜像，由 runner 直接上传到 GitHub Release。
+#
+#   桌面伴侣程序 + foxos 命令行（自带 Python 3.12 与内核）
+#     Windows x64 / arm64  NSIS 安装程序 · MSI · 便携 zip            windows-2022 / windows-11-arm
+#     macOS arm64 / x64    dmg · zip（未签名，签名与公证可通过 secrets 打开）  macos-14 / macos-15-intel
+#     Linux x64 / arm64    AppImage · deb · rpm · tar.gz              ubuntu-24.04 / ubuntu-24.04-arm
+#   系统镜像（Ubuntu 24.04 + XFCE）
+#     amd64  默认用发布里已有的分卷合并出单文件 ISO；勾选 iso_amd64_build 才在 CI 重建
+#     arm64  在 ubuntu-24.04-arm 上原生构建（UEFI）
+#   每个文件都 < 2 GiB（GitHub Release 单文件上限）；ISO 同时提供单文件和 800 MiB 分卷。
+#   最后统一重算 SHA256SUMS，生成 winget / Homebrew / AUR 清单草稿，并在各系统上用 install.sh / install.ps1 真装一遍。
+#
+# 签名（可选，没配就出未签名包）：
+#   macOS   MAC_CSC_LINK（base64 的 .p12）· MAC_CSC_KEY_PASSWORD · APPLE_ID · APPLE_APP_SPECIFIC_PASSWORD · APPLE_TEAM_ID
+#   Windows WIN_CSC_LINK · WIN_CSC_KEY_PASSWORD
+# Docker Hub 推送不在这里（见 docker.yml，等 Sarah 登录后再开）。
+name: release
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: '发布标签（不存在会建成预发布）'
+        type: string
+        default: 'v0.3.2-os-preview'
+      desktop:
+        description: '构建桌面安装包（Windows / macOS / Linux）'
+        type: boolean
+        default: true
+      iso_arm64:
+        description: '构建 arm64 系统镜像'
+        type: boolean
+        default: true
+      iso_amd64_build:
+        description: '在 CI 重建 amd64 系统镜像（默认只把已有分卷合并成单文件上传）'
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ inputs.tag || github.ref_name }}
+  cancel-in-progress: false
+
+env:
+  TAG: ${{ inputs.tag || github.ref_name }}
+  GH_TOKEN: ${{ github.token }}
+  GH_REPO: ${{ github.repository }}
+
+jobs:
+  release:
+    name: 准备发布
+    runs-on: ubuntu-24.04
+    outputs:
+      version: ${{ steps.v.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: v
+        run: echo "version=$(node -p "require('./apps/desktop/package.json').version")" >> "$GITHUB_OUTPUT"
+      - name: 发布不存在就建成预发布（已有的发布不改标题和说明）
+        run: |
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            echo "发布 $TAG 已存在，产物将追加上传。"
+          else
+            gh release create "$TAG" --prerelease --target "$GITHUB_SHA" \
+              --title "狐狸OS ${{ steps.v.outputs.version }} 安装包 / FoxOS ${{ steps.v.outputs.version }} installers" \
+              --notes "所有常见系统的安装包。安装说明：https://github.com/${GH_REPO}/blob/main/docs/install.md"
+          fi
+
+  desktop:
+    name: 桌面 ${{ matrix.os }}-${{ matrix.arch }}
+    needs: release
+    if: ${{ github.event_name == 'push' || inputs.desktop }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: linux, arch: x64,   runner: ubuntu-24.04 }
+          - { os: linux, arch: arm64, runner: ubuntu-24.04-arm }
+          - { os: mac,   arch: arm64, runner: macos-14 }
+          - { os: mac,   arch: x64,   runner: macos-15-intel }
+          - { os: win,   arch: x64,   runner: windows-2022 }
+          - { os: win,   arch: arm64, runner: windows-11-arm }
+    runs-on: ${{ matrix.runner }}
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: apps/desktop/package-lock.json
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: astral-sh/setup-uv@v6
+      - name: Linux 打包工具（rpmbuild、xvfb）
+        if: matrix.os == 'linux'
+        run: sudo apt-get update -q && sudo apt-get install -y -q rpm xvfb libfuse2t64
+      - name: npm ci
+        working-directory: apps/desktop
+        run: npm ci
+      - name: 准备随包 Python 与 node-pty（${{ matrix.os }}-${{ matrix.arch }}）
+        run: bash scripts/packaging/prepare-platform.sh ${{ matrix.os }} ${{ matrix.arch }}
+      - name: electron-builder
+        working-directory: apps/desktop
+        env:
+          MAC_CSC_LINK: ${{ secrets.MAC_CSC_LINK }}
+          MAC_CSC_KEY_PASSWORD: ${{ secrets.MAC_CSC_KEY_PASSWORD }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          WIN_CSC_LINK: ${{ secrets.WIN_CSC_LINK }}
+          WIN_CSC_KEY_PASSWORD: ${{ secrets.WIN_CSC_KEY_PASSWORD }}
+        run: |
+          extra=()
+          if [ "${{ matrix.os }}" = mac ]; then
+            if [ -n "$MAC_CSC_LINK" ]; then
+              export CSC_LINK="$MAC_CSC_LINK" CSC_KEY_PASSWORD="$MAC_CSC_KEY_PASSWORD"
+              echo "macOS：使用 Developer ID 签名${APPLE_ID:+并公证}"
+            else
+              # 没有 Apple 开发者账号：ad-hoc 签名（Apple 芯片必须至少 ad-hoc 签名才能运行），不开 hardened runtime
+              export CSC_IDENTITY_AUTO_DISCOVERY=false
+              unset APPLE_ID APPLE_APP_SPECIFIC_PASSWORD APPLE_TEAM_ID
+              extra+=(-c.mac.identity=- -c.mac.hardenedRuntime=false)
+              echo "macOS：未配置签名证书，出 ad-hoc 签名的未公证版本"
+            fi
+          elif [ "${{ matrix.os }}" = win ]; then
+            if [ -n "$WIN_CSC_LINK" ]; then
+              export CSC_LINK="$WIN_CSC_LINK" CSC_KEY_PASSWORD="$WIN_CSC_KEY_PASSWORD"
+              extra+=(-c.win.signExecutable=true)
+              echo "Windows：使用代码签名证书"
+            else
+              export CSC_IDENTITY_AUTO_DISCOVERY=false
+              echo "Windows：未配置签名证书，出未签名版本（SmartScreen 会提示）"
+            fi
+          fi
+          npx electron-builder --${{ matrix.os }} --${{ matrix.arch }} --publish never "${extra[@]}"
+      - name: 统一文件名
+        run: bash scripts/packaging/collect-artifacts.sh apps/desktop/dist out ${{ matrix.os }} ${{ matrix.arch }}
+
+      # ---------------- 冒烟：真装、真跑
+      - name: 冒烟（Linux：tar.gz / AppImage / rpm 检查 / apt 真装 deb）
+        if: matrix.os == 'linux'
+        run: bash scripts/packaging/smoke-linux.sh out ${{ matrix.arch }} --install
+      - name: 冒烟（macOS：挂载 dmg、验签、foxos --version、启动桌面截图）
+        if: matrix.os == 'mac'
+        run: |
+          set -euo pipefail
+          V=$(node -p "require('./apps/desktop/package.json').version")
+          dmg=out/FoxOS-$V-mac-${{ matrix.arch }}.dmg
+          mnt=$(hdiutil attach -nobrowse -readonly "$dmg" | awk -F'\t' '/\/Volumes\//{print $NF; exit}')
+          app="$mnt/FoxOS.app"
+          codesign --verify --deep --strict --verbose=2 "$app"
+          lipo -archs "$app/Contents/MacOS/FoxOS"
+          out=$("$app/Contents/Resources/bin/foxos" --version); echo "$out"; test "$out" = "foxos $V"
+          ws=$(mktemp -d); "$app/Contents/Resources/bin/foxos" --workspace "$ws" sheets create smoke.xlsx --json >/dev/null; test -s "$ws/smoke.xlsx"
+          hdiutil detach "$mnt"
+          # zip 版：解压到临时“应用程序”目录后启动并截图
+          d=$(mktemp -d); ditto -x -k "out/FoxOS-$V-mac-${{ matrix.arch }}.zip" "$d"
+          mkdir -p out/smoke
+          ( "$d/FoxOS.app/Contents/MacOS/FoxOS" --user-data-dir="$d/ud" --workspace="$d/ws" --screenshot="$PWD/out/smoke/zip-mac-${{ matrix.arch }}.png" & pid=$!; \
+            for i in $(seq 1 90); do [ -s out/smoke/zip-mac-${{ matrix.arch }}.png ] && break; sleep 1; done; kill $pid 2>/dev/null || true )
+          test -s out/smoke/zip-mac-${{ matrix.arch }}.png && echo "桌面截图 OK" || echo "::warning::macOS 桌面没有在 90 秒内出截图"
+      - name: 冒烟（Windows：NSIS 静默安装、MSI 安装、便携版、foxos --version）
+        if: matrix.os == 'win'
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $V = node -p "require('./apps/desktop/package.json').version"
+          $A = '${{ matrix.arch }}'
+          function Check-Cli([string]$label, [string]$res) {
+            $py = Join-Path $res 'python\python.exe'
+            $out = (& $py -m foxos --version).Trim()
+            if ($out -ne "foxos $V") { throw "${label}: foxos --version -> $out" }
+            $ws = Join-Path $env:RUNNER_TEMP "ws-$label"
+            & $py -m foxos --workspace $ws sheets create smoke.xlsx --json | Out-Null
+            if (-not (Test-Path (Join-Path $ws 'smoke.xlsx'))) { throw "${label}: sheets create" }
+            Write-Host "通过 ${label}: $out"
+          }
+          # NSIS（按用户安装）
+          $p = Start-Process "out\FoxOS-Setup-$V-$A.exe" -ArgumentList '/S' -Wait -PassThru
+          if ($p.ExitCode -ne 0) { throw "NSIS exit $($p.ExitCode)" }
+          Check-Cli 'nsis' "$env:LOCALAPPDATA\Programs\FoxOS\resources"
+          $u = Get-ChildItem "$env:LOCALAPPDATA\Programs\FoxOS" -Filter 'Uninstall*.exe' | Select-Object -First 1
+          Start-Process $u.FullName -ArgumentList '/S' -Wait
+          # MSI（按机器安装）
+          $p = Start-Process msiexec.exe -ArgumentList '/i', "`"$PWD\out\FoxOS-$V-win-$A.msi`"", '/qn', '/norestart', '/l*v', "$env:RUNNER_TEMP\msi.log" -Wait -PassThru
+          if ($p.ExitCode -ne 0) { Get-Content "$env:RUNNER_TEMP\msi.log" -Tail 40; throw "MSI exit $($p.ExitCode)" }
+          $exe = Get-ChildItem 'C:\Program Files' -Filter 'FoxOS.exe' -Recurse -Depth 2 | Select-Object -First 1
+          Check-Cli 'msi' (Join-Path $exe.DirectoryName 'resources')
+          # 便携 zip
+          Expand-Archive "out\FoxOS-$V-win-$A.zip" -DestinationPath "$env:RUNNER_TEMP\portable"
+          Check-Cli 'zip' "$env:RUNNER_TEMP\portable\resources"
+          # 便携版启动并截图
+          New-Item -ItemType Directory -Force out\smoke | Out-Null
+          $shot = "$PWD\out\smoke\zip-win-$A.png"
+          $proc = Start-Process "$env:RUNNER_TEMP\portable\FoxOS.exe" -ArgumentList "--user-data-dir=$env:RUNNER_TEMP\ud", "--workspace=$env:RUNNER_TEMP\dws", "--screenshot=$shot" -PassThru
+          for ($i = 0; $i -lt 90 -and -not (Test-Path $shot); $i++) { Start-Sleep 1 }
+          Stop-Process -Id $proc.Id -Force -ErrorAction SilentlyContinue
+          if (Test-Path $shot) { Write-Host '桌面截图 OK' } else { Write-Host '::warning::Windows 桌面没有在 90 秒内出截图' }
+
+      - name: 上传到发布 ${{ env.TAG }}
+        run: gh release upload "$TAG" out/FoxOS-* --clobber
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sums-desktop-${{ matrix.os }}-${{ matrix.arch }}
+          path: out/SHA256SUMS.*
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: smoke-${{ matrix.os }}-${{ matrix.arch }}
+          path: out/smoke
+          if-no-files-found: ignore
+
+  iso:
+    name: 系统镜像 ${{ matrix.arch }}
+    needs: release
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { arch: amd64, runner: ubuntu-24.04,     grub: 'grub-pc-bin grub-efi-amd64-bin' }
+          - { arch: arm64, runner: ubuntu-24.04-arm, grub: 'grub-efi-arm64-bin' }
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: 决定是构建还是合并
+        id: mode
+        run: |
+          if [ "${{ matrix.arch }}" = arm64 ]; then
+            if [ "${{ github.event_name }}" = push ] || [ "${{ inputs.iso_arm64 }}" = true ]; then echo "mode=build" >> "$GITHUB_OUTPUT"; else echo "mode=skip" >> "$GITHUB_OUTPUT"; fi
+          elif [ "${{ inputs.iso_amd64_build }}" = true ]; then echo "mode=build" >> "$GITHUB_OUTPUT"
+          else echo "mode=assemble" >> "$GITHUB_OUTPUT"; fi
+      - name: 腾出磁盘
+        if: steps.mode.outputs.mode == 'build'
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL /usr/local/share/boost || true
+          df -h /
+      - name: 构建工具
+        if: steps.mode.outputs.mode == 'build'
+        run: sudo apt-get update -q && sudo apt-get install -y -q debootstrap squashfs-tools xorriso mtools grub-common ${{ matrix.grub }} rsync wget python3 zstd
+      - name: 构建 ISO（${{ matrix.arch }}）
+        if: steps.mode.outputs.mode == 'build'
+        env:
+          FOXOS_OS_ARCH: ${{ matrix.arch }}
+          FOXOS_OS_OUT: ${{ github.workspace }}/build/os
+        run: |
+          # x64 runner 的 /mnt 是单独的大盘；没有就用 RUNNER_TEMP
+          if mountpoint -q /mnt; then export FOXOS_OS_WORK=/mnt/foxos-os; else export FOXOS_OS_WORK=$RUNNER_TEMP/foxos-os; fi
+          df -h / /mnt || true
+          sudo -E bash scripts/os/build-iso.sh
+      - name: 合并已发布的 amd64 分卷为单文件 ISO
+        if: steps.mode.outputs.mode == 'assemble'
+        run: |
+          set -euo pipefail
+          V=$(node -p "require('./apps/desktop/package.json').version")
+          mkdir -p build/os && cd build/os
+          gh release download "$TAG" -p "FoxOS-$V-amd64.iso.part*" -p SHA256SUMS
+          cat $(ls FoxOS-$V-amd64.iso.part* | sort -V) > "FoxOS-$V-amd64.iso"
+          want=$(awk -v f="FoxOS-$V-amd64.iso" '$2==f||$2=="*"f{print $1}' SHA256SUMS)
+          got=$(sha256sum "FoxOS-$V-amd64.iso" | cut -d' ' -f1)
+          echo "want=$want got=$got"
+          if [ -n "$want" ] && [ "$want" != "$got" ]; then echo "合并后的 ISO 与发布里记录的校验值不一致" >&2; exit 1; fi
+          rm -f SHA256SUMS FoxOS-$V-amd64.iso.part*
+      - name: 检查 ISO（引导记录、内核、squashfs 里的狐狸OS）
+        if: steps.mode.outputs.mode != 'skip'
+        run: |
+          set -euo pipefail
+          sudo apt-get install -y -q xorriso squashfs-tools >/dev/null
+          V=$(node -p "require('./apps/desktop/package.json').version")
+          iso=build/os/FoxOS-$V-${{ matrix.arch }}.iso
+          size=$(stat -c%s "$iso"); echo "大小 $size"; test "$size" -lt $((2*1024*1024*1024))
+          xorriso -indev "$iso" -report_el_torito plain 2>/dev/null | tee "$RUNNER_TEMP/eltorito.txt"
+          grep -qi 'UEFI\|efi' "$RUNNER_TEMP/eltorito.txt"
+          if [ "${{ matrix.arch }}" = amd64 ]; then grep -qi 'BIOS' "$RUNNER_TEMP/eltorito.txt"; fi
+          m=$(mktemp -d); sudo mount -o loop,ro "$iso" "$m"
+          ls -l "$m/casper/vmlinuz" "$m/casper/initrd" "$m/casper/filesystem.squashfs"
+          cat "$m/.disk/info"; grep -q "${{ matrix.arch }}" "$m/.disk/info"
+          s=$(mktemp -d); sudo mount -o loop,ro "$m/casper/filesystem.squashfs" "$s"
+          for f in usr/bin/foxos usr/bin/startxfce4 usr/bin/calamares usr/bin/firefox usr/bin/foxos-chrome; do test -e "$s/$f" && echo "有 /$f"; done
+          if [ "$(uname -m)" = "$( [ ${{ matrix.arch }} = amd64 ] && echo x86_64 || echo aarch64 )" ]; then
+            out=$(sudo chroot "$s" /usr/bin/foxos --version); echo "$out"; test "$out" = "foxos $V"
+          fi
+          sudo umount "$s" "$m"
+      - name: 分卷（每个 800 MiB，与之前的发布一致）并上传单文件 + 分卷
+        if: steps.mode.outputs.mode != 'skip'
+        run: |
+          set -euo pipefail
+          V=$(node -p "require('./apps/desktop/package.json').version")
+          cd build/os
+          f=FoxOS-$V-${{ matrix.arch }}.iso
+          if [ "${{ steps.mode.outputs.mode }}" = build ]; then
+            split -b 800M -d -a 1 --numeric-suffixes=1 "$f" "$f.part"
+            files=("$f" "$f".part*)
+          else
+            files=("$f")   # 分卷已经在发布里
+          fi
+          sha256sum "${files[@]}" > SHA256SUMS.iso-${{ matrix.arch }}
+          cat SHA256SUMS.iso-${{ matrix.arch }}
+          gh release upload "$TAG" "${files[@]}" --clobber
+      - uses: actions/upload-artifact@v4
+        if: steps.mode.outputs.mode != 'skip'
+        with:
+          name: sums-iso-${{ matrix.arch }}
+          path: build/os/SHA256SUMS.*
+
+  checksums:
+    name: SHA256SUMS、安装脚本与清单草稿
+    needs: [release, desktop, iso]
+    if: ${{ always() && needs.release.result == 'success' }}
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: sums-*
+          path: sums
+          merge-multiple: true
+      - name: 上传 install.sh / install.ps1，重算整个发布的 SHA256SUMS
+        run: |
+          set -euo pipefail
+          V=${{ needs.release.outputs.version }}
+          sed -i "s/v0\.3\.2-os-preview/$TAG/g" scripts/install.sh scripts/install.ps1
+          gh release upload "$TAG" scripts/install.sh scripts/install.ps1 --clobber
+          mkdir -p all && cd all
+          gh release download "$TAG" --skip-existing -p '*' 
+          rm -f SHA256SUMS
+          sha256sum $(ls | sort) > SHA256SUMS
+          cat SHA256SUMS
+          # 各构建机算的值必须和 Release 上的文件一致（上传没有损坏）
+          if ls ../sums/SHA256SUMS.* >/dev/null 2>&1; then
+            cat ../sums/SHA256SUMS.* | sha256sum -c -
+          fi
+          gh release upload "$TAG" SHA256SUMS --clobber
+      - name: winget / Homebrew / AUR 清单草稿
+        run: |
+          python3 scripts/packaging/gen_manifests.py --version "${{ needs.release.outputs.version }}" --tag "$TAG" \
+            --sums all/SHA256SUMS --out manifests
+          (cd manifests && zip -qr "../FoxOS-${{ needs.release.outputs.version }}-package-manifests.zip" .)
+          gh release upload "$TAG" "FoxOS-${{ needs.release.outputs.version }}-package-manifests.zip" --clobber
+      - uses: actions/upload-artifact@v4
+        with:
+          name: package-manifests
+          path: manifests
+
+  install-e2e:
+    name: 一行安装 ${{ matrix.name }}
+    needs: checksums
+    if: ${{ always() && needs.checksums.result == 'success' && (github.event_name == 'push' || inputs.desktop) }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { name: ubuntu-24.04-x64,  runner: ubuntu-24.04,     container: '' ,                  method: deb }
+          - { name: ubuntu-24.04-arm64, runner: ubuntu-24.04-arm, container: '',                   method: deb }
+          - { name: debian-12,         runner: ubuntu-24.04,     container: 'debian:12',          method: deb }
+          - { name: fedora-42,         runner: ubuntu-24.04,     container: 'fedora:42',          method: rpm }
+          - { name: opensuse-tumbleweed, runner: ubuntu-24.04,   container: 'opensuse/tumbleweed', method: rpm }
+          - { name: archlinux,         runner: ubuntu-24.04,     container: 'archlinux:latest',   method: tar }
+          - { name: macos-14-arm64,    runner: macos-14,         container: '',                   method: auto }
+          - { name: macos-15-x64,      runner: macos-15-intel,   container: '',                   method: auto }
+    runs-on: ${{ matrix.runner }}
+    container: ${{ matrix.container }}
+    steps:
+      - name: 容器里补 curl / sudo 以外的基础工具
+        if: matrix.container != ''
+        run: |
+          if command -v apt-get >/dev/null; then apt-get update -q && apt-get install -y -q curl ca-certificates
+          elif command -v dnf >/dev/null; then dnf install -y -q curl tar gzip findutils
+          elif command -v zypper >/dev/null; then zypper --non-interactive install -y curl tar gzip
+          elif command -v pacman >/dev/null; then pacman -Sy --noconfirm curl tar gzip gtk3 nss alsa-lib libxss libxtst; fi
+      - name: curl | sh
+        shell: sh
+        run: |
+          curl -fsSL "https://github.com/${GH_REPO}/releases/download/${TAG}/install.sh" | FOXOS_TAG="$TAG" FOXOS_METHOD=${{ matrix.method }} sh
+          if [ ${{ matrix.method }} = tar ]; then "$HOME/.local/bin/foxos" --version; else command -v foxos >/dev/null && foxos --version || "$HOME/.local/bin/foxos" --version; fi
+
+  install-e2e-windows:
+    name: 一行安装 windows-${{ matrix.arch }}
+    needs: checksums
+    if: ${{ always() && needs.checksums.result == 'success' && (github.event_name == 'push' || inputs.desktop) }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { arch: x64,   runner: windows-2022 }
+          - { arch: arm64, runner: windows-11-arm }
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - name: irm | iex（静默安装）
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $env:FOXOS_TAG = $env:TAG
+          & ([scriptblock]::Create((Invoke-RestMethod "https://github.com/$env:GH_REPO/releases/download/$env:TAG/install.ps1"))) -Silent
+          $py = "$env:LOCALAPPDATA\Programs\FoxOS\resources\python\python.exe"
+          $out = (& $py -m foxos --version).Trim(); Write-Host $out
+          if ($out -notlike 'foxos *') { throw "foxos --version -> $out" }

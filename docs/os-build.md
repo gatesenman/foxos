@@ -97,3 +97,14 @@ sudo scripts/os/tools/shoot-desktop.sh /tmp/foxos-shots 1920x1080
 - ISO 引导后没有图形：用菜单里的「安全模式」看启动日志，或读 QEMU 串口日志；确认 `casper` 找到了 squashfs。
 - 此宿主 `/dev/kvm` 存在但创建 vCPU 触发内核 BUG：`qemu-boot.sh` 会报错退出，需明确加 `--tcg`（或 `FOXOS_ALLOW_TEST_VMM=qemu-tcg`）才用软件模拟。这只影响本机构建测试，不影响 ISO 在真实电脑或正常 Hyper-V 上使用 KVM。
 - ISO ≥ 2 GB：从 `packages.list` 再减包，或提高 squashfs 压缩（脚本已用 xz）。
+
+## arm64 镜像
+
+`FOXOS_OS_ARCH=arm64 scripts/os/build-iso.sh` 在 arm64 机器上构建 `FoxOS-<版本>-arm64.iso`（GitHub Actions 用 `ubuntu-24.04-arm`，见 [`release.yml`](../.github/workflows/release.yml) 的 `iso` 任务）。和 amd64 的区别：
+
+- 软件源换成 `http://ports.ubuntu.com/ubuntu-ports`；只做 UEFI 引导（`grub-efi-arm64-signed`，构建机需要 `grub-efi-arm64-bin`），没有 BIOS 和 Hyper-V 来宾工具。
+- Firefox 用 Mozilla 的 `linux64-aarch64` 包，cloud-hypervisor 用 `cloud-hypervisor-static-aarch64`。
+- Google 不发布 Linux arm64 版 Chrome：`foxos-chrome-setup --status` 返回 `unsupported-arch`，「Google Chrome」入口直接打开 Firefox。
+- 串口控制台是 `ttyAMA0`（QEMU virt 与多数 ARM 服务器）。
+
+每个 ISO 必须小于 2 GiB（GitHub Release 单文件上限）；CI 同时上传单文件和 800 MiB 分卷。

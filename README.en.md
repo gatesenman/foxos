@@ -46,48 +46,48 @@ Screenshots of the Windows companion app are in their own section below: [Window
 
 ## Download
 
-Everything is on [Releases](https://github.com/gatesenman/foxos/releases). Two different things:
+Everything is on [v0.3.2-os-preview](https://github.com/gatesenman/foxos/releases/tag/v0.3.2-os-preview) (pre-release); `SHA256SUMS` in the same release covers every file. Two different things:
 
-- **The FoxOS operating system** = the bootable ISO in `v0.3.2-os-preview` (two parts, `part1` + `part2`; concatenate them, then check SHA-256 `8e6a9e65f5e39f22170a23c9dde583056663e26c298e936bdbda4524f1110e39`). The screenshots above are this system. From 0.3.2 the default browser is Google Chrome, installed from Google's official repository at first login (see [docs/os.md](docs/os.md)). The older `v0.3.1-os-preview` and `v0.3.0-os-preview` releases remain on the Releases page.
-- **The Windows companion app** = `FoxOS-Setup-0.2.0-x64.exe` / `FoxOS-0.2.0-win-x64.zip` / `install.ps1` in `v0.2.0-windows-preview`. It is an application that runs on your existing Windows desktop, not an operating system.
+- **The FoxOS operating system**: the bootable ISO (Ubuntu 24.04 + XFCE). The screenshots above are this system. From 0.3.2 the default browser is Google Chrome, installed from Google's official repository at first login (see [docs/os.md](docs/os.md)).
+- **The desktop companion + `foxos` CLI**: an app for your existing Windows / macOS / Linux. It bundles Python 3.12 and the kernel, so `foxos` works in a terminal right after install.
 
-**Bootable ISO (recommended):** [v0.3.2-os-preview](https://github.com/gatesenman/foxos/releases/tag/v0.3.2-os-preview) (pre-release). Write it to USB or boot it in Hyper-V; see the [ISO test guide](docs/os-test-guide.md).
+| OS | x64 | arm64 |
+| --- | --- | --- |
+| Windows 10 1809+ / 11 | `FoxOS-Setup-0.3.2-x64.exe` (installer) · `FoxOS-0.3.2-win-x64.msi` (MSI) · `FoxOS-0.3.2-win-x64.zip` (portable) | `FoxOS-Setup-0.3.2-arm64.exe` · `FoxOS-0.3.2-win-arm64.msi` · `FoxOS-0.3.2-win-arm64.zip` |
+| macOS 11+ | Intel: `FoxOS-0.3.2-mac-x64.dmg` / `.zip` | Apple silicon: `FoxOS-0.3.2-mac-arm64.dmg` / `.zip` |
+| Ubuntu / Debian / Mint | `FoxOS-0.3.2-linux-x64.deb` | `FoxOS-0.3.2-linux-arm64.deb` |
+| Fedora / RHEL / Rocky / Alma / openSUSE | `FoxOS-0.3.2-linux-x64.rpm` | `FoxOS-0.3.2-linux-arm64.rpm` |
+| Arch / Manjaro / other distros | `FoxOS-0.3.2-linux-x64.tar.gz` · `.AppImage` | `FoxOS-0.3.2-linux-arm64.tar.gz` · `.AppImage` |
+| **FoxOS OS ISO** | `FoxOS-0.3.2-amd64.iso` (UEFI + BIOS; also `.part1` + `.part2`) | `FoxOS-0.3.2-arm64.iso` (UEFI; ARM PCs, UTM on Apple silicon, ARM servers) |
+| Package managers (drafts, not submitted) | winget `gatesenman.FoxOS` · Homebrew cask `foxos` · AUR `foxos-bin`, see `FoxOS-0.3.2-package-manifests.zip` and [`packaging/`](packaging/) | same |
 
-| File | What it is |
-| --- | --- |
-| `FoxOS-0.3.2-amd64.iso.part1` / `.part2` | Two parts of the complete ISO (838860800 + 724301824 bytes, 1563162624 bytes after concat, ~1.46 GiB) |
-| `FoxOS-0.3.2-amd64.iso` | The assembled Live + installer image (UEFI + BIOS), amd64, under 2 GB, SHA-256 `8e6a9e65f5e39f22170a23c9dde583056663e26c298e936bdbda4524f1110e39` |
-| `SHA256SUMS` | Checksums (complete ISO and both parts) |
-
-The Release ships only the two parts: a single-file upload of the ~1.46 GiB ISO from this build environment was cut off mid-transfer, so concatenate the parts and then verify.
+One-line install (detects OS and CPU, downloads, verifies SHA-256, installs, then runs `foxos --version`):
 
 ```bash
-base=https://github.com/gatesenman/foxos/releases/download/v0.3.2-os-preview
-curl -L -O "$base/FoxOS-0.3.2-amd64.iso.part1"
-curl -L -O "$base/FoxOS-0.3.2-amd64.iso.part2"
-curl -L -O "$base/SHA256SUMS"
+# Linux / macOS: deb on Ubuntu / Debian, rpm on Fedora / RHEL / openSUSE, ~/.local elsewhere or without sudo
+curl -fsSL https://github.com/gatesenman/foxos/releases/download/v0.3.2-os-preview/install.sh | sh
+```
+
+```powershell
+# Windows (x64 / arm64); set $env:FOXOS_PORTABLE = '1' for portable or $env:FOXOS_MSI = '1' for the MSI first
+irm https://github.com/gatesenman/foxos/releases/download/v0.3.2-os-preview/install.ps1 | iex
+```
+
+The packages are not code-signed yet: on Windows, SmartScreen → "More info" → "Run anyway"; on macOS, Control-click FoxOS in Applications → Open (macOS 15+: System Settings → Privacy & Security → "Open Anyway"). Per-OS details, AppImage and ISO usage: **[docs/install.md](docs/install.md#english)**.
+
+Each ISO is a single file under 2 GiB; on a flaky connection download the parts and join them:
+
+```bash
 cat FoxOS-0.3.2-amd64.iso.part1 FoxOS-0.3.2-amd64.iso.part2 > FoxOS-0.3.2-amd64.iso
 sha256sum -c SHA256SUMS --ignore-missing
 ```
-
-Windows (PowerShell):
 
 ```powershell
 cmd /c copy /b FoxOS-0.3.2-amd64.iso.part1+FoxOS-0.3.2-amd64.iso.part2 FoxOS-0.3.2-amd64.iso
 Get-FileHash -Algorithm SHA256 .\FoxOS-0.3.2-amd64.iso
 ```
 
-**Windows x64 companion app (not the OS):** [v0.2.0-windows-preview](https://github.com/gatesenman/foxos/releases/tag/v0.2.0-windows-preview) (pre-release, not yet verified on real Windows hardware — see the [test checklist](docs/windows-test-guide.md)).
-
-```powershell
-irm https://github.com/gatesenman/foxos/releases/download/v0.2.0-windows-preview/install.ps1 | iex      # anonymous download, verifies SHA256SUMS
-$env:FOXOS_PORTABLE = '1'; irm https://github.com/gatesenman/foxos/releases/download/v0.2.0-windows-preview/install.ps1 | iex   # portable
-$env:FOXOS_LANG = 'en-US'; irm https://github.com/gatesenman/foxos/releases/download/v0.2.0-windows-preview/install.ps1 | iex  # English messages (default: Chinese)
-```
-
-The setup program offers Simplified Chinese (default) and English and picks the one matching the Windows UI language.
-
-`$env:GITHUB_TOKEN` is optional and only helps with GitHub's anonymous API rate limit. The installer is unsigned (SmartScreen warns on first run). Linux: boot the ISO above, or run the Windows/Linux companion from source. We do not ship a macOS OS image for non-Apple hardware.
+USB and Hyper-V steps: [ISO test guide](docs/os-test-guide.md). All packages and the arm64 ISO are built by GitHub Actions ([`release.yml`](.github/workflows/release.yml)) on matching runners, installed and checked there, then uploaded straight to the release. Older releases (`v0.3.1-os-preview`, `v0.3.0-os-preview`, the Windows companion `v0.2.0-windows-preview`) remain on the [Releases](https://github.com/gatesenman/foxos/releases) page.
 
 ## Windows 伴侣程序（在现有 Windows 桌面上运行，v0.2.0） / Windows companion app
 

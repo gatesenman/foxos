@@ -16,10 +16,11 @@ function setWorkspace(ws) {
 }
 function getWorkspace() { return workspace; }
 
-// Windows 安装包自带的 Python（resources/python，embeddable 版 + 办公库，内核通过 ._pth 加入搜索路径）
+// 安装包自带的 Python（resources/python）：Windows 是 embeddable 版（内核通过 ._pth 加入搜索路径），
+// Linux / macOS 是 python-build-standalone（内核通过 PYTHONPATH）；都已带好办公库
 function bundledPython() {
-  if (!IS_WIN || !app.isPackaged) return null;
-  const p = path.join(process.resourcesPath, 'python', 'python.exe');
+  if (!app.isPackaged) return null;
+  const p = IS_WIN ? path.join(process.resourcesPath, 'python', 'python.exe') : path.join(process.resourcesPath, 'python', 'bin', 'python3');
   return fs.existsSync(p) ? p : null;
 }
 
