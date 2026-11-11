@@ -13,6 +13,7 @@ session/request_permission）和 session/new 交给它的 foxos MCP 服务器做
   remember <内容> | 记住 <内容>
   on <机器>: list [目录] | 在 <机器> 上列出 [目录]
   read <路径> | 读取 <路径>
+  use <连接器> <工具> {JSON 参数} | 使用 <连接器> <工具> {…}   经 foxos MCP 调用连接器工具（按智能体授权与审批）
 其它文字：复述收到的上下文（身份、可委托的智能体、技能数）。
 
 用法：python3 -m foxos.local_agent
@@ -288,6 +289,25 @@ class Agent:
             except RuntimeError as e:
                 self.done(sid, tid, False, [{"type": "content", "content": {"type": "text", "text": str(e)}}])
                 self.say(sid, T(f"委托给 {to} 没有成功：{e}\n", f"Delegating to {to} failed: {e}\n"))
+            return True
+        m = re.match(r"^(?:use|使用)\s+([a-z0-9][a-z0-9_-]*)\s+([A-Za-z0-9_.-]+)\s*(\{.*\})?\s*$", ln, re.S)
+        if m:
+            cid, tool, raw = m.group(1), m.group(2), m.group(3)
+            try:
+                args = json.loads(raw) if raw else {}
+            except ValueError:
+                self.say(sid, T("参数不是 JSON 对象。\n", "Arguments are not a JSON object.\n"))
+                return True
+            tid = self.tool(sid, "fetch", T(f"连接器 {cid} · {tool}", f"Connector {cid} · {tool}"), {"tool": "connector_tool_call", "connector": cid, "name": tool})
+            r = self.mcp(sid).tool("connector_tool_call", {"connector": cid, "tool": tool, "arguments": args})
+            if r.get("ok"):
+                res = r["result"]
+                text = "\n".join(c.get("text", "") for c in (res.get("content") or []) if c.get("type") == "text") or json.dumps(res, ensure_ascii=False)[:2000]
+                self.done(sid, tid, not res.get("isError"), [{"type": "content", "content": {"type": "text", "text": text[:4000]}}], {"connector": cid})
+                self.say(sid, T(f"{cid} · {tool} 返回：{text[:400]}\n", f"{cid} · {tool} returned: {text[:400]}\n"))
+            else:
+                self.done(sid, tid, False, [{"type": "content", "content": {"type": "text", "text": r["error"]["message"]}}])
+                self.say(sid, T(f"{cid} · {tool}：{r['error']['message']}\n", f"{cid} · {tool}: {r['error']['message']}\n"))
             return True
         m = re.match(r"^(?:remember|记住)\s*[:：]?\s*(.+)$", ln)
         if m:

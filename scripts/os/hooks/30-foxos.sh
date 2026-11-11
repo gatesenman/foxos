@@ -14,7 +14,7 @@ VENV=/usr/lib/foxos/venv
 if [ ! -x "$VENV/bin/python" ]; then
   python3 -m venv --system-site-packages "$VENV"
 fi
-"$VENV/bin/python" -m pip install --no-cache-dir 'python-pptx>=1.0,<2' 'zstandard>=0.22'
+"$VENV/bin/python" -m pip install --no-cache-dir --ignore-installed 'python-pptx>=1.0,<2' 'zstandard>=0.22'
 "$VENV/bin/python" -c 'import pptx, zstandard, openpyxl, docx'
 cat > /usr/bin/foxos <<'U'
 #!/bin/sh
