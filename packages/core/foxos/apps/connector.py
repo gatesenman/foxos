@@ -56,6 +56,9 @@ def c_connect(ctx: Context, connector: str, token: str | None = None, client_id:
     try:
         t = connectors.refresh_tools(connector)
     except FoxError as e:
+        if e.code == "PERMISSION_DENIED":  # 对端拒绝了令牌：不算连上，删掉这枚令牌
+            connectors.disconnect(connector)
+            return {"connected": False, "tools": None, "warning": e.message}
         return {"connected": True, "tools": None, "warning": e.message}
     return {"message": tr("connector.connected", c["title"], len(t["tools"])), "connected": True, "tools": t["tools"], "server": t["server"]}
 
