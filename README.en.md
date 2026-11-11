@@ -4,13 +4,21 @@
 
 <p align="center">A desktop operating system for agents: real desktop apps, one <code>foxos</code> command line and MCP tool set for everything, audit log and human takeover, and a home-grown isolation layer.</p>
 
-<p align="center"><a href="README.md">中文</a> · <a href="https://github.com/gatesenman/foxos/releases/tag/v0.2.0-windows-preview">Windows preview download</a> · <a href="AGENTS.md">AGENTS.md</a> · <a href="docs/test-report.md">Test report</a></p>
+<p align="center"><a href="README.md">中文</a> · <a href="https://github.com/gatesenman/foxos/releases/tag/v0.3.0-os-preview">Bootable ISO</a> · <a href="https://github.com/gatesenman/foxos/releases/tag/v0.2.0-windows-preview">Windows companion preview</a> · <a href="docs/os-test-guide.md">ISO test guide</a> · <a href="AGENTS.md">AGENTS.md</a></p>
 
-![FoxOS desktop (English UI)](docs/screenshots/desktop-en.png)
+![FoxOS real desktop: labwc, bottom panel, start menu, and GNOME Terminal](docs/screenshots/os-desktop.png)
+
+This screenshot is from a graphical session of the Live ISO (QEMU used for testing only). It shows real labwc windows: GNOME Terminal (`foxos@foxos`), the FoxOS bottom panel (Start, clock, System, Take over), and the start menu — not a painted Electron fake desktop.
 
 ## What it is
 
-FoxOS is a desktop program for Windows and Linux (macOS planned) that gives agents (ACP/MCP clients such as Claude Code, Codex, Gemini CLI) and humans one shared workbench:
+FoxOS is first a **bootable, installable Linux OS** (Ubuntu 24.04 base, Chinese default, labwc compositor + GTK panel). Agents (ACP/MCP clients such as Claude Code, Codex, Gemini CLI) and humans share a real desktop: every window is a real OS process.
+
+The Windows `.exe` is a **companion** ([v0.2.0-windows-preview](https://github.com/gatesenman/foxos/releases/tag/v0.2.0-windows-preview)), not the ISO itself. We will not ship a macOS system image for non-Apple hardware.
+
+Environments do not use Docker, Podman, or QEMU as the product runtime: full Linux guests use in-kernel KVM plus cloud-hypervisor (Apache-2.0); light sandboxes use namespaces; the Windows companion uses WSL2 / Hyper-V / Windows Sandbox. Docker Hub is only an optional distribution channel; see [docs/docker.md](docs/docker.md).
+
+The workbench includes:
 
 - **Real apps**: terminal (real PTY), file manager, Monaco editor, browser, native LibreOffice windows, and the 51 open-source Everything apps.
 - **One operation, three entry points**: GUI, `foxos <app> <resource> <verb> --json`, and MCP tools (stdio and Streamable HTTP) all call the same kernel command.
@@ -40,7 +48,27 @@ Captured from the running desktop (xvfb, 1600×1000) with real files created in 
 
 ## Download
 
-Windows x64 preview: [v0.2.0-windows-preview](https://github.com/gatesenman/foxos/releases/tag/v0.2.0-windows-preview) (pre-release, not yet verified on real Windows hardware — see the [test checklist](docs/windows-test-guide.md)).
+**Bootable ISO (recommended):** [v0.3.0-os-preview](https://github.com/gatesenman/foxos/releases/tag/v0.3.0-os-preview) (pre-release). Write it to USB or boot it in Hyper-V; see the [ISO test guide](docs/os-test-guide.md).
+
+| File | What it is |
+| --- | --- |
+| `FoxOS-0.3.0-amd64.iso` | Live + installer image (UEFI + BIOS), amd64, under 2 GB |
+| `SHA256SUMS` | Checksums |
+
+```bash
+curl -L -O https://github.com/gatesenman/foxos/releases/download/v0.3.0-os-preview/FoxOS-0.3.0-amd64.iso
+curl -L -O https://github.com/gatesenman/foxos/releases/download/v0.3.0-os-preview/SHA256SUMS
+sha256sum -c SHA256SUMS
+```
+
+Real-desktop screenshots:
+
+| | |
+| --- | --- |
+| ![FoxOS desktop](docs/screenshots/os-desktop.png)<br>**Desktop**: labwc, bottom panel, start menu, GNOME Terminal | ![Terminal](docs/screenshots/os-terminal.png)<br>**GNOME Terminal**: a real `foxos@foxos` session |
+| ![Text editor](docs/screenshots/os-editor.png)<br>**Text editor**: a real GNOME Text Editor window | |
+
+**Windows x64 companion preview:** [v0.2.0-windows-preview](https://github.com/gatesenman/foxos/releases/tag/v0.2.0-windows-preview) (pre-release, not yet verified on real Windows hardware — see the [test checklist](docs/windows-test-guide.md)).
 
 ```powershell
 irm https://github.com/gatesenman/foxos/releases/download/v0.2.0-windows-preview/install.ps1 | iex      # anonymous download, verifies SHA256SUMS
@@ -50,7 +78,7 @@ $env:FOXOS_LANG = 'en-US'; irm https://github.com/gatesenman/foxos/releases/down
 
 The setup program offers Simplified Chinese (default) and English and picks the one matching the Windows UI language.
 
-`$env:GITHUB_TOKEN` is optional and only helps with GitHub's anonymous API rate limit. The installer is unsigned (SmartScreen warns on first run). Linux: run from source for now; macOS: not released.
+`$env:GITHUB_TOKEN` is optional and only helps with GitHub's anonymous API rate limit. The installer is unsigned (SmartScreen warns on first run). Linux: boot the ISO above, or run the Windows/Linux companion from source. We do not ship a macOS OS image for non-Apple hardware.
 
 ## Quick start (from source)
 

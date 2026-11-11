@@ -5,19 +5,27 @@
 <p align="center">给智能体使用的桌面操作系统：真实的桌面与应用、统一的 <code>foxos</code> 命令与 MCP 工具、审计与人工接管、自研隔离环境。</p>
 
 <p align="center">
-  <a href="https://github.com/gatesenman/foxos/releases/tag/v0.2.0-windows-preview">下载 Windows 预览版</a> ·
+  <a href="https://github.com/gatesenman/foxos/releases/tag/v0.3.0-os-preview">下载可引导 ISO</a> ·
+  <a href="https://github.com/gatesenman/foxos/releases/tag/v0.2.0-windows-preview">Windows 伴侣预览</a> ·
   <a href="#快速开始">快速开始</a> ·
   <a href="AGENTS.md">智能体接入</a> ·
-  <a href="docs/test-report.md">测试报告</a> ·
+  <a href="docs/os-test-guide.md">ISO 测试指南</a> ·
   <a href="README.en.md">English</a>
 </p>
 
-![狐狸OS 桌面：快捷方式、标题栏与任务栏显示各程序自带的图标](docs/screenshots/desktop.png)
+![狐狸OS 真实桌面：labwc、底部面板、开始菜单和 GNOME 终端](docs/screenshots/os-desktop.png)
+
+这张截图来自 Live ISO 在 QEMU 里的一次干净引导之后的图形会话（QEMU 只用于测试）。图里是真正的 labwc 窗口：GNOME 终端（`foxos@foxos`）、底部狐狸OS 面板（开始、时钟、系统、人工接管）和开始菜单，不是 Electron 里画的假桌面。
 
 ## 狐狸OS 是什么
 
-狐狸OS 是运行在 Windows、Linux（以及计划中的 macOS）上的桌面程序。它给智能体（Claude Code、Codex、Gemini CLI 等 ACP / MCP 客户端）
-和人一个共同的工作台：
+狐狸OS 首先是一个**可引导、可安装的 Linux 操作系统**（Ubuntu 24.04 基础，默认中文，labwc 合成器 + GTK 面板）。它给智能体（Claude Code、Codex、Gemini CLI 等 ACP / MCP 客户端）和人一个共同的真实桌面：每个窗口都是真实的 OS 进程。
+
+Windows 上的 `.exe` 是**伴侣程序**（预览版见 [v0.2.0-windows-preview](https://github.com/gatesenman/foxos/releases/tag/v0.2.0-windows-preview)），用来在 Windows 里继续用 WSL2 / Hyper-V / Windows Sandbox 工作；它不是这张 ISO 本身。我们不会在非 Apple 硬件上提供 macOS 系统镜像。
+
+产品里的「环境」不依赖 Docker / Podman / QEMU 作为运行时：Linux 上来宾完整虚拟机走内核 KVM + cloud-hypervisor（Apache-2.0），轻量场景走命名空间。Docker Hub 只是可选的分发通道，见 [docs/docker.md](docs/docker.md)。
+
+它给智能体和人的工作台包括：
 
 - **真实的应用**：终端（真实 PTY）、文件管理器、Monaco 编辑器、浏览器、LibreOffice 原生窗口，以及 51 个 Everything 开源应用（表格、文档、白板、CRM、国际象棋……）。
 - **同一套操作，三个入口**：图形界面、`foxos <应用> <资源> <动作> --json` 命令、MCP 工具（stdio 与 Streamable HTTP），调用的是同一个内核命令。
@@ -61,7 +69,28 @@
 
 ## 下载
 
-**Windows x64 预览版**：[v0.2.0-windows-preview](https://github.com/gatesenman/foxos/releases/tag/v0.2.0-windows-preview)（预发布，尚未在 Windows 实机上验收，见 [Windows 测试清单](docs/windows-test-guide.md)）
+**可引导 ISO（推荐）**：[v0.3.0-os-preview](https://github.com/gatesenman/foxos/releases/tag/v0.3.0-os-preview)（预发布）。写到 U 盘或在 Hyper-V 里启动，步骤见 [ISO 测试指南](docs/os-test-guide.md)。
+
+| 文件 | 说明 |
+| --- | --- |
+| `FoxOS-0.3.0-amd64.iso` | Live + 安装镜像（UEFI + BIOS），amd64，小于 2 GB |
+| `SHA256SUMS` | 校验和 |
+
+```bash
+# 下载并校验（版本号以 Release 页面为准）
+curl -L -O https://github.com/gatesenman/foxos/releases/download/v0.3.0-os-preview/FoxOS-0.3.0-amd64.iso
+curl -L -O https://github.com/gatesenman/foxos/releases/download/v0.3.0-os-preview/SHA256SUMS
+sha256sum -c SHA256SUMS
+```
+
+真实桌面截图：
+
+| | |
+| --- | --- |
+| ![狐狸OS 桌面](docs/screenshots/os-desktop.png)<br>**桌面**：labwc、底部面板、开始菜单、GNOME 终端 | ![终端](docs/screenshots/os-terminal.png)<br>**GNOME 终端**：真实的 `foxos@foxos` 会话 |
+| ![文本编辑器](docs/screenshots/os-editor.png)<br>**文本编辑器**：GNOME Text Editor 的真实窗口 | |
+
+**Windows x64 伴侣预览**：[v0.2.0-windows-preview](https://github.com/gatesenman/foxos/releases/tag/v0.2.0-windows-preview)（预发布，尚未在 Windows 实机上验收，见 [Windows 测试清单](docs/windows-test-guide.md)）
 
 | 文件 | 说明 |
 | --- | --- |
@@ -81,7 +110,7 @@ powershell -ExecutionPolicy Bypass -File install.ps1 -Portable
 
 `$env:GITHUB_TOKEN` 可选，只在遇到 GitHub 匿名 API 频率限制（每小时 60 次）时设置。安装包未签名，首次运行时 SmartScreen 会提示，选“更多信息 → 仍要运行”。
 
-Linux：目前从源码运行（见下），安装包尚未发布。macOS：未发布、未测试。
+Linux：请使用上面的可引导 ISO，或从源码运行伴侣程序。我们不会在非 Apple 硬件上提供 macOS 系统镜像。
 
 ## 快速开始
 
