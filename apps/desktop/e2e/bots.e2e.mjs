@@ -46,7 +46,9 @@ class Env {
     this.display = ':' + n;
     this.env = { ...process.env, PYTHONPATH: path.join(ROOT, 'packages', 'core'), PYTHONIOENCODING: 'utf-8', DISPLAY: this.display,
       FOXOS_HOME: path.join(this.root, 'home'), XDG_DATA_HOME: path.join(this.root, 'data'), XDG_STATE_HOME: path.join(this.root, 'state'),
-      XDG_CONFIG_HOME: path.join(this.root, 'config'), FOXOS_RUNTIME_BIN: path.join(this.root, 'bin'), FOXOS_BOTS_BROWSER: BROWSER };
+      XDG_CONFIG_HOME: path.join(this.root, 'config'), FOXOS_RUNTIME_BIN: path.join(this.root, 'bin'), FOXOS_BOTS_BROWSER: BROWSER,
+      // 这个窗口模拟狐狸OS 虚拟电脑里的智能体窗口；宿主上的限制见 test_hostguard.py（US-134）
+      FOXOS_PLACE: 'foxos' };
     if (fs.existsSync(CACHE)) this.env.FOXOS_RUNTIME_PREFIX = CACHE;
     delete this.env.FOXOS_AGENT; delete this.env.FOXOS_WORKSPACE; delete this.env.DEEPSEEK_API_KEY;
     this.procs = [];

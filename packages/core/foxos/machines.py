@@ -214,11 +214,13 @@ def ping(name: str) -> dict:
             "acting": r.get("acting"), "ms": round((time.monotonic() - t0) * 1000, 1)}
 
 
-def invoke(ws, machine: str | None, command: str, params: dict, agent: str, task: str | None = None, interface: str = "acp") -> dict:
-    """本机或远程执行（聊天引擎、MCP 的 machine 参数、CLI 的 --machine 都走这里）。"""
+def invoke(ws, machine: str | None, command: str, params: dict, agent: str, task: str | None = None, interface: str = "acp",
+           confirm=None) -> dict:
+    """本机或远程执行（聊天引擎、MCP 的 machine 参数、CLI 的 --machine 都走这里）。
+    在宿主上，智能体对本机的调用由内核里的 hostguard 把关（confirm：逐个问人的回调）。"""
     if machine in (None, "", LOCAL):
         from .kernel import Context, invoke as kinvoke
-        return kinvoke(command, params, Context(ws, agent=agent, task=task, interface=interface))
+        return kinvoke(command, params, Context(ws, agent=agent, task=task, interface=interface, confirm=confirm))
     return remote_invoke(machine, command, params, agent, task, ws=ws)
 
 

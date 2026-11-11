@@ -836,6 +836,31 @@ foxos bot memory forget BOT MEMORY_ID
 foxos bot memory forget fox mem-1a2b3c4d
 ```
 
+### `foxos bot host-access`
+
+查看或更改：宿主上的智能体能否在本机执行（默认不能，只在狐狸OS 虚拟电脑里）
+
+```text
+foxos bot host-access [ACTION]
+```
+
+工具接口名：`bot_host-access` · 权限：`modify`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `action` | `ACTION` | string |  | status、enable（只有人能做，之后每个操作仍要确认）或 disable；可选：status / enable / disable；默认 status |
+
+示例：
+
+```bash
+foxos bot host-access --json
+foxos bot host-access enable
+```
+
+限制：
+
+- 这个操作只有人可以做
+
 ### `foxos bot approval list`
 
 列出待审批的请求

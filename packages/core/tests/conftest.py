@@ -7,6 +7,8 @@ from pathlib import Path
 import pytest
 
 CORE = Path(__file__).resolve().parents[1]
+# 测试默认模拟“运行在狐狸OS 虚拟电脑里”；宿主保护（智能体不在宿主上动手）由 test_hostguard.py 用 FOXOS_PLACE=host 单独测
+os.environ.setdefault("FOXOS_PLACE", "foxos")
 
 
 def _env(extra=None):

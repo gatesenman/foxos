@@ -1306,5 +1306,15 @@
   "env.expose_port_param": "Fixed host port (picked automatically by default)",
   "env.expose_limit": "Only a human can expose; takes effect on the next start; the host firewall must allow the port",
   "bot.p_provider": "Model provider preset: deepseek, openai, dashscope, ollama or custom (fills in the base URL and default model; store the key with --api-key-stdin)",
-  "bots.model_unknown_tool": "The model called an unknown tool: {0}"
+  "bots.model_unknown_tool": "The model called an unknown tool: {0}",
+  "host.bots_stay_in_vm": "On the host, bots can't run {0} on this computer: bots act only inside the FoxOS virtual computer",
+  "host.bots_stay_in_vm_hint": "Open the bots window inside the FoxOS virtual computer, or pair it (foxos machine pair) and point the bot at it (foxos bot config set <bot> --machines <name> --default-machine <name>). If you really need host execution, a person runs foxos bot host-access enable; every action still needs its own confirmation",
+  "host.not_confirmed": "Nobody confirmed running {0} on the host, so it was refused",
+  "host.acp_in_vm": "The code agent {0} reads, writes and runs commands on the computer it runs on; on the host it can only run inside the FoxOS virtual computer",
+  "host.confirm_title": "Run {0} on the host",
+  "host.status_vm": "Running inside FoxOS: bots act on this virtual computer",
+  "host.status_off": "On the host: bots can't act on this computer (default)",
+  "host.status_on": "On the host: host execution is allowed, and every action needs a person's confirmation",
+  "bot.c_host_access": "Show or change whether bots on the host may act on this computer (default: no, only inside the FoxOS virtual computer)",
+  "bot.p_host_action": "status, enable (people only; every action still needs confirmation) or disable"
 }

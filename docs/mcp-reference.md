@@ -16,7 +16,7 @@
 
 错误码：USAGE(2) NOT_FOUND(3) PERMISSION_DENIED(4) LOCKED(5) DEPENDENCY_MISSING(6) CONFLICT(7) PAUSED(8) ERROR(1)。
 
-共 4432 个工具。
+共 4433 个工具。
 
 ## acp（12 个工具）
 
@@ -237,7 +237,7 @@
 {"name": "acp_key_remove", "arguments": {"agent": "…", "name": "…"}}
 ```
 
-## bot（30 个工具）
+## bot（31 个工具）
 
 ### `bot_profile_list`
 
@@ -681,6 +681,23 @@
 
 ```json
 {"name": "bot_memory_forget", "arguments": {"bot": "…", "memory": "…"}}
+```
+
+### `bot_host-access`
+
+查看或更改：宿主上的智能体能否在本机执行（默认不能，只在狐狸OS 虚拟电脑里）。CLI：foxos bot host-access [ACTION]。限制：这个操作只有人可以做。示例：foxos bot host-access --json
+
+只读：否 · 破坏性：否 · CLI：`foxos bot host-access`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `action` | string |  | status、enable（只有人能做，之后每个操作仍要确认）或 disable 可选：status / enable / disable |
+| `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
+
+调用示例：
+
+```json
+{"name": "bot_host-access", "arguments": {}}
 ```
 
 ### `bot_approval_list`

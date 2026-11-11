@@ -120,6 +120,7 @@ class Context:
     lock_wait: float = 0.0
     interface: str = "cli"  # cli | mcp | desktop | remote
     machine: str | None = None  # 远程调用时：发起方的机器 / 客户端名，写入审计
+    confirm: Callable[[str, str], bool] | None = None  # 宿主上智能体的非只读操作：逐个问人（见 hostguard）
 
     def rel(self, path: Path) -> str:
         return self.workspace.rel(path)
@@ -277,6 +278,9 @@ def invoke(command_id: str, params: dict | None, ctx: Context) -> dict:
         record["permission"] = cmd.permission
         record["args"] = redact(cmd, params or {})
         values = validate(cmd, params or {})
+        if cmd.app not in ("bot", "control"):
+            from .hostguard import guard as host_guard
+            host_guard(ctx.agent, cmd.id, cmd.permission, ctx.confirm)
         if cmd.permission != "read" and cmd.app != "control" and paused_for(ctx.workspace, ctx.agent):
             st = paused_for(ctx.workspace, ctx.agent)
             raise FoxError(

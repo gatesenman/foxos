@@ -40,6 +40,7 @@
 | US-131 | 停靠窗口占住屏幕边（`_NET_WM_STRUT_PARTIAL`），最大化窗口不被盖住，取消停靠后释放 | `apps/desktop/e2e/bots.e2e.mjs`：`US-131` |
 | US-132 | 智能体窗口：配对第二台狐狸OS 并在聊天里切换机器 | `apps/desktop/e2e/bots.e2e.mjs`：`US-132` |
 | US-133 | 智能体窗口：人工接管让智能体的编辑停下（卡片记为接管），交还后恢复 | `apps/desktop/e2e/bots.e2e.mjs`：`US-133` |
+| US-134 | 宿主应用里的智能体只在狐狸OS 虚拟电脑里动手；宿主执行要人明确打开（`foxos bot host-access enable`）并逐个确认 | `packages/core/tests/test_hostguard.py`：`test_US134_…` |
 
 说明：
 
@@ -64,4 +65,5 @@ Every story has an automated test, and `scripts/stories.json` maps each story to
 - US-116: opencode is downloaded, checked against its sha256, and completes a real ACP handshake.
 - US-117–US-118: the ISO runtime, checked as user `foxos` in an overlay of the image chroot.
 - US-119–US-124: real model turns through DeepSeek's OpenAI-compatible API: the main bot answers, delegates to an opencode code bot that edits a file after a person approves (the card carries the diff), a denied edit leaves the file alone, a pstack skill, a read on a second FoxOS machine, and Qwen Code pointed at DeepSeek. The key is read from `~/.secrets/deepseek_api_key` (or `FOXOS_TEST_DEEPSEEK_KEY_FILE`) and only goes into the test's own secret store over stdin. Without the key file these tests are skipped, not failed.
+- US-134: on a host app (the Windows companion and other non-FoxOS systems), bots act only inside the FoxOS virtual computer. Host execution needs a person to turn it on, and then a confirmation for every action that isn't read-only.
 - US-125–US-133: the real bots window (Chrome app mode) on its own Xvfb + xfwm4 desktop, driven with Playwright over CDP: create and configure bots, approve and deny real opencode edits, @ delegation, `/` skills, a real local MCP connector, docking with a reserved screen edge, pairing a second machine, and takeover. The code bots use `deepseek/deepseek-flash` when the key file exists and opencode's default free model otherwise (no key, but opencode caps free usage).

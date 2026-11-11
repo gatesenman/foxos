@@ -10,7 +10,7 @@ from __future__ import annotations
 import os
 from pathlib import Path
 
-from .. import bots, secrets, skills
+from .. import bots, hostguard, secrets, skills
 from ..errors import FoxError
 from ..i18n import tr
 from ..kernel import Command, Context, Param, is_human, register, register_app
@@ -263,6 +263,16 @@ def memory_forget(ctx: Context, bot: str, memory: str) -> dict:
     return bots.memory_forget(ctx.workspace, bot, memory)
 
 
+def host_access(ctx: Context, action: str = "status") -> dict:
+    """宿主上智能体能不能在本机动手：默认不能（只在狐狸OS 虚拟电脑里）；只有人能打开，打开后每个非只读操作仍要人逐个确认。"""
+    if action in ("enable", "disable"):
+        _human(ctx)
+        hostguard.set_policy(action == "enable", ctx.agent)
+    pol = hostguard.policy()
+    return {"place": hostguard.place(), "on_host": hostguard.on_host(), "enabled": pol["enabled"], "by": pol["by"], "at": pol["at"],
+            "message": tr("host.status_vm") if not hostguard.on_host() else tr("host.status_on") if pol["enabled"] else tr("host.status_off")}
+
+
 def approval_list(ctx: Context) -> dict:
     a = bots.approvals_pending(ctx.workspace)
     return {"count": len(a), "approvals": a}
@@ -374,6 +384,9 @@ register(Command("bot", "memory add", tr("bot.c_memory_add"), memory_add,
 register(Command("bot", "memory forget", tr("bot.c_memory_forget"), memory_forget,
                  params=[BOT, Param("memory", "string", tr("bot.p_memory"), required=True, positional=True, metavar="MEMORY_ID")],
                  examples=["foxos bot memory forget fox mem-1a2b3c4d"], permission="delete"))
+register(Command("bot", "host-access", tr("bot.c_host_access"), host_access,
+                 params=[Param("action", "string", tr("bot.p_host_action"), enum=["status", "enable", "disable"], default="status", positional=True, metavar="ACTION")],
+                 examples=["foxos bot host-access --json", "foxos bot host-access enable"], permission="modify", limits=[tr("bot.human_only")]))
 register(Command("bot", "approval list", tr("bot.c_approvals"), approval_list, examples=["foxos bot approval list --json"], audited=False))
 register(Command("bot", "approval answer", tr("bot.c_approval_answer"), approval_answer,
                  params=[Param("request", "string", tr("bot.p_request"), required=True, positional=True, metavar="REQUEST"),

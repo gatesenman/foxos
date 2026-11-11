@@ -23,7 +23,7 @@ import time
 import uuid
 from pathlib import Path
 
-from . import audit, machines, secrets, skills
+from . import audit, hostguard, machines, secrets, skills
 from .errors import FoxError
 from .i18n import get_lang, tr
 
@@ -858,6 +858,60 @@ def _prompt_blocks(ws, text: str, pre: str, skill_block: str, attachments: list)
     return blocks
 
 
+def _ask_human(ws, bot: dict, turn: "_Turn", cd: dict, tc: dict, opts: list[dict], aid: str) -> str | None:
+    """写一条待审批记录，在卡片上显示按钮，等人回答（界面、CLI 的 bot approval answer 或频道）；超时或人工接管都算拒绝。"""
+    from .kernel import paused_for
+    rid = "apr-" + uuid.uuid4().hex[:10]
+    a = {"id": rid, "status": "pending", "bot": bot["id"], "bot_name": bot["name"], "turn": turn.turn, "toolCall": tc,
+         "options": opts, "created": audit.now_iso(), "expires": time.time() + APPROVAL_TIMEOUT, "machine": turn.machine,
+         "pid": os.getpid()}
+    f = _approvals_dir(ws) / f"{rid}.json"
+    f.write_text(json.dumps(a, ensure_ascii=False), encoding="utf-8")
+    cd["approval"] = {"request": rid, "options": opts, "decision": "pending"}
+    turn.emit({"type": "card", "card": cd})
+    turn.emit({"type": "approval", "request": a})
+    while time.time() < a["expires"]:
+        try:
+            cur = json.loads(f.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            cur = a
+        if cur.get("status") == "answered":
+            opt = cur.get("optionId")
+            kindsel = next((o.get("kind") for o in opts if o["optionId"] == opt), None)
+            cd["approval"] = {"request": rid, "decision": "allow" if kindsel and kindsel.startswith("allow") else "deny",
+                              "by": cur.get("by"), "optionId": opt}
+            audit.append_safe(ws, {"agent": cur.get("by", "human"), "interface": "bot", "command": "bot.approval.answer",
+                                   "status": "ok", "args": {"request": rid, "bot": bot["id"], "option": opt, "tool": tc.get("title")}})
+            turn.emit({"type": "card", "card": cd})
+            return opt
+        if paused_for(ws, aid):
+            break
+        time.sleep(0.25)
+    why = "takeover" if paused_for(ws, aid) else "timeout"
+    a["status"] = "cancelled" if why == "takeover" else "expired"
+    f.write_text(json.dumps(a, ensure_ascii=False), encoding="utf-8")
+    cd["approval"] = {"request": rid, "decision": "deny", "by": why}
+    turn.emit({"type": "card", "card": cd})
+    return _pick(opts, False)
+
+
+HOST_OPTIONS = [{"optionId": "allow", "name": "Allow once", "kind": "allow_once"}, {"optionId": "reject", "name": "Reject", "kind": "reject_once"}]
+
+
+def _host_confirm(ws, bot: dict, turn: "_Turn", aid: str):
+    """宿主上（已明确允许时）每个非只读操作当场问人一次：返回给 Context.confirm 的回调。"""
+    def confirm(command: str, permission: str) -> bool:
+        cid = "host-" + uuid.uuid4().hex[:8]
+        tc = {"toolCallId": cid, "title": tr("host.confirm_title", command), "kind": "execute" if permission == "run" else "edit",
+              "rawInput": {"command": command, "place": "host"}}
+        cd = turn.card(cid)
+        cd.update(title=tc["title"], kind=tc["kind"], status="pending", host=True)
+        opt = _ask_human(ws, bot, turn, cd, tc, HOST_OPTIONS, aid)
+        cd["status"] = "completed" if opt == "allow" else "failed"
+        turn.emit({"type": "card", "card": cd})
+        return opt == "allow"
+    return confirm
+
 def _run_acp(ws, bot, turn: _Turn, text, skill_block, envelope, attachments, ident, keep, approval_mode) -> str:
     from .acp_client import AcpConnection, AcpError, foxos_mcp_server
     from .apps.acp import agent_env, installed_info
@@ -869,8 +923,15 @@ def _run_acp(ws, bot, turn: _Turn, text, skill_block, envelope, attachments, ide
     aid = f"{ident}/acp:{agent_id}"
     mach = bot.get("machines") or {}
 
+    if hostguard.on_host() and not hostguard.policy()["enabled"]:
+        # 代码智能体的进程跑在这台机器上（自己读写文件、跑命令），在宿主上就是在宿主上动手：要在狐狸OS 虚拟电脑里用
+        raise FoxError("PERMISSION_DENIED", tr("host.acp_in_vm", agent_id), hint=tr("host.bots_stay_in_vm_hint"),
+                       details={"agent": agent_id, "place": "host"})
+    on_host = hostguard.on_host()
+    confirm = _host_confirm(ws, bot, turn, aid)
+
     def call(cmd, params):
-        return machines.invoke(ws, turn.machine, cmd, params, agent=aid, task=f"turn:{turn.turn}")
+        return machines.invoke(ws, turn.machine, cmd, params, agent=aid, task=f"turn:{turn.turn}", confirm=confirm)
 
     def on_perm(params):
         tc = params.get("toolCall") or {}
@@ -878,6 +939,8 @@ def _run_acp(ws, bot, turn: _Turn, text, skill_block, envelope, attachments, ide
         opts = params.get("options") or []
         mode = approval_mode or "rules"
         dec = {"deny": "deny", "allow": "allow"}.get(mode) or _auto_decision(bot, kind)
+        if on_host and dec == "allow":
+            dec = "ask"  # 宿主上：规则和“全部允许”都不能代替人逐个确认
         cd = turn.card(tc.get("toolCallId") or "perm-" + uuid.uuid4().hex[:6])
         for f in ("title", "kind"):
             if tc.get(f):
@@ -893,38 +956,7 @@ def _run_acp(ws, bot, turn: _Turn, text, skill_block, envelope, attachments, ide
             cd["approval"] = {"decision": dec, "by": "rule", "optionId": opt}
             turn.emit({"type": "card", "card": cd})
             return opt
-        rid = "apr-" + uuid.uuid4().hex[:10]
-        a = {"id": rid, "status": "pending", "bot": bot["id"], "bot_name": bot["name"], "turn": turn.turn, "toolCall": tc,
-             "options": opts, "created": audit.now_iso(), "expires": time.time() + APPROVAL_TIMEOUT, "machine": turn.machine,
-             "pid": os.getpid()}
-        f = _approvals_dir(ws) / f"{rid}.json"
-        f.write_text(json.dumps(a, ensure_ascii=False), encoding="utf-8")
-        cd["approval"] = {"request": rid, "options": opts, "decision": "pending"}
-        turn.emit({"type": "card", "card": cd})
-        turn.emit({"type": "approval", "request": a})
-        while time.time() < a["expires"]:
-            try:
-                cur = json.loads(f.read_text(encoding="utf-8"))
-            except (OSError, ValueError):
-                cur = a
-            if cur.get("status") == "answered":
-                opt = cur.get("optionId")
-                kindsel = next((o.get("kind") for o in opts if o["optionId"] == opt), None)
-                cd["approval"] = {"request": rid, "decision": "allow" if kindsel and kindsel.startswith("allow") else "deny",
-                                  "by": cur.get("by"), "optionId": opt}
-                audit.append_safe(ws, {"agent": cur.get("by", "human"), "interface": "bot", "command": "bot.approval.answer",
-                                       "status": "ok", "args": {"request": rid, "bot": bot["id"], "option": opt, "tool": tc.get("title")}})
-                turn.emit({"type": "card", "card": cd})
-                return opt
-            if paused_for(ws, aid):
-                break
-            time.sleep(0.25)
-        why = "takeover" if paused_for(ws, aid) else "timeout"
-        a["status"] = "cancelled" if why == "takeover" else "expired"
-        f.write_text(json.dumps(a, ensure_ascii=False), encoding="utf-8")
-        cd["approval"] = {"request": rid, "decision": "deny", "by": why}
-        turn.emit({"type": "card", "card": cd})
-        return _pick(opts, False)
+        return _ask_human(ws, bot, turn, cd, tc, opts, aid)
 
     env = agent_env(agent_id, info)
     if bot.get("model"):
@@ -1110,7 +1142,8 @@ def _run_model(ws, bot, turn: _Turn, text, skill_block, envelope, attachments, i
                     if cmd.id == "bot.skill.show":
                         turn.use_skill(args.get("name", ""))
                     cd["machine"] = machine
-                    res = machines.invoke(ws, machine, cmd.id, args, agent=aid, task=f"turn:{turn.turn}", interface="model")
+                    res = machines.invoke(ws, machine, cmd.id, args, agent=aid, task=f"turn:{turn.turn}", interface="model",
+                                          confirm=_host_confirm(ws, bot, turn, aid))
                 payload = {"ok": True, "result": res}
                 cd["status"] = "completed"
             except FoxError as e:
