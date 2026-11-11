@@ -78,7 +78,7 @@
 
 ## 智能体、连接器、多机与运行环境（2026-11-12 01:00，Asia/Shanghai）
 
-在合并主线（`bf5b1a6`）之后的分支上运行 `packages/core` 的全部 pytest：**111 通过、1 失败、3 跳过**（13 分 34 秒）。失败的是 US-61 `test_os_kvm.py`：这台构建盒上 `/dev/kvm` 存在但当前用户不可读写，是环境原因，以前就是这样。跳过的 3 个仍是 Windows 实机与 wine 用例。Electron 桌面端到端（Playwright）这次**没有**重跑；`apps/desktop` 的 `lint:i18n` 通过（511 个词条，0 错误）。
+在合并主线（`bf5b1a6`）之后的分支上运行 `packages/core` 的全部 pytest：**111 通过、1 失败、3 跳过**（13 分 33 秒）。失败的是 US-61 `test_os_kvm.py`：这台构建盒上 `/dev/kvm` 存在但当前用户不可读写，是环境原因，以前就是这样。跳过的 3 个仍是 Windows 实机与 wine 用例。Electron 桌面端到端（Playwright）这次**没有**重跑；`apps/desktop` 的 `lint:i18n` 通过（511 个词条，0 错误）。
 
 | 故事 | 测试 | 结果 |
 |---|---|---|
