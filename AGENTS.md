@@ -39,6 +39,14 @@ FOXOS_MCP_TOKEN=<令牌> foxos --workspace <目录> mcp --http 127.0.0.1:8765   
 
 工具的 `_meta` 里有 `foxos/id`、对应的 CLI、权限与示例；错误以 `isError: true` 加结构化内容返回。
 
+## 智能体（bot）、多机与运行环境
+
+- 智能体：`foxos bot profile|config|message|task|skill|memory|routine|approval|channel …`；你的身份是 `bot:<id>`（经 ACP 时 `bot:<id>/acp:<智能体>`）。只能在自己的 `scope` 里读写；委托用 `bot_task_delegate`（`{task, constraints, expecting}`，深度 ≤ 3，每回合 ≤ 5）。
+- 技能：`foxos bot skill list/show`；需要时先读 SKILL.md 再按步骤做（pstack 随系统分发）。
+- 连接器：`foxos connector tools <连接器>`、`connector tool call`；只有智能体设置里启用的连接器能用，写操作要人批准。
+- 另一台狐狸OS：`--machine <名字>`（MCP 工具参数 `machine`）。被控端默认拒绝，返回 PERMISSION_DENIED 时不要换身份重试，请人去被控端授权（`foxos machine host grant`）。
+- 运行环境：`foxos runtime doctor`；系统 Python 遵循 PEP 668，装包用 `uv`/`venv`/`pipx`。说明见 [docs/agent-chat-design.md](docs/agent-chat-design.md)、[docs/agent-runtime.md](docs/agent-runtime.md)。
+
 ## 给本仓库的贡献者
 
 - 代码：内核 `packages/core`（Python），桌面 `apps/desktop`（Electron）；命令只在注册表里定义一次，文档由 `scripts/gen_cli_docs.py` 生成（`--check` 检查漂移）
