@@ -43,6 +43,7 @@ sudo scripts/os/build-iso.sh
 | `FOXOS_OS_OUT` | `<仓库>/build/os` | 写 ISO 与 SHA256SUMS 的目录 |
 | `FOXOS_OS_MIRROR` | `http://archive.ubuntu.com/ubuntu` | Ubuntu 软件源，可换成国内镜像 |
 | `FOXOS_OS_KEEP=1` | 关 | 结束后保留临时 ISO 树 |
+| `FOXOS_OS_REPACK=1` | 关 | 复用已有 chroot，跳过 apt / Firefox / VMM 下载，只重跑 hook 并打包 |
 | `FOXOS_CH_VERSION` | `v46.0` | 要下载的 cloud-hypervisor 版本标签 |
 
 脚本会自行 `sudo`。已存在的 chroot 会复用（跳过 debootstrap）；要完全重做就删掉 `$FOXOS_OS_WORK/chroot`。
@@ -63,9 +64,12 @@ Live 用户名为 `foxos`（见 `scripts/os/branding/casper.conf`）。在 Live 
 ## 测试引导
 
 ```bash
-scripts/os/qemu-boot.sh                          # UEFI + KVM，VNC 在 127.0.0.1:5900
+scripts/os/qemu-boot.sh                          # UEFI；有可用 KVM 时用 KVM，否则 TCG
+scripts/os/qemu-boot.sh --tcg --gtk              # 强制软件模拟（部分嵌套虚拟机上 KVM 会踩内核 BUG）
 scripts/os/qemu-boot.sh build/os/FoxOS-0.3.0-amd64.iso --install-disk /tmp/foxos-disk.qcow2
 ```
+
+默认把内核串口写到 `$FOXOS_OS_WORK/qemu/serial.log`（`console=ttyS0`）。若构建机上的 QEMU 没有 VNC 显示模块，脚本会改用 gtk。
 
 QEMU 只用于在本开发机上自动测试，**不是狐狸OS 的一部分**，也不进入 ISO。在真实电脑或 Hyper-V 里测试请看 [os-test-guide.md](os-test-guide.md)（该文件随第一张可引导 ISO 一起补齐）。
 
@@ -80,5 +84,8 @@ QEMU 只用于在本开发机上自动测试，**不是狐狸OS 的一部分**�
 
 - debootstrap 失败：检查网络与 `FOXOS_OS_MIRROR`，以及构建机的 debootstrap 是否认识 `noble`（`ls /usr/share/debootstrap/scripts/noble`）。
 - chroot 里 `apt-get` 失败：有时构建机的 HTTP 代理对 APT 不友好；脚本会在检测到 `/etc/apt/apt.conf.d/99-box-proxy` 时临时拷进 chroot，并在 hook `90-cleanup.sh` 里删除。
-- ISO 引导后没有图形：用菜单里的「安全模式」看启动日志；确认 `casper` 找到了 squashfs（virtio / Hyper-V 模块已写进 initramfs）。
+- ISO 引导后掉进 initramfs 的 busybox，并提示 `/cow format specified as 'overlay' and no support found`：检查 `scripts/os/branding/casper.conf` 里的 `BUILD_SYSTEM` 必须是 `Ubuntu` 或 `Debian`（这是 casper 的内部字段，不是产品名）。写成其它值时，casper 会执行 `modprobe "" -b overlay` 而失败。`scripts/os/verify-initrd.sh` 会在打包时拦下这个问题。Ubuntu 24.04 的 `linux-image-generic` 已把 squashfs / loop / virtio_blk / sr_mod 编进内核，不必以模块形式存在于 initrd；overlay 仍是模块，必须在 initrd 里。
+- 启动日志里出现 `plymouthd: not found`：initramfs 里有 plymouth 脚本但没有守护进程（没装主题时 hook 会跳过复制）。构建 hook 会在没有 plymouthd 时删掉这些脚本；grub 也不再传 `splash`。
+- ISO 引导后没有图形：用菜单里的「安全模式」看启动日志，或读 QEMU 串口日志；确认 `casper` 找到了 squashfs。
+- 此宿主 `/dev/kvm` 存在但创建 vCPU 触发内核 BUG：`qemu-boot.sh --tcg` 改用软件模拟。这只影响本机构建测试，不影响 ISO 在真实电脑或正常 Hyper-V 上使用 KVM。
 - ISO ≥ 2 GB：从 `packages.list` 再减包，或提高 squashfs 压缩（脚本已用 xz）。

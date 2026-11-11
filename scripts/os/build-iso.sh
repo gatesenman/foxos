@@ -6,6 +6,7 @@
 #   FOXOS_OS_OUT     输出目录（默认 <仓库>/build/os）
 #   FOXOS_OS_MIRROR  Ubuntu 软件源（默认 http://archive.ubuntu.com/ubuntu）
 #   FOXOS_OS_KEEP=1  结束后保留 chroot，方便排查
+#   FOXOS_OS_REPACK=1  复用已有 chroot，跳过 apt / Firefox / VMM 下载，只重跑 hook 并打包
 set -euo pipefail
 
 SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
@@ -26,7 +27,7 @@ log() { printf '[foxos-os] %s\n' "$*"; }
 die() { printf '[foxos-os] 错误：%s\n' "$*" >&2; exit 1; }
 
 if [ "$(id -u)" -ne 0 ]; then
-  exec sudo --preserve-env=FOXOS_OS_WORK,FOXOS_OS_OUT,FOXOS_OS_MIRROR,FOXOS_OS_KEEP,http_proxy,https_proxy,HTTP_PROXY,HTTPS_PROXY "$0" "$@"
+  exec sudo --preserve-env=FOXOS_OS_WORK,FOXOS_OS_OUT,FOXOS_OS_MIRROR,FOXOS_OS_KEEP,FOXOS_OS_REPACK,FOXOS_CH_VERSION,http_proxy,https_proxy,HTTP_PROXY,HTTPS_PROXY "$0" "$@"
 fi
 
 # 构建机 apt 若需代理，chroot 里同样用（收尾 hook 会删掉，不带进 ISO）
@@ -97,6 +98,13 @@ if [ "$MIRROR" != "http://archive.ubuntu.com/ubuntu" ]; then
   sed -i "s|http://archive.ubuntu.com/ubuntu|$MIRROR|g" "$CHROOT/etc/apt/sources.list"
 fi
 
+REPACK=0
+if [ "${FOXOS_OS_REPACK:-0}" = 1 ] && [ -x "$CHROOT/usr/bin/labwc" ]; then
+  REPACK=1
+  log "FOXOS_OS_REPACK=1，跳过 apt / Firefox / VMM 下载，只重跑 hook 并打包"
+fi
+
+if [ "$REPACK" != 1 ]; then
 log "安装软件包"
 chroot_run apt-get update
 # shellcheck disable=SC2046
@@ -144,6 +152,8 @@ Copyright the cloud-hypervisor authors.
 The binary shipped in 狐狸OS is the official static build of this version.
 EOF
 
+fi
+
 # ------------------------------------------------------------------ hooks
 log "拷入 staging 并运行 hooks"
 rm -rf "$CHROOT/usr/src/foxos-os"
@@ -168,16 +178,19 @@ INITRD=$(ls -1 "$CHROOT/boot/initrd.img-"* | sort | tail -1)
 cp -f "$KERNEL" "$ISO/casper/vmlinuz"
 cp -f "$INITRD" "$ISO/casper/initrd"
 chmod 644 "$ISO/casper/vmlinuz" "$ISO/casper/initrd"
+# 打包前检查 Live initrd（casper BUILD_SYSTEM、overlay、plymouth）
+python3 "$SCRIPT_DIR/verify-initrd.sh" "$ISO/casper/initrd"
 
 log "mksquashfs（这一步较久）"
 rm -f "$ISO/casper/filesystem.squashfs"
-# 排除 chroot 里的临时挂载点内容（此时已卸载）
+# 保留空的 /run /proc /sys /dev /tmp。casper 在 pivot 前会 chroot 到根文件系统做 adduser，
+# 没有 /run 时会报 “could not open lock file /run/adduser”，Live 用户建不出来，
+# lightdm 随后 “Can't login unknown user 'foxos'”，进不了桌面。
+# 不要用 -e run / -e proc 把目录本身排除掉。
+mkdir -p "$CHROOT/run" "$CHROOT/proc" "$CHROOT/sys" "$CHROOT/dev" "$CHROOT/tmp" "$CHROOT/var/tmp"
 mksquashfs "$CHROOT" "$ISO/casper/filesystem.squashfs" \
-  -comp xz -Xbcj x86 -b 1M -no-empty -quiet \
-  -e dev/dev dev/pts dev/shm proc sys run tmp/* var/tmp/* \
-  -wildcards -e 'usr/src/foxos-os' || \
-mksquashfs "$CHROOT" "$ISO/casper/filesystem.squashfs" \
-  -comp xz -Xbcj x86 -b 1M -quiet
+  -comp xz -Xbcj x86 -b 1M -quiet \
+  -wildcards -e 'usr/src/foxos-os' -e 'tmp/*' -e 'var/tmp/*' -e 'run/*' -e 'proc/*' -e 'sys/*'
 
 du -sx --block-size=1 "$CHROOT" | cut -f1 > "$ISO/casper/filesystem.size"
 # 清单
