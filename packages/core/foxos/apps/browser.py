@@ -359,3 +359,203 @@ register(Command("browser", "screenshot", tr("browser.screenshot_summary"), brow
 register(Command("browser", "close", tr("browser.close_summary"), browser_close,
                  params=[Param("tab", "string", tr("browser.tab_id_param"), required=True, positional=True, metavar="TAB")],
                  examples=["foxos browser close 3F2A"], permission="modify"))
+
+
+# ------------------------------------------------------------------ 浏览器操控：无障碍快照 + ref（Playwright MCP 同款做法）
+
+def browser_snapshot(ctx: Context, tab: str | None = None, max_chars: int = 40000, interactive: bool = False) -> dict:
+    from ..cu import cdp
+    return cdp.snapshot(ctx, tab, int(max_chars), bool(interactive))
+
+
+def browser_click(ctx: Context, ref: str, tab: str | None = None, double: bool = False, button: str = "left") -> dict:
+    from ..cu import cdp
+    return cdp.click(ctx, ref, tab, button, bool(double))
+
+
+def browser_type(ctx: Context, ref: str, text: str, tab: str | None = None, submit: bool = False, append: bool = False) -> dict:
+    from ..cu import cdp
+    return cdp.type_text(ctx, ref, text, tab, bool(submit), clear=not append)
+
+
+def browser_press(ctx: Context, key: str, tab: str | None = None) -> dict:
+    from ..cu import cdp
+    return cdp.press(ctx, key, tab)
+
+
+def browser_select(ctx: Context, ref: str, value: str, tab: str | None = None) -> dict:
+    from ..cu import cdp
+    return cdp.select_option(ctx, ref, value, tab)
+
+
+def browser_scroll(ctx: Context, direction: str = "down", amount: int = 600, tab: str | None = None) -> dict:
+    from ..cu import cdp
+    return cdp.scroll(ctx, direction, int(amount), tab)
+
+
+def browser_back(ctx: Context, tab: str | None = None) -> dict:
+    from ..cu import cdp
+    return cdp.history(ctx, -1, tab)
+
+
+def browser_forward(ctx: Context, tab: str | None = None) -> dict:
+    from ..cu import cdp
+    return cdp.history(ctx, 1, tab)
+
+
+def browser_text(ctx: Context, tab: str | None = None, ref: str | None = None, max_chars: int = 30000) -> dict:
+    from ..cu import cdp
+    return cdp.page_text(ctx, tab, ref, int(max_chars))
+
+
+def browser_wait(ctx: Context, text: str | None = None, seconds: float = 0, tab: str | None = None, timeout: float = 20) -> dict:
+    from ..cu import cdp
+    return cdp.wait_for(ctx, text, float(seconds or 0), tab, float(timeout))
+
+
+def browser_download(ctx: Context, url: str | None = None, ref: str | None = None, tab: str | None = None, timeout: float = 120) -> dict:
+    from ..cu import cdp
+    return cdp.download(ctx, url, ref, tab, float(timeout))
+
+
+def browser_downloads(ctx: Context) -> dict:
+    from ..cu import cdp
+    return cdp.list_downloads(ctx)
+
+
+def browser_tab_select(ctx: Context, tab: str) -> dict:
+    _require_cdp(ctx)
+    p = _page(ctx, tab)
+    _http(ctx, f"/json/activate/{p['id']}")
+    return {"message": tr("cu.tab_selected", p["id"]), "tab": p["id"], "url": p["url"], "title": p["title"]}
+
+
+def browser_tab_new(ctx: Context, url: str = "about:blank") -> dict:
+    _require_cdp(ctx)
+    t = _http(ctx, "/json/new?" + urllib.parse.quote(url, safe=":/?&=#%"), method="PUT")
+    return {"message": tr("browser.opened", url), "tab": t.get("id") if isinstance(t, dict) else None, "url": url}
+
+
+def ensure_running(ctx: Context, wait: float = 20.0) -> None:
+    """browser task 用：CDP 已由人开启但 Chrome 没在跑时，按狐狸OS 参数启动它。"""
+    cfg = load_cfg(ctx)
+    if not cfg["cdp"]:
+        raise FoxError("PERMISSION_DENIED", tr("browser.cdp_disabled"), hint=tr("browser.cdp_enable_hint"))
+    if _cdp_version(ctx) is None:
+        browser_open(ctx, "about:blank", wait=wait)
+    if _cdp_version(ctx) is None:
+        raise FoxError("NOT_FOUND", tr("browser.cdp_not_running", cfg["port"]), hint=tr("browser.cdp_start_hint"))
+
+
+def browser_task(ctx: Context, task: str, url: str | None = None, engine: str = "foxos", max_steps: int = 25, approve: str = "risky",
+                 vision: str = "auto", tab: str | None = None) -> dict:
+    """智能体循环：给一句话任务，模型看无障碍快照、按 ref 操作，直到完成并给出答案。"""
+    ensure_running(ctx)
+    if not tab:
+        t = browser_tab_new(ctx, url or "about:blank")
+        tab = t["tab"]
+        if url:
+            time.sleep(1.0)
+    elif url:
+        browser_navigate(ctx, url, tab)
+    if engine == "browser-use":
+        from ..cu import engines
+        return engines.browser_use_task(ctx, task, tab=tab, max_steps=int(max_steps), vision=vision)
+    from ..cu.loop import Loop
+    return Loop(ctx, "browser", task, max_steps=int(max_steps), approve=approve, vision=vision, tab=tab).run()
+
+
+def browser_engine_status(ctx: Context) -> dict:
+    from ..cu import engines
+    return engines.status()
+
+
+def browser_engine_install(ctx: Context, engine: str) -> dict:
+    from ..cu import engines
+    return engines.install(engine)
+
+
+def browser_engine_call(ctx: Context, engine: str, tool: str, args: dict | None = None) -> dict:
+    from ..cu import engines
+    ensure_running(ctx)
+    return engines.call(ctx, engine, tool, args or {})
+
+
+def browser_engine_tools(ctx: Context, engine: str) -> dict:
+    from ..cu import engines
+    ensure_running(ctx)
+    return engines.tools(ctx, engine)
+
+
+_REF = Param("ref", "string", tr("cu.p_ref"), required=True, positional=True, metavar="REF")
+register(Command("browser", "snapshot", tr("cu.c_snapshot"), browser_snapshot,
+                 params=[_TAB, Param("max_chars", "integer", tr("cu.p_max_chars"), default=40000),
+                         Param("interactive", "boolean", tr("cu.p_interactive"), default=False)],
+                 examples=["foxos browser snapshot", "foxos browser snapshot --interactive --json"],
+                 limits=[tr("cu.l_snapshot")], permission="read", audited=False))
+register(Command("browser", "click", tr("cu.c_click"), browser_click,
+                 params=[_REF, _TAB, Param("double", "boolean", tr("cu.p_double"), default=False),
+                         Param("button", "string", tr("cu.p_button"), enum=["left", "right", "middle"], default="left")],
+                 examples=["foxos browser click e12"], permission="modify"))
+register(Command("browser", "type", tr("cu.c_type"), browser_type,
+                 params=[_REF, Param("text", "string", tr("cu.p_text"), required=True, positional=True, metavar="TEXT"), _TAB,
+                         Param("submit", "boolean", tr("cu.p_submit"), default=False), Param("append", "boolean", tr("cu.p_append"), default=False)],
+                 examples=["foxos browser type e5 'FoxOS' --submit"], permission="modify"))
+register(Command("browser", "press", tr("cu.c_press"), browser_press,
+                 params=[Param("key", "string", tr("cu.p_key"), required=True, positional=True, metavar="KEY"), _TAB],
+                 examples=["foxos browser press Enter", "foxos browser press ctrl+a"], permission="modify"))
+register(Command("browser", "select", tr("cu.c_select"), browser_select,
+                 params=[_REF, Param("value", "string", tr("cu.p_value"), required=True, positional=True, metavar="VALUE"), _TAB],
+                 examples=["foxos browser select e9 '中文'"], permission="modify"))
+register(Command("browser", "scroll", tr("cu.c_scroll"), browser_scroll,
+                 params=[Param("direction", "string", tr("cu.p_direction"), enum=["down", "up", "left", "right"], default="down", positional=True, metavar="DIR"),
+                         Param("amount", "integer", tr("cu.p_amount"), default=600), _TAB],
+                 examples=["foxos browser scroll down"], permission="read"))
+register(Command("browser", "back", tr("cu.c_back"), browser_back, params=[_TAB], examples=["foxos browser back"], permission="modify"))
+register(Command("browser", "forward", tr("cu.c_forward"), browser_forward, params=[_TAB], examples=["foxos browser forward"], permission="modify"))
+register(Command("browser", "text", tr("cu.c_text"), browser_text,
+                 params=[_TAB, Param("ref", "string", tr("cu.p_ref_opt")), Param("max_chars", "integer", tr("cu.p_max_chars"), default=30000)],
+                 examples=["foxos browser text", "foxos browser text --ref e40"], permission="read", audited=False))
+register(Command("browser", "wait", tr("cu.c_wait"), browser_wait,
+                 params=[Param("text", "string", tr("cu.p_wait_text")), Param("seconds", "number", tr("cu.p_seconds")), _TAB,
+                         Param("timeout", "number", tr("cu.p_timeout"), default=20)],
+                 examples=["foxos browser wait --text '结果'", "foxos browser wait --seconds 2"], permission="read", audited=False))
+register(Command("browser", "download", tr("cu.c_download"), browser_download,
+                 params=[Param("url", "string", tr("browser.url_param")), Param("ref", "string", tr("cu.p_ref_opt")), _TAB,
+                         Param("timeout", "number", tr("cu.p_timeout"), default=120)],
+                 examples=["foxos browser download --url https://example.com/file.pdf", "foxos browser download --ref e33"],
+                 limits=[tr("cu.l_download")], permission="create"))
+register(Command("browser", "downloads", tr("cu.c_downloads"), browser_downloads, examples=["foxos browser downloads --json"], permission="read"))
+register(Command("browser", "tab select", tr("cu.c_tab_select"), browser_tab_select,
+                 params=[Param("tab", "string", tr("browser.tab_id_param"), required=True, positional=True, metavar="TAB")],
+                 examples=["foxos browser tab select 3F2A"], permission="modify"))
+register(Command("browser", "tab new", tr("cu.c_tab_new"), browser_tab_new,
+                 params=[Param("url", "string", tr("browser.url_param"), default="about:blank", positional=True, metavar="URL")],
+                 examples=["foxos browser tab new https://example.com"], permission="run"))
+register(Command("browser", "task", tr("cu.c_task"), browser_task,
+                 params=[Param("task", "string", tr("cu.p_task"), required=True, positional=True, metavar="TASK"),
+                         Param("url", "string", tr("cu.p_start_url")),
+                         Param("engine", "string", tr("cu.p_engine"), enum=["foxos", "browser-use"], default="foxos"),
+                         Param("max_steps", "integer", tr("cu.p_max_steps"), default=25),
+                         Param("approve", "string", tr("cu.p_approve"), enum=["risky", "ask", "auto", "deny"], default="risky"),
+                         Param("vision", "string", tr("cu.p_vision"), enum=["auto", "on", "off"], default="auto"), _TAB],
+                 examples=["foxos browser task '在维基百科查珠穆朗玛峰的海拔' --url https://zh.wikipedia.org --vision off",
+                           "foxos browser task 'find the latest FoxOS release name' --url https://github.com/gatesenman/foxos --engine browser-use"],
+                 limits=[tr("cu.l_task_model"), tr("cu.l_task_approve")], permission="run"))
+register(Command("browser", "engine status", tr("cu.c_engine_status"), browser_engine_status,
+                 examples=["foxos browser engine status --json"], permission="read", audited=False))
+register(Command("browser", "engine install", tr("cu.c_engine_install"), browser_engine_install,
+                 params=[Param("engine", "string", tr("cu.p_engine_name"), required=True, positional=True, metavar="ENGINE",
+                               enum=["playwright-mcp", "chrome-devtools-mcp", "browser-use"])],
+                 examples=["foxos browser engine install playwright-mcp", "foxos browser engine install browser-use"], permission="run"))
+register(Command("browser", "engine tools", tr("cu.c_engine_tools"), browser_engine_tools,
+                 params=[Param("engine", "string", tr("cu.p_engine_name"), required=True, positional=True, metavar="ENGINE",
+                               enum=["playwright-mcp", "chrome-devtools-mcp"])],
+                 examples=["foxos browser engine tools playwright-mcp"], permission="read"))
+register(Command("browser", "engine call", tr("cu.c_engine_call"), browser_engine_call,
+                 params=[Param("engine", "string", tr("cu.p_engine_name"), required=True, positional=True, metavar="ENGINE",
+                               enum=["playwright-mcp", "chrome-devtools-mcp"]),
+                         Param("tool", "string", tr("cu.p_tool"), required=True, positional=True, metavar="TOOL"),
+                         Param("args", "object", tr("cu.p_args"))],
+                 examples=["foxos browser engine call playwright-mcp browser_snapshot",
+                           "foxos browser engine call chrome-devtools-mcp list_pages"], permission="modify"))

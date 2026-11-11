@@ -101,8 +101,11 @@ def _add_command(sub, cmd, parents):
                 continue
             if prm.type == "array":
                 kw["nargs"] = "*" if not prm.required else "+"
-            elif not prm.required:
+            elif not prm.required or prm.cli_stdin:
                 kw["nargs"] = "?"
+            if prm.cli_stdin:  # 位置参数也可以从标准输入读（大文本、密钥）：--<name>-stdin
+                p.add_argument(f"--{prm.name.replace('_', '-')}-stdin", dest=f"{DEST}{prm.name}__stdin",
+                               action="store_true", help=tr("cli.read_from_standard_input", prm.name))
             p.add_argument(DEST + prm.name, metavar=prm.metavar or prm.name.upper(), **kw)
             continue
         flags = [prm.flag] + ([prm.cli_short] if prm.cli_short else [])
