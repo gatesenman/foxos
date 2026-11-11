@@ -48,6 +48,7 @@ fi
 # 见 docs/os.md「浏览器：为什么 Chrome 不在 ISO 里」。
 if [ -d "$SRC/chrome" ]; then
   command -v zenity >/dev/null 2>&1 || DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends zenity || true
+  command -v xorriso >/dev/null 2>&1 || { apt-get update -q >/dev/null 2>&1; DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends xorriso; } || true   # 预设系统的种子光盘
   install -m 755 "$SRC/chrome/foxos-chrome-setup" /usr/lib/foxos/foxos-chrome-setup
   ln -sf /usr/lib/foxos/foxos-chrome-setup /usr/bin/foxos-chrome-setup
   install -m 755 "$SRC/chrome/foxos-chrome" /usr/bin/foxos-chrome
