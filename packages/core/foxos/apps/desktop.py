@@ -1,7 +1,7 @@
 """真实桌面 / 会话命令：窗口列表、聚焦、移动、键入、点击、截图、人工接管。
 
 `foxos desktop …` 与 `foxos session …` 共用同一组处理函数（文档里两种写法都有效）。
-走 labwc / wlroots 协议，不是 Electron 里画的假窗口。
+默认走 XFCE / X11（wmctrl、xdotool、scrot），不是 Electron 里画的假窗口。
 """
 
 from __future__ import annotations
@@ -126,7 +126,7 @@ def _register_for(app: str) -> None:
                      examples=[f"foxos {app} close 4278190080"], permission="modify"))
     register(Command(app, "launch", tr("desktop.launch_an_application_or_command"), desktop_launch,
                      params=[Param("command", "array", tr("desktop.command_and_arguments"), required=True, positional=True, items={"type": "string"}, metavar="CMD")],
-                     examples=[f"foxos {app} launch -- gnome-terminal", f"foxos {app} launch -- foot -T notes"], permission="run"))
+                     examples=[f"foxos {app} launch -- xfce4-terminal", f"foxos {app} launch -- xfce4-terminal -T notes"], permission="run"))
     register(Command(app, "type", tr("desktop.type_text_into_the_focused_window"), desktop_type,
                      params=[Param("text", "string", tr("desktop.text_to_type"), required=True, positional=True, metavar="TEXT")],
                      examples=[f"foxos {app} type 'hello'"], permission="modify"))

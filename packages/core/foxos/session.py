@@ -1,4 +1,5 @@
-"""真实桌面会话后端：labwc / wlroots 上的窗口与输入；测试可用假后端。"""
+"""真实桌面会话后端：默认是 XFCE / X11（wmctrl、xdotool、scrot）；
+也保留 Wayland / wlroots 实现。测试可用假后端。"""
 
 from __future__ import annotations
 
@@ -205,7 +206,7 @@ class WaylandBackend(SessionBackend):
             conn.close()
 
     def move(self, win_id: str, x: int, y: int) -> dict:
-        # labwc 的 foreign-toplevel 没有设位置请求；若有 wlrctl 则用之，否则说明限制。
+        # Wayland 后端：foreign-toplevel 没有设位置请求；若有 wlrctl 则用之，否则说明限制。
         if shutil.which("wlrctl"):
             r = subprocess.run(["wlrctl", "toplevel", "move", win_id, str(x), str(y)], capture_output=True, text=True)
             if r.returncode == 0:
@@ -286,10 +287,7 @@ class WaylandBackend(SessionBackend):
 
 
 def _guess_compositor() -> str | None:
-    if os.environ.get("LABWC_PID") or shutil.which("labwc") and os.environ.get("WAYLAND_DISPLAY"):
-        # 有 WAYLAND_DISPLAY 时保守报 labwc（本系统默认合成器）
-        return os.environ.get("XDG_CURRENT_DESKTOP") or "labwc"
-    return os.environ.get("XDG_CURRENT_DESKTOP")
+    return os.environ.get("XDG_CURRENT_DESKTOP") or os.environ.get("XDG_SESSION_DESKTOP")
 
 
 def available_wayland() -> bool:
@@ -302,17 +300,31 @@ def available_wayland() -> bool:
         return False
 
 
+def available_x11() -> bool:
+    from .session_x11 import available_x11 as _ok
+    return _ok()
+
+
 def get_backend(ws: Workspace | None = None) -> SessionBackend:
     kind = (_env_backend() or "").strip().lower()
     fake = os.environ.get("FOXOS_SESSION_FAKE")
     if kind == "fake" or fake:
         path = Path(fake) if fake else (ws.data_dir / "session-fake.json" if ws else Path("/tmp/foxos-session-fake.json"))
         return FakeBackend(path)
-    if kind in ("wayland", "labwc", "") and available_wayland():
-        return WaylandBackend()
+    if kind in ("x11", "xfce", "xfwm", "xfwm4"):
+        if available_x11():
+            from .session_x11 import X11Backend
+            return X11Backend()  # type: ignore[return-value]
+        raise FoxError("DEPENDENCY_MISSING", tr("desktop.x11_display_is_not_available"), hint=tr("desktop.start_an_xfce_session_or_set_display"))
     if kind in ("wayland", "labwc"):
-        raise FoxError("DEPENDENCY_MISSING", tr("desktop.wayland_display_is_not_available"), hint=tr("desktop.start_a_labwc_session_or_set_wayland"))
-    # 默认：有显示就用真实会话，否则明确报错（不要悄悄落到 Electron 假桌面）
+        if available_wayland():
+            return WaylandBackend()
+        raise FoxError("DEPENDENCY_MISSING", tr("desktop.wayland_display_is_not_available"), hint=tr("desktop.start_an_xfce_session_or_set_display"))
+    # 默认：狐狸OS 图形会话是 XFCE / X11；若只有 Wayland 再走 wlroots。
+    # 不要悄悄落到 Electron 假桌面。
+    if available_x11():
+        from .session_x11 import X11Backend
+        return X11Backend()  # type: ignore[return-value]
     if available_wayland():
         return WaylandBackend()
-    raise FoxError("DEPENDENCY_MISSING", tr("desktop.wayland_display_is_not_available"), hint=tr("desktop.start_a_labwc_session_or_set_wayland"))
+    raise FoxError("DEPENDENCY_MISSING", tr("desktop.x11_display_is_not_available"), hint=tr("desktop.start_an_xfce_session_or_set_display"))
