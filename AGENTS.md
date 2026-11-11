@@ -47,6 +47,15 @@ FOXOS_MCP_TOKEN=<令牌> foxos --workspace <目录> mcp --http 127.0.0.1:8765   
 - 另一台狐狸OS：`--machine <名字>`（MCP 工具参数 `machine`）。被控端默认拒绝，返回 PERMISSION_DENIED 时不要换身份重试，请人去被控端授权（`foxos machine host grant`）。
 - 运行环境：`foxos runtime doctor`；系统 Python 遵循 PEP 668，装包用 `uv`/`venv`/`pipx`。说明见 [docs/agent-chat-design.md](docs/agent-chat-design.md)、[docs/agent-runtime.md](docs/agent-runtime.md)。
 
+## 操控电脑、浏览器和命令行
+
+- **默认：agent-desktop + Jev。** `foxos computer task "<一句话任务>" --app <程序>`（MCP `computer_task`）：agent-desktop 读无障碍树，Jev 选每一步（没有 TypeSafe 密钥时自动用 DeepSeek），DeepSeek 规划和核对。先 `foxos computer doctor` 看栈是否就绪。
+- **兜底（自动）：** 程序没有无障碍信息 → 截图操控（xdotool + Jev Box / 视觉定位）；网页内容 agent-desktop 读不到 → 浏览器操控（Chrome CDP，装了 agent-browser 就用它）。也可以手动：`--surface a11y|screen|browser`，或智能体设置「电脑操控」（`foxos bot config set <id> --cu-surface …`）。
+- 单步操作：`foxos desktop tree --app <程序>`、`desktop element click|set-text|select|scroll <ref>`、`desktop press <组合键> --app <程序>`；网页：`foxos browser snapshot`、`browser click|type|press <ref>`，`browser backend set agent-browser|builtin|auto`。
+- 命令行：`foxos shell …`（持久会话，越界与接管同样生效）。
+- 删除、发送、支付、提交、安装等动作总会弹审批；不要试图绕过。每一步写进审计（`computer.step` / `browser.step`）。
+- 本地视觉模型只有 UI-TARS-1.5-7B（可选，`foxos model install ui-tars-1.5-7b`，默认不装）；密钥只能人用 `foxos model provider add deepseek|typesafe --key-stdin` 添加。说明见 [docs/computer-use-research.md](docs/computer-use-research.md)。
+
 ## 给本仓库的贡献者
 
 - 代码：内核 `packages/core`（Python），桌面 `apps/desktop`（Electron）；命令只在注册表里定义一次，文档由 `scripts/gen_cli_docs.py` 生成（`--check` 检查漂移）

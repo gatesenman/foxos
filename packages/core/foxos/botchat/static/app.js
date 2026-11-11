@@ -454,7 +454,7 @@ async function answerApproval(req, option) {
 
 // ------------------------------------------------------------------ 设置（与 OpenBot 的 Bot 设置分页对应）
 const TABS = [["setup", "settings"], ["skills", "books"], ["memory", "brain"], ["approvals", "shield-check"], ["routines", "repeat"],
-  ["delegation", "arrow-forward-up"], ["machines", "devices-pc"], ["channels", "message-share"], ["manage", "adjustments"]];
+  ["delegation", "arrow-forward-up"], ["machines", "devices-pc"], ["computer", "device-desktop-cog"], ["channels", "message-share"], ["manage", "adjustments"]];
 async function openSettings(id, tab = "setup") {
   S.view = "settings"; renderSidebar();
   const [cfg, sk, ag, cn] = await Promise.all([api("GET", `bots/${id}/config`), api("GET", "skills"), loadAgents(), api("GET", "connectors")]);
@@ -471,7 +471,7 @@ async function openSettings(id, tab = "setup") {
     $$(".tab", v).forEach(x => x.classList.toggle("active", x.dataset.tab === k));
     const body = $("#tab-body"); body.innerHTML = "";
     ({ setup: tabSetup, skills: tabSkills, memory: tabMemory, approvals: tabApprovals, routines: tabRoutines, delegation: tabDelegation,
-       machines: tabMachines, channels: tabChannels, manage: tabManage })[k](body, draft, { sk: sk.skills, ag, cn });
+       machines: tabMachines, computer: tabComputer, channels: tabChannels, manage: tabManage })[k](body, draft, { sk: sk.skills, ag, cn });
     applyI18n(body);
   };
   $$(".tab", v).forEach(x => x.onclick = () => show(x.dataset.tab));
@@ -581,6 +581,21 @@ function tabApprovals(body, d) {
   $$("#a-mode button", body).forEach(x => x.onclick = () => { m = x.dataset.m; $$("#a-mode button").forEach(y => y.classList.toggle("sel", y === x)); });
   $$("[data-rule]", body).forEach(g => $$("button", g).forEach(x => x.onclick = () => { rules[g.dataset.rule] = x.dataset.v; $$("button", g).forEach(y => y.classList.toggle("sel", y === x)); }));
   saveBar(body, () => patchBot(d.id, { approval_mode: m, rules: Object.fromEntries(ACP_KINDS.map(k => [k, rules[k] || "default"])) }));
+}
+// 电脑操控：默认 agent-desktop + Jev；截图 / 浏览器是兜底，可以按机器人固定
+function tabComputer(body, d) {
+  const cu = d.computer_use || { surface: "auto", step_policy: "auto" };
+  let surf = cu.surface || "auto", pol = cu.step_policy || "auto";
+  body.innerHTML = `<div class="section"><h4><i class="ti ti-device-desktop-cog"></i>${esc(t("settings.cu_title"))}</h4><p class="lead">${esc(t("settings.cu_help"))}</p>
+    <h4>${esc(t("settings.cu_surface"))}</h4>
+    <div class="seg" id="cu-surf">${["auto", "a11y", "screen", "browser"].map(k => `<button data-v="${k}" class="${surf === k ? "sel" : ""}">${esc(t("settings.cu_s_" + k))}</button>`).join("")}</div>
+    <div class="help">${esc(t("settings.cu_surface_help"))}</div>
+    <h4>${esc(t("settings.cu_policy"))}</h4>
+    <div class="seg" id="cu-pol">${["auto", "typesafe", "deepseek"].map(k => `<button data-v="${k}" class="${pol === k ? "sel" : ""}">${esc(t("settings.cu_p_" + k))}</button>`).join("")}</div>
+    <div class="help">${esc(t("settings.cu_policy_help"))}</div></div>`;
+  $$("#cu-surf button", body).forEach(x => x.onclick = () => { surf = x.dataset.v; $$("#cu-surf button", body).forEach(y => y.classList.toggle("sel", y === x)); });
+  $$("#cu-pol button", body).forEach(x => x.onclick = () => { pol = x.dataset.v; $$("#cu-pol button", body).forEach(y => y.classList.toggle("sel", y === x)); });
+  saveBar(body, () => patchBot(d.id, { cu_surface: surf, cu_step_policy: pol }));
 }
 async function tabRoutines(body, d) {
   const rs = (await api("GET", "routines")).routines.filter(r => r.bot === d.id);

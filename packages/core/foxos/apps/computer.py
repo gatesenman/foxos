@@ -180,7 +180,7 @@ register(Command("computer", "model set", tr("cu.c_model_set"), model_set,
 register(Command("computer", "model key", tr("cu.c_model_key"), model_key,
                  params=[Param("value", "string", tr("cu.p_key_value"), required=True, positional=True, metavar="KEY", secret=True, cli_stdin=True),
                          Param("provider", "string", tr("cu.p_provider"))],
-                 examples=["foxos computer model key --value-stdin < deepseek.key"], limits=[tr("cu.l_human_only")], permission="modify"))
+                 examples=["cat deepseek.key | foxos computer model key --value-stdin"], limits=[tr("cu.l_human_only")], permission="modify"))
 register(Command("computer", "model test", tr("cu.c_model_test"), model_test,
                  params=[Param("vision", "boolean", tr("cu.p_test_vision"), default=False)],
                  examples=["foxos computer model test"], permission="read"))

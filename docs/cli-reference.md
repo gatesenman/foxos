@@ -332,7 +332,7 @@ foxos bot profile show fox --json
 新建智能体
 
 ```text
-foxos bot profile create NAME [--title TITLE] [--role ROLE] [--instructions INSTRUCTIONS] [--icon ICON] [--color COLOR] [--image IMAGE] [--acp-agent AGENT] [--base-url BASE_URL] [--model MODEL] [--api-key API_KEY] [--scope SCOPE] [--isolated] [--visibility {private,public}] [--pinned] [--hidden] [--active] [--notifications] [--skills-mode {all,selected}] [--skills SKILLS] [--skills-off SKILLS_OFF] [--connectors CONNECTORS] [--machines MACHINES] [--default-machine DEFAULT_MACHINE] [--approval-mode {ask,allow_reads,allow_all}] [--rule RULES] [--delegate-to DELEGATE_TO] [--max-depth MAX_DEPTH] [--max-per-turn MAX_PER_TURN] [--id ID]
+foxos bot profile create NAME [--title TITLE] [--role ROLE] [--instructions INSTRUCTIONS] [--icon ICON] [--color COLOR] [--image IMAGE] [--acp-agent AGENT] [--base-url BASE_URL] [--model MODEL] [--api-key API_KEY] [--scope SCOPE] [--isolated] [--visibility {private,public}] [--pinned] [--hidden] [--active] [--notifications] [--skills-mode {all,selected}] [--skills SKILLS] [--skills-off SKILLS_OFF] [--connectors CONNECTORS] [--machines MACHINES] [--default-machine DEFAULT_MACHINE] [--approval-mode {ask,allow_reads,allow_all}] [--rule RULES] [--delegate-to DELEGATE_TO] [--max-depth MAX_DEPTH] [--max-per-turn MAX_PER_TURN] [--cu-surface {auto,a11y,screen,browser}] [--cu-step-policy {auto,typesafe,deepseek}] [--id ID]
 ```
 
 工具接口名：`bot_profile_create` · 权限：`create`
@@ -368,6 +368,8 @@ foxos bot profile create NAME [--title TITLE] [--role ROLE] [--instructions INST
 | `delegate_to` | `--delegate-to` | array |  | 可以委托给哪些智能体（* 表示全部） |
 | `max_depth` | `--max-depth` | integer |  | 委托最大深度 |
 | `max_per_turn` | `--max-per-turn` | integer |  | 每轮最多委托几次 |
+| `cu_surface` | `--cu-surface` | string |  | 电脑操控方式：auto（默认 agent-desktop，读不到时退到截图 / 浏览器）/ a11y / screen / browser；可选：auto / a11y / screen / browser |
+| `cu_step_policy` | `--cu-step-policy` | string |  | 电脑操控单步策略：auto / typesafe / deepseek；可选：auto / typesafe / deepseek |
 | `id` | `--id` | string |  | 指定 ID（小写字母数字与 -） |
 
 示例：
@@ -385,7 +387,7 @@ foxos bot profile create Coder --title Coding --acp-agent codex-acp --icon code 
 修改智能体资料（同 bot config set）
 
 ```text
-foxos bot profile update BOT [--name NAME] [--title TITLE] [--role ROLE] [--instructions INSTRUCTIONS] [--icon ICON] [--color COLOR] [--image IMAGE] [--acp-agent AGENT] [--base-url BASE_URL] [--model MODEL] [--api-key API_KEY] [--scope SCOPE] [--isolated] [--visibility {private,public}] [--pinned] [--hidden] [--active] [--notifications] [--skills-mode {all,selected}] [--skills SKILLS] [--skills-off SKILLS_OFF] [--connectors CONNECTORS] [--machines MACHINES] [--default-machine DEFAULT_MACHINE] [--approval-mode {ask,allow_reads,allow_all}] [--rule RULES] [--delegate-to DELEGATE_TO] [--max-depth MAX_DEPTH] [--max-per-turn MAX_PER_TURN]
+foxos bot profile update BOT [--name NAME] [--title TITLE] [--role ROLE] [--instructions INSTRUCTIONS] [--icon ICON] [--color COLOR] [--image IMAGE] [--acp-agent AGENT] [--base-url BASE_URL] [--model MODEL] [--api-key API_KEY] [--scope SCOPE] [--isolated] [--visibility {private,public}] [--pinned] [--hidden] [--active] [--notifications] [--skills-mode {all,selected}] [--skills SKILLS] [--skills-off SKILLS_OFF] [--connectors CONNECTORS] [--machines MACHINES] [--default-machine DEFAULT_MACHINE] [--approval-mode {ask,allow_reads,allow_all}] [--rule RULES] [--delegate-to DELEGATE_TO] [--max-depth MAX_DEPTH] [--max-per-turn MAX_PER_TURN] [--cu-surface {auto,a11y,screen,browser}] [--cu-step-policy {auto,typesafe,deepseek}]
 ```
 
 工具接口名：`bot_profile_update` · 权限：`modify`
@@ -422,6 +424,8 @@ foxos bot profile update BOT [--name NAME] [--title TITLE] [--role ROLE] [--inst
 | `delegate_to` | `--delegate-to` | array |  | 可以委托给哪些智能体（* 表示全部） |
 | `max_depth` | `--max-depth` | integer |  | 委托最大深度 |
 | `max_per_turn` | `--max-per-turn` | integer |  | 每轮最多委托几次 |
+| `cu_surface` | `--cu-surface` | string |  | 电脑操控方式：auto（默认 agent-desktop，读不到时退到截图 / 浏览器）/ a11y / screen / browser；可选：auto / a11y / screen / browser |
+| `cu_step_policy` | `--cu-step-policy` | string |  | 电脑操控单步策略：auto / typesafe / deepseek；可选：auto / typesafe / deepseek |
 
 示例：
 
@@ -525,7 +529,7 @@ foxos bot config get fox --json
 修改智能体设置（与 OpenBot 的 Bot 设置逐项对应）
 
 ```text
-foxos bot config set BOT [--name NAME] [--title TITLE] [--role ROLE] [--instructions INSTRUCTIONS] [--icon ICON] [--color COLOR] [--image IMAGE] [--acp-agent AGENT] [--base-url BASE_URL] [--model MODEL] [--api-key API_KEY] [--scope SCOPE] [--isolated] [--visibility {private,public}] [--pinned] [--hidden] [--active] [--notifications] [--skills-mode {all,selected}] [--skills SKILLS] [--skills-off SKILLS_OFF] [--connectors CONNECTORS] [--machines MACHINES] [--default-machine DEFAULT_MACHINE] [--approval-mode {ask,allow_reads,allow_all}] [--rule RULES] [--delegate-to DELEGATE_TO] [--max-depth MAX_DEPTH] [--max-per-turn MAX_PER_TURN]
+foxos bot config set BOT [--name NAME] [--title TITLE] [--role ROLE] [--instructions INSTRUCTIONS] [--icon ICON] [--color COLOR] [--image IMAGE] [--acp-agent AGENT] [--base-url BASE_URL] [--model MODEL] [--api-key API_KEY] [--scope SCOPE] [--isolated] [--visibility {private,public}] [--pinned] [--hidden] [--active] [--notifications] [--skills-mode {all,selected}] [--skills SKILLS] [--skills-off SKILLS_OFF] [--connectors CONNECTORS] [--machines MACHINES] [--default-machine DEFAULT_MACHINE] [--approval-mode {ask,allow_reads,allow_all}] [--rule RULES] [--delegate-to DELEGATE_TO] [--max-depth MAX_DEPTH] [--max-per-turn MAX_PER_TURN] [--cu-surface {auto,a11y,screen,browser}] [--cu-step-policy {auto,typesafe,deepseek}]
 ```
 
 工具接口名：`bot_config_set` · 权限：`modify`
@@ -562,6 +566,8 @@ foxos bot config set BOT [--name NAME] [--title TITLE] [--role ROLE] [--instruct
 | `delegate_to` | `--delegate-to` | array |  | 可以委托给哪些智能体（* 表示全部） |
 | `max_depth` | `--max-depth` | integer |  | 委托最大深度 |
 | `max_per_turn` | `--max-per-turn` | integer |  | 每轮最多委托几次 |
+| `cu_surface` | `--cu-surface` | string |  | 电脑操控方式：auto（默认 agent-desktop，读不到时退到截图 / 浏览器）/ a11y / screen / browser；可选：auto / a11y / screen / browser |
+| `cu_step_policy` | `--cu-step-policy` | string |  | 电脑操控单步策略：auto / typesafe / deepseek；可选：auto / typesafe / deepseek |
 
 示例：
 
@@ -1212,6 +1218,479 @@ foxos browser close TAB
 foxos browser close 3F2A
 ```
 
+### `foxos browser snapshot`
+
+网页的无障碍快照（文字），每个元素一个 ref；纯文字模型也能据此操作
+
+```text
+foxos browser snapshot [--tab TAB] [--max-chars MAX_CHARS] [--interactive]
+```
+
+工具接口名：`browser_snapshot` · 权限：`read`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `tab` | `--tab` | string |  | 标签页 id（foxos browser tabs 里的 id，可写前缀；默认第一个） |
+| `max_chars` | `--max-chars` | integer |  | 最多多少字符；默认 40000 |
+| `interactive` | `--interactive` | boolean |  | 只列可操作的元素 |
+
+示例：
+
+```bash
+foxos browser snapshot
+foxos browser snapshot --interactive --json
+```
+
+限制：
+
+- ref 在下一次快照前有效；需要先由人运行 foxos browser cdp on
+
+### `foxos browser click`
+
+按快照里的 ref 点击网页元素（真实鼠标事件）
+
+```text
+foxos browser click REF [--tab TAB] [--double] [--button {left,right,middle}]
+```
+
+工具接口名：`browser_click` · 权限：`modify`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `ref` | `REF` | string | 是 | 快照里的 ref（e12） |
+| `tab` | `--tab` | string |  | 标签页 id（foxos browser tabs 里的 id，可写前缀；默认第一个） |
+| `double` | `--double` | boolean |  | 双击 |
+| `button` | `--button` | string |  | 鼠标键；可选：left / right / middle；默认 left |
+
+示例：
+
+```bash
+foxos browser click e12
+```
+
+### `foxos browser type`
+
+在输入框里输入文字（可回车提交）
+
+```text
+foxos browser type REF TEXT [--tab TAB] [--submit] [--append]
+```
+
+工具接口名：`browser_type` · 权限：`modify`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `ref` | `REF` | string | 是 | 快照里的 ref（e12） |
+| `text` | `TEXT` | string | 是 | 文字 |
+| `tab` | `--tab` | string |  | 标签页 id（foxos browser tabs 里的 id，可写前缀；默认第一个） |
+| `submit` | `--submit` | boolean |  | 输入后按回车 |
+| `append` | `--append` | boolean |  | 追加而不是替换 |
+
+示例：
+
+```bash
+foxos browser type e5 'FoxOS' --submit
+```
+
+### `foxos browser press`
+
+在网页里按键
+
+```text
+foxos browser press KEY [--tab TAB]
+```
+
+工具接口名：`browser_press` · 权限：`modify`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `key` | `KEY` | string | 是 | 按键（Enter、Escape、ArrowDown、ctrl+a …） |
+| `tab` | `--tab` | string |  | 标签页 id（foxos browser tabs 里的 id，可写前缀；默认第一个） |
+
+示例：
+
+```bash
+foxos browser press Enter
+foxos browser press ctrl+a
+```
+
+### `foxos browser select`
+
+选择下拉框（<select>）的选项
+
+```text
+foxos browser select REF VALUE [--tab TAB]
+```
+
+工具接口名：`browser_select` · 权限：`modify`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `ref` | `REF` | string | 是 | 快照里的 ref（e12） |
+| `value` | `VALUE` | string | 是 | 选项的值或文字 |
+| `tab` | `--tab` | string |  | 标签页 id（foxos browser tabs 里的 id，可写前缀；默认第一个） |
+
+示例：
+
+```bash
+foxos browser select e9 '中文'
+```
+
+### `foxos browser scroll`
+
+滚动网页
+
+```text
+foxos browser scroll [DIR] [--amount AMOUNT] [--tab TAB]
+```
+
+工具接口名：`browser_scroll` · 权限：`read`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `direction` | `DIR` | string |  | 方向；可选：down / up / left / right；默认 down |
+| `amount` | `--amount` | integer |  | 像素；默认 600 |
+| `tab` | `--tab` | string |  | 标签页 id（foxos browser tabs 里的 id，可写前缀；默认第一个） |
+
+示例：
+
+```bash
+foxos browser scroll down
+```
+
+### `foxos browser back`
+
+后退
+
+```text
+foxos browser back [--tab TAB]
+```
+
+工具接口名：`browser_back` · 权限：`modify`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `tab` | `--tab` | string |  | 标签页 id（foxos browser tabs 里的 id，可写前缀；默认第一个） |
+
+示例：
+
+```bash
+foxos browser back
+```
+
+### `foxos browser forward`
+
+前进
+
+```text
+foxos browser forward [--tab TAB]
+```
+
+工具接口名：`browser_forward` · 权限：`modify`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `tab` | `--tab` | string |  | 标签页 id（foxos browser tabs 里的 id，可写前缀；默认第一个） |
+
+示例：
+
+```bash
+foxos browser forward
+```
+
+### `foxos browser text`
+
+网页（或某个元素）的可见文字
+
+```text
+foxos browser text [--tab TAB] [--ref REF] [--max-chars MAX_CHARS]
+```
+
+工具接口名：`browser_text` · 权限：`read`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `tab` | `--tab` | string |  | 标签页 id（foxos browser tabs 里的 id，可写前缀；默认第一个） |
+| `ref` | `--ref` | string |  | 快照里的 ref（可选） |
+| `max_chars` | `--max-chars` | integer |  | 最多多少字符；默认 30000 |
+
+示例：
+
+```bash
+foxos browser text
+foxos browser text --ref e40
+```
+
+### `foxos browser wait`
+
+等待文字出现或等几秒
+
+```text
+foxos browser wait [--text TEXT] [--seconds SECONDS] [--tab TAB] [--timeout TIMEOUT]
+```
+
+工具接口名：`browser_wait` · 权限：`read`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `text` | `--text` | string |  | 等这段文字出现 |
+| `seconds` | `--seconds` | number |  | 等几秒 |
+| `tab` | `--tab` | string |  | 标签页 id（foxos browser tabs 里的 id，可写前缀；默认第一个） |
+| `timeout` | `--timeout` | number |  | 超时秒数；默认 20 |
+
+示例：
+
+```bash
+foxos browser wait --text '结果'
+foxos browser wait --seconds 2
+```
+
+### `foxos browser download`
+
+在浏览器里下载文件到工作空间 downloads/
+
+```text
+foxos browser download [--url URL] [--ref REF] [--tab TAB] [--timeout TIMEOUT]
+```
+
+工具接口名：`browser_download` · 权限：`create`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `url` | `--url` | string |  | 网址 |
+| `ref` | `--ref` | string |  | 快照里的 ref（可选） |
+| `tab` | `--tab` | string |  | 标签页 id（foxos browser tabs 里的 id，可写前缀；默认第一个） |
+| `timeout` | `--timeout` | number |  | 超时秒数；默认 120 |
+
+示例：
+
+```bash
+foxos browser download --url https://example.com/file.pdf
+foxos browser download --ref e33
+```
+
+限制：
+
+- 只存到工作空间 downloads/
+
+### `foxos browser downloads`
+
+列出已下载的文件
+
+```text
+foxos browser downloads
+```
+
+工具接口名：`browser_downloads` · 权限：`read`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| — | | | | 无参数 |
+
+示例：
+
+```bash
+foxos browser downloads --json
+```
+
+### `foxos browser tab select`
+
+切换到标签页
+
+```text
+foxos browser tab select TAB
+```
+
+工具接口名：`browser_tab_select` · 权限：`modify`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `tab` | `TAB` | string | 是 | 标签页 id（foxos browser tabs 里的 id，可写前缀；默认第一个） |
+
+示例：
+
+```bash
+foxos browser tab select 3F2A
+```
+
+### `foxos browser tab new`
+
+新开标签页
+
+```text
+foxos browser tab new [URL]
+```
+
+工具接口名：`browser_tab_new` · 权限：`run`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `url` | `URL` | string |  | 网址；默认 about:blank |
+
+示例：
+
+```bash
+foxos browser tab new https://example.com
+```
+
+### `foxos browser task`
+
+浏览器智能体：一句话任务，模型看快照、按 ref 操作 Chrome，直到给出答案
+
+```text
+foxos browser task TASK [--url URL] [--mode {s1s2,llm}] [--policy {auto,typesafe,deepseek}] [--max-steps MAX_STEPS] [--approve {risky,ask,auto,deny}] [--vision {auto,on,off}] [--tab TAB]
+```
+
+工具接口名：`browser_task` · 权限：`run`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `task` | `TASK` | string | 是 | 任务（一句话） |
+| `url` | `--url` | string |  | 先打开的网址 |
+| `mode` | `--mode` | string |  | 做法：s1s2（快决策 + 规划器，默认）/ llm（只用大模型）；可选：s1s2 / llm；默认 s1s2 |
+| `policy` | `--policy` | string |  | 单步策略：auto（有 TypeSafe 密钥用 Jev，否则 DeepSeek）/ typesafe / deepseek；可选：auto / typesafe / deepseek；默认 auto |
+| `max_steps` | `--max-steps` | integer |  | 最多多少步；默认 25 |
+| `approve` | `--approve` | string |  | 审批：risky（缺省）/ ask / auto / deny；可选：risky / ask / auto / deny；默认 risky |
+| `vision` | `--vision` | string |  | 截图：auto（配了视觉模型就用）/ on / off；可选：auto / on / off；默认 auto |
+| `tab` | `--tab` | string |  | 标签页 id（foxos browser tabs 里的 id，可写前缀；默认第一个） |
+
+示例：
+
+```bash
+foxos browser task '在维基百科查珠穆朗玛峰的海拔' --url https://zh.wikipedia.org --vision off
+foxos browser task 'find the latest FoxOS release name' --url https://github.com/gatesenman/foxos --mode llm
+```
+
+限制：
+
+- 需要 foxos computer model 配好模型与密钥（DeepSeek 等）；纯文字模型也能用
+- risky：删除、发送、支付、提交等高风险动作要人批准（foxos bot approval answer）；ask：每个改动都要批准
+
+### `foxos browser backend set`
+
+选择网页操作后端：auto（装了 agent-browser 就用它）/ agent-browser / builtin（内置 CDP）
+
+```text
+foxos browser backend set BACKEND
+```
+
+工具接口名：`browser_backend_set` · 权限：`modify`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `backend` | `BACKEND` | string | 是 | 后端；可选：auto / agent-browser / builtin |
+
+示例：
+
+```bash
+foxos browser backend set agent-browser
+foxos browser backend set builtin
+```
+
+### `foxos browser backend status`
+
+查看网页操作后端与 agent-browser 安装情况
+
+```text
+foxos browser backend status
+```
+
+工具接口名：`browser_backend_status` · 权限：`read`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| — | | | | 无参数 |
+
+示例：
+
+```bash
+foxos browser backend status --json
+```
+
+### `foxos browser engine status`
+
+浏览器引擎的安装状态、版本、许可证
+
+```text
+foxos browser engine status
+```
+
+工具接口名：`browser_engine_status` · 权限：`read`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| — | | | | 无参数 |
+
+示例：
+
+```bash
+foxos browser engine status --json
+```
+
+### `foxos browser engine install`
+
+安装开源浏览器引擎（Playwright MCP、Chrome DevTools MCP、browser-use）
+
+```text
+foxos browser engine install ENGINE
+```
+
+工具接口名：`browser_engine_install` · 权限：`run`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `engine` | `ENGINE` | string | 是 | 引擎名；可选：agent-browser / playwright-mcp |
+
+示例：
+
+```bash
+foxos browser engine install agent-browser
+foxos browser engine install playwright-mcp
+```
+
+### `foxos browser engine tools`
+
+列出引擎提供的 MCP 工具
+
+```text
+foxos browser engine tools ENGINE
+```
+
+工具接口名：`browser_engine_tools` · 权限：`read`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `engine` | `ENGINE` | string | 是 | 引擎名；可选：agent-browser / playwright-mcp |
+
+示例：
+
+```bash
+foxos browser engine tools playwright-mcp
+```
+
+### `foxos browser engine call`
+
+调用 Playwright MCP / Chrome DevTools MCP 的一个工具（连同一个 Chrome）
+
+```text
+foxos browser engine call ENGINE TOOL [--args ARGS]
+```
+
+工具接口名：`browser_engine_call` · 权限：`modify`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `engine` | `ENGINE` | string | 是 | 引擎名；可选：agent-browser / playwright-mcp |
+| `tool` | `TOOL` | string | 是 | 工具名 |
+| `args` | `--args` | object |  | 工具参数（JSON） |
+
+示例：
+
+```bash
+foxos browser engine call playwright-mcp browser_snapshot
+foxos browser engine call playwright-mcp browser_navigate --args '{"url": "https://example.com"}'
+```
+
 ## connector — 连接器：MCP 服务器与 OAuth 应用
 
 连接器：远程 MCP 服务器（HTTP / SSE）、本地 MCP 命令、OAuth 应用（PKCE、动态注册）。目录与 OpenBot 一致（Parallel、Exa、Firecrawl、Notion、Google Drive），另加 GitHub 和自定义地址。令牌存本地密钥库；每个智能体单独开启；写操作按智能体的审批规则询问。
@@ -1600,21 +2079,23 @@ foxos desktop key ctrl+c
 在屏幕坐标处点击
 
 ```text
-foxos desktop click --x X --y Y [--button BUTTON]
+foxos desktop click [--x X] [--y Y] [--button BUTTON] [--element ELEMENT]
 ```
 
 工具接口名：`desktop_click` · 权限：`modify`
 
 | 参数 | CLI | 类型 | 必填 | 说明 |
 |---|---|---|---|---|
-| `x` | `--x` | integer | 是 | X 坐标（像素） |
-| `y` | `--y` | integer | 是 | Y 坐标（像素） |
+| `x` | `--x` | integer |  | X 坐标（像素） |
+| `y` | `--y` | integer |  | Y 坐标（像素） |
 | `button` | `--button` | integer |  | 鼠标按钮：1 左键、2 中键、3 右键；默认 1 |
+| `element` | `--element` | string |  | 按无障碍引用点击（来自 desktop tree / find） |
 
 示例：
 
 ```bash
 foxos desktop click --x 400 --y 300
+foxos desktop click --element e12
 ```
 
 ### `foxos desktop screenshot`
@@ -1725,6 +2206,298 @@ foxos desktop resume
 限制：
 
 - 只有 human 身份可以执行
+
+### `foxos desktop tree`
+
+AT-SPI 无障碍树（文字快照，每个元素一个引用 e1、e2…）
+
+```text
+foxos desktop tree [--app APP] [--window-id WINDOW_ID] [--interactive] [--max-depth MAX_DEPTH] [--offscreen] [--full]
+```
+
+工具接口名：`desktop_tree` · 权限：`read`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `app` | `--app` | string |  | 程序名（如 mousepad、Thunar、Google Chrome） |
+| `window_id` | `--window-id` | string |  | 窗口 id（来自 desktop windows 或 agent-desktop） |
+| `interactive` | `--interactive` | boolean |  | 只列出可操作的元素 |
+| `max_depth` | `--max-depth` | integer |  | 最大深度；默认 14 |
+| `offscreen` | `--offscreen` | boolean |  | 也列出屏幕外的元素 |
+| `full` | `--full` | boolean |  | 同时返回结构化节点列表 |
+
+示例：
+
+```bash
+foxos desktop tree
+foxos desktop tree --app mousepad --json
+```
+
+限制：
+
+- 缺省只看当前活动窗口所属的程序、只列可见元素；引用在下一次 tree / find 之前有效
+
+### `foxos desktop find`
+
+按角色 / 名字在所有程序里找元素
+
+```text
+foxos desktop find [--role ROLE] [--name NAME] [--app APP] [--regex] [--limit LIMIT]
+```
+
+工具接口名：`desktop_find` · 权限：`read`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `role` | `--role` | string |  | 角色（push button、menu item、text、check box …） |
+| `name` | `--name` | string |  | 名字或文字包含（--regex 时为正则） |
+| `app` | `--app` | string |  | 程序名（如 mousepad、Thunar、Google Chrome） |
+| `regex` | `--regex` | boolean |  | --name 按正则匹配 |
+| `limit` | `--limit` | integer |  | 最多返回几个；默认 20 |
+
+示例：
+
+```bash
+foxos desktop find --role button --name Save
+foxos desktop find --app mousepad --role textfield
+```
+
+### `foxos desktop apps`
+
+列出有无障碍信息的程序与窗口
+
+```text
+foxos desktop apps
+```
+
+工具接口名：`desktop_apps` · 权限：`read`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| — | | | | 无参数 |
+
+示例：
+
+```bash
+foxos desktop apps --json
+```
+
+### `foxos desktop press`
+
+向程序发送按键组合（agent-desktop）
+
+```text
+foxos desktop press COMBO [--window-id WINDOW_ID] [--app APP]
+```
+
+工具接口名：`desktop_press` · 权限：`modify`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `keys` | `COMBO` | string | 是 | 按键组合，例如 ctrl+s、return |
+| `window_id` | `--window-id` | string |  | 窗口 id（来自 desktop windows 或 agent-desktop） |
+| `app` | `--app` | string |  | 程序名（如 mousepad、Thunar、Google Chrome） |
+
+示例：
+
+```bash
+foxos desktop press ctrl+s
+```
+
+### `foxos desktop element click`
+
+按无障碍引用点击元素（菜单、按钮、菜单项、标签页…）
+
+```text
+foxos desktop element click REF
+```
+
+工具接口名：`desktop_element_click` · 权限：`modify`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `ref` | `REF` | string | 是 | 元素引用（e12，或 进程号:路径） |
+
+示例：
+
+```bash
+foxos desktop element click e12
+```
+
+### `foxos desktop element focus`
+
+让元素获得焦点
+
+```text
+foxos desktop element focus REF
+```
+
+工具接口名：`desktop_element_focus` · 权限：`modify`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `ref` | `REF` | string | 是 | 元素引用（e12，或 进程号:路径） |
+
+示例：
+
+```bash
+foxos desktop element focus e7
+```
+
+### `foxos desktop element read`
+
+读元素的文字、值、状态、位置与可用动作
+
+```text
+foxos desktop element read REF [--property {text,value,title,bounds,role,states}]
+```
+
+工具接口名：`desktop_element_read` · 权限：`read`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `ref` | `REF` | string | 是 | 元素引用（e12，或 进程号:路径） |
+| `property` | `--property` | string |  | 要读取的属性（text、value、name、states、bounds…）；可选：text / value / title / bounds / role / states；默认 text |
+
+示例：
+
+```bash
+foxos desktop element read e7
+```
+
+### `foxos desktop element set-text`
+
+设置可编辑元素的文字（替换或追加）
+
+```text
+foxos desktop element set-text REF TEXT [--append]
+```
+
+工具接口名：`desktop_element_set-text` · 权限：`modify`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `ref` | `REF` | string | 是 | 元素引用（e12，或 进程号:路径） |
+| `text` | `TEXT` | string | 是 | 文字 |
+| `append` | `--append` | boolean |  | 追加到末尾而不是替换 |
+
+示例：
+
+```bash
+foxos desktop element set-text e7 'hello'
+```
+
+### `foxos desktop element type`
+
+在元素里按键输入文字
+
+```text
+foxos desktop element type REF TEXT
+```
+
+工具接口名：`desktop_element_type` · 权限：`modify`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `ref` | `REF` | string | 是 | 元素引用（e12，或 进程号:路径） |
+| `text` | `TEXT` | string | 是 | 文字 |
+
+示例：
+
+```bash
+foxos desktop element type e7 'more text'
+```
+
+### `foxos desktop element select`
+
+在组合框 / 列表里选择一项
+
+```text
+foxos desktop element select REF VALUE
+```
+
+工具接口名：`desktop_element_select` · 权限：`modify`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `ref` | `REF` | string | 是 | 元素引用（e12，或 进程号:路径） |
+| `value` | `VALUE` | string | 是 | 值 / 选项文字 |
+
+示例：
+
+```bash
+foxos desktop element select e9 'UTF-8'
+```
+
+### `foxos desktop element scroll`
+
+滚动一个元素
+
+```text
+foxos desktop element scroll REF [--direction {up,down,left,right}] [--amount AMOUNT]
+```
+
+工具接口名：`desktop_element_scroll` · 权限：`modify`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `ref` | `REF` | string | 是 | 元素引用（e12，或 进程号:路径） |
+| `direction` | `--direction` | string |  | 方向：up / down / left / right；可选：up / down / left / right；默认 down |
+| `amount` | `--amount` | integer |  | 滚动量；默认 3 |
+
+示例：
+
+```bash
+foxos desktop element scroll e30 --direction down
+```
+
+### `foxos desktop element action`
+
+对元素执行指定的无障碍动作（activate、press、expand …）
+
+```text
+foxos desktop element action REF ACTION
+```
+
+工具接口名：`desktop_element_action` · 权限：`modify`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `ref` | `REF` | string | 是 | 元素引用（e12，或 进程号:路径） |
+| `name` | `ACTION` | string | 是 | 动作名（element read 可以看到可用动作）；可选：double-click / right-click / triple-click / toggle / check / uncheck / expand / collapse / clear / scroll-to |
+
+示例：
+
+```bash
+foxos desktop element action e9 toggle
+```
+
+### `foxos desktop ground`
+
+视觉定位：截图 + 视觉模型，按一句话描述找坐标（可直接点击）
+
+```text
+foxos desktop ground DESCRIPTION [--click] [--kind {vlm,ui-tars,omniparser,typesafe}] [--button BUTTON]
+```
+
+工具接口名：`desktop_ground` · 权限：`modify`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `description` | `DESCRIPTION` | string | 是 | 要找的东西，一句话描述 |
+| `click` | `--click` | boolean |  | 找到后直接点击 |
+| `kind` | `--kind` | string |  | 定位方式（缺省用 computer model 的设置）；可选：vlm / ui-tars / omniparser / typesafe |
+| `button` | `--button` | integer |  | 鼠标按钮：1 左键、2 中键、3 右键；默认 1 |
+
+示例：
+
+```bash
+foxos desktop ground 'the Save button in the toolbar' --click
+```
+
+限制：
+
+- 需要视觉模型（foxos computer model set --vision-model …）或 UI-TARS / OmniParser 服务
 
 ## session — 真实桌面会话
 
@@ -1922,21 +2695,23 @@ foxos session key ctrl+c
 在屏幕坐标处点击
 
 ```text
-foxos session click --x X --y Y [--button BUTTON]
+foxos session click [--x X] [--y Y] [--button BUTTON] [--element ELEMENT]
 ```
 
 工具接口名：`session_click` · 权限：`modify`
 
 | 参数 | CLI | 类型 | 必填 | 说明 |
 |---|---|---|---|---|
-| `x` | `--x` | integer | 是 | X 坐标（像素） |
-| `y` | `--y` | integer | 是 | Y 坐标（像素） |
+| `x` | `--x` | integer |  | X 坐标（像素） |
+| `y` | `--y` | integer |  | Y 坐标（像素） |
 | `button` | `--button` | integer |  | 鼠标按钮：1 左键、2 中键、3 右键；默认 1 |
+| `element` | `--element` | string |  | 按无障碍引用点击（来自 desktop tree / find） |
 
 示例：
 
 ```bash
 foxos session click --x 400 --y 300
+foxos session click --element e12
 ```
 
 ### `foxos session screenshot`
@@ -2047,6 +2822,298 @@ foxos session resume
 限制：
 
 - 只有 human 身份可以执行
+
+### `foxos session tree`
+
+AT-SPI 无障碍树（文字快照，每个元素一个引用 e1、e2…）
+
+```text
+foxos session tree [--app APP] [--window-id WINDOW_ID] [--interactive] [--max-depth MAX_DEPTH] [--offscreen] [--full]
+```
+
+工具接口名：`session_tree` · 权限：`read`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `app` | `--app` | string |  | 程序名（如 mousepad、Thunar、Google Chrome） |
+| `window_id` | `--window-id` | string |  | 窗口 id（来自 desktop windows 或 agent-desktop） |
+| `interactive` | `--interactive` | boolean |  | 只列出可操作的元素 |
+| `max_depth` | `--max-depth` | integer |  | 最大深度；默认 14 |
+| `offscreen` | `--offscreen` | boolean |  | 也列出屏幕外的元素 |
+| `full` | `--full` | boolean |  | 同时返回结构化节点列表 |
+
+示例：
+
+```bash
+foxos session tree
+foxos session tree --app mousepad --json
+```
+
+限制：
+
+- 缺省只看当前活动窗口所属的程序、只列可见元素；引用在下一次 tree / find 之前有效
+
+### `foxos session find`
+
+按角色 / 名字在所有程序里找元素
+
+```text
+foxos session find [--role ROLE] [--name NAME] [--app APP] [--regex] [--limit LIMIT]
+```
+
+工具接口名：`session_find` · 权限：`read`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `role` | `--role` | string |  | 角色（push button、menu item、text、check box …） |
+| `name` | `--name` | string |  | 名字或文字包含（--regex 时为正则） |
+| `app` | `--app` | string |  | 程序名（如 mousepad、Thunar、Google Chrome） |
+| `regex` | `--regex` | boolean |  | --name 按正则匹配 |
+| `limit` | `--limit` | integer |  | 最多返回几个；默认 20 |
+
+示例：
+
+```bash
+foxos session find --role button --name Save
+foxos session find --app mousepad --role textfield
+```
+
+### `foxos session apps`
+
+列出有无障碍信息的程序与窗口
+
+```text
+foxos session apps
+```
+
+工具接口名：`session_apps` · 权限：`read`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| — | | | | 无参数 |
+
+示例：
+
+```bash
+foxos session apps --json
+```
+
+### `foxos session press`
+
+向程序发送按键组合（agent-desktop）
+
+```text
+foxos session press COMBO [--window-id WINDOW_ID] [--app APP]
+```
+
+工具接口名：`session_press` · 权限：`modify`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `keys` | `COMBO` | string | 是 | 按键组合，例如 ctrl+s、return |
+| `window_id` | `--window-id` | string |  | 窗口 id（来自 desktop windows 或 agent-desktop） |
+| `app` | `--app` | string |  | 程序名（如 mousepad、Thunar、Google Chrome） |
+
+示例：
+
+```bash
+foxos session press ctrl+s
+```
+
+### `foxos session element click`
+
+按无障碍引用点击元素（菜单、按钮、菜单项、标签页…）
+
+```text
+foxos session element click REF
+```
+
+工具接口名：`session_element_click` · 权限：`modify`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `ref` | `REF` | string | 是 | 元素引用（e12，或 进程号:路径） |
+
+示例：
+
+```bash
+foxos session element click e12
+```
+
+### `foxos session element focus`
+
+让元素获得焦点
+
+```text
+foxos session element focus REF
+```
+
+工具接口名：`session_element_focus` · 权限：`modify`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `ref` | `REF` | string | 是 | 元素引用（e12，或 进程号:路径） |
+
+示例：
+
+```bash
+foxos session element focus e7
+```
+
+### `foxos session element read`
+
+读元素的文字、值、状态、位置与可用动作
+
+```text
+foxos session element read REF [--property {text,value,title,bounds,role,states}]
+```
+
+工具接口名：`session_element_read` · 权限：`read`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `ref` | `REF` | string | 是 | 元素引用（e12，或 进程号:路径） |
+| `property` | `--property` | string |  | 要读取的属性（text、value、name、states、bounds…）；可选：text / value / title / bounds / role / states；默认 text |
+
+示例：
+
+```bash
+foxos session element read e7
+```
+
+### `foxos session element set-text`
+
+设置可编辑元素的文字（替换或追加）
+
+```text
+foxos session element set-text REF TEXT [--append]
+```
+
+工具接口名：`session_element_set-text` · 权限：`modify`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `ref` | `REF` | string | 是 | 元素引用（e12，或 进程号:路径） |
+| `text` | `TEXT` | string | 是 | 文字 |
+| `append` | `--append` | boolean |  | 追加到末尾而不是替换 |
+
+示例：
+
+```bash
+foxos session element set-text e7 'hello'
+```
+
+### `foxos session element type`
+
+在元素里按键输入文字
+
+```text
+foxos session element type REF TEXT
+```
+
+工具接口名：`session_element_type` · 权限：`modify`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `ref` | `REF` | string | 是 | 元素引用（e12，或 进程号:路径） |
+| `text` | `TEXT` | string | 是 | 文字 |
+
+示例：
+
+```bash
+foxos session element type e7 'more text'
+```
+
+### `foxos session element select`
+
+在组合框 / 列表里选择一项
+
+```text
+foxos session element select REF VALUE
+```
+
+工具接口名：`session_element_select` · 权限：`modify`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `ref` | `REF` | string | 是 | 元素引用（e12，或 进程号:路径） |
+| `value` | `VALUE` | string | 是 | 值 / 选项文字 |
+
+示例：
+
+```bash
+foxos session element select e9 'UTF-8'
+```
+
+### `foxos session element scroll`
+
+滚动一个元素
+
+```text
+foxos session element scroll REF [--direction {up,down,left,right}] [--amount AMOUNT]
+```
+
+工具接口名：`session_element_scroll` · 权限：`modify`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `ref` | `REF` | string | 是 | 元素引用（e12，或 进程号:路径） |
+| `direction` | `--direction` | string |  | 方向：up / down / left / right；可选：up / down / left / right；默认 down |
+| `amount` | `--amount` | integer |  | 滚动量；默认 3 |
+
+示例：
+
+```bash
+foxos session element scroll e30 --direction down
+```
+
+### `foxos session element action`
+
+对元素执行指定的无障碍动作（activate、press、expand …）
+
+```text
+foxos session element action REF ACTION
+```
+
+工具接口名：`session_element_action` · 权限：`modify`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `ref` | `REF` | string | 是 | 元素引用（e12，或 进程号:路径） |
+| `name` | `ACTION` | string | 是 | 动作名（element read 可以看到可用动作）；可选：double-click / right-click / triple-click / toggle / check / uncheck / expand / collapse / clear / scroll-to |
+
+示例：
+
+```bash
+foxos session element action e9 toggle
+```
+
+### `foxos session ground`
+
+视觉定位：截图 + 视觉模型，按一句话描述找坐标（可直接点击）
+
+```text
+foxos session ground DESCRIPTION [--click] [--kind {vlm,ui-tars,omniparser,typesafe}] [--button BUTTON]
+```
+
+工具接口名：`session_ground` · 权限：`modify`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `description` | `DESCRIPTION` | string | 是 | 要找的东西，一句话描述 |
+| `click` | `--click` | boolean |  | 找到后直接点击 |
+| `kind` | `--kind` | string |  | 定位方式（缺省用 computer model 的设置）；可选：vlm / ui-tars / omniparser / typesafe |
+| `button` | `--button` | integer |  | 鼠标按钮：1 左键、2 中键、3 右键；默认 1 |
+
+示例：
+
+```bash
+foxos session ground 'the Save button in the toolbar' --click
+```
+
+限制：
+
+- 需要视觉模型（foxos computer model set --vision-model …）或 UI-TARS / OmniParser 服务
 
 ## docs — 文档：读写标准 .docx（段落、标题、列表、表格），替换文本与导出
 
@@ -3580,6 +4647,202 @@ foxos sheets export sales.xlsx out/sales.pdf --force --json
 - csv 只导出一个工作表，公式导出为求值结果（需 LibreOffice，否则导出公式文本）
 - pdf / ods 需要 LibreOffice
 
+## shell — 终端会话
+
+持久终端（tmux）：连续执行命令，带退出码、超时、录制与审计
+
+### `foxos shell session new`
+
+开一个持久终端会话
+
+```text
+foxos shell session new [NAME] [--cwd CWD] [--isolation {light,none}] [--network] [--record] [--shared] [--env ENV]
+```
+
+工具接口名：`shell_session_new` · 权限：`run`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `name` | `NAME` | string |  | 会话名（缺省自动生成） |
+| `cwd` | `--cwd` | string |  | 起始目录（工作空间内）；工作空间路径（read） |
+| `isolation` | `--isolation` | string |  | 隔离：light（Landlock 沙箱，智能体默认）或 none（只有人能用）；可选：light / none |
+| `network` | `--network` | boolean |  | 允许联网（缺省允许；--no-network 断网） |
+| `record` | `--record` | boolean |  | 录制为 asciicast（缺省录制；--no-record 不录） |
+| `shared` | `--shared` | boolean |  | 其他智能体也能用这个会话 |
+| `env` | `--env` | object |  | 额外环境变量 KEY=VALUE |
+
+示例：
+
+```bash
+foxos shell session new dev --cwd .
+foxos shell session new build --isolation light --no-network
+```
+
+限制：
+
+- 智能体的会话默认在轻量沙箱里：只能写工作空间、私有 HOME 与临时目录
+- 起始目录必须在工作空间内；人工接管时 exec 返回 PAUSED
+
+### `foxos shell session exec`
+
+在会话里执行命令，返回输出、退出码、用时与当前目录
+
+```text
+foxos shell session exec SESSION COMMAND [--timeout TIMEOUT] [--max-output MAX_OUTPUT]
+```
+
+工具接口名：`shell_session_exec` · 权限：`run`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `session` | `SESSION` | string | 是 | 会话名 |
+| `command` | `COMMAND` | string | 是 | 要执行的命令（bash，可多行） |
+| `timeout` | `--timeout` | number |  | 最多等待秒数；超时不杀进程；默认 120.0 |
+| `max_output` | `--max-output` | integer |  | 输出最多返回多少字符（超出时保留开头与结尾）；默认 30000 |
+
+示例：
+
+```bash
+foxos shell session exec dev 'python3 -m venv .venv && . .venv/bin/activate'
+foxos shell session exec dev 'pytest -q' --timeout 600
+```
+
+限制：
+
+- 超时返回 timed_out=true，命令继续运行；同一会话一次只跑一条命令
+
+### `foxos shell session wait`
+
+继续等待超时的命令
+
+```text
+foxos shell session wait SESSION [--id ID] [--timeout TIMEOUT] [--max-output MAX_OUTPUT]
+```
+
+工具接口名：`shell_session_wait` · 权限：`read`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `session` | `SESSION` | string | 是 | 会话名 |
+| `id` | `--id` | string |  | 命令 id（exec 返回） |
+| `timeout` | `--timeout` | number |  | 最多等待秒数；超时不杀进程；默认 60.0 |
+| `max_output` | `--max-output` | integer |  | 输出最多返回多少字符（超出时保留开头与结尾）；默认 30000 |
+
+示例：
+
+```bash
+foxos shell session wait dev --timeout 300
+```
+
+### `foxos shell session read`
+
+读会话屏幕或输出日志
+
+```text
+foxos shell session read SESSION [--mode {screen,log}] [--lines LINES] [--since SINCE]
+```
+
+工具接口名：`shell_session_read` · 权限：`read`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `session` | `SESSION` | string | 是 | 会话名 |
+| `mode` | `--mode` | string |  | screen：当前屏幕；log：输出日志；可选：screen / log；默认 screen |
+| `lines` | `--lines` | integer |  | 行数；默认 50 |
+| `since` | `--since` | integer |  | 从日志的这个字节位置读起（log 模式） |
+
+示例：
+
+```bash
+foxos shell session read dev
+foxos shell session read dev --mode log --lines 200
+```
+
+### `foxos shell session send-keys`
+
+向会话发送按键或文字（交互程序、Ctrl-C）
+
+```text
+foxos shell session send-keys SESSION [KEY...] [--text TEXT] [--enter]
+```
+
+工具接口名：`shell_session_send-keys` · 权限：`run`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `session` | `SESSION` | string | 是 | 会话名 |
+| `keys` | `KEY` | array |  | tmux 按键名：C-c、Enter、Up、Tab、q … |
+| `text` | `--text` | string |  | 原样输入的文字 |
+| `enter` | `--enter` | boolean |  | 最后按回车 |
+
+示例：
+
+```bash
+foxos shell session send-keys dev C-c
+foxos shell session send-keys dev --text 'print(1+1)' --enter
+```
+
+### `foxos shell session kill`
+
+结束会话
+
+```text
+foxos shell session kill SESSION
+```
+
+工具接口名：`shell_session_kill` · 权限：`run`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `session` | `SESSION` | string | 是 | 会话名 |
+
+示例：
+
+```bash
+foxos shell session kill dev
+```
+
+### `foxos shell session list`
+
+列出终端会话
+
+```text
+foxos shell session list
+```
+
+工具接口名：`shell_session_list` · 权限：`read`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| — | | | | 无参数 |
+
+示例：
+
+```bash
+foxos shell session list --json
+```
+
+### `foxos shell session history`
+
+会话里执行过的命令（退出码、用时）与录制文件
+
+```text
+foxos shell session history SESSION [--limit LIMIT]
+```
+
+工具接口名：`shell_session_history` · 权限：`read`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `session` | `SESSION` | string | 是 | 会话名 |
+| `limit` | `--limit` | integer |  | 最多返回几条；默认 50 |
+
+示例：
+
+```bash
+foxos shell session history dev
+```
+
 ## slides — 演示：读写标准 .pptx（标题页、要点页、图片、原生图表、备注），替换文本与导出
 
 基于 python-pptx 读写 PowerPoint 2007+ (.pptx)，使用默认模板的标准版式。
@@ -4105,6 +5368,463 @@ foxos control resume --only bot:coder
 限制：
 
 - 只有 human 身份可以执行
+
+## computer — 电脑操控
+
+电脑操控智能体与模型设置（无障碍树 + 可选视觉定位）
+
+### `foxos computer doctor`
+
+体检默认电脑操控栈：agent-desktop + Jev 单步策略 + 截图 / xdotool 兜底 + 规划器
+
+```text
+foxos computer doctor
+```
+
+工具接口名：`computer_doctor` · 权限：`read`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| — | | | | 无参数 |
+
+示例：
+
+```bash
+foxos computer doctor
+foxos computer doctor --json
+```
+
+### `foxos computer backend install`
+
+安装电脑操控后端 agent-desktop（Vercel Labs，Apache-2.0）
+
+```text
+foxos computer backend install
+```
+
+工具接口名：`computer_backend_install` · 权限：`run`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| — | | | | 无参数 |
+
+示例：
+
+```bash
+foxos computer backend install
+```
+
+### `foxos computer backend status`
+
+查看 agent-desktop 状态
+
+```text
+foxos computer backend status
+```
+
+工具接口名：`computer_backend_status` · 权限：`read`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| — | | | | 无参数 |
+
+示例：
+
+```bash
+foxos computer backend status --json
+```
+
+### `foxos computer model show`
+
+查看操控用的模型设置
+
+```text
+foxos computer model show
+```
+
+工具接口名：`computer_model_show` · 权限：`read`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| — | | | | 无参数 |
+
+示例：
+
+```bash
+foxos computer model show --json
+```
+
+### `foxos computer model set`
+
+设置操控用的模型、视觉模型与视觉定位
+
+```text
+foxos computer model set [--provider PROVIDER] [--model MODEL] [--vision-model VISION_MODEL] [--base-url BASE_URL] [--vision {auto,off}] [--grounding {auto,vlm,ui-tars,omniparser,typesafe,none}] [--grounding-url GROUNDING_URL] [--grounding-model GROUNDING_MODEL] [--max-steps MAX_STEPS] [--step-policy {auto,typesafe,deepseek}] [--gate-high GATE_HIGH] [--gate-low GATE_LOW]
+```
+
+工具接口名：`computer_model_set` · 权限：`modify`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `provider` | `--provider` | string |  | 服务商：deepseek、openai、dashscope、zhipu、moonshot、local |
+| `model` | `--model` | string |  | 文字模型 |
+| `vision_model` | `--vision-model` | string |  | 视觉模型（收图片），空字符串表示没有 |
+| `base_url` | `--base-url` | string |  | OpenAI 兼容接口地址 |
+| `vision` | `--vision` | string |  | 视觉：auto 或 off；可选：auto / off |
+| `grounding` | `--grounding` | string |  | 视觉定位方式；可选：auto / vlm / ui-tars / omniparser / typesafe / none |
+| `grounding_url` | `--grounding-url` | string |  | 定位服务地址（vLLM / Ollama / OmniParser） |
+| `grounding_model` | `--grounding-model` | string |  | 定位模型名（如 ByteDance-Seed/UI-TARS-1.5-7B） |
+| `max_steps` | `--max-steps` | integer |  | 最多多少步 |
+| `step_policy` | `--step-policy` | string |  | 默认单步策略；可选：auto / typesafe / deepseek |
+| `gate_high` | `--gate-high` | number |  | 高置信度门槛（≥ 直接执行） |
+| `gate_low` | `--gate-low` | number |  | 低置信度门槛（< 升级给规划器） |
+
+示例：
+
+```bash
+foxos computer model set --provider deepseek
+foxos computer model set --vision off
+foxos computer model set --grounding ui-tars --grounding-url http://127.0.0.1:8000/v1 --grounding-model ByteDance-Seed/UI-TARS-1.5-7B
+```
+
+限制：
+
+- 只有人（human 身份）能改
+
+### `foxos computer model key`
+
+保存模型服务的 API 密钥（只存本机密钥库）
+
+```text
+foxos computer model key KEY [--provider PROVIDER]
+```
+
+工具接口名：`computer_model_key` · 权限：`modify`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `value` | `KEY` | string | 是 | API 密钥（建议用 --value-stdin） |
+| `provider` | `--provider` | string |  | 服务商：deepseek、openai、dashscope、zhipu、moonshot、local |
+
+示例：
+
+```bash
+cat deepseek.key | foxos computer model key --value-stdin
+```
+
+限制：
+
+- 只有人（human 身份）能改
+
+### `foxos computer model test`
+
+真实调用一次模型，检查密钥与网络
+
+```text
+foxos computer model test [--vision]
+```
+
+工具接口名：`computer_model_test` · 权限：`read`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `vision` | `--vision` | boolean |  | 测试视觉模型 |
+
+示例：
+
+```bash
+foxos computer model test
+```
+
+### `foxos computer task`
+
+电脑操控智能体：一句话任务，模型看无障碍树（可选截图）一步步操作桌面程序
+
+```text
+foxos computer task TASK [--app APP] [--launch ARG] [--max-steps MAX_STEPS] [--approve {risky,ask,auto,deny}] [--vision {auto,on,off}] [--mode {s1s2,llm}] [--policy {auto,typesafe,deepseek}] [--surface {auto,a11y,screen,browser}] [--url URL]
+```
+
+工具接口名：`computer_task` · 权限：`run`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `task` | `TASK` | string | 是 | 任务（一句话） |
+| `app` | `--app` | string |  | 只看这个程序的无障碍树 |
+| `launch` | `--launch` | array |  | 先启动的程序与参数（可重复） |
+| `max_steps` | `--max-steps` | integer |  | 最多多少步；默认 25 |
+| `approve` | `--approve` | string |  | 审批：risky（缺省）/ ask / auto / deny；可选：risky / ask / auto / deny；默认 risky |
+| `vision` | `--vision` | string |  | 截图：auto（配了视觉模型就用）/ on / off；可选：auto / on / off；默认 auto |
+| `mode` | `--mode` | string |  | 做法：s1s2（快决策 + 规划器，默认）/ llm（只用大模型）；可选：s1s2 / llm；默认 s1s2 |
+| `policy` | `--policy` | string |  | 单步策略：auto（有 TypeSafe 密钥用 Jev，否则 DeepSeek）/ typesafe / deepseek；可选：auto / typesafe / deepseek；默认 auto |
+| `surface` | `--surface` | string |  | 操作面：auto（网页 → 浏览器；桌面程序 → agent-desktop；没有无障碍信息 → 截图）/ a11y / screen / browser；可选：auto / a11y / screen / browser；默认 auto |
+| `url` | `--url` | string |  | 网页任务的起始网址（会路由到浏览器） |
+
+示例：
+
+```bash
+foxos computer task '在 Mousepad 里写一行 hello 并保存' --launch mousepad --launch notes.txt --app mousepad --vision off
+foxos computer task '在 xpaint 里点“确定”' --app xpaint --surface screen
+foxos computer task '查一下 example.com 的标题' --url https://example.com
+```
+
+限制：
+
+- 需要 foxos computer model 配好模型与密钥（DeepSeek 等）；纯文字模型也能用
+- risky：删除、发送、支付、提交等高风险动作要人批准（foxos bot approval answer）；ask：每个改动都要批准
+- 人工接管时暂停，恢复后继续
+
+## model — 模型
+
+本地视觉模型（可选）与模型服务商
+
+### `foxos model catalog`
+
+列出可一键安装的本地模型（只有 UI-TARS-1.5-7B）和硬件是否够用
+
+```text
+foxos model catalog
+```
+
+工具接口名：`model_catalog` · 权限：`read`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| — | | | | 无参数 |
+
+示例：
+
+```bash
+foxos model catalog --json
+```
+
+### `foxos model install`
+
+下载本地模型（断点续传 + sha256 校验，国内优先魔搭）
+
+```text
+foxos model install MODEL [--source {auto,hf,hf-mirror,modelscope}] [--force]
+```
+
+工具接口名：`model_install` · 权限：`run`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `model` | `MODEL` | string | 是 | 模型 id；可选：ui-tars-1.5-7b |
+| `source` | `--source` | string |  | 下载源：auto / hf / hf-mirror / modelscope；可选：auto / hf / hf-mirror / modelscope；默认 auto |
+| `force` | `--force` | boolean |  | 硬件不够也装 |
+
+示例：
+
+```bash
+foxos model install ui-tars-1.5-7b
+foxos model install ui-tars-1.5-7b --source modelscope
+```
+
+限制：
+
+- 约 5.6 GB 下载；权重不随系统镜像分发
+
+### `foxos model run`
+
+启动本地模型服务（llama.cpp 或 vLLM，OpenAI 兼容接口）
+
+```text
+foxos model run MODEL [--backend {auto,llama.cpp,vllm}] [--port PORT] [--ctx-size CTX_SIZE] [--threads THREADS] [--use]
+```
+
+工具接口名：`model_run` · 权限：`run`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `model` | `MODEL` | string | 是 | 模型 id；可选：ui-tars-1.5-7b |
+| `backend` | `--backend` | string |  | 推理后端：auto / llama.cpp / vllm；可选：auto / llama.cpp / vllm；默认 auto |
+| `port` | `--port` | integer |  | 端口 |
+| `ctx_size` | `--ctx-size` | integer |  | 上下文长度；默认 8192 |
+| `threads` | `--threads` | integer |  | CPU 线程数 |
+| `use` | `--use` | boolean |  | 启动后设为视觉定位；默认 True |
+
+示例：
+
+```bash
+foxos model run ui-tars-1.5-7b
+```
+
+限制：
+
+- CPU 上很慢（每步几十秒）；有 GPU 更好
+
+### `foxos model stop`
+
+停止本地模型服务
+
+```text
+foxos model stop MODEL
+```
+
+工具接口名：`model_stop` · 权限：`run`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `model` | `MODEL` | string | 是 | 模型 id；可选：ui-tars-1.5-7b |
+
+示例：
+
+```bash
+foxos model stop ui-tars-1.5-7b
+```
+
+### `foxos model status`
+
+本地模型安装 / 运行状态
+
+```text
+foxos model status
+```
+
+工具接口名：`model_status` · 权限：`read`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| — | | | | 无参数 |
+
+示例：
+
+```bash
+foxos model status --json
+```
+
+### `foxos model remove`
+
+删除已下载的本地模型
+
+```text
+foxos model remove MODEL
+```
+
+工具接口名：`model_remove` · 权限：`modify`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `model` | `MODEL` | string | 是 | 模型 id；可选：ui-tars-1.5-7b |
+
+示例：
+
+```bash
+foxos model remove ui-tars-1.5-7b
+```
+
+### `foxos model use`
+
+把运行中的本地模型设为视觉定位
+
+```text
+foxos model use MODEL
+```
+
+工具接口名：`model_use` · 权限：`modify`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `model` | `MODEL` | string | 是 | 模型 id；可选：ui-tars-1.5-7b |
+
+示例：
+
+```bash
+foxos model use ui-tars-1.5-7b
+```
+
+### `foxos model provider list`
+
+列出模型服务商和是否配了密钥
+
+```text
+foxos model provider list
+```
+
+工具接口名：`model_provider_list` · 权限：`read`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| — | | | | 无参数 |
+
+示例：
+
+```bash
+foxos model provider list --json
+```
+
+### `foxos model provider add`
+
+添加模型服务商密钥（只能人来做，从标准输入读）
+
+```text
+foxos model provider add PROVIDER --key KEY [--base-url BASE_URL] [--model MODEL]
+```
+
+工具接口名：`model_provider_add` · 权限：`modify`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `provider` | `PROVIDER` | string | 是 | 服务商：deepseek / typesafe；可选：deepseek / typesafe |
+| `key` | `--key` | string | 是 | 从标准输入读密钥 |
+| `base_url` | `--base-url` | string |  | OpenAI 兼容接口地址 |
+| `model` | `--model` | string |  | 文字模型 |
+
+示例：
+
+```bash
+cat typesafe.key | foxos model provider add typesafe --key-stdin
+cat deepseek.key | foxos model provider add deepseek --key-stdin
+```
+
+限制：
+
+- 只有人（human 身份）能改
+
+### `foxos model provider remove`
+
+删除模型服务商密钥
+
+```text
+foxos model provider remove PROVIDER
+```
+
+工具接口名：`model_provider_remove` · 权限：`modify`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `provider` | `PROVIDER` | string | 是 | 服务商：deepseek / typesafe；可选：deepseek / typesafe |
+
+示例：
+
+```bash
+foxos model provider remove typesafe
+```
+
+限制：
+
+- 只有人（human 身份）能改
+
+### `foxos model provider test`
+
+用一次真实调用测试服务商（报状态和延迟）
+
+```text
+foxos model provider test PROVIDER
+```
+
+工具接口名：`model_provider_test` · 权限：`read`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `provider` | `PROVIDER` | string | 是 | 服务商：deepseek / typesafe；可选：deepseek / typesafe |
+
+示例：
+
+```bash
+foxos model provider test deepseek
+foxos model provider test typesafe
+```
 
 ## Everything 应用的通用命令（每个应用都有）
 

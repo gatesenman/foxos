@@ -250,7 +250,7 @@ class Loop:
                  "scroll": ("desktop.element.scroll", {"ref": a.get("ref"), "direction": a.get("direction", "down")}),
                  "read": ("desktop.element.read", {"ref": a.get("ref")}),
                  "type_keys": ("desktop.type", {"text": a.get("text", "")}),
-                 "key": ("desktop.press", {"keys": a.get("keys", "")}),
+                 "key": ("desktop.press", {"keys": a.get("keys", ""), "app": self.app}),
                  "focus_window": ("desktop.focus", {"window": str(a.get("window", ""))}),
                  "click_visual": ("desktop.ground", {"description": a.get("description", ""), "click": True})}
             if name == "wait":

@@ -1551,5 +1551,8 @@
   "ts.no_key": "No TypeSafe API key",
   "ts.no_questions": "At least one question is required",
   "ts.too_many_choices": "Choice allows at most 255 options; got {0}",
-  "bots.bad_computer_use": "Invalid computer-use setting: surface must be one of {0}; step_policy one of {1}"
+  "bots.bad_computer_use": "Invalid computer-use setting: surface must be one of {0}; step_policy one of {1}",
+  "ab.timeout": "agent-browser {0} timed out",
+  "bot.p_cu_surface": "Computer-use surface: auto (agent-desktop, falling back to screenshot / browser) / a11y / screen / browser",
+  "bot.p_cu_step_policy": "Computer-use step policy: auto / typesafe / deepseek"
 }

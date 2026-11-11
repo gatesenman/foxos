@@ -20,3 +20,19 @@ pstack 的技能原文没有改动，里面提到的工具名与编辑器（例�
 ## 镜像里的智能体运行环境
 
 镜像只预装允许再分发的工具（Node.js、Bun、uv、GitHub CLI、Gemini CLI、Codex CLI、codex-acp、Qwen Code、opencode 等），每个工具的许可证与来源见 [docs/agent-runtime.md](docs/agent-runtime.md) 和 `packages/core/foxos/data/runtime-manifest.json`。专有工具（Claude Code、claude-agent-acp、Cursor CLI）不在镜像里，只在用户同意后从厂商官方来源安装。
+
+## 电脑操控 / Computer use
+
+作为依赖在安装时获取（npm 固定版本），镜像预装到 `/usr/lib/foxos/tools/<名字>/`，许可证文件随 npm 包（`node_modules/<名字>/LICENSE`）。狐狸OS 只通过命令行 / JSON 调用它们，没有拷贝源代码。
+Installed as pinned npm dependencies (preinstalled in the ISO under `/usr/lib/foxos/tools/<name>/`, license files ship inside each package). FoxOS only calls them as separate processes; no source code is copied.
+
+| 作品 / Work | 版本 / Version | 许可证 / License | 用途 / Use |
+|---|---|---|---|
+| agent-desktop（Vercel Labs） | 1.2.0 | Apache-2.0 | 默认：桌面无障碍树观察与操作 / default desktop observe & act |
+| agent-browser（Vercel Labs） | 0.42.0 | Apache-2.0 | 兜底：网页操作（经 CDP 连自带 Chrome）/ browser-use fallback |
+| @playwright/mcp（Microsoft） | 0.0.85 | Apache-2.0 | 给 ACP 智能体的浏览器 MCP / browser MCP for ACP agents (not preinstalled) |
+| llama.cpp（ggml-org） | b12284 | MIT | 可选本地模型运行时，按 sha256 下载，不进镜像 / optional local runtime, downloaded with sha256 checks, not in the ISO |
+| UI-TARS-1.5-7B（ByteDance Seed）GGUF（Mungert/UI-TARS-1.5-7B-GGUF） | Q4_K_M + q8_0 mmproj | Apache-2.0 | 可选本地视觉定位；权重不进镜像，用户一键下载 / optional; weights never shipped |
+| xdotool、scrot | 发行版软件包 / distro packages | BSD-3-Clause / MIT-feh | 截图兜底的键鼠与截图（独立进程）/ screenshot fallback (separate processes) |
+
+托管服务（不分发任何代码）/ Hosted services (nothing redistributed)：TypeSafe Jev（System One API）、DeepSeek API。密钥只在本机密钥库，不进镜像。

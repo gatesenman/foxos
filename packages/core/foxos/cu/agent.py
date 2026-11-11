@@ -34,7 +34,8 @@ VERIFY_SYS = ("You verify whether a computer-use task is complete, from the curr
               '"missing": "what still needs to be done if not complete"}.')
 STEP_SYS = ("You are the planner (System 2) of a computer-use agent. The fast step policy was not confident or failed. Look at the full "
             "observation and do the next step yourself with ONE tool call. Use set_plan to replace the remaining subgoals when the "
-            "plan is wrong, subgoal_done when the current subgoal is already satisfied, and done only when the whole task is complete.")
+            "plan is wrong, subgoal_done as soon as the current subgoal is already satisfied (do not keep reading the page), and done "
+            "(with the answer) only when the whole task is complete.")
 
 
 class Agent(Loop):
@@ -134,12 +135,22 @@ class Agent(Loop):
         self.sg = 0
         self.event({"type": "plan", "subgoals": self.subgoals, "seconds": round(time.time() - t0, 2), "replan": bool(note)})
 
+    def page_text(self) -> str:
+        """浏览器：快照只有元素，核对答案时再带上网页正文（信息框、段落里的文字）。"""
+        if self.kind != "browser":
+            return ""
+        try:
+            t = self.run_cmd("browser.text", {"tab": self.tab, "max_chars": 12000} if self.tab else {"max_chars": 12000})
+            return "\n\nPage text:\n" + str(t.get("text") or "")[:12000]
+        except FoxError:
+            return ""
+
     def verify(self, obs: Observation) -> dict:
         if obs.surface == "screen" and self.policy.name == "typesafe":
             return self.verify_screen(obs)
         r = self._s2([{"role": "system", "content": VERIFY_SYS + " " + tr("cu.sys_lang", get_lang())},
                       {"role": "user", "content": f"Task: {self.task}\nActions so far: {json.dumps(self.history[-10:], ensure_ascii=False)}\n\n"
-                                                  f"Current observation:\n{obs.full[:16000]}"}], json_mode=True)
+                                                  f"Current observation:\n{obs.full[:12000]}{self.page_text()}"}], json_mode=True)
         d = self._json(r["message"].get("content"))
         self.event({"type": "verify", **{k: d.get(k) for k in ("complete", "answer", "missing")}})
         return d
@@ -308,7 +319,18 @@ class Agent(Loop):
             if not self.wait_if_paused():
                 status = "paused"
                 break
-            obs = self._pending or self.compile()
+            try:
+                obs = self._pending or self.compile()
+            except FoxError as e:
+                if e.code == "PAUSED":
+                    continue
+                self.event({"type": "observe_error", "error": e.message[:300]})
+                time.sleep(1.0)
+                try:
+                    obs = self.compile()
+                except FoxError as e2:
+                    answer, status = f"observation failed: {e2.message}", "error"
+                    break
             self._pending = None
             if self.sg >= len(self.subgoals):
                 v = self.verify(obs)

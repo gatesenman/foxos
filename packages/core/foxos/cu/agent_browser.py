@@ -62,11 +62,15 @@ def run(ctx, args: list[str], timeout: float = 60) -> dict:
     cwd = ctx.workspace.data_dir / "agent-browser"
     cwd.mkdir(parents=True, exist_ok=True)
     env = dict(os.environ)
-    try:
-        p = subprocess.run([b, "--cdp", port, "--session", _session(ctx), "--json", *args], capture_output=True, text=True,
-                           timeout=timeout, cwd=str(cwd), env=env)
-    except subprocess.TimeoutExpired as e:
-        raise FoxError("ERROR", tr("ad.timeout", args[0])) from e
+    readonly = args[0] in ("snapshot", "get") or args[:2] == ["tab", "list"]
+    for attempt in range(2 if readonly else 1):  # 只读命令偶尔卡住（守护进程忙）：重试一次
+        try:
+            p = subprocess.run([b, "--cdp", port, "--session", _session(ctx), "--json", *args], capture_output=True, text=True,
+                               timeout=timeout if not readonly else min(timeout, 30), cwd=str(cwd), env=env)
+            break
+        except subprocess.TimeoutExpired as e:
+            if attempt or not readonly:
+                raise FoxError("ERROR", tr("ab.timeout", " ".join(args[:2]))) from e
     line = next((ln for ln in reversed((p.stdout or "").splitlines()) if ln.startswith("{")), None)
     if not line:
         raise FoxError("ERROR", tr("ad.bad_output", args[0], (p.stderr or p.stdout)[-400:]))

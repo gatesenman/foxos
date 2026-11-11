@@ -237,10 +237,13 @@ def act(ws, action: str, ref: str | None = None, value: str | None = None, **kw)
     return run(args, stdin=stdin)
 
 
-def press(combo: str, window_id: str | None = None) -> dict:
+def press(combo: str, window_id: str | None = None, app: str | None = None) -> dict:
+    """按键发给指定程序的进程（--app / --window-id），不依赖哪个窗口有焦点。"""
     args = ["press", combo]
     if window_id:
         args += ["--window-id", str(window_id)]
+    elif app:
+        args += ["--app", app]
     return run(args)
 
 

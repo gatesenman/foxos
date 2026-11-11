@@ -141,7 +141,7 @@ register(Command("model", "provider list", tr("mdl.c_provider_list"), provider_l
 register(Command("model", "provider add", tr("mdl.c_provider_add"), provider_add,
                  params=[P, Param("key", "string", tr("mdl.p_key"), required=True, secret=True, cli_stdin=True),
                          Param("base_url", "string", tr("cu.p_base_url")), Param("model", "string", tr("cu.p_model"))],
-                 examples=["foxos model provider add typesafe --key-stdin < typesafe.key", "foxos model provider add deepseek --key-stdin < deepseek.key"],
+                 examples=["cat typesafe.key | foxos model provider add typesafe --key-stdin", "cat deepseek.key | foxos model provider add deepseek --key-stdin"],
                  limits=[tr("cu.l_human_only")], permission="modify"))
 register(Command("model", "provider remove", tr("mdl.c_provider_remove"), provider_remove, params=[P],
                  examples=["foxos model provider remove typesafe"], limits=[tr("cu.l_human_only")], permission="modify"))

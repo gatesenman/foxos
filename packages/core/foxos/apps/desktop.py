@@ -287,9 +287,9 @@ def element_action(ctx: Context, ref: str, name: str) -> dict:
     return _act(ctx, name, ref)
 
 
-def desktop_press(ctx: Context, keys: str, window_id: str | None = None) -> dict:
+def desktop_press(ctx: Context, keys: str, window_id: str | None = None, app: str | None = None) -> dict:
     _claim(ctx)
-    return {"keys": keys, "result": _ad().press(keys, window_id)}
+    return {"keys": keys, "result": _ad().press(keys, window_id, app)}
 
 
 def desktop_ground(ctx: Context, description: str, click: bool = False, kind: str | None = None, button: int = 1) -> dict:
@@ -329,7 +329,8 @@ def _register_a11y(app: str) -> None:
     register(Command(app, "apps", tr("a11y.c_apps"), desktop_apps, examples=[f"foxos {app} apps --json"], permission="read", audited=False))
     register(Command(app, "press", tr("a11y.c_press"), desktop_press,
                      params=[Param("keys", "string", tr("a11y.p_keys"), required=True, positional=True, metavar="COMBO"),
-                             Param("window_id", "string", tr("a11y.p_window_id"))],
+                             Param("window_id", "string", tr("a11y.p_window_id")),
+                             Param("app", "string", tr("a11y.p_app"))],
                      examples=[f"foxos {app} press ctrl+s"], permission="modify"))
     register(Command(app, "element click", tr("a11y.c_click"), element_click, params=[REF],
                      examples=[f"foxos {app} element click e12"], permission="modify"))

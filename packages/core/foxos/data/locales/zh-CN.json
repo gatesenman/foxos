@@ -1551,5 +1551,8 @@
   "ts.no_key": "没有 TypeSafe 密钥",
   "ts.no_questions": "至少要一个问题",
   "ts.too_many_choices": "Choice 最多 255 个选项，现在有 {0} 个",
-  "bots.bad_computer_use": "电脑操控设置不对：surface 只能是 {0}，step_policy 只能是 {1}"
+  "bots.bad_computer_use": "电脑操控设置不对：surface 只能是 {0}，step_policy 只能是 {1}",
+  "ab.timeout": "agent-browser {0} 超时",
+  "bot.p_cu_surface": "电脑操控方式：auto（默认 agent-desktop，读不到时退到截图 / 浏览器）/ a11y / screen / browser",
+  "bot.p_cu_step_policy": "电脑操控单步策略：auto / typesafe / deepseek"
 }

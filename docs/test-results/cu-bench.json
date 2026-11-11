@@ -1,0 +1,91 @@
+[
+ {
+  "task": "desk-replace",
+  "surface": "a11y (agent-desktop)",
+  "config": "jev",
+  "success": true,
+  "agent_said_success": true,
+  "steps": 10,
+  "s1_steps": 10,
+  "escalations": 0,
+  "mean_policy_ms": 113,
+  "seconds": 31.7,
+  "wall_seconds": 33.9,
+  "usd": 0.00723,
+  "tokens": {
+   "planner": {
+    "prompt_tokens": 1437,
+    "completion_tokens": 2883
+   },
+   "step_policy": {
+    "input_tokens": 13653,
+    "output_tokens": 3650
+   }
+  },
+  "routed_to": "computer",
+  "route_reason": null,
+  "answer": "文档已替换为“Shopping list: apples, milk”并保存。",
+  "task_id": "task-ab6f528edc",
+  "error": null,
+  "at": "2026-11-12 02:27:37 +0800"
+ },
+ {
+  "task": "desk-replace",
+  "surface": "a11y (agent-desktop)",
+  "config": "deepseek",
+  "success": true,
+  "agent_said_success": true,
+  "steps": 6,
+  "s1_steps": 6,
+  "escalations": 0,
+  "mean_policy_ms": 1103,
+  "seconds": 19.5,
+  "wall_seconds": 21.7,
+  "usd": 0.00353,
+  "tokens": {
+   "planner": {
+    "prompt_tokens": 1145,
+    "completion_tokens": 1076
+   },
+   "step_policy": {
+    "prompt_tokens": 3908,
+    "completion_tokens": 102,
+    "total_tokens": 4010,
+    "prompt_cache_hit_tokens": 1536,
+    "prompt_cache_miss_tokens": 2372
+   }
+  },
+  "routed_to": "computer",
+  "route_reason": null,
+  "answer": "已将文档内容替换为“Shopping list: apples, milk”并保存。",
+  "task_id": "task-bc86604fba",
+  "error": null,
+  "at": "2026-11-12 02:28:02 +0800"
+ },
+ {
+  "task": "desk-replace",
+  "surface": "a11y (agent-desktop)",
+  "config": "llm",
+  "success": true,
+  "agent_said_success": false,
+  "steps": 14,
+  "s1_steps": null,
+  "escalations": null,
+  "mean_policy_ms": null,
+  "seconds": 61.1,
+  "wall_seconds": 63.0,
+  "usd": 0.04277,
+  "tokens": {
+   "planner": {
+    "prompt_tokens": 53897,
+    "completion_tokens": 3633
+   }
+  },
+  "routed_to": null,
+  "route_reason": null,
+  "answer": null,
+  "task_id": "task-90a6febbf8",
+  "error": null,
+  "at": "2026-11-12 02:29:08 +0800"
+ }
+]
