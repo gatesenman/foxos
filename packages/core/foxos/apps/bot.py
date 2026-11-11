@@ -34,6 +34,7 @@ def _cfg_params(with_name: bool) -> list[Param]:
         Param("color", "string", tr("bot.p_color")),
         Param("image", "string", tr("bot.p_image")),
         Param("agent", "string", tr("bot.p_agent"), cli_flag="--acp-agent"),
+        Param("provider", "string", tr("bot.p_provider"), enum=list(bots.PROVIDERS)),
         Param("base_url", "string", tr("bot.p_base_url")),
         Param("model", "string", tr("bot.p_model")),
         Param("api_key", "string", tr("bot.p_api_key"), cli_stdin=True, secret=True),
@@ -66,10 +67,18 @@ def _patch(cur: dict | None, a: dict) -> dict:
     if any(a.get(k) is not None for k in ("icon", "color", "image")):
         p["avatar"] = {"icon": a.get("icon"), "color": a.get("color"), "image": a.get("image")}
     be = cur.get("backend") or {}
-    if a.get("agent") and not a.get("base_url"):
+    if a.get("provider"):
+        pv = bots.PROVIDERS[a["provider"]]
+        same = be.get("kind") == "model" and be.get("provider") == a["provider"]
+        p["backend"] = {"kind": "model", "provider": a["provider"],
+                        "base_url": a.get("base_url") or (be.get("base_url") if same else None) or pv["base_url"],
+                        "model": a.get("model") or (be.get("model") if same else None) or pv["model"]}
+        p.pop("model", None)
+    elif a.get("agent") and not a.get("base_url"):
         p["backend"] = {"kind": "acp", "agent": a["agent"]}
     elif a.get("base_url") or (a.get("model") and be.get("kind") == "model"):
-        p["backend"] = {"kind": "model", "base_url": a.get("base_url") or be.get("base_url"), "model": a.get("model") or be.get("model")}
+        p["backend"] = {"kind": "model", "provider": be.get("provider") or "custom",
+                        "base_url": a.get("base_url") or be.get("base_url"), "model": a.get("model") or be.get("model")}
     if any(a.get(k) is not None for k in ("skills_mode", "skills", "skills_off")):
         s = dict(cur.get("skills") or {})
         if a.get("skills_mode"):
@@ -122,6 +131,7 @@ def _public(ws, b: dict) -> dict:
     out = dict(b)
     out["has_api_key"] = bool(secrets.get(f"bot:{b['id']}:api_key"))
     out["identity"] = f"bot:{b['id']}"
+    out["providers"] = bots.PROVIDERS
     return out
 
 

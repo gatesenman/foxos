@@ -1250,5 +1250,7 @@
   "connectors.oauth_discovery_failed": "在 {0} 找不到 OAuth 授权服务器元数据（RFC 9728 / RFC 8414）",
   "connectors.oauth_needs_url": "OAuth 连接器需要 MCP 地址（--url）",
   "connectors.oauth_no_pkce": "授权服务器 {0} 不支持 PKCE S256，拒绝连接",
-  "machines.client_cert_needed": "配对请求里缺少控制端证书"
+  "machines.client_cert_needed": "配对请求里缺少控制端证书",
+  "bot.p_provider": "模型服务商预设：deepseek、openai、dashscope、ollama 或 custom（填好地址与默认模型；密钥用 --api-key-stdin 存进本机密钥库）",
+  "bots.model_unknown_tool": "模型调用了不存在的工具：{0}"
 }

@@ -1250,5 +1250,7 @@
   "connectors.oauth_discovery_failed": "No OAuth authorization server metadata found for {0} (RFC 9728 / RFC 8414)",
   "connectors.oauth_needs_url": "An OAuth connector needs an MCP URL (--url)",
   "connectors.oauth_no_pkce": "Authorization server {0} does not support PKCE S256; refusing",
-  "machines.client_cert_needed": "The pairing request is missing the controller certificate"
+  "machines.client_cert_needed": "The pairing request is missing the controller certificate",
+  "bot.p_provider": "Model provider preset: deepseek, openai, dashscope, ollama or custom (fills in the base URL and default model; store the key with --api-key-stdin)",
+  "bots.model_unknown_tool": "The model called an unknown tool: {0}"
 }

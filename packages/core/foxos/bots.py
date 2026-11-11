@@ -29,6 +29,17 @@ from .i18n import get_lang, tr
 
 MAX_DEPTH = 3
 MAX_PER_TURN = 5
+# 模型服务商（OpenAI 兼容 /chat/completions）。只写核实过的默认模型；其余由用户填。
+PROVIDERS = {
+    "deepseek": {"title": "DeepSeek", "base_url": "https://api.deepseek.com", "model": "deepseek-flash",
+                 "models": ["deepseek-flash", "deepseek-v4-pro"], "keys": "https://platform.deepseek.com/api_keys"},
+    "openai": {"title": "OpenAI", "base_url": "https://api.openai.com/v1", "model": "", "models": [],
+               "keys": "https://platform.openai.com/api-keys"},
+    "dashscope": {"title": "通义千问（DashScope）", "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1", "model": "", "models": [],
+                  "keys": "https://dashscope.console.aliyun.com/apiKey"},
+    "ollama": {"title": "Ollama（本机）", "base_url": "http://127.0.0.1:11434/v1", "model": "", "models": [], "keys": ""},
+    "custom": {"title": "OpenAI-compatible", "base_url": "", "model": "", "models": [], "keys": ""},
+}
 APPROVAL_TIMEOUT = float(os.environ.get("FOXOS_APPROVAL_TIMEOUT", "600"))
 ICON_RE = re.compile(r"^[a-z0-9-]{2,40}$")
 COLOR_RE = re.compile(r"^#[0-9a-fA-F]{6}$")
@@ -192,7 +203,8 @@ def validate_patch(ws, patch: dict, cur: dict | None = None) -> dict:
                 if not v.get("base_url") or not v.get("model"):
                     raise FoxError("USAGE", tr("bots.backend_model_required"))
                 out[k] = {"kind": "model", "base_url": v["base_url"].rstrip("/"), "model": v["model"],
-                          "auth_header": v.get("auth_header") or "Authorization"}
+                          "auth_header": v.get("auth_header") or "Authorization",
+                          "provider": v.get("provider") if v.get("provider") in PROVIDERS else "custom"}
             else:
                 raise FoxError("USAGE", tr("bots.bad_backend"))
         elif k == "scope":
@@ -805,7 +817,7 @@ def run_turn(ws, ref: str, text: str, *, attachments: list | None = None, actor:
                     pass
             backend = bot.get("backend") or {"kind": "acp", "agent": "foxos-local"}
             if backend["kind"] == "model":
-                stop = _run_model(ws, bot, turn, text, skill_block, envelope, attachments or [])
+                stop = _run_model(ws, bot, turn, text, skill_block, envelope, attachments or [], ident, approval_mode)
             else:
                 stop = _run_acp(ws, bot, turn, text, skill_block, envelope, attachments or [], ident, keep, approval_mode)
     except FoxError as e:
@@ -961,9 +973,41 @@ def _run_acp(ws, bot, turn: _Turn, text, skill_block, envelope, attachments, ide
             conn.stop()
 
 
-def _run_model(ws, bot, turn: _Turn, text, skill_block, envelope, attachments) -> str:
-    """OpenAI 兼容的 /chat/completions（流式）。没有工具调用；文件、委托请用 ACP 智能体作为后端。"""
+MODEL_TOOLS = ["bot.task.delegate", "bot.skill.list", "bot.skill.show", "files.list", "files.read", "files.info"]
+MODEL_MAX_ROUNDS = 8
+
+
+def _model_tools(bot: dict) -> list[dict]:
+    """模型后端（OpenAI 兼容）的工具：委托给别的智能体、pstack 技能、读文件（可带 machine 到另一台狐狸OS）。
+    改文件、跑命令交给有 ACP 智能体的 Bot 去做（那里有审批卡片与 diff）。"""
+    from .kernel import REGISTRY
+    out = []
+    for cid in MODEL_TOOLS:
+        c = REGISTRY.get(cid)
+        if not c:
+            continue
+        schema = c.input_schema()
+        if c.app == "files":
+            schema = {**schema, "properties": {**schema.get("properties", {}),
+                                               "machine": {"type": "string", "description": tr("catalog.machine_param")}}}
+        out.append({"type": "function", "function": {"name": c.tool_name, "description": c.summary, "parameters": schema}})
+    return out
+
+
+def _model_request(be: dict, key: str | None, payload: dict):
     import urllib.request
+    hdr = {"Content-Type": "application/json", "User-Agent": "foxos-bot/0.3"}
+    if key:
+        h = be.get("auth_header") or "Authorization"
+        hdr[h] = f"Bearer {key}" if h.lower() == "authorization" else key
+    req = urllib.request.Request(be["base_url"] + "/chat/completions", data=json.dumps(payload).encode("utf-8"), headers=hdr, method="POST")
+    return urllib.request.urlopen(req, timeout=600)
+
+
+def _run_model(ws, bot, turn: _Turn, text, skill_block, envelope, attachments, ident: str, approval_mode: str | None) -> str:
+    """OpenAI 兼容的 /chat/completions（流式，带函数调用）。DeepSeek、通义、Ollama 等都走这里。"""
+    import urllib.error
+    from .kernel import REGISTRY
     be = bot["backend"]
     key = secrets.get(f"bot:{bot['id']}:api_key")
     pre = _preamble(ws, bot, turn, envelope, attachments)
@@ -971,32 +1015,105 @@ def _run_model(ws, bot, turn: _Turn, text, skill_block, envelope, attachments) -
     for m in messages(ws, bot["id"], 12)[:-1]:
         msgs.append({"role": "user" if m["role"] == "user" else "assistant", "content": m.get("text", "")})
     msgs.append({"role": "user", "content": skill_block + text})
-    body = json.dumps({"model": be["model"], "messages": msgs, "stream": True}).encode("utf-8")
-    hdr = {"Content-Type": "application/json"}
-    if key:
-        h = be.get("auth_header") or "Authorization"
-        hdr[h] = f"Bearer {key}" if h.lower() == "authorization" else key
-    req = urllib.request.Request(be["base_url"] + "/chat/completions", data=body, headers=hdr, method="POST")
+    tools = _model_tools(bot)
+    by_name = {REGISTRY[c].tool_name: REGISTRY[c] for c in MODEL_TOOLS if c in REGISTRY}
+    aid = f"{ident}/model:{be['model']}"
+    allowed = (bot.get("machines") or {}).get("allowed") or [machines.LOCAL]
     turn.emit({"type": "agent", "agent": "model:" + be["model"]})
-    try:
-        with urllib.request.urlopen(req, timeout=600) as r:
-            for raw in r:
-                line = raw.decode("utf-8", "replace").strip()
-                if not line.startswith("data:"):
-                    continue
-                data = line[5:].strip()
-                if data == "[DONE]":
-                    break
-                try:
-                    delta = json.loads(data)["choices"][0].get("delta", {}).get("content")
-                except (ValueError, KeyError, IndexError):
-                    continue
-                if delta:
-                    turn.text += delta
-                    turn.emit({"type": "text", "text": delta})
-    except OSError as e:
-        raise FoxError("DEPENDENCY_MISSING", tr("bots.model_failed", be["base_url"], e)) from e
-    return "end_turn"
+    stop = "end_turn"
+    for _round in range(MODEL_MAX_ROUNDS):
+        calls: dict[int, dict] = {}
+        said, reasoning, finish = "", "", None
+        try:
+            with _model_request(be, key, {"model": be["model"], "messages": msgs, "stream": True, "tools": tools}) as r:
+                for raw in r:
+                    line = raw.decode("utf-8", "replace").strip()
+                    if not line.startswith("data:"):
+                        continue
+                    data = line[5:].strip()
+                    if data == "[DONE]":
+                        break
+                    try:
+                        ch = json.loads(data)["choices"][0]
+                    except (ValueError, KeyError, IndexError):
+                        continue
+                    d = ch.get("delta") or {}
+                    finish = ch.get("finish_reason") or finish
+                    if d.get("reasoning_content"):
+                        reasoning += d["reasoning_content"]
+                        turn.emit({"type": "thought", "text": d["reasoning_content"]})
+                    if d.get("content"):
+                        said += d["content"]
+                        turn.text += d["content"]
+                        turn.emit({"type": "text", "text": d["content"]})
+                    for tc in d.get("tool_calls") or []:
+                        c = calls.setdefault(tc.get("index", 0), {"id": "", "name": "", "args": ""})
+                        c["id"] = tc.get("id") or c["id"]
+                        f = tc.get("function") or {}
+                        c["name"] += f.get("name") or ""
+                        c["args"] += f.get("arguments") or ""
+        except urllib.error.HTTPError as e:
+            body = e.read().decode("utf-8", "replace")[:300]
+            raise FoxError("PERMISSION_DENIED" if e.code in (401, 403) else "DEPENDENCY_MISSING",
+                           tr("bots.model_failed", be["base_url"], f"HTTP {e.code} {body}")) from e
+        except OSError as e:
+            raise FoxError("DEPENDENCY_MISSING", tr("bots.model_failed", be["base_url"], e)) from e
+        if not calls:
+            stop = "max_tokens" if finish == "length" else "end_turn"
+            break
+        am = {"role": "assistant", "content": said or None,
+              "tool_calls": [{"id": c["id"] or f"call_{i}", "type": "function", "function": {"name": c["name"], "arguments": c["args"] or "{}"}}
+                             for i, c in sorted(calls.items())]}
+        if reasoning:
+            am["reasoning_content"] = reasoning
+        msgs.append(am)
+        if said and not turn.text.endswith("\n"):
+            turn.text += "\n"
+        for tc in am["tool_calls"]:
+            name = tc["function"]["name"]
+            try:
+                args = json.loads(tc["function"]["arguments"] or "{}")
+            except ValueError:
+                args = {}
+            cd = turn.card(tc["id"])
+            cmd = by_name.get(name)
+            cd.update(title=name, kind="read" if cmd and cmd.permission == "read" else "other", status="in_progress", rawInput=args)
+            turn.emit({"type": "card", "card": cd})
+            try:
+                if not cmd:
+                    raise FoxError("NOT_FOUND", tr("bots.model_unknown_tool", name))
+                if cmd.id == "bot.task.delegate":
+                    cd.update(type="delegation", via="tool", to=args.get("to"), task=args.get("task"))
+                    try:
+                        cd["to_name"] = get(ws, args.get("to", ""))["name"]
+                    except FoxError:
+                        pass
+                    turn.emit({"type": "card", "card": cd})
+                    res = delegate(ws, ident, args.get("to", ""), args.get("task", ""), args.get("constraints"), args.get("expecting"),
+                                   depth=turn.depth, turn=turn.turn, approve=approval_mode)
+                    cd.update(answer=res.get("answer", ""), message=res.get("message"), refused=res.get("refused"),
+                              skills_used=res.get("skills_used", []))
+                else:
+                    machine = args.pop("machine", None) or turn.machine
+                    if machine != machines.LOCAL and machine not in allowed:
+                        raise FoxError("PERMISSION_DENIED", tr("machines.bot_not_allowed", machine), hint=tr("machines.bot_allowed_hint"))
+                    if cmd.id == "bot.skill.show":
+                        turn.use_skill(args.get("name", ""))
+                    cd["machine"] = machine
+                    res = machines.invoke(ws, machine, cmd.id, args, agent=aid, task=f"turn:{turn.turn}", interface="model")
+                payload = {"ok": True, "result": res}
+                cd["status"] = "completed"
+            except FoxError as e:
+                payload = {"ok": False, "error": e.to_dict()}
+                cd["status"] = "failed"
+            out = json.dumps(payload, ensure_ascii=False, default=str)
+            cd["rawOutput"] = payload if len(out) < 4000 else {"ok": payload["ok"], "truncated": True}
+            cd["content"] = [{"type": "content", "content": {"type": "text", "text": out[:4000]}}]
+            turn.emit({"type": "card", "card": cd})
+            msgs.append({"role": "tool", "tool_call_id": tc["id"], "content": out[:20000]})
+    else:
+        stop = "max_turn_requests"
+    return stop
 
 
 # ---------------------------------------------------------------------- 委托
@@ -1012,15 +1129,16 @@ def _turn_counter(ws, turn: str) -> int:
 
 
 def delegate(ws, caller: str, to: str, task: str, constraints: str | None = None, expecting: str | None = None,
-             keep: bool = False) -> dict:
+             keep: bool = False, depth: int | None = None, turn: str | None = None, approve: str | None = None) -> dict:
     """主智能体（或任何智能体）把一件事交给另一个智能体。拒绝也作为可以说给人听的回答返回（refused: true）。"""
     if not task.strip():
         raise FoxError("USAGE", tr("bots.empty_task"))
     target = get(ws, to)
     from_id = machines._bot_of(caller) if caller.startswith("bot:") else None
     src = get(ws, from_id) if from_id else None
-    depth = int(os.environ.get("FOXOS_BOT_DEPTH", "0"))
-    turn = os.environ.get("FOXOS_BOT_TURN")
+    # 经 MCP 进程调用时从环境变量取（狐狸OS 启动 MCP 进程时设置）；模型后端在本进程里调用时直接传
+    depth = int(os.environ.get("FOXOS_BOT_DEPTH", "0")) if depth is None else depth
+    turn = os.environ.get("FOXOS_BOT_TURN") if turn is None else turn
     cfg = (src or {}).get("delegation") or {"allowed": ["*"], "max_depth": MAX_DEPTH, "max_per_turn": MAX_PER_TURN}
 
     def refuse(msg):
@@ -1040,6 +1158,8 @@ def delegate(ws, caller: str, to: str, task: str, constraints: str | None = None
     body = task + (f"\n\n{tr('bots.constraints')}: {constraints}" if constraints else "") + (f"\n{tr('bots.expecting')}: {expecting}" if expecting else "")
     # 人为这一轮选了「全部允许/全部拒绝」时，委托出去的子任务沿用（环境变量只由狐狸OS 在启动智能体的 MCP 进程时设置）
     appr = os.environ.get("FOXOS_BOT_APPROVE") if caller.startswith("bot:") and os.environ.get("FOXOS_BOT_APPROVE") in ("allow", "deny") else None
+    if approve in ("allow", "deny"):
+        appr = approve
     r = run_turn(ws, target["id"], body, actor=caller, origin="handoff", delegated_by=caller, depth=depth + 1, envelope=env, keep=keep,
                  approval_mode=appr)
     return {"refused": False, "to": target["id"], "to_name": target["name"], "answer": r.get("text", ""), "message": r["id"],
