@@ -39,7 +39,7 @@ Linux 和 macOS（自动识别系统和 CPU，下载、校验、安装，最后�
 curl -fsSL https://github.com/gatesenman/foxos/releases/download/v0.3.2-os-preview/install.sh | sh
 ```
 
-- Ubuntu / Debian 用 `.deb`，Fedora / RHEL / openSUSE 用 `.rpm`（需要 sudo）；Arch 等其他发行版、或没有 sudo 时，装到 `~/.local/share/foxos`，命令链接到 `~/.local/bin/foxos`。
+- Ubuntu / Debian 用 `.deb`，Fedora / RHEL / openSUSE 用 `.rpm`（需要 sudo）；Arch 等其他发行版、或没有 sudo 时，装到 `~/.local/opt/foxos`，命令链接到 `~/.local/bin/foxos`。
 - 指定方式：`curl -fsSL …/install.sh | sh -s -- --method tar`（可选 `deb` / `rpm` / `tar` / `appimage`）；只下载校验：`--download-only`；英文提示：`--lang en`。
 - macOS 装到 `/Applications/FoxOS.app`（没有写权限就装到 `~/Applications`），命令链接到 `/usr/local/bin/foxos` 或 `~/.local/bin/foxos`。
 
@@ -65,7 +65,8 @@ $env:FOXOS_PORTABLE = '1'   # 或 $env:FOXOS_MSI = '1'
 
 **Linux**：
 
-- deb / rpm 会把程序装到 `/opt/FoxOS`，并建立 `/usr/bin/foxos`（命令行）和 `/usr/bin/foxos-desktop`（桌面）。卸载：`sudo apt remove foxos-desktop` 或 `sudo dnf remove foxos-desktop`。
+- deb / rpm 会把程序装到 `/opt/FoxOS`，并建立 `/usr/bin/foxos`（命令行）和 `/usr/bin/foxos-desktop`（桌面）。卸载：`sudo apt remove foxos-desktop`、`sudo dnf remove foxos-desktop` 或 `sudo zypper remove foxos-desktop`。
+- tar.gz / AppImage（install.sh 装在 `~/.local/opt/foxos`）卸载：`rm -rf ~/.local/opt/foxos ~/.local/bin/foxos ~/.local/bin/foxos-desktop ~/.local/share/applications/foxos.desktop`。你的数据在 `~/.local/share/foxos`，卸载不会动它。
 - 中文界面需要中文字体：Ubuntu / Debian 会自动推荐安装 `fonts-noto-cjk`；Fedora 装 `google-noto-sans-cjk-fonts`，Arch 装 `noto-fonts-cjk`。
 - 在没有用户命名空间的系统上（部分加固内核），deb / rpm 会自动给 `chrome-sandbox` 设 SUID；tar.gz / AppImage 可加 `--no-sandbox` 启动。
 
@@ -152,7 +153,7 @@ irm https://github.com/gatesenman/foxos/releases/download/v0.3.2-os-preview/inst
 
 - **Windows**: not code-signed yet; on first run SmartScreen says "Windows protected your PC" → "More info" → "Run anyway".
 - **macOS**: not notarized yet (needs an Apple Developer account). Control-click (right-click) FoxOS in Applications → Open → Open. On macOS 15 Sequoia and later, open it once, then go to System Settings → Privacy & Security → "Open Anyway". Or run `xattr -dr com.apple.quarantine /Applications/FoxOS.app` (install.sh already does this).
-- **Linux**: deb / rpm install to `/opt/FoxOS` with `/usr/bin/foxos` and `/usr/bin/foxos-desktop`. Install a CJK font for the Chinese UI (`fonts-noto-cjk`, `google-noto-sans-cjk-fonts`, `noto-fonts-cjk`).
+- **Linux**: deb / rpm install to `/opt/FoxOS` with `/usr/bin/foxos` and `/usr/bin/foxos-desktop`; uninstall with `sudo apt remove foxos-desktop` / `sudo dnf remove foxos-desktop` / `sudo zypper remove foxos-desktop`. tar.gz / AppImage (install.sh puts them in `~/.local/opt/foxos`): `rm -rf ~/.local/opt/foxos ~/.local/bin/foxos ~/.local/bin/foxos-desktop ~/.local/share/applications/foxos.desktop`; your data in `~/.local/share/foxos` is kept. Install a CJK font for the Chinese UI (`fonts-noto-cjk`, `google-noto-sans-cjk-fonts`, `noto-fonts-cjk`).
 
 ### Package managers (drafts)
 

@@ -10,7 +10,7 @@
 # 选项（也可以用环境变量）：
 #   --tag <标签>          FOXOS_TAG       发布标签，默认 v0.3.2-os-preview
 #   --method <方式>       FOXOS_METHOD    auto（默认）| deb | rpm | appimage | tar；macOS 固定为 app
-#   --prefix <目录>       FOXOS_PREFIX    tar / appimage 的安装目录，默认 ~/.local/share/foxos
+#   --prefix <目录>       FOXOS_PREFIX    tar / appimage 的安装目录，默认 ~/.local/opt/foxos
 #   --download-only       FOXOS_DOWNLOAD_ONLY=1   只下载并校验，文件留在当前目录
 #   --lang <zh|en>        FOXOS_LANG      提示语言，默认中文
 #   FOXOS_BASE_URL        下载地址前缀（镜像或测试用），默认 https://github.com/<仓库>/releases/download/<标签>
@@ -124,7 +124,7 @@ case $METHOD in
     else root yum install -y "$TMP/$FILE"; fi
     CLI=/usr/bin/foxos ;;
   tar)
-    PREFIX=${PREFIX:-$HOME/.local/share/foxos}
+    PREFIX=${PREFIX:-$HOME/.local/opt/foxos}
     rm -rf "$PREFIX.new"; mkdir -p "$PREFIX.new"
     tar -xzf "$TMP/$FILE" -C "$PREFIX.new" --strip-components=1
     rm -rf "$PREFIX"; mv "$PREFIX.new" "$PREFIX"
@@ -142,7 +142,7 @@ Categories=Office;
 DESK
     CLI=$PREFIX/resources/bin/foxos ;;
   appimage)
-    PREFIX=${PREFIX:-$HOME/.local/share/foxos}
+    PREFIX=${PREFIX:-$HOME/.local/opt/foxos}
     mkdir -p "$PREFIX"; cp "$TMP/$FILE" "$PREFIX/FoxOS.AppImage"; chmod +x "$PREFIX/FoxOS.AppImage"
     mkdir -p "$BIN_DIR"; ln -sf "$PREFIX/FoxOS.AppImage" "$BIN_DIR/foxos-desktop"
     say "AppImage 需要 FUSE 2（Ubuntu 24.04：sudo apt install libfuse2t64）。命令行 foxos 请用 deb / rpm / tar 方式安装。" \
