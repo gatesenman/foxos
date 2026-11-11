@@ -20,6 +20,16 @@
     mount(body, params, win) {
       const a = appInfo(params.app);
       if (a) { win.iconSpec = FX.evIcon(a); win.node.querySelector('.win-icon').replaceChildren(FX.appIcon(win.iconSpec)); FX.renderTaskbar(); }
+      if (FX.env.mode === 'client') {
+        // 客户端模式：Everything 应用在狐狸OS 电脑的桌面上打开，这里只给出状态
+        const msg = el('div', { class: 'muted', text: FX.t('client.opening_in_guest', a ? a.name : params.app) });
+        body.append(el('div', { class: 'empty', 'data-guest-open': params.app }, icon('device-desktop'), msg,
+          el('button', { class: 'btn', onclick: () => FX.openWindow('computer', {}) }, icon('device-desktop'), FX.t('client.computer_title'))));
+        window.foxos.everything.openInGuest(params.app, params.file || null)
+          .then(() => { msg.textContent = FX.t('client.opened_in_guest', a ? a.name : params.app); FX.openWindow('computer', {}); })
+          .catch((e) => { msg.textContent = e.message; msg.classList.add('error'); });
+        return;
+      }
       if (!a || !a.installed) {
         body.append(el('div', { class: 'empty' }, icon('package-off'), el('div', { text: FX.t('everything.is_not_installed', a ? a.name : params.app) }),
           el('div', { class: 'muted small', text: FX.t('everything.install_it_from_the_app_center_or') }),

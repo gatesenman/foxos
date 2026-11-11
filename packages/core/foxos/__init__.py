@@ -4,4 +4,4 @@ CLI（foxos.cli）、MCP 工具服务器（foxos.mcp_server）和桌面外壳都
 kernel.invoke()，保证「CLI 能做的，智能体工具接口也能做」，结果格式一致。
 """
 
-__version__ = "0.3.2"
+__version__ = "0.3.3"

@@ -22,6 +22,9 @@ const { AcpConnection } = require('./acp');
 const everything = require('./everything');
 const control = require('./control');
 const bots = require('./bots');
+const guest = require('./guest');
+const client = require('./client');
+const policy = require('./policy');
 
 const s0 = settings.load();
 // 界面语言：--lang= > 设置 > FOXOS_LANG > zh-CN；同时设置 Chromium 自身的界面语言（右键菜单、日期控件）
@@ -113,17 +116,69 @@ handle('env', () => ({
   versions: { electron: process.versions.electron, chrome: process.versions.chrome, node: process.versions.node, app: app.getVersion() },
   userData: app.getPath('userData'),
   python: kernel.pythonPath(),
+  pythonInfo: kernel.pythonInfo(),
+  cli: kernel.cliPath(),
+  mode: kernel.executionMode(),
+  hostExecution: settings.load().hostExecution === true,
+  guest: guest.config(),
   encryption: settings.encryptionInfo(),
   setupDone: settings.load().setupDone,
   screenshot: Boolean(SCREENSHOT),
   shell: process.env.SHELL || '/bin/sh',
 }));
 
-handle('apps:detect', () => apps.detect());
-handle('bots:url', () => bots.ensure());
+handle('cli:commandLine', (args) => kernel.cliCommandLine(args));
+const CLIENT = () => kernel.executionMode() === 'client';
+// 本机执行闸门：客户端模式下默认关闭；设置里打开“允许在本机执行”后，每次都要在原生对话框里确认
+async function hostGate(action, detail = '') {
+  if (!CLIENT()) return true;
+  if (settings.load().hostExecution !== true) throw new Error(t('client.host_execution_off', action));
+  const r = await dialog.showMessageBox(win, { type: 'warning', buttons: [t('client.allow_once'), t('common.cancel')], defaultId: 1, cancelId: 1, noLink: true,
+    title: t('client.host_action_title'), message: t('client.host_action_message', action), detail: String(detail).slice(0, 2000) });
+  if (r.response !== 0) throw new Error(t('client.host_action_denied', action));
+  return true;
+}
+handle('apps:detect', async () => {
+  if (!CLIENT()) return apps.detect();
+  const local = await apps.detect();
+  return client.detect(local.builtin);
+});
+handle('bots:url', () => (CLIENT() ? client.botsEnsure() : bots.ensure()));
+
+// 狐狸OS 电脑（来宾）：连接设置、状态、画面
+handle('guest:status', () => guest.status());
+handle('guest:set', (g) => {
+  if (g !== null) {
+    const kind = g && g.kind;
+    if (!['env', 'ssh', 'machine'].includes(kind)) throw new Error('kind');
+    const clean = kind === 'env' ? { kind, env: String(g.env) }
+      : kind === 'ssh' ? { kind, host: String(g.host), port: Number(g.port) || 22, user: String(g.user || 'foxos'), key: g.key ? String(g.key) : null, label: g.label ? String(g.label) : null }
+        : { kind, machine: String(g.machine), ssh: g.ssh ? { host: String(g.ssh.host), port: Number(g.ssh.port) || 22, user: String(g.ssh.user || 'foxos'), key: g.ssh.key ? String(g.ssh.key) : null } : null };
+    return guest.setConfig(clean);
+  }
+  return guest.setConfig(null);
+});
+handle('dialog:chooseFile', async () => {
+  const r = await dialog.showOpenDialog(win, { properties: ['openFile', 'showHiddenFiles'] });
+  return r.canceled ? null : r.filePaths[0];
+});
+const rfbs = new Map();
+let nextRfb = 1;
+handle('rfb:open', async () => {
+  const s = await guest.rfbStream();
+  const id = nextRfb++;
+  rfbs.set(id, s);
+  s.on('data', (d) => send('rfb:data', id, new Uint8Array(d)));
+  s.on('close', () => { rfbs.delete(id); send('rfb:close', id); });
+  s.on('error', (e) => send('rfb:error', id, String(e && e.message || e)));
+  return { id, via: s.via };
+});
+ipcMain.on('rfb:write', (_e, id, data) => { try { rfbs.get(id)?.write(Buffer.from(data)); } catch { /* 已关闭 */ } });
+ipcMain.on('rfb:close', (_e, id) => { const s = rfbs.get(id); rfbs.delete(id); try { s?.end(); } catch { /* 已关闭 */ } });
 
 // Everything 应用
-handle('ev:list', () => everything.list());
+handle('ev:list', () => (CLIENT() ? client.evList(everything.list()) : everything.list()));
+handle('ev:openInGuest', (appId, rel) => client.evOpen(appId, rel || null));
 handle('ev:attach', (appId, wcId) => { const wc = webContents.fromId(wcId); if (!wc) throw new Error(t('index.the_webview_does_not_exist')); everything.registerWebview(appId, wc); return true; });
 handle('ev:openFile', (appId, rel) => everything.openFile(appId, rel));
 everything.hooks.onTitle = (appId, t) => send('ev:title', appId, t);
@@ -148,23 +203,41 @@ async function controlHandler(msg) {
   if (op === 'ev.reloadData') { everything.kvInvalidate(appId); const inst = everything.instances.get(appId); if (inst) { inst.wc.reload(); await everything.waitReady(inst.wc); } return everything.status(appId); }
   throw Object.assign(new Error(t('index.unknown_operation', op)), { code: 'USAGE' });
 }
-handle('office:launch', (appId, file) => apps.launchOffice(appId, file));
+handle('office:launch', (appId, file) => (CLIENT() ? client.officeLaunch(appId, file) : apps.launchOffice(appId, file)));
 handle('office:list', async () => ({ processes: apps.processList(), windows: await apps.nativeWindows() }));
 handle('office:focus', (wid) => apps.focusNative(wid));
 handle('office:close', (wid) => apps.closeNative(wid));
 
-handle('pty:spawn', (opts) => pty.spawnPty(win.webContents, opts || {}));
+handle('pty:spawn', async (opts = {}) => {
+  // 客户端模式：终端是狐狸OS 电脑里的 shell（SSH）；应用中心的安装命令（guestArgv）也在那里运行
+  // 虚拟机生命周期（foxos env … / foxos machine …）在本机运行：它管理的是狐狸OS 电脑本身，不是“操作电脑”
+  if (opts.lifecycleArgv) {
+    const argv = (opts.lifecycleArgv || []).map(String);
+    if (policy.routeKernel(argv) !== 'local') throw new Error(`not a lifecycle command: ${argv[0]}`);
+    if (argv.some((x) => /["%^&|<>\r\n]/.test(x))) throw new Error('unsupported characters');
+    const cli = kernel.cliPath();
+    const [command, args] = process.platform === 'win32' ? [process.env.ComSpec || 'cmd.exe', ['/d', '/c', cli, ...argv]] : [cli, argv];
+    return pty.spawnPty(win.webContents, { ...opts, command, args, title: opts.title || `foxos ${argv.slice(0, 2).join(' ')}` });
+  }
+  if (CLIENT()) {
+    if (opts.command && !opts.guestArgv) { await hostGate(t('client.action_terminal'), [opts.command, ...(opts.args || [])].join(' ')); return pty.spawnPty(win.webContents, opts); }
+    const spec = await guest.terminalSpec(opts.guestArgv || null);
+    return { ...pty.spawnPty(win.webContents, { ...opts, command: spec.command, args: spec.args, title: opts.title || t('client.guest_terminal') }), guest: true };
+  }
+  if (opts.guestArgv) return pty.spawnPty(win.webContents, { ...opts, command: kernel.cliPath(), args: opts.guestArgv.slice(1) });
+  return pty.spawnPty(win.webContents, opts);
+});
 ipcMain.on('pty:write', (_e, id, data) => pty.write(id, data));
 ipcMain.on('pty:resize', (_e, id, cols, rows) => pty.resize(id, cols, rows));
 ipcMain.on('pty:kill', (_e, id) => pty.kill(id));
 
-handle('agents:list', () => agents.list());
-handle('agents:installed', () => agents.installed());
-handle('agents:install', (id) => agents.install(id, {
+handle('agents:list', () => (CLIENT() ? client.agentsList() : agents.list()));
+handle('agents:installed', () => (CLIENT() ? client.agentsInstalled() : agents.installed()));
+handle('agents:install', (id) => (CLIENT() ? client.agentsInstall(id, { log: (text) => send('agents:log', id, text) }) : agents.install(id, {
   log: (text) => send('agents:log', id, text),
   progress: (ratio, got, total) => send('agents:progress', id, ratio, got, total),
-}));
-handle('agents:uninstall', (id) => agents.uninstall(id));
+})));
+handle('agents:uninstall', (id) => (CLIENT() ? client.agentsUninstall(id) : agents.uninstall(id)));
 
 // ACP 连接
 const conns = new Map();
@@ -172,7 +245,7 @@ const permWaiters = new Map();
 let nextConn = 1;
 let nextPerm = 1;
 handle('acp:start', async (agentId, opts = {}) => {
-  const info = agents.installedInfo(agentId);
+  const info = CLIENT() ? await client.agentInfo(agentId) : agents.installedInfo(agentId);
   if (!info) throw new Error(t('index.not_installed', agentId));
   const connId = nextConn++;
   const c = new AcpConnection(info, {
@@ -202,7 +275,8 @@ ipcMain.on('acp:permissionReply', (_e, reqId, optionId) => {
 handle('settings:get', () => { const s = settings.load(); return { ...s, secrets: settings.secretNames() }; });
 handle('settings:set', (patch) => {
   const s = settings.load();
-  const allowed = ['workspace', 'python', 'setupDone', 'agentDefault'];
+  const allowed = ['workspace', 'python', 'setupDone', 'agentDefault', 'hostExecution'];
+  if ('hostExecution' in patch) patch.hostExecution = patch.hostExecution === true;
   for (const k of allowed) if (k in patch) s[k] = patch[k];
   settings.save(s);
   return true;
@@ -216,7 +290,7 @@ handle('dialog:chooseDir', async () => {
   const r = await dialog.showOpenDialog(win, { properties: ['openDirectory', 'createDirectory'] });
   return r.canceled ? null : r.filePaths[0];
 });
-handle('shell:showInFolder', (rel) => shell.showItemInFolder(path.resolve(kernel.getWorkspace(), rel)));
+handle('shell:showInFolder', async (rel) => { await hostGate(t('client.action_show_in_folder'), rel); return shell.showItemInFolder(path.resolve(kernel.getWorkspace(), rel)); });
 
 // 截图模式（文档与 CI）：界面就绪后截取窗口并退出
 ipcMain.on('ui:ready', async () => {
@@ -244,6 +318,8 @@ app.whenReady().then(() => {
   const launch = { exec: process.execPath, args: [...(app.isPackaged ? [] : [app.getAppPath()]), ...process.argv.filter((a) => a === '--no-sandbox' || a.startsWith('--user-data-dir='))] };
   control.start(controlHandler, { launch });
   try { fs.mkdirSync(everything.foxosHome(), { recursive: true }); fs.writeFileSync(path.join(everything.foxosHome(), 'desktop-launch.json'), JSON.stringify(launch)); } catch { /* 忽略 */ }
+  // Windows 安装版 / 便携版：把 resources\bin（foxos.cmd）放到用户 PATH（NSIS 装时已加；zip、MSI 靠这里补上）
+  if (app.isPackaged && process.platform === 'win32') require('./userpath').ensureUserPath(process.resourcesPath).catch(() => {});
   if (!HEADLESS) createWindow();
   app.on('activate', () => { if (BrowserWindow.getAllWindows().length === 0) createWindow(); });
 });

@@ -737,6 +737,33 @@
       ]
     },
     {
+      "id": "US-86",
+      "title": "Windows 伴侣程序不依赖 PATH 上的 foxos：终端 PATH 只保留一个键（Windows 的 Path），应用中心 / 环境终端用 foxos 的绝对路径；安装程序把 foxos.cmd 加到用户 PATH（保留 REG_EXPAND_SZ）",
+      "match": [
+        [
+          "pytest",
+          "test_desktop_cli.py",
+          "^test_US86"
+        ]
+      ]
+    },
+    {
+      "id": "US-87",
+      "title": "Windows / macOS / 普通 Linux 上的桌面程序是“狐狸OS 电脑”的客户端：应用中心安装、打开 Word、终端、文件、智能体、聊天都在狐狸OS 虚拟机或远程狐狸OS 里执行；本机执行默认关闭，打开后每次确认；虚拟机控制台 / 来宾桌面画面（noVNC）",
+      "match": [
+        [
+          "pytest",
+          "test_desktop_client.py",
+          "^test_US87"
+        ],
+        [
+          "e2e",
+          "client.e2e.js",
+          "US-87"
+        ]
+      ]
+    },
+    {
       "id": "US-120",
       "title": "电脑操控体检：显示默认栈（agent-desktop + Jev/DeepSeek + 规划器）和两条兜底",
       "match": [

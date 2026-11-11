@@ -1608,5 +1608,6 @@
   "env.expose_summary": "Expose a VM's SSH port forward on all host addresses, or bring it back to localhost",
   "env.expose_ssh_param": "on (exposed) or off (localhost only)",
   "env.expose_port_param": "Fixed host port (picked automatically by default)",
-  "env.expose_limit": "Only a human can expose; takes effect on the next start; the host firewall must allow the port"
+  "env.expose_limit": "Only a human can expose; takes effect on the next start; the host firewall must allow the port",
+  "cli.acp_stdio": "Start an installed ACP agent with stdio passed through (used by the desktop client over SSH)"
 }

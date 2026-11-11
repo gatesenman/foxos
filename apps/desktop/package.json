@@ -1,6 +1,6 @@
 {
   "name": "foxos-desktop",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "private": true,
   "description": "狐狸OS（FoxOS）桌面",
   "main": "src/main/index.js",
@@ -68,7 +68,16 @@
       "icon": "../../assets/icon.ico",
       "executableName": "FoxOS",
       "signExecutable": false,
-      "artifactName": "FoxOS-${version}-win-${arch}.${ext}"
+      "artifactName": "FoxOS-${version}-win-${arch}.${ext}",
+      "extraResources": [
+        {
+          "from": "build-resources/bin",
+          "to": "bin",
+          "filter": [
+            "foxos.cmd"
+          ]
+        }
+      ]
     },
     "nsis": {
       "oneClick": false,
@@ -84,7 +93,8 @@
         "en_US"
       ],
       "language": "2052",
-      "displayLanguageSelector": false
+      "displayLanguageSelector": false,
+      "include": "build-resources/win/installer.nsh"
     },
     "linux": {
       "target": [
@@ -105,7 +115,8 @@
           "from": "build-resources/bin",
           "to": "bin",
           "filter": [
-            "**/*"
+            "**/*",
+            "!*.cmd"
           ]
         }
       ],
@@ -132,7 +143,8 @@
           "from": "build-resources/bin",
           "to": "bin",
           "filter": [
-            "**/*"
+            "**/*",
+            "!*.cmd"
           ]
         }
       ],

@@ -236,7 +236,7 @@ def case_ssh() -> str:
     assert bad2.returncode != 0 and "LOGGED-IN" not in bad2.stdout
     root = subprocess.run(ssh_base("root") + ["true"], capture_output=True, text=True, timeout=60)
     assert root.returncode != 0, "root 用密钥登录成功了"
-    fw = ssh("LC_ALL=C sudo -n ufw status", check=True).stdout
+    fw = ssh("sudo -n env LANGUAGE=C LC_ALL=C ufw status", check=True).stdout
     assert "Status: active" in fw and "22/tcp" in fw, fw
     live = "passwordauthentication yes" in eff
     msg = f"开机后 {took:.0f}s 密钥登录成功；sshd -T：{' '.join(eff.split())}；默认 / 错误密码被拒；root 被拒；ufw active 放行 22/tcp"
@@ -269,7 +269,7 @@ def case_foxos_over_ssh() -> str:
     tools = {t["name"] for t in replies[2]["result"]["tools"]}
     assert {"ssh_status", "env_catalog", "bot_message_send"} <= tools, sorted(tools)[:20]
     assert not replies[3]["result"].get("isError"), replies[3]
-    return f"{v}；foxos ssh status：active、root_login=false、password_login={st['password_login']}；MCP over SSH：{len(tools)} 个工具，tools/call ssh_status 成功"
+    return f"{v}；foxos ssh status：active、root_login={st['root_login']}、password_login={st['password_login']}；MCP over SSH：{len(tools)} 个工具，tools/call ssh_status 成功"
 
 
 def case_runtime() -> str:
@@ -295,12 +295,13 @@ def case_acp() -> str:
 def case_desktop() -> str:
     shot = WORK / f"e2e-desktop-{int(time.time())}.png"
     st = j(ssh("foxos desktop status --json", check=True))["result"]
-    ssh("foxos desktop launch -- xfce4-terminal -T foxos-e2e-term", check=True)
+    title = f"foxos-e2e-term-{int(time.time())}"
+    ssh(f"foxos desktop launch -- xfce4-terminal -T {title}", check=True)
     ok = False
     for _ in range(40):
         w = j(ssh("foxos desktop windows --json", check=True))["result"]
         wins = w.get("windows", w if isinstance(w, list) else [])
-        hit = [x for x in wins if "foxos-e2e-term" in (x.get("title") or "")]
+        hit = [x for x in wins if title in (x.get("title") or "")]
         if hit:
             ok = True
             break
@@ -311,12 +312,15 @@ def case_desktop() -> str:
     ssh("foxos desktop type 'echo FOXOS-E2E-TYPED'", check=True)
     ssh("foxos desktop key Return", check=True)
     time.sleep(5)
-    ssh(f"foxos desktop screenshot --path {shlex.quote('/tmp/' + shot.name)}", check=True)
+    ssh(f"foxos desktop screenshot --path shots/{shot.name}", check=True)
     screendump(shot)
     ssh(f"foxos desktop close {shlex.quote(wid)}", check=True)
-    time.sleep(5)
-    left = j(ssh("foxos desktop windows --json", check=True))["result"]
-    assert "foxos-e2e-term" not in json.dumps(left, ensure_ascii=False)
+    for _ in range(24):
+        time.sleep(5)
+        left = j(ssh("foxos desktop windows --json", check=True))["result"]
+        if title not in json.dumps(left, ensure_ascii=False):
+            break
+    assert title not in json.dumps(left, ensure_ascii=False), "关闭后窗口还在"
     return f"desktop status：{json.dumps(st, ensure_ascii=False)[:160]}；launch → windows 里出现 → focus → type → key → screenshot → close 全部成功", [str(shot)]
 
 
@@ -493,6 +497,12 @@ CASES = {"ssh": case_ssh, "foxos_over_ssh": case_foxos_over_ssh, "runtime": case
 
 def run(names: list[str]) -> int:
     bad = 0
+    if os.environ.get("FOXOS_E2E_QUIET", "1") == "1" and names != ["ssh"] and names != ["installed_ssh"]:
+        # TCG 下每分钟一次的例程定时器（每次启动一个 Python）会占满来宾 CPU；测试期间停掉（不影响被测功能）
+        try:
+            ssh("systemctl --user stop foxos-bots-routines.timer 2>/dev/null; true", timeout=900)
+        except subprocess.TimeoutExpired:
+            pass
     for n in names:
         started = now()
         log(f"开始 {n}")

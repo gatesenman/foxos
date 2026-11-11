@@ -28,7 +28,7 @@
       const ro = new ResizeObserver(() => doFit());
       ro.observe(host);
       setTimeout(doFit, 0);
-      const ready = window.foxos.pty.spawn({ cols: term.cols || 100, rows: term.rows || 30, command: params.command || null, args: params.args || [] }).then((info) => {
+      const ready = window.foxos.pty.spawn({ cols: term.cols || 100, rows: term.rows || 30, command: params.command || null, args: params.args || [], guestArgv: params.guestArgv || null, lifecycleArgv: params.lifecycleArgv || null, title: params.title || null }).then((info) => {
         ptyId = info.id;
         win.ptyId = info.id;
         win.shell = info.shell;
@@ -51,7 +51,7 @@
       return {
         term, ready,
         onResize: doFit,
-        persistParams: () => (params.command ? null : {}),
+        persistParams: () => (params.command || params.guestArgv || params.lifecycleArgv ? null : {}),
         // 测试与自动化：读取终端屏幕上的文本
         screenText: () => {
           const b = term.buffer.active; const lines = [];
@@ -70,4 +70,11 @@
     const args = isWin ? ['-NoProfile', '-Command', commandLine] : ['-c', `${commandLine}`];
     FX.openWindow('terminal', { title, command, args, onExit: resolve });
   });
+  // 在终端里运行 foxos：主进程给出 foxos 的绝对路径命令行（不依赖 PATH 上有 foxos）
+  FX.foxosCommandLine = (args) => window.foxos.cli.commandLine(args);
+  // 客户端模式（Windows 等）：foxos 命令在狐狸OS 电脑里运行（SSH 终端），不碰本机
+  FX.runFoxosInTerminal = async (title, args) => {
+    if (FX.env.mode === 'client') return new Promise((resolve) => FX.openWindow('terminal', { title, guestArgv: ['foxos', ...args], onExit: resolve }));
+    return FX.runInTerminal(title, await FX.foxosCommandLine(args));
+  };
 })();
