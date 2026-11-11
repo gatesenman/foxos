@@ -104,7 +104,7 @@ ch() { chroot "$MNT" env -i PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/b
 log "软件包：内核、systemd、SSH、XFCE 桌面、中文字体、x11vnc、Python"
 ch apt-get update -q
 ch apt-get install -y -q --no-install-recommends -o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confold \
-  $KPKG grub-efi-amd64-bin grub2-common initramfs-tools systemd-sysv systemd-timesyncd udev dbus dbus-x11 kmod iproute2 iputils-ping \
+  $KPKG grub-efi-amd64-bin grub2-common initramfs-tools systemd-sysv systemd-timesyncd udev dbus dbus-x11 dbus-user-session libpam-systemd kmod iproute2 iputils-ping \
   locales tzdata sudo openssh-server curl wget git xz-utils unzip zstd less nano procps psmisc file \
   python3 python3-venv python3-pip python3-openpyxl python3-docx \
   xserver-xorg-core xserver-xorg-input-libinput xinit lightdm lightdm-gtk-greeter \

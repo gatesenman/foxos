@@ -1,6 +1,6 @@
 [Unit]
 Description=FoxOS preset: report ready on the serial console
-After=foxos-preset-firstboot.service ssh.service sshd.service network-online.target
+After=foxos-preset-firstboot.service ssh.service sshd.service network-online.target user@1000.service
 Wants=network-online.target
 [Service]
 Type=oneshot

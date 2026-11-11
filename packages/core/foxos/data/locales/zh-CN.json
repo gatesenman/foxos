@@ -861,5 +861,6 @@
   "envs.presets.no_iso_tool": "没有找到 xorriso / genisoimage，无法生成种子光盘",
   "envs.presets.not_enough_disk": "磁盘空间不够：需要 {0}，{2} 只剩 {1}",
   "envs.presets.not_on_this_host": "这个预设不能在 {0} 主机上安装",
-  "envs.presets.seed_iso_failed": "生成种子光盘失败：{0}"
+  "envs.presets.seed_iso_failed": "生成种子光盘失败：{0}",
+  "cli.catalog_summary": "共 {0} 项（其中预设 {1} 项），主机 {2}；+ 可安装，- 不可安装（括号里是原因）；大小为 下载 / 需要磁盘"
 }

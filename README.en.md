@@ -48,15 +48,15 @@ Screenshots of the Windows companion app are in their own section below: [Window
 
 Everything is on [Releases](https://github.com/gatesenman/foxos/releases). Two different things:
 
-- **The FoxOS operating system** = the bootable ISO in `v0.3.2-os-preview` (two parts, `part1` + `part2`; concatenate them, then check SHA-256 `8e6a9e65f5e39f22170a23c9dde583056663e26c298e936bdbda4524f1110e39`). The screenshots above are this system. From 0.3.2 the default browser is Google Chrome, installed from Google's official repository at first login (see [docs/os.md](docs/os.md)). The older `v0.3.1-os-preview` and `v0.3.0-os-preview` releases remain on the Releases page.
+- **The FoxOS operating system** = the bootable ISO in `v0.3.2-os-preview` (two parts, `part1` + `part2`; concatenate them, then check SHA-256 `9ce810228b111cc9087e6a6667deae2096f57d7a3e464c128d73604c33bcec5b`). The screenshots above are this system. From 0.3.2 the default browser is Google Chrome, installed from Google's official repository at first login (see [docs/os.md](docs/os.md)). The older `v0.3.1-os-preview` and `v0.3.0-os-preview` releases remain on the Releases page.
 - **The Windows companion app** = `FoxOS-Setup-0.2.0-x64.exe` / `FoxOS-0.2.0-win-x64.zip` / `install.ps1` in `v0.2.0-windows-preview`. It is an application that runs on your existing Windows desktop, not an operating system.
 
 **Bootable ISO (recommended):** [v0.3.2-os-preview](https://github.com/gatesenman/foxos/releases/tag/v0.3.2-os-preview) (pre-release). Write it to USB or boot it in Hyper-V; see the [ISO test guide](docs/os-test-guide.md).
 
 | File | What it is |
 | --- | --- |
-| `FoxOS-0.3.2-amd64.iso.part1` / `.part2` | Two parts of the complete ISO (838860800 + 724301824 bytes, 1563162624 bytes after concat, ~1.46 GiB) |
-| `FoxOS-0.3.2-amd64.iso` | The assembled Live + installer image (UEFI + BIOS), amd64, under 2 GB, SHA-256 `8e6a9e65f5e39f22170a23c9dde583056663e26c298e936bdbda4524f1110e39` |
+| `FoxOS-0.3.2-amd64.iso.part1` / `.part2` | Two parts of the complete ISO (838860800 + 725448704 bytes, 1564309504 bytes after concat, ~1.46 GiB) |
+| `FoxOS-0.3.2-amd64.iso` | The assembled Live + installer image (UEFI + BIOS), amd64, under 2 GB, SHA-256 `9ce810228b111cc9087e6a6667deae2096f57d7a3e464c128d73604c33bcec5b` |
 | `SHA256SUMS` | Checksums (complete ISO and both parts) |
 
 The Release ships only the two parts: a single-file upload of the ~1.46 GiB ISO from this build environment was cut off mid-transfer, so concatenate the parts and then verify.

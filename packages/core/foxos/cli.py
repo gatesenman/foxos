@@ -221,6 +221,19 @@ def print_human(cmd_id: str, result: dict) -> None:
     if cmd_id == "env.list":
         for e in result["envs"]:
             print(tr("cli.network_workspace", e['state'], e['name'], e['image'], e['network'], e['workspace']['mode']), file=out)
+    if cmd_id == "env.catalog":
+        def _gb(n):
+            return f"{(n or 0) / 1024 ** 3:.1f} GB"
+        for e in result.get("entries") or []:
+            ok = e.get("installable", e.get("available"))
+            where = ",".join(e.get("host_providers") or []) if ok else (e.get("reason") or "")
+            size = f"{_gb(e.get('download_bytes'))} / {_gb(e.get('disk_bytes'))}" if e.get("download_bytes") else ""
+            print(f"{'+' if ok else '-'} {e['id']:<34} {size:<18} {e.get('name', '')}  [{where}]", file=out)
+        print(tr("cli.catalog_summary", result.get("count", 0), result.get("presets", 0), result.get("host", "")), file=out)
+    if cmd_id == "env.progress":
+        for k in ("state", "phase", "step", "total", "part", "parts", "bytes", "bytes_total", "resumed", "why", "error"):
+            if result.get(k) not in (None, ""):
+                print(f"  {k}: {result[k]}", file=out)
     if cmd_id == "everything.list":
         for a in result["apps"]:
             print(tr("cli.ops", tr("cli.installed") if a['installed'] else tr("cli.not_installed"), a['group_name'], a['id'], a['name'], a['license'], a['ops']), file=out)

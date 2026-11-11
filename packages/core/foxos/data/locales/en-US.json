@@ -861,5 +861,6 @@
   "envs.presets.no_iso_tool": "xorriso / genisoimage not found; cannot build the seed disc",
   "envs.presets.not_enough_disk": "Not enough disk space: need {0}, only {1} free at {2}",
   "envs.presets.not_on_this_host": "This preset cannot be installed on a {0} host",
-  "envs.presets.seed_iso_failed": "Building the seed disc failed: {0}"
+  "envs.presets.seed_iso_failed": "Building the seed disc failed: {0}",
+  "cli.catalog_summary": "{0} entries ({1} presets), host {2}; + installable, - unavailable (reason in brackets); sizes are download / disk needed"
 }

@@ -69,15 +69,15 @@ Windows 伴侣程序的截图在下方单独一节：[Windows 伴侣程序](#win
 
 所有版本都在 [Releases](https://github.com/gatesenman/foxos/releases)。两种东西不要混淆：
 
-- **狐狸OS 操作系统** = `v0.3.2-os-preview` 里的可引导 ISO（两个分卷 `part1` + `part2`，拼接后校验 SHA-256 `8e6a9e65f5e39f22170a23c9dde583056663e26c298e936bdbda4524f1110e39`）。上面的截图就是它。0.3.2 起默认浏览器是 Google Chrome（首次登录时从 Google 官方源安装，见 [docs/os.md](docs/os.md#浏览器为什么-chrome-不在-iso-里怎么装)）。旧版本 `v0.3.1-os-preview`、`v0.3.0-os-preview` 仍在 Releases 页面。
+- **狐狸OS 操作系统** = `v0.3.2-os-preview` 里的可引导 ISO（两个分卷 `part1` + `part2`，拼接后校验 SHA-256 `9ce810228b111cc9087e6a6667deae2096f57d7a3e464c128d73604c33bcec5b`）。上面的截图就是它。0.3.2 起默认浏览器是 Google Chrome（首次登录时从 Google 官方源安装，见 [docs/os.md](docs/os.md#浏览器为什么-chrome-不在-iso-里怎么装)）。旧版本 `v0.3.1-os-preview`、`v0.3.0-os-preview` 仍在 Releases 页面。
 - **Windows 伴侣程序** = `v0.2.0-windows-preview` 里的 `FoxOS-Setup-0.2.0-x64.exe` / `FoxOS-0.2.0-win-x64.zip` / `install.ps1`。它是在现有 Windows 桌面上运行的应用程序，不是操作系统。
 
 **可引导 ISO（推荐）**：[v0.3.2-os-preview](https://github.com/gatesenman/foxos/releases/tag/v0.3.2-os-preview)（预发布）。写到 U 盘或在 Hyper-V 里启动，步骤见 [ISO 测试指南](docs/os-test-guide.md)。
 
 | 文件 | 说明 |
 | --- | --- |
-| `FoxOS-0.3.2-amd64.iso.part1` / `.part2` | 完整 ISO 的两个分卷（838860800 + 724301824 字节，拼接后 1563162624 字节，约 1.46 GiB） |
-| `FoxOS-0.3.2-amd64.iso` | 拼接得到的 Live + 安装镜像（UEFI + BIOS），amd64，小于 2 GB，SHA-256 `8e6a9e65f5e39f22170a23c9dde583056663e26c298e936bdbda4524f1110e39` |
+| `FoxOS-0.3.2-amd64.iso.part1` / `.part2` | 完整 ISO 的两个分卷（838860800 + 725448704 字节，拼接后 1564309504 字节，约 1.46 GiB） |
+| `FoxOS-0.3.2-amd64.iso` | 拼接得到的 Live + 安装镜像（UEFI + BIOS），amd64，小于 2 GB，SHA-256 `9ce810228b111cc9087e6a6667deae2096f57d7a3e464c128d73604c33bcec5b` |
 | `SHA256SUMS` | 校验和（含完整 ISO 与两个分卷） |
 
 Release 上只有两个分卷：本构建环境单个上传约 1.46 GiB 的完整 ISO 时连接在中途断开，所以请把分卷拼起来再校验。
