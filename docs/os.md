@@ -111,7 +111,8 @@ kwin_wayland 功能更全（无障碍、高分屏、特效），但会带入大�
 
 **随后迭代（不假装已经做完）：**
 
-- 窗口级智能体控制的全部动词与 US-6x 端到端覆盖
+- 窗口程序化移动 / 缩放依赖合成器能力（wlr-foreign-toplevel 没有位置请求；有 wlrctl 时可用）
+- 智能体对辅助功能树的完整覆盖；linux-kvm 来宾内 exec（SSH / vsock）与 virtio-gpu 目标显示路径
 - 完整目录里的每一个来宾（含 Windows 评估版的自动安装与来宾工具）
 - virtio-gpu 直出（替换过渡显示通道）
 - LibreOffice、Everything、ACP 的在线组件安装器在安装后的打磨

@@ -27,6 +27,566 @@
 - **audit**：每次调用（含失败与拒绝）都追加到 <workspace>/.foxos/audit.jsonl；只读自省命令 audit tail、control status 成功时不记录
 - **tool_names**：工具接口名 = 命令 ID 把 . 换成 _，如 sheets.chart.create → sheets_chart_create
 
+## desktop — 真实桌面会话
+
+在 labwc 合成器管理的真实窗口上列出、聚焦、移动，以及键入、点击和人工接管。不是 Electron 里画的假窗口。
+
+### `foxos desktop status`
+
+显示当前图形会话与人工接管状态
+
+```text
+foxos desktop status
+```
+
+工具接口名：`desktop_status` · 权限：`read`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| — | | | | 无参数 |
+
+示例：
+
+```bash
+foxos desktop status --json
+```
+
+### `foxos desktop windows`
+
+列出合成器管理的真实窗口
+
+```text
+foxos desktop windows
+```
+
+工具接口名：`desktop_windows` · 权限：`read`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| — | | | | 无参数 |
+
+示例：
+
+```bash
+foxos desktop windows --json
+```
+
+### `foxos desktop focus`
+
+聚焦一个窗口
+
+```text
+foxos desktop focus WINDOW
+```
+
+工具接口名：`desktop_focus` · 权限：`run`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `window` | `WINDOW` | string | 是 | 窗口编号（见 windows 命令） |
+
+示例：
+
+```bash
+foxos desktop focus 4278190080
+```
+
+### `foxos desktop move`
+
+移动一个窗口
+
+```text
+foxos desktop move WINDOW --x X --y Y
+```
+
+工具接口名：`desktop_move` · 权限：`modify`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `window` | `WINDOW` | string | 是 | 窗口编号（见 windows 命令） |
+| `x` | `--x` | integer | 是 | X 坐标（像素） |
+| `y` | `--y` | integer | 是 | Y 坐标（像素） |
+
+示例：
+
+```bash
+foxos desktop move 4278190080 --x 100 --y 80
+```
+
+### `foxos desktop resize`
+
+调整一个窗口的大小
+
+```text
+foxos desktop resize WINDOW --width WIDTH --height HEIGHT
+```
+
+工具接口名：`desktop_resize` · 权限：`modify`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `window` | `WINDOW` | string | 是 | 窗口编号（见 windows 命令） |
+| `width` | `--width` | integer | 是 | 宽度（像素） |
+| `height` | `--height` | integer | 是 | 高度（像素） |
+
+示例：
+
+```bash
+foxos desktop resize 4278190080 --width 800 --height 600
+```
+
+### `foxos desktop close`
+
+关闭一个窗口
+
+```text
+foxos desktop close WINDOW
+```
+
+工具接口名：`desktop_close` · 权限：`modify`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `window` | `WINDOW` | string | 是 | 窗口编号（见 windows 命令） |
+
+示例：
+
+```bash
+foxos desktop close 4278190080
+```
+
+### `foxos desktop launch`
+
+启动一个应用或命令
+
+```text
+foxos desktop launch CMD...
+```
+
+工具接口名：`desktop_launch` · 权限：`run`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `command` | `CMD` | array | 是 | 要启动的命令和参数 |
+
+示例：
+
+```bash
+foxos desktop launch -- gnome-terminal
+foxos desktop launch -- foot -T notes
+```
+
+### `foxos desktop type`
+
+向当前聚焦的窗口键入文本
+
+```text
+foxos desktop type TEXT
+```
+
+工具接口名：`desktop_type` · 权限：`modify`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `text` | `TEXT` | string | 是 | 要键入的文本 |
+
+示例：
+
+```bash
+foxos desktop type 'hello'
+```
+
+### `foxos desktop key`
+
+发送按键或组合键
+
+```text
+foxos desktop key KEYS
+```
+
+工具接口名：`desktop_key` · 权限：`modify`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `keys` | `KEYS` | string | 是 | 按键名，例如 Return，或组合键 ctrl+c |
+
+示例：
+
+```bash
+foxos desktop key Return
+foxos desktop key ctrl+c
+```
+
+### `foxos desktop click`
+
+在屏幕坐标处点击
+
+```text
+foxos desktop click --x X --y Y [--button BUTTON]
+```
+
+工具接口名：`desktop_click` · 权限：`modify`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `x` | `--x` | integer | 是 | X 坐标（像素） |
+| `y` | `--y` | integer | 是 | Y 坐标（像素） |
+| `button` | `--button` | integer |  | 鼠标按钮：1 左键、2 中键、3 右键；默认 1 |
+
+示例：
+
+```bash
+foxos desktop click --x 400 --y 300
+```
+
+### `foxos desktop screenshot`
+
+截取当前会话画面
+
+```text
+foxos desktop screenshot [--path PATH]
+```
+
+工具接口名：`desktop_screenshot` · 权限：`read`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `path` | `--path` | string |  | 工作空间内的 PNG 路径（缺省写到 .foxos/screenshots/）；工作空间路径（write） |
+
+示例：
+
+```bash
+foxos desktop screenshot --path shots/desk.png
+```
+
+### `foxos desktop takeover`
+
+人工接管：暂停智能体的写操作
+
+```text
+foxos desktop takeover [--reason REASON]
+```
+
+工具接口名：`desktop_takeover` · 权限：`modify`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `reason` | `--reason` | string |  | 暂停原因（写入状态与审计） |
+
+示例：
+
+```bash
+foxos desktop takeover --reason 我来改
+```
+
+限制：
+
+- 只有 human 身份可以执行
+
+### `foxos desktop resume`
+
+结束人工接管，恢复智能体写操作
+
+```text
+foxos desktop resume
+```
+
+工具接口名：`desktop_resume` · 权限：`modify`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| — | | | | 无参数 |
+
+示例：
+
+```bash
+foxos desktop resume
+```
+
+限制：
+
+- 只有 human 身份可以执行
+
+## session — 真实桌面会话
+
+在 labwc 合成器管理的真实窗口上列出、聚焦、移动，以及键入、点击和人工接管。不是 Electron 里画的假窗口。
+
+### `foxos session status`
+
+显示当前图形会话与人工接管状态
+
+```text
+foxos session status
+```
+
+工具接口名：`session_status` · 权限：`read`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| — | | | | 无参数 |
+
+示例：
+
+```bash
+foxos session status --json
+```
+
+### `foxos session windows`
+
+列出合成器管理的真实窗口
+
+```text
+foxos session windows
+```
+
+工具接口名：`session_windows` · 权限：`read`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| — | | | | 无参数 |
+
+示例：
+
+```bash
+foxos session windows --json
+```
+
+### `foxos session focus`
+
+聚焦一个窗口
+
+```text
+foxos session focus WINDOW
+```
+
+工具接口名：`session_focus` · 权限：`run`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `window` | `WINDOW` | string | 是 | 窗口编号（见 windows 命令） |
+
+示例：
+
+```bash
+foxos session focus 4278190080
+```
+
+### `foxos session move`
+
+移动一个窗口
+
+```text
+foxos session move WINDOW --x X --y Y
+```
+
+工具接口名：`session_move` · 权限：`modify`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `window` | `WINDOW` | string | 是 | 窗口编号（见 windows 命令） |
+| `x` | `--x` | integer | 是 | X 坐标（像素） |
+| `y` | `--y` | integer | 是 | Y 坐标（像素） |
+
+示例：
+
+```bash
+foxos session move 4278190080 --x 100 --y 80
+```
+
+### `foxos session resize`
+
+调整一个窗口的大小
+
+```text
+foxos session resize WINDOW --width WIDTH --height HEIGHT
+```
+
+工具接口名：`session_resize` · 权限：`modify`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `window` | `WINDOW` | string | 是 | 窗口编号（见 windows 命令） |
+| `width` | `--width` | integer | 是 | 宽度（像素） |
+| `height` | `--height` | integer | 是 | 高度（像素） |
+
+示例：
+
+```bash
+foxos session resize 4278190080 --width 800 --height 600
+```
+
+### `foxos session close`
+
+关闭一个窗口
+
+```text
+foxos session close WINDOW
+```
+
+工具接口名：`session_close` · 权限：`modify`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `window` | `WINDOW` | string | 是 | 窗口编号（见 windows 命令） |
+
+示例：
+
+```bash
+foxos session close 4278190080
+```
+
+### `foxos session launch`
+
+启动一个应用或命令
+
+```text
+foxos session launch CMD...
+```
+
+工具接口名：`session_launch` · 权限：`run`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `command` | `CMD` | array | 是 | 要启动的命令和参数 |
+
+示例：
+
+```bash
+foxos session launch -- gnome-terminal
+foxos session launch -- foot -T notes
+```
+
+### `foxos session type`
+
+向当前聚焦的窗口键入文本
+
+```text
+foxos session type TEXT
+```
+
+工具接口名：`session_type` · 权限：`modify`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `text` | `TEXT` | string | 是 | 要键入的文本 |
+
+示例：
+
+```bash
+foxos session type 'hello'
+```
+
+### `foxos session key`
+
+发送按键或组合键
+
+```text
+foxos session key KEYS
+```
+
+工具接口名：`session_key` · 权限：`modify`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `keys` | `KEYS` | string | 是 | 按键名，例如 Return，或组合键 ctrl+c |
+
+示例：
+
+```bash
+foxos session key Return
+foxos session key ctrl+c
+```
+
+### `foxos session click`
+
+在屏幕坐标处点击
+
+```text
+foxos session click --x X --y Y [--button BUTTON]
+```
+
+工具接口名：`session_click` · 权限：`modify`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `x` | `--x` | integer | 是 | X 坐标（像素） |
+| `y` | `--y` | integer | 是 | Y 坐标（像素） |
+| `button` | `--button` | integer |  | 鼠标按钮：1 左键、2 中键、3 右键；默认 1 |
+
+示例：
+
+```bash
+foxos session click --x 400 --y 300
+```
+
+### `foxos session screenshot`
+
+截取当前会话画面
+
+```text
+foxos session screenshot [--path PATH]
+```
+
+工具接口名：`session_screenshot` · 权限：`read`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `path` | `--path` | string |  | 工作空间内的 PNG 路径（缺省写到 .foxos/screenshots/）；工作空间路径（write） |
+
+示例：
+
+```bash
+foxos session screenshot --path shots/desk.png
+```
+
+### `foxos session takeover`
+
+人工接管：暂停智能体的写操作
+
+```text
+foxos session takeover [--reason REASON]
+```
+
+工具接口名：`session_takeover` · 权限：`modify`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `reason` | `--reason` | string |  | 暂停原因（写入状态与审计） |
+
+示例：
+
+```bash
+foxos session takeover --reason 我来改
+```
+
+限制：
+
+- 只有 human 身份可以执行
+
+### `foxos session resume`
+
+结束人工接管，恢复智能体写操作
+
+```text
+foxos session resume
+```
+
+工具接口名：`session_resume` · 权限：`modify`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| — | | | | 无参数 |
+
+示例：
+
+```bash
+foxos session resume
+```
+
+限制：
+
+- 只有 human 身份可以执行
+
 ## docs — 文档：读写标准 .docx（段落、标题、列表、表格），替换文本与导出
 
 基于 python-docx 读写 Word 2007+ (.docx)。样式名使用 Word 内置英文样式名，如 Heading 1、List Bullet。
@@ -204,6 +764,57 @@ foxos env pull IMAGE [--sha256 SHA256]
 ```bash
 foxos env pull alpine-3.20
 foxos env pull ubuntu-24.04
+```
+
+### `foxos env run`
+
+没有镜像就拉取，然后创建并启动（用法靠近 docker run）；可附上来宾桌面
+
+```text
+foxos env run NAME [--image IMAGE] [--iso ISO] [--provider PROVIDER] [--network {user,host,none}] [--workspace-mode {rw,ro,none}] [--memory-mb MEMORY_MB] [--cpus CPUS] [--pids PIDS] [--desktop-attach] [--no-start]
+```
+
+工具接口名：`env_run` · 权限：`run`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `name` | `NAME` | string | 是 | 环境名 |
+| `image` | `--image` | string |  | 镜像 ID |
+| `iso` | `--iso` | string |  | 安装介质 ISO 路径（Hyper-V） |
+| `provider` | `--provider` | string |  | 指定提供者 |
+| `network` | `--network` | string |  | 网络：user 为用户态转发（来宾 5900 映射到宿主），none 断开，host 仅用于命名空间环境；可选：user / host / none；默认 user |
+| `workspace_mode` | `--workspace-mode` | string |  | 工作空间挂载方式；可选：rw / ro / none；默认 rw |
+| `memory_mb` | `--memory-mb` | integer |  | 内存上限（MB） |
+| `cpus` | `--cpus` | number |  | CPU 上限（核，需 cgroup） |
+| `pids` | `--pids` | integer |  | 进程数上限 |
+| `desktop_attach` | `--desktop-attach` | boolean |  | 启动后附上来宾桌面 |
+| `no_start` | `--no-start` | boolean |  | 只创建，不启动 |
+
+示例：
+
+```bash
+foxos env run dev --image alpine-3.20
+foxos env run live --provider linux-kvm --iso FoxOS-0.3.0-amd64.iso --desktop-attach
+```
+
+### `foxos env desktop-attach`
+
+把完整虚拟机的来宾桌面作为显示通道打开（wayvnc）
+
+```text
+foxos env desktop-attach NAME
+```
+
+工具接口名：`env_desktop-attach` · 权限：`run`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `name` | `NAME` | string | 是 | 环境名 |
+
+示例：
+
+```bash
+foxos env desktop-attach live --json
 ```
 
 ### `foxos env create`

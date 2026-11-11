@@ -5,6 +5,7 @@
   "author": "gaosichun",
   "scripts": {
     "test:all": "python3 scripts/test_all.py",
-    "test:report": "python3 scripts/test_all.py --report-only"
+    "test:report": "python3 scripts/test_all.py --report-only",
+    "test:os": "python3 scripts/test_all.py --only os"
   }
 }

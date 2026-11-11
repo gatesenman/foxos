@@ -16,7 +16,415 @@
 
 错误码：USAGE(2) NOT_FOUND(3) PERMISSION_DENIED(4) LOCKED(5) DEPENDENCY_MISSING(6) CONFLICT(7) PAUSED(8) ERROR(1)。
 
-共 4321 个工具。
+共 4349 个工具。
+
+## desktop（13 个工具）
+
+### `desktop_status`
+
+显示当前图形会话与人工接管状态。CLI：foxos desktop status。示例：foxos desktop status --json
+
+只读：是 · 破坏性：否 · CLI：`foxos desktop status`
+
+调用示例：
+
+```json
+{"name": "desktop_status", "arguments": {}}
+```
+
+### `desktop_windows`
+
+列出合成器管理的真实窗口。CLI：foxos desktop windows。示例：foxos desktop windows --json
+
+只读：是 · 破坏性：否 · CLI：`foxos desktop windows`
+
+调用示例：
+
+```json
+{"name": "desktop_windows", "arguments": {}}
+```
+
+### `desktop_focus`
+
+聚焦一个窗口。CLI：foxos desktop focus WINDOW。示例：foxos desktop focus 4278190080
+
+只读：否 · 破坏性：否 · CLI：`foxos desktop focus`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `window` | string | 是 | 窗口编号（见 windows 命令） |
+
+调用示例：
+
+```json
+{"name": "desktop_focus", "arguments": {"window": "…"}}
+```
+
+### `desktop_move`
+
+移动一个窗口。CLI：foxos desktop move WINDOW --x X --y Y。示例：foxos desktop move 4278190080 --x 100 --y 80
+
+只读：否 · 破坏性：否 · CLI：`foxos desktop move`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `window` | string | 是 | 窗口编号（见 windows 命令） |
+| `x` | integer | 是 | X 坐标（像素） |
+| `y` | integer | 是 | Y 坐标（像素） |
+
+调用示例：
+
+```json
+{"name": "desktop_move", "arguments": {"window": "…", "x": 1, "y": 1}}
+```
+
+### `desktop_resize`
+
+调整一个窗口的大小。CLI：foxos desktop resize WINDOW --width WIDTH --height HEIGHT。示例：foxos desktop resize 4278190080 --width 800 --height 600
+
+只读：否 · 破坏性：否 · CLI：`foxos desktop resize`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `window` | string | 是 | 窗口编号（见 windows 命令） |
+| `width` | integer | 是 | 宽度（像素） |
+| `height` | integer | 是 | 高度（像素） |
+
+调用示例：
+
+```json
+{"name": "desktop_resize", "arguments": {"window": "…", "width": 1, "height": 1}}
+```
+
+### `desktop_close`
+
+关闭一个窗口。CLI：foxos desktop close WINDOW。示例：foxos desktop close 4278190080
+
+只读：否 · 破坏性：否 · CLI：`foxos desktop close`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `window` | string | 是 | 窗口编号（见 windows 命令） |
+
+调用示例：
+
+```json
+{"name": "desktop_close", "arguments": {"window": "…"}}
+```
+
+### `desktop_launch`
+
+启动一个应用或命令。CLI：foxos desktop launch CMD...。示例：foxos desktop launch -- gnome-terminal
+
+只读：否 · 破坏性：否 · CLI：`foxos desktop launch`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `command` | array | 是 | 要启动的命令和参数 |
+
+调用示例：
+
+```json
+{"name": "desktop_launch", "arguments": {"command": []}}
+```
+
+### `desktop_type`
+
+向当前聚焦的窗口键入文本。CLI：foxos desktop type TEXT。示例：foxos desktop type 'hello'
+
+只读：否 · 破坏性：否 · CLI：`foxos desktop type`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `text` | string | 是 | 要键入的文本 |
+
+调用示例：
+
+```json
+{"name": "desktop_type", "arguments": {"text": "…"}}
+```
+
+### `desktop_key`
+
+发送按键或组合键。CLI：foxos desktop key KEYS。示例：foxos desktop key Return
+
+只读：否 · 破坏性：否 · CLI：`foxos desktop key`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `keys` | string | 是 | 按键名，例如 Return，或组合键 ctrl+c |
+
+调用示例：
+
+```json
+{"name": "desktop_key", "arguments": {"keys": "…"}}
+```
+
+### `desktop_click`
+
+在屏幕坐标处点击。CLI：foxos desktop click --x X --y Y [--button BUTTON]。示例：foxos desktop click --x 400 --y 300
+
+只读：否 · 破坏性：否 · CLI：`foxos desktop click`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `x` | integer | 是 | X 坐标（像素） |
+| `y` | integer | 是 | Y 坐标（像素） |
+| `button` | integer |  | 鼠标按钮：1 左键、2 中键、3 右键 |
+
+调用示例：
+
+```json
+{"name": "desktop_click", "arguments": {"x": 1, "y": 1}}
+```
+
+### `desktop_screenshot`
+
+截取当前会话画面。CLI：foxos desktop screenshot [--path PATH]。示例：foxos desktop screenshot --path shots/desk.png
+
+只读：是 · 破坏性：否 · CLI：`foxos desktop screenshot`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `path` | string |  | 工作空间内的 PNG 路径（缺省写到 .foxos/screenshots/） |
+
+调用示例：
+
+```json
+{"name": "desktop_screenshot", "arguments": {}}
+```
+
+### `desktop_takeover`
+
+人工接管：暂停智能体的写操作。CLI：foxos desktop takeover [--reason REASON]。限制：只有 human 身份可以执行。示例：foxos desktop takeover --reason 我来改
+
+只读：否 · 破坏性：否 · CLI：`foxos desktop takeover`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `reason` | string |  | 暂停原因（写入状态与审计） |
+
+调用示例：
+
+```json
+{"name": "desktop_takeover", "arguments": {}}
+```
+
+### `desktop_resume`
+
+结束人工接管，恢复智能体写操作。CLI：foxos desktop resume。限制：只有 human 身份可以执行。示例：foxos desktop resume
+
+只读：否 · 破坏性：否 · CLI：`foxos desktop resume`
+
+调用示例：
+
+```json
+{"name": "desktop_resume", "arguments": {}}
+```
+
+## session（13 个工具）
+
+### `session_status`
+
+显示当前图形会话与人工接管状态。CLI：foxos session status。示例：foxos session status --json
+
+只读：是 · 破坏性：否 · CLI：`foxos session status`
+
+调用示例：
+
+```json
+{"name": "session_status", "arguments": {}}
+```
+
+### `session_windows`
+
+列出合成器管理的真实窗口。CLI：foxos session windows。示例：foxos session windows --json
+
+只读：是 · 破坏性：否 · CLI：`foxos session windows`
+
+调用示例：
+
+```json
+{"name": "session_windows", "arguments": {}}
+```
+
+### `session_focus`
+
+聚焦一个窗口。CLI：foxos session focus WINDOW。示例：foxos session focus 4278190080
+
+只读：否 · 破坏性：否 · CLI：`foxos session focus`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `window` | string | 是 | 窗口编号（见 windows 命令） |
+
+调用示例：
+
+```json
+{"name": "session_focus", "arguments": {"window": "…"}}
+```
+
+### `session_move`
+
+移动一个窗口。CLI：foxos session move WINDOW --x X --y Y。示例：foxos session move 4278190080 --x 100 --y 80
+
+只读：否 · 破坏性：否 · CLI：`foxos session move`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `window` | string | 是 | 窗口编号（见 windows 命令） |
+| `x` | integer | 是 | X 坐标（像素） |
+| `y` | integer | 是 | Y 坐标（像素） |
+
+调用示例：
+
+```json
+{"name": "session_move", "arguments": {"window": "…", "x": 1, "y": 1}}
+```
+
+### `session_resize`
+
+调整一个窗口的大小。CLI：foxos session resize WINDOW --width WIDTH --height HEIGHT。示例：foxos session resize 4278190080 --width 800 --height 600
+
+只读：否 · 破坏性：否 · CLI：`foxos session resize`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `window` | string | 是 | 窗口编号（见 windows 命令） |
+| `width` | integer | 是 | 宽度（像素） |
+| `height` | integer | 是 | 高度（像素） |
+
+调用示例：
+
+```json
+{"name": "session_resize", "arguments": {"window": "…", "width": 1, "height": 1}}
+```
+
+### `session_close`
+
+关闭一个窗口。CLI：foxos session close WINDOW。示例：foxos session close 4278190080
+
+只读：否 · 破坏性：否 · CLI：`foxos session close`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `window` | string | 是 | 窗口编号（见 windows 命令） |
+
+调用示例：
+
+```json
+{"name": "session_close", "arguments": {"window": "…"}}
+```
+
+### `session_launch`
+
+启动一个应用或命令。CLI：foxos session launch CMD...。示例：foxos session launch -- gnome-terminal
+
+只读：否 · 破坏性：否 · CLI：`foxos session launch`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `command` | array | 是 | 要启动的命令和参数 |
+
+调用示例：
+
+```json
+{"name": "session_launch", "arguments": {"command": []}}
+```
+
+### `session_type`
+
+向当前聚焦的窗口键入文本。CLI：foxos session type TEXT。示例：foxos session type 'hello'
+
+只读：否 · 破坏性：否 · CLI：`foxos session type`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `text` | string | 是 | 要键入的文本 |
+
+调用示例：
+
+```json
+{"name": "session_type", "arguments": {"text": "…"}}
+```
+
+### `session_key`
+
+发送按键或组合键。CLI：foxos session key KEYS。示例：foxos session key Return
+
+只读：否 · 破坏性：否 · CLI：`foxos session key`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `keys` | string | 是 | 按键名，例如 Return，或组合键 ctrl+c |
+
+调用示例：
+
+```json
+{"name": "session_key", "arguments": {"keys": "…"}}
+```
+
+### `session_click`
+
+在屏幕坐标处点击。CLI：foxos session click --x X --y Y [--button BUTTON]。示例：foxos session click --x 400 --y 300
+
+只读：否 · 破坏性：否 · CLI：`foxos session click`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `x` | integer | 是 | X 坐标（像素） |
+| `y` | integer | 是 | Y 坐标（像素） |
+| `button` | integer |  | 鼠标按钮：1 左键、2 中键、3 右键 |
+
+调用示例：
+
+```json
+{"name": "session_click", "arguments": {"x": 1, "y": 1}}
+```
+
+### `session_screenshot`
+
+截取当前会话画面。CLI：foxos session screenshot [--path PATH]。示例：foxos session screenshot --path shots/desk.png
+
+只读：是 · 破坏性：否 · CLI：`foxos session screenshot`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `path` | string |  | 工作空间内的 PNG 路径（缺省写到 .foxos/screenshots/） |
+
+调用示例：
+
+```json
+{"name": "session_screenshot", "arguments": {}}
+```
+
+### `session_takeover`
+
+人工接管：暂停智能体的写操作。CLI：foxos session takeover [--reason REASON]。限制：只有 human 身份可以执行。示例：foxos session takeover --reason 我来改
+
+只读：否 · 破坏性：否 · CLI：`foxos session takeover`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `reason` | string |  | 暂停原因（写入状态与审计） |
+
+调用示例：
+
+```json
+{"name": "session_takeover", "arguments": {}}
+```
+
+### `session_resume`
+
+结束人工接管，恢复智能体写操作。CLI：foxos session resume。限制：只有 human 身份可以执行。示例：foxos session resume
+
+只读：否 · 破坏性：否 · CLI：`foxos session resume`
+
+调用示例：
+
+```json
+{"name": "session_resume", "arguments": {}}
+```
 
 ## docs（5 个工具）
 
@@ -110,7 +518,7 @@
 {"name": "docs_export", "arguments": {"file": "…", "output": "…"}}
 ```
 
-## env（28 个工具）
+## env（30 个工具）
 
 ### `env_images`
 
@@ -139,6 +547,48 @@
 
 ```json
 {"name": "env_pull", "arguments": {"image": "…"}}
+```
+
+### `env_run`
+
+没有镜像就拉取，然后创建并启动（用法靠近 docker run）；可附上来宾桌面。CLI：foxos env run NAME [--image IMAGE] [--iso ISO] [--provider PROVIDER] [--network {user,host,none}] [--workspace-mode {rw,ro,none}] [--memory-mb MEMORY_MB] [--cpus CPUS] [--pids PIDS] [--desktop-attach] [--no-start]。示例：foxos env run dev --image alpine-3.20
+
+只读：否 · 破坏性：否 · CLI：`foxos env run`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `name` | string | 是 | 环境名 |
+| `image` | string |  | 镜像 ID |
+| `iso` | string |  | 安装介质 ISO 路径（Hyper-V） |
+| `provider` | string |  | 指定提供者 |
+| `network` | string |  | 网络：user 为用户态转发（来宾 5900 映射到宿主），none 断开，host 仅用于命名空间环境 可选：user / host / none |
+| `workspace_mode` | string |  | 工作空间挂载方式 可选：rw / ro / none |
+| `memory_mb` | integer |  | 内存上限（MB） |
+| `cpus` | number |  | CPU 上限（核，需 cgroup） |
+| `pids` | integer |  | 进程数上限 |
+| `desktop_attach` | boolean |  | 启动后附上来宾桌面 |
+| `no_start` | boolean |  | 只创建，不启动 |
+
+调用示例：
+
+```json
+{"name": "env_run", "arguments": {"name": "…"}}
+```
+
+### `env_desktop-attach`
+
+把完整虚拟机的来宾桌面作为显示通道打开（wayvnc）。CLI：foxos env desktop-attach NAME。示例：foxos env desktop-attach live --json
+
+只读：否 · 破坏性：否 · CLI：`foxos env desktop-attach`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `name` | string | 是 | 环境名 |
+
+调用示例：
+
+```json
+{"name": "env_desktop-attach", "arguments": {"name": "…"}}
 ```
 
 ### `env_create`

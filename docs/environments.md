@@ -9,7 +9,7 @@
 
 | 平台 | 后端 ID | 实现 | 状态 |
 |---|---|---|---|
-| 狐狸OS / Linux 宿主 | `linux-kvm` | 内核 KVM + cloud-hypervisor（Apache-2.0，随系统提供二进制并保留 NOTICE，不把源码整树拷进仓库）：完整 Linux / Windows 虚拟机，virtio-blk / virtio-net / virtio-fs（工作空间）、来宾桌面进狐狸OS 窗口 | 设计已定；第一张 ISO 起提供该功能，至少一条 Linux 来宾路径，随后补齐目录与显示通道 |
+| 狐狸OS / Linux 宿主 | `linux-kvm` | 内核 KVM + cloud-hypervisor（Apache-2.0，随系统提供二进制并保留 NOTICE，不把源码整树拷进仓库）：完整 Linux / Windows 虚拟机，virtio-blk / virtio-net / virtio-fs（工作空间）、来宾桌面进狐狸OS 窗口 | 已实现 `run` / `desktop-attach`：产品路径为 KVM + cloud-hypervisor + 来宾 wayvnc；KVM 不可用时需显式 `FOXOS_ALLOW_TEST_VMM=qemu-tcg` 才用 QEMU 做测试 |
 | 狐狸OS / Linux 宿主 | `linux-ns` | 自研运行时 `foxos/envs/linux.py`：用户命名空间（无特权）+ mount / pid / uts / ipc / 可选 net 命名空间、overlayfs、pivot_root、seccomp、cgroup v2（可委派时）或 rlimit | 在本机（内核 6.12，普通用户 uid 1000）端到端测试通过；无 KVM 时仍可用 |
 | Windows 伴侣 | `wsl2` | 驱动系统自带的 WSL2（`wsl.exe --import/--exec/--terminate/--export/--unregister`），进程限制用 Job Object | 有代码和单元测试（命令构造、路径换算、输出解析），**未在 Windows 实机上测试** |
 | macOS 伴侣 | `macos-vz` | Swift 小程序 `FoxVZ.swift` 调用 Virtualization.framework（Linux 内核引导、virtio 磁盘 / 网络 NAT / virtio-fs 共享工作空间 / 控制台） | 有代码和单元测试（配置生成、命令构造），**未在 Mac 实机上测试** |
@@ -93,7 +93,7 @@
 
 - 每个智能体会话在面板“运行位置”里选：宿主、轻量沙箱、轻量沙箱（不联网），或某个运行中的完整环境。
 - 不依赖 Docker / Podman / LXC / VirtualBox / QEMU。完整虚拟机用的是内核 KVM（Linux 已有的功能）和 Apache-2.0 的 cloud-hypervisor（随系统提供，保留 NOTICE）。GPL / LGPL / AGPL 项目只借鉴思路，不复制代码。
-- **状态**：`linux-ns` 已实现并端到端测试；`linux-kvm` 随操作系统 ISO 落地（第一张 ISO 至少一条 Linux 来宾路径，目录其余条目随后补）。Windows 三个伴侣提供者有代码与单元测试，未在 Windows 硬件上验证；
+- **状态**：`linux-ns` 已实现并端到端测试；`linux-kvm` 已接入 `foxos env run` / `desktop-attach`（产品路径为内核 KVM + cloud-hypervisor，来宾桌面走 wayvnc）。在 KVM 不可用（例如本构建盒创建 vCPU 会触发内核 BUG）的机器上，只有显式设置 `FOXOS_ALLOW_TEST_VMM=qemu-tcg` 才用 QEMU TCG 做开发测试，QEMU 不是产品依赖。Windows 三个伴侣提供者有代码与单元测试，未在 Windows 硬件上验证；
   轻量档的 Linux 实现已完成并端到端测试（US-52）；macOS（Seatbelt）与 Windows（受限令牌 / AppContainer + 作业对象）有代码与单元测试，未在实机上验证。详见 [sandbox.md](sandbox.md)。
 
 

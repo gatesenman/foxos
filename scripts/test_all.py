@@ -5,6 +5,7 @@
   pytest        packages/core/tests
   smoke         apps/desktop/scripts/smoke.sh（桌面冒烟）
   e2e           apps/desktop/e2e/*.e2e.js / *.e2e.mjs（Playwright 驱动真实 Electron 桌面、官方 MCP SDK）
+  os            packages/core/tests/test_os_session.py 与 test_os_kvm.py（真实 labwc 会话、linux-kvm 动词）
 结果（JUnit XML）写到 build/test-results/，汇总写到 docs/test-results/summary.json，报告写到 docs/test-report.md。
 
 用法：python3 scripts/test_all.py [--only pytest,smoke,e2e] [--e2e mcp,sandbox,...] [--report-only]
@@ -60,7 +61,8 @@ def junit_single(path: Path, name: str, ok: bool, message: str, seconds: float) 
 
 def main() -> int:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--only", default="pytest,smoke,e2e")
+    ap.add_argument("--only", default="pytest,smoke,e2e",
+                    help="comma list: pytest,smoke,e2e,os")
     ap.add_argument("--e2e", default=",".join(f.split(".")[0] for f in E2E_ORDER))
     ap.add_argument("--report-only", action="store_true")
     a = ap.parse_args()
@@ -74,6 +76,10 @@ def main() -> int:
         if not a.report_only:
             if "pytest" in only:
                 codes["pytest"] = run([PY, "-m", "pytest", "-q", "packages/core/tests", f"--junitxml={OUT / 'pytest.xml'}"], env, ROOT, OUT / "pytest.log")
+            if "os" in only:
+                codes["os"] = run([PY, "-m", "pytest", "-q",
+                                   "packages/core/tests/test_os_session.py", "packages/core/tests/test_os_kvm.py",
+                                   f"--junitxml={OUT / 'os.xml'}"], env, ROOT, OUT / "os.log")
             if "smoke" in only or "e2e" in only:
                 xvfb = ensure_display(env)
             if "smoke" in only and sys.platform == "linux":
