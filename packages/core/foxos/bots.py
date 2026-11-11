@@ -14,6 +14,7 @@ foxos 内核：工作空间约束、该智能体的工作范围、写锁、审�
 
 from __future__ import annotations
 
+import contextlib
 import json
 import os
 import re
@@ -62,9 +63,26 @@ def _save(ws, d: dict) -> None:
     os.replace(tmp, p)
 
 
+_held = threading.local()
+
+
+@contextlib.contextmanager
 def _flock(ws):
+    """跨进程的索引锁；同一线程里可以重入（update 里会调用 get → ensure_main）。"""
     from .activity import _flock as fl
-    return fl(root(ws) / ".index.lock")
+    if getattr(_held, "depth", 0):
+        _held.depth += 1
+        try:
+            yield
+        finally:
+            _held.depth -= 1
+        return
+    with fl(root(ws) / ".index.lock"):
+        _held.depth = 1
+        try:
+            yield
+        finally:
+            _held.depth = 0
 
 
 def default_bot(main: bool = False) -> dict:
