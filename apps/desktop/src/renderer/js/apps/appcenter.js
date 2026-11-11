@@ -117,7 +117,8 @@
               el('div', { class: 'card-grid' }, apps.map((a) => el('div', { class: `app-card ${a.installed ? 'ok' : 'missing'}`, 'data-ev-app': a.id },
                 el('div', { class: 'app-card-icon' }, FX.appIcon(FX.evIcon(a))),
                 el('div', { class: 'app-card-main' },
-                  el('div', { class: 'app-card-name' }, a.name, el('span', { class: `badge ${a.installed ? 'ok' : a.upstreamIssue ? 'error' : 'warn'}`, text: a.installed ? FX.t('common.installed') : a.upstreamIssue ? FX.t('appcenter.upstream_does_not_build') : FX.t('common.not_installed') }), a.agpl ? el('span', { class: 'badge', text: 'AGPL' }) : null),
+                  el('div', { class: 'app-card-name' }, a.name, el('span', { class: `badge ${a.installed ? 'ok' : a.upstreamIssue ? 'error' : 'warn'}`, text: a.installed ? FX.t('common.installed') : a.upstreamIssue ? FX.t('appcenter.upstream_does_not_build') : FX.t('common.not_installed') }), a.agpl ? el('span', { class: 'badge', text: 'AGPL' }) : null,
+                    a.uiLanguages && !a.uiLanguages.includes(FX.lang) ? el('span', { class: 'badge', 'data-ui-lang': 'en', title: a.localeFormats === 'follows' ? FX.t('appcenter.ui_english_formats_follow') : FX.t('appcenter.ui_english_tip'), text: FX.t('appcenter.ui_english') }) : null),
                   el('div', { class: 'muted small', text: FX.evIssue(a) || FX.evDesc(a) })),
                 el('div', { class: 'app-card-actions' }, a.installed
                   ? [el('button', { class: 'btn sm ghost', onclick: () => FX.openWindow('everything', { app: a.id }) }, FX.t('common.open')),

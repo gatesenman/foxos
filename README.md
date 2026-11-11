@@ -117,7 +117,7 @@ foxos mcp --profile compact                                                # 精
 来自 [HeyPuter/everything](https://github.com/HeyPuter/everything)（提交 `0fbb88cd`）。AGPL 应用在安装时从上游源码在本机构建，狐狸OS 不修改、不内置其源码。
 
 <!-- apps:start -->
-本机可运行 **50/51** · 有语义命令（CLI / MCP）**50/51** · 启动测试通过 **4/51** · 界面与命令等价 **2/51**（明细：[docs/everything-apps.md](docs/everything-apps.md)）
+本机可运行 **50/51** · 有语义命令（CLI / MCP）**50/51** · 启动测试通过 **50/51** · 界面与命令等价 **49/51**（明细：[docs/everything-apps.md](docs/everything-apps.md)）
 
 | 分组 | 应用（括号内为语义命令数） |
 | --- | --- |

@@ -16,7 +16,7 @@ CORE = ROOT / "packages" / "core"
 
 
 def everything_list():
-    env = {**os.environ, "PYTHONPATH": str(CORE)}
+    env = {**os.environ, "PYTHONPATH": str(CORE), "FOXOS_LANG": "zh-CN"}
     out = subprocess.run([sys.executable, "-m", "foxos", "everything", "list", "--json"], capture_output=True, text=True, env=env, check=True).stdout
     return json.loads(out)["result"]
 
@@ -58,6 +58,11 @@ def build():
     return d, rows, cov
 
 
+def uilang(r):
+    ui = "中文 / 英文" if "zh-CN" in (r.get("ui_languages") or []) else "英文"
+    return ui + {"follows": "，格式跟随", "en-US": "，格式固定英文"}.get(r.get("locale_formats"), "")
+
+
 def main():
     d, rows, cov = build()
     lines = ["# Everything 应用（51 个）", "",
@@ -67,15 +72,18 @@ def main():
              "用户故事 US-40…48（按分组）与端到端测试（启动 + 一次界面操作与等价 CLI 命令的结果对比）。", "",
              f"覆盖：本机可运行 **{cov['local']}/{cov['total']}**，有语义命令 **{cov['cli']}/{cov['total']}**，"
              f"启动测试通过 **{cov['boot']}/{cov['total']}**，界面与命令等价 **{cov['parity']}/{cov['total']}**。", "",
-             "| 分组 | 应用 | ID | 许可证 | 本机运行 | 语义命令 | 启动测试 | 界面 = 命令 | 等价测试用的命令 | 操作清单 |",
-             "| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |"]
+             "| 分组 | 应用 | ID | 许可证 | 本机运行 | 语义命令 | 启动测试 | 界面 = 命令 | 等价测试用的命令 | 界面语言 | 操作清单 |",
+             "| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |"]
     for r in rows:
         lines.append(f"| {r['group']} | {r['name']} | `{r['id']}` | {r['license']} | {'上游缺源码' if r['upstream_issue'] else '可运行'} | {r.get('ops') or 0} | "
-                     f"{LABEL.get(r['boot'], r['boot'])} | {LABEL.get(r['parity'], r['parity'])} | {('`' + r['op'] + '`') if r['op'] else '—'} | "
+                     f"{LABEL.get(r['boot'], r['boot'])} | {LABEL.get(r['parity'], r['parity'])} | {('`' + r['op'] + '`') if r['op'] else '—'} | {uilang(r)} | "
                      f"[{r['id']}.md](operations/{r['id']}.md) |")
     lines += ["", "说明：", "",
               "- `assets` 的上游仓库缺少 `src/main.js`，无法构建（GitHub contents API 返回 404），如实标为“上游缺源码”，不计入可运行数。",
               "- “语义命令”是从界面实际遍历 + 快捷键挖掘得到的操作数（`foxos <应用> <资源> <动作>`），清单见 `docs/operations/`。",
+              "- “界面语言”：上游应用自带的界面语言。狐狸OS 把自己的语言通过 Chromium 语言（`navigator.language`）传给每个应用；"
+              "上游提供中文界面的（目前只有 spreadsheet）随狐狸OS 切换中 / 英文；其余是英文界面，标“格式跟随”的应用的日期与数字按狐狸OS 语言显示。"
+              "数据来自扫描上游源码（`packages/core/foxos/data/everything-locale.json`），spreadsheet 由 US-55 端到端测试验证。",
               "- 测试结果来自 `docs/test-results/everything.json`，由 `npm run test:all` 中的 everything.e2e.js 写入。", ""]
     (ROOT / "docs" / "everything-apps.md").write_text("\n".join(lines), encoding="utf-8")
     json.dump({"coverage": cov, "apps": [{k: r[k] for k in ("id", "name", "group", "group_id", "license", "upstream_issue", "ops", "boot", "parity")} for r in rows]},

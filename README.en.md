@@ -64,7 +64,7 @@ Grammar `foxos <app> <resource> <verb> --json`; MCP tool names `<app>_<resource>
 From [HeyPuter/everything](https://github.com/HeyPuter/everything) at `0fbb88cd`. AGPL apps are built from upstream source at install time and are not modified or vendored.
 
 <!-- apps:start -->
-Runs locally: **50/51** · semantic CLI/MCP commands: **50/51** · boot e2e passed: **4/51** · GUI = CLI parity: **2/51** (details: [docs/everything-apps.md](docs/everything-apps.md))
+Runs locally: **50/51** · semantic CLI/MCP commands: **50/51** · boot e2e passed: **50/51** · GUI = CLI parity: **49/51** (details: [docs/everything-apps.md](docs/everything-apps.md))
 
 | Group | Apps (ops = semantic commands) |
 | --- | --- |

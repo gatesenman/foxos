@@ -29,11 +29,13 @@ function foxosHome() {
   return path.join(process.env.XDG_DATA_HOME || path.join(os.homedir(), '.local', 'share'), 'foxos');
 }
 function catalog() { return JSON.parse(fs.readFileSync(path.join(corePath(), 'foxos', 'data', 'everything.json'), 'utf8')); }
+// 每个上游应用的界面语言（ui）与日期 / 数字格式是否跟随狐狸OS 语言（formats），见 data/everything-locale.json
+function locales() { try { return JSON.parse(fs.readFileSync(path.join(corePath(), 'foxos', 'data', 'everything-locale.json'), 'utf8')).apps; } catch { return {}; } }
 function distDir(id) { return path.join(foxosHome(), 'everything', id, 'dist'); }
 function manifest(id) { try { return JSON.parse(fs.readFileSync(path.join(foxosHome(), 'everything', id, 'manifest.json'), 'utf8')); } catch { return null; } }
 function list() {
-  const c = catalog();
-  return { ...c, home: foxosHome(), apps: c.apps.map((a) => ({ ...a, partition: partitionFor(a.id), installed: fs.existsSync(path.join(distDir(a.id), 'index.html')), manifest: manifest(a.id) })) };
+  const c = catalog(); const loc = locales();
+  return { ...c, home: foxosHome(), apps: c.apps.map((a) => ({ ...a, uiLanguages: loc[a.id]?.ui || ['en-US'], localeFormats: loc[a.id]?.formats || 'none', partition: partitionFor(a.id), installed: fs.existsSync(path.join(distDir(a.id), 'index.html')), manifest: manifest(a.id) })) };
 }
 
 // ---------------------------------------------------------------- 路径映射（Puter 虚拟路径 → 工作空间）

@@ -7,7 +7,7 @@ data/ops/<应用>.json 生成的语义命令 `foxos <应用> <资源> <动作>`�
 
 from __future__ import annotations
 
-from foxos.i18n import tr
+from foxos.i18n import get_lang, tr
 import base64
 import hashlib
 import json
@@ -28,6 +28,8 @@ DATA = Path(__file__).resolve().parent.parent / "data"
 CATALOG = json.loads((DATA / "everything.json").read_text(encoding="utf-8"))
 APPS = {a["id"]: a for a in CATALOG["apps"]}
 GROUPS = {g["id"]: g for g in CATALOG["groups"]}
+# 每个上游应用的界面语言与日期 / 数字格式是否跟随狐狸OS 语言（扫描上游源码得出，见 data/everything-locale.json）
+LOCALE = json.loads((DATA / "everything-locale.json").read_text(encoding="utf-8"))["apps"]
 UPSTREAM_GIT = CATALOG["upstream"] + ".git"
 
 
@@ -48,9 +50,10 @@ def installed(app: str) -> bool:
 
 def _row(a: dict) -> dict:
     m = manifest(a["id"])
-    return {"id": a["id"], "name": a["name"], "group": a["group"], "group_name": GROUPS[a["group"]]["zh"], "license": a["license"],
+    return {"id": a["id"], "name": a["name"], "group": a["group"], "group_name": GROUPS[a["group"]]["zh" if get_lang() == "zh-CN" else "en"], "license": a["license"],
             "agpl": a["agpl"], "alternative_to": a["alternativeTo"], "installed": installed(a["id"]),
-            "installed_commit": m and m.get("commit"), "ops": len(load_ops(a["id"]))}
+            "installed_commit": m and m.get("commit"), "ops": len(load_ops(a["id"])),
+            "ui_languages": LOCALE[a["id"]]["ui"], "locale_formats": LOCALE[a["id"]]["formats"]}
 
 
 # ---------------------------------------------------------------- 目录与安装

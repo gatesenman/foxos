@@ -94,3 +94,35 @@ test('US-55 默认中文，可在设置中实时切换到 English 并保存', as
   assert.equal(en.error.message, en2.error.message);
   assert.deepEqual(Object.keys(en).sort(), Object.keys(zh).sort());
 });
+
+// Everything 应用：狐狸OS 通过 Chromium 语言（navigator.language）把界面语言传给上游应用；
+// 上游提供了中文界面的（spreadsheet）跟随切换，其余应用在中文下标「英文界面」（见 data/everything-locale.json）
+const evText = (page) => page.evaluate(async () => {
+  const v = document.querySelector('.window[data-app=everything] webview');
+  try { return JSON.parse(await v.executeJavaScript('JSON.stringify([navigator.language, document.documentElement.lang, (document.body && document.body.innerText) || ""])')); } catch { return null; }
+});
+test('US-55 Everything 应用跟随狐狸OS 语言（上游支持时）', async (t) => {
+  if (!fs.existsSync(path.join(FOXOS_HOME, 'everything', 'spreadsheet', 'dist', 'index.html'))) return t.skip('需要已安装的 spreadsheet（FOXOS_HOME）');
+  const ws = tmpWorkspace('i18n-ev');
+  for (const [lang, want, uiLang, badge] of [['zh-CN', /文件\n编辑\n视图/, 'zh-Hans', true], ['en-US', /File\nEdit\nView/, 'en', false]]) {
+    const { app, page } = await launch(ws, { extraEnv: { FOXOS_HOME, FOXOS_LANG: lang } });
+    try {
+      await page.dblclick('[data-launch=appcenter]');
+      await page.waitForSelector('[data-ev-app=chess]', { timeout: 60000 });
+      assert.equal(await page.$('[data-ev-app=chess] [data-ui-lang]') !== null, badge, `${lang}：没有中文界面的应用${badge ? '应' : '不应'}标「英文界面」`);
+      assert.equal(await page.$('[data-ev-app=spreadsheet] [data-ui-lang]'), null, 'spreadsheet 有中文界面，不标');
+      await page.evaluate(() => FX.windows().forEach((w) => FX.closeWindow(w)));
+      await page.evaluate(() => FX.openWindow('everything', { app: 'spreadsheet' }));
+      await page.waitForSelector('.window[data-app=everything] webview', { timeout: 30000 });
+      let r = null;
+      for (let i = 0; i < 60 && !(r && want.test(r[2])); i++) { await page.waitForTimeout(500); r = await evText(page); }
+      assert.ok(r, 'spreadsheet 页面应载入');
+      assert.equal(r[0], lang, 'navigator.language 跟随狐狸OS 语言');
+      assert.equal(r[1], uiLang, 'spreadsheet 选用对应语言的界面');
+      assert.match(r[2], want);
+      await shot(page, `US-55-spreadsheet-${lang}`);
+    } finally {
+      await app.close();
+    }
+  }
+});

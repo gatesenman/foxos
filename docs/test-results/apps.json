@@ -3,8 +3,8 @@
   "total": 51,
   "local": 50,
   "cli": 50,
-  "boot": 4,
-  "parity": 2
+  "boot": 50,
+  "parity": 49
  },
  "apps": [
   {
@@ -26,8 +26,8 @@
    "license": "MIT (root LICENSE)",
    "upstream_issue": false,
    "ops": 311,
-   "boot": null,
-   "parity": null
+   "boot": "ok",
+   "parity": "equal"
   },
   {
    "id": "presentation",
@@ -37,8 +37,8 @@
    "license": "AGPL-3.0-only",
    "upstream_issue": false,
    "ops": 284,
-   "boot": null,
-   "parity": null
+   "boot": "ok",
+   "parity": "equal"
   },
   {
    "id": "whiteboard",
@@ -48,8 +48,8 @@
    "license": "AGPL-3.0-only",
    "upstream_issue": false,
    "ops": 26,
-   "boot": null,
-   "parity": null
+   "boot": "ok",
+   "parity": "equal"
   },
   {
    "id": "pdf",
@@ -59,8 +59,8 @@
    "license": "AGPL-3.0-only",
    "upstream_issue": false,
    "ops": 85,
-   "boot": null,
-   "parity": null
+   "boot": "ok",
+   "parity": "equal"
   },
   {
    "id": "notes",
@@ -70,8 +70,8 @@
    "license": "AGPL-3.0-only",
    "upstream_issue": false,
    "ops": 136,
-   "boot": null,
-   "parity": null
+   "boot": "ok",
+   "parity": "equal"
   },
   {
    "id": "records",
@@ -81,8 +81,8 @@
    "license": "MIT",
    "upstream_issue": false,
    "ops": 16,
-   "boot": null,
-   "parity": null
+   "boot": "ok",
+   "parity": "equal"
   },
   {
    "id": "meetings",
@@ -92,8 +92,8 @@
    "license": "MIT (root LICENSE)",
    "upstream_issue": false,
    "ops": 17,
-   "boot": null,
-   "parity": null
+   "boot": "ok",
+   "parity": "equal"
   },
   {
    "id": "teamchat",
@@ -103,8 +103,8 @@
    "license": "MIT (root LICENSE)",
    "upstream_issue": false,
    "ops": 6,
-   "boot": null,
-   "parity": null
+   "boot": "ok",
+   "parity": "equal"
   },
   {
    "id": "email",
@@ -114,8 +114,8 @@
    "license": "AGPL-3.0-only",
    "upstream_issue": false,
    "ops": 2,
-   "boot": null,
-   "parity": null
+   "boot": "ok",
+   "parity": "equal"
   },
   {
    "id": "contacts",
@@ -125,8 +125,8 @@
    "license": "MIT (root LICENSE)",
    "upstream_issue": false,
    "ops": 28,
-   "boot": null,
-   "parity": null
+   "boot": "ok",
+   "parity": "equal"
   },
   {
    "id": "calendar",
@@ -136,8 +136,8 @@
    "license": "MIT",
    "upstream_issue": false,
    "ops": 36,
-   "boot": null,
-   "parity": null
+   "boot": "ok",
+   "parity": "equal"
   },
   {
    "id": "signatures",
@@ -147,8 +147,8 @@
    "license": "MIT (root LICENSE)",
    "upstream_issue": false,
    "ops": 29,
-   "boot": null,
-   "parity": null
+   "boot": "ok",
+   "parity": "equal"
   },
   {
    "id": "photo-studio",
@@ -158,8 +158,8 @@
    "license": "MIT (root LICENSE)",
    "upstream_issue": false,
    "ops": 104,
-   "boot": null,
-   "parity": null
+   "boot": "ok",
+   "parity": "different"
   },
   {
    "id": "video-studio",
@@ -169,8 +169,8 @@
    "license": "AGPL-3.0-only",
    "upstream_issue": false,
    "ops": 34,
-   "boot": null,
-   "parity": null
+   "boot": "ok",
+   "parity": "equal"
   },
   {
    "id": "vector-studio",
@@ -180,8 +180,8 @@
    "license": "MIT (root LICENSE)",
    "upstream_issue": false,
    "ops": 90,
-   "boot": null,
-   "parity": null
+   "boot": "ok",
+   "parity": "equal"
   },
   {
    "id": "audio-studio",
@@ -191,8 +191,8 @@
    "license": "MIT (root LICENSE)",
    "upstream_issue": false,
    "ops": 148,
-   "boot": null,
-   "parity": null
+   "boot": "ok",
+   "parity": "equal"
   },
   {
    "id": "music-studio",
@@ -202,8 +202,8 @@
    "license": "MIT (root LICENSE)",
    "upstream_issue": false,
    "ops": 266,
-   "boot": null,
-   "parity": null
+   "boot": "ok",
+   "parity": "equal"
   },
   {
    "id": "3d",
@@ -213,8 +213,8 @@
    "license": "AGPL-3.0-only",
    "upstream_issue": false,
    "ops": 230,
-   "boot": null,
-   "parity": null
+   "boot": "ok",
+   "parity": "equal"
   },
   {
    "id": "cad",
@@ -224,8 +224,8 @@
    "license": "AGPL-3.0-only",
    "upstream_issue": false,
    "ops": 180,
-   "boot": null,
-   "parity": null
+   "boot": "ok",
+   "parity": "equal"
   },
   {
    "id": "parametric",
@@ -235,8 +235,8 @@
    "license": "AGPL-3.0-only",
    "upstream_issue": false,
    "ops": 33,
-   "boot": null,
-   "parity": null
+   "boot": "ok",
+   "parity": "equal"
   },
   {
    "id": "circuits",
@@ -246,8 +246,8 @@
    "license": "AGPL-3.0-only",
    "upstream_issue": false,
    "ops": 39,
-   "boot": null,
-   "parity": null
+   "boot": "ok",
+   "parity": "equal"
   },
   {
    "id": "building-design",
@@ -257,8 +257,8 @@
    "license": "AGPL-3.0-only",
    "upstream_issue": false,
    "ops": 1,
-   "boot": null,
-   "parity": null
+   "boot": "ok",
+   "parity": "equal"
   },
   {
    "id": "tasks",
@@ -269,7 +269,7 @@
    "upstream_issue": false,
    "ops": 58,
    "boot": "ok",
-   "parity": "different"
+   "parity": "equal"
   },
   {
    "id": "projects",
@@ -279,8 +279,8 @@
    "license": "MIT",
    "upstream_issue": false,
    "ops": 50,
-   "boot": null,
-   "parity": null
+   "boot": "ok",
+   "parity": "equal"
   },
   {
    "id": "wiki",
@@ -290,8 +290,8 @@
    "license": "MIT (root LICENSE)",
    "upstream_issue": false,
    "ops": 60,
-   "boot": null,
-   "parity": null
+   "boot": "ok",
+   "parity": "equal"
   },
   {
    "id": "time-tracking",
@@ -301,8 +301,8 @@
    "license": "MIT (root LICENSE)",
    "upstream_issue": false,
    "ops": 71,
-   "boot": null,
-   "parity": null
+   "boot": "ok",
+   "parity": "equal"
   },
   {
    "id": "survey",
@@ -312,8 +312,8 @@
    "license": "MIT",
    "upstream_issue": false,
    "ops": 28,
-   "boot": null,
-   "parity": null
+   "boot": "ok",
+   "parity": "equal"
   },
   {
    "id": "accounting",
@@ -323,8 +323,8 @@
    "license": "MIT",
    "upstream_issue": false,
    "ops": 45,
-   "boot": null,
-   "parity": null
+   "boot": "ok",
+   "parity": "equal"
   },
   {
    "id": "invoicing",
@@ -334,8 +334,8 @@
    "license": "MIT (root LICENSE)",
    "upstream_issue": false,
    "ops": 20,
-   "boot": null,
-   "parity": null
+   "boot": "ok",
+   "parity": "equal"
   },
   {
    "id": "expense",
@@ -345,8 +345,8 @@
    "license": "MIT (root LICENSE)",
    "upstream_issue": false,
    "ops": 17,
-   "boot": null,
-   "parity": null
+   "boot": "ok",
+   "parity": "equal"
   },
   {
    "id": "cap-table",
@@ -356,8 +356,8 @@
    "license": "MIT (root LICENSE)",
    "upstream_issue": false,
    "ops": 27,
-   "boot": null,
-   "parity": null
+   "boot": "ok",
+   "parity": "equal"
   },
   {
    "id": "crm",
@@ -368,7 +368,7 @@
    "upstream_issue": false,
    "ops": 16,
    "boot": "ok",
-   "parity": "no-op"
+   "parity": "equal"
   },
   {
    "id": "help-desk",
@@ -378,8 +378,8 @@
    "license": "MIT",
    "upstream_issue": false,
    "ops": 6,
-   "boot": null,
-   "parity": null
+   "boot": "ok",
+   "parity": "equal"
   },
   {
    "id": "contracts",
@@ -389,8 +389,8 @@
    "license": "MIT (root LICENSE)",
    "upstream_issue": false,
    "ops": 14,
-   "boot": null,
-   "parity": null
+   "boot": "ok",
+   "parity": "equal"
   },
   {
    "id": "pos",
@@ -400,8 +400,8 @@
    "license": "MIT (root LICENSE)",
    "upstream_issue": false,
    "ops": 17,
-   "boot": null,
-   "parity": null
+   "boot": "ok",
+   "parity": "equal"
   },
   {
    "id": "inventory",
@@ -411,8 +411,8 @@
    "license": "MIT (root LICENSE)",
    "upstream_issue": false,
    "ops": 17,
-   "boot": null,
-   "parity": null
+   "boot": "ok",
+   "parity": "equal"
   },
   {
    "id": "assets",
@@ -433,8 +433,8 @@
    "license": "MIT (root LICENSE)",
    "upstream_issue": false,
    "ops": 22,
-   "boot": null,
-   "parity": null
+   "boot": "ok",
+   "parity": "equal"
   },
   {
    "id": "shifts",
@@ -444,8 +444,8 @@
    "license": "MIT (root LICENSE)",
    "upstream_issue": false,
    "ops": 17,
-   "boot": null,
-   "parity": null
+   "boot": "ok",
+   "parity": "equal"
   },
   {
    "id": "childcare",
@@ -455,8 +455,8 @@
    "license": "MIT (root LICENSE)",
    "upstream_issue": false,
    "ops": 39,
-   "boot": null,
-   "parity": null
+   "boot": "ok",
+   "parity": "equal"
   },
   {
    "id": "field-service",
@@ -466,8 +466,8 @@
    "license": "MIT (root LICENSE)",
    "upstream_issue": false,
    "ops": 40,
-   "boot": null,
-   "parity": null
+   "boot": "ok",
+   "parity": "equal"
   },
   {
    "id": "legal",
@@ -477,8 +477,8 @@
    "license": "MIT (root LICENSE)",
    "upstream_issue": false,
    "ops": 43,
-   "boot": null,
-   "parity": null
+   "boot": "ok",
+   "parity": "equal"
   },
   {
    "id": "fleet",
@@ -488,8 +488,8 @@
    "license": "MIT (root LICENSE)",
    "upstream_issue": false,
    "ops": 41,
-   "boot": null,
-   "parity": null
+   "boot": "ok",
+   "parity": "equal"
   },
   {
    "id": "property-management",
@@ -499,8 +499,8 @@
    "license": "MIT (root LICENSE)",
    "upstream_issue": false,
    "ops": 45,
-   "boot": null,
-   "parity": null
+   "boot": "ok",
+   "parity": "equal"
   },
   {
    "id": "api-client",
@@ -510,8 +510,8 @@
    "license": "MIT (root LICENSE)",
    "upstream_issue": false,
    "ops": 59,
-   "boot": null,
-   "parity": null
+   "boot": "ok",
+   "parity": "equal"
   },
   {
    "id": "chess",
@@ -532,8 +532,8 @@
    "license": "MIT (root LICENSE)",
    "upstream_issue": false,
    "ops": 27,
-   "boot": null,
-   "parity": null
+   "boot": "ok",
+   "parity": "equal"
   },
   {
    "id": "checkers",
@@ -543,8 +543,8 @@
    "license": "MIT (root LICENSE)",
    "upstream_issue": false,
    "ops": 21,
-   "boot": null,
-   "parity": null
+   "boot": "ok",
+   "parity": "equal"
   },
   {
    "id": "solitaire",
@@ -554,8 +554,8 @@
    "license": "MIT (root LICENSE)",
    "upstream_issue": false,
    "ops": 9,
-   "boot": null,
-   "parity": null
+   "boot": "ok",
+   "parity": "equal"
   },
   {
    "id": "sudoku",
@@ -565,8 +565,8 @@
    "license": "MIT (root LICENSE)",
    "upstream_issue": false,
    "ops": 39,
-   "boot": null,
-   "parity": null
+   "boot": "ok",
+   "parity": "equal"
   }
  ]
 }

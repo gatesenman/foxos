@@ -1,0 +1,363 @@
+{
+ "_comment": "Per-app locale support of the upstream Everything apps (scanned from the upstream source; spreadsheet verified in e2e US-55). FoxOS passes its language to every app through the Chromium locale (navigator.language / navigator.languages).",
+ "apps": {
+  "spreadsheet": {
+   "ui": [
+    "zh-CN",
+    "en-US"
+   ],
+   "formats": "follows",
+   "how": "upstream i18n (src/i18n, zh-Hans catalogs): ?lang= > in-app choice > navigator.languages; FoxOS sets the Chromium locale (--lang), so the UI follows FoxOS"
+  },
+  "documents": {
+   "ui": [
+    "en-US"
+   ],
+   "formats": "follows",
+   "how": "no UI translations upstream; dates / numbers use the browser locale (navigator.language), which FoxOS sets"
+  },
+  "presentation": {
+   "ui": [
+    "en-US"
+   ],
+   "formats": "follows",
+   "how": "no UI translations upstream; dates / numbers use the browser locale (navigator.language), which FoxOS sets"
+  },
+  "whiteboard": {
+   "ui": [
+    "en-US"
+   ],
+   "formats": "follows",
+   "how": "no UI translations upstream; dates / numbers use the browser locale (navigator.language), which FoxOS sets"
+  },
+  "pdf": {
+   "ui": [
+    "en-US"
+   ],
+   "formats": "follows",
+   "how": "no UI translations upstream; dates / numbers use the browser locale (navigator.language), which FoxOS sets"
+  },
+  "notes": {
+   "ui": [
+    "en-US"
+   ],
+   "formats": "follows",
+   "how": "no UI translations upstream; dates / numbers use the browser locale (navigator.language), which FoxOS sets"
+  },
+  "records": {
+   "ui": [
+    "en-US"
+   ],
+   "formats": "follows",
+   "how": "no UI translations upstream; dates / numbers use the browser locale (navigator.language), which FoxOS sets"
+  },
+  "meetings": {
+   "ui": [
+    "en-US"
+   ],
+   "formats": "follows",
+   "how": "no UI translations upstream; dates / numbers use the browser locale (navigator.language), which FoxOS sets"
+  },
+  "teamchat": {
+   "ui": [
+    "en-US"
+   ],
+   "formats": "follows",
+   "how": "no UI translations upstream; dates / numbers use the browser locale (navigator.language), which FoxOS sets"
+  },
+  "email": {
+   "ui": [
+    "en-US"
+   ],
+   "formats": "follows",
+   "how": "no UI translations upstream; dates / numbers use the browser locale (navigator.language), which FoxOS sets"
+  },
+  "contacts": {
+   "ui": [
+    "en-US"
+   ],
+   "formats": "follows",
+   "how": "no UI translations upstream; dates / numbers use the browser locale (navigator.language), which FoxOS sets"
+  },
+  "calendar": {
+   "ui": [
+    "en-US"
+   ],
+   "formats": "follows",
+   "how": "no UI translations upstream; dates / numbers use the browser locale (navigator.language), which FoxOS sets"
+  },
+  "signatures": {
+   "ui": [
+    "en-US"
+   ],
+   "formats": "follows",
+   "how": "no UI translations upstream; dates / numbers use the browser locale (navigator.language), which FoxOS sets"
+  },
+  "photo-studio": {
+   "ui": [
+    "en-US"
+   ],
+   "formats": "follows",
+   "how": "no UI translations upstream; dates / numbers use the browser locale (navigator.language), which FoxOS sets"
+  },
+  "video-studio": {
+   "ui": [
+    "en-US"
+   ],
+   "formats": "follows",
+   "how": "no UI translations upstream; dates / numbers use the browser locale (navigator.language), which FoxOS sets"
+  },
+  "vector-studio": {
+   "ui": [
+    "en-US"
+   ],
+   "formats": "follows",
+   "how": "no UI translations upstream; dates / numbers use the browser locale (navigator.language), which FoxOS sets"
+  },
+  "audio-studio": {
+   "ui": [
+    "en-US"
+   ],
+   "formats": "follows",
+   "how": "no UI translations upstream; dates / numbers use the browser locale (navigator.language), which FoxOS sets"
+  },
+  "music-studio": {
+   "ui": [
+    "en-US"
+   ],
+   "formats": "follows",
+   "how": "no UI translations upstream; dates / numbers use the browser locale (navigator.language), which FoxOS sets"
+  },
+  "3d": {
+   "ui": [
+    "en-US"
+   ],
+   "formats": "follows",
+   "how": "no UI translations upstream; dates / numbers use the browser locale (navigator.language), which FoxOS sets"
+  },
+  "cad": {
+   "ui": [
+    "en-US"
+   ],
+   "formats": "follows",
+   "how": "no UI translations upstream; dates / numbers use the browser locale (navigator.language), which FoxOS sets"
+  },
+  "parametric": {
+   "ui": [
+    "en-US"
+   ],
+   "formats": "follows",
+   "how": "no UI translations upstream; dates / numbers use the browser locale (navigator.language), which FoxOS sets"
+  },
+  "circuits": {
+   "ui": [
+    "en-US"
+   ],
+   "formats": "follows",
+   "how": "no UI translations upstream; dates / numbers use the browser locale (navigator.language), which FoxOS sets"
+  },
+  "building-design": {
+   "ui": [
+    "en-US"
+   ],
+   "formats": "follows",
+   "how": "no UI translations upstream; dates / numbers use the browser locale (navigator.language), which FoxOS sets"
+  },
+  "tasks": {
+   "ui": [
+    "en-US"
+   ],
+   "formats": "follows",
+   "how": "no UI translations upstream; dates / numbers use the browser locale (navigator.language), which FoxOS sets"
+  },
+  "projects": {
+   "ui": [
+    "en-US"
+   ],
+   "formats": "follows",
+   "how": "no UI translations upstream; dates / numbers use the browser locale (navigator.language), which FoxOS sets"
+  },
+  "wiki": {
+   "ui": [
+    "en-US"
+   ],
+   "formats": "follows",
+   "how": "no UI translations upstream; dates / numbers use the browser locale (navigator.language), which FoxOS sets"
+  },
+  "time-tracking": {
+   "ui": [
+    "en-US"
+   ],
+   "formats": "follows",
+   "how": "no UI translations upstream; dates / numbers use the browser locale (navigator.language), which FoxOS sets"
+  },
+  "survey": {
+   "ui": [
+    "en-US"
+   ],
+   "formats": "follows",
+   "how": "no UI translations upstream; dates / numbers use the browser locale (navigator.language), which FoxOS sets"
+  },
+  "accounting": {
+   "ui": [
+    "en-US"
+   ],
+   "formats": "follows",
+   "how": "no UI translations upstream; dates / numbers use the browser locale (navigator.language), which FoxOS sets"
+  },
+  "invoicing": {
+   "ui": [
+    "en-US"
+   ],
+   "formats": "follows",
+   "how": "no UI translations upstream; dates / numbers use the browser locale (navigator.language), which FoxOS sets"
+  },
+  "expense": {
+   "ui": [
+    "en-US"
+   ],
+   "formats": "follows",
+   "how": "no UI translations upstream; dates / numbers use the browser locale (navigator.language), which FoxOS sets"
+  },
+  "cap-table": {
+   "ui": [
+    "en-US"
+   ],
+   "formats": "en-US",
+   "how": "no UI translations upstream; dates / numbers are formatted in en-US by the app itself"
+  },
+  "crm": {
+   "ui": [
+    "en-US"
+   ],
+   "formats": "en-US",
+   "how": "no UI translations upstream; dates / numbers are formatted in en-US by the app itself"
+  },
+  "help-desk": {
+   "ui": [
+    "en-US"
+   ],
+   "formats": "follows",
+   "how": "no UI translations upstream; dates / numbers use the browser locale (navigator.language), which FoxOS sets"
+  },
+  "contracts": {
+   "ui": [
+    "en-US"
+   ],
+   "formats": "follows",
+   "how": "no UI translations upstream; dates / numbers use the browser locale (navigator.language), which FoxOS sets"
+  },
+  "pos": {
+   "ui": [
+    "en-US"
+   ],
+   "formats": "follows",
+   "how": "no UI translations upstream; dates / numbers use the browser locale (navigator.language), which FoxOS sets"
+  },
+  "inventory": {
+   "ui": [
+    "en-US"
+   ],
+   "formats": "follows",
+   "how": "no UI translations upstream; dates / numbers use the browser locale (navigator.language), which FoxOS sets"
+  },
+  "assets": {
+   "ui": [
+    "en-US"
+   ],
+   "formats": "none",
+   "how": "no UI translations and no locale-dependent formatting upstream"
+  },
+  "hiring": {
+   "ui": [
+    "en-US"
+   ],
+   "formats": "follows",
+   "how": "no UI translations upstream; dates / numbers use the browser locale (navigator.language), which FoxOS sets"
+  },
+  "shifts": {
+   "ui": [
+    "en-US"
+   ],
+   "formats": "follows",
+   "how": "no UI translations upstream; dates / numbers use the browser locale (navigator.language), which FoxOS sets"
+  },
+  "childcare": {
+   "ui": [
+    "en-US"
+   ],
+   "formats": "follows",
+   "how": "no UI translations upstream; dates / numbers use the browser locale (navigator.language), which FoxOS sets"
+  },
+  "field-service": {
+   "ui": [
+    "en-US"
+   ],
+   "formats": "follows",
+   "how": "no UI translations upstream; dates / numbers use the browser locale (navigator.language), which FoxOS sets"
+  },
+  "legal": {
+   "ui": [
+    "en-US"
+   ],
+   "formats": "follows",
+   "how": "no UI translations upstream; dates / numbers use the browser locale (navigator.language), which FoxOS sets"
+  },
+  "fleet": {
+   "ui": [
+    "en-US"
+   ],
+   "formats": "follows",
+   "how": "no UI translations upstream; dates / numbers use the browser locale (navigator.language), which FoxOS sets"
+  },
+  "property-management": {
+   "ui": [
+    "en-US"
+   ],
+   "formats": "follows",
+   "how": "no UI translations upstream; dates / numbers use the browser locale (navigator.language), which FoxOS sets"
+  },
+  "api-client": {
+   "ui": [
+    "en-US"
+   ],
+   "formats": "follows",
+   "how": "no UI translations upstream; dates / numbers use the browser locale (navigator.language), which FoxOS sets"
+  },
+  "chess": {
+   "ui": [
+    "en-US"
+   ],
+   "formats": "none",
+   "how": "no UI translations and no locale-dependent formatting upstream"
+  },
+  "backgammon": {
+   "ui": [
+    "en-US"
+   ],
+   "formats": "none",
+   "how": "no UI translations and no locale-dependent formatting upstream"
+  },
+  "checkers": {
+   "ui": [
+    "en-US"
+   ],
+   "formats": "none",
+   "how": "no UI translations and no locale-dependent formatting upstream"
+  },
+  "solitaire": {
+   "ui": [
+    "en-US"
+   ],
+   "formats": "none",
+   "how": "no UI translations and no locale-dependent formatting upstream"
+  },
+  "sudoku": {
+   "ui": [
+    "en-US"
+   ],
+   "formats": "follows",
+   "how": "no UI translations upstream; dates / numbers use the browser locale (navigator.language), which FoxOS sets"
+  }
+ }
+}
