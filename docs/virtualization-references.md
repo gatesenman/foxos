@@ -19,7 +19,9 @@
 | Landlock（Linux 内核 LSM） | 内核的一部分（GPL-2.0）；只调用其系统调用接口 | 无特权进程自己限制文件系统 / 网络访问 | 轻量沙箱的文件规则：除工作空间和临时目录外只读。本机内核 ABI 版本 6 可用 |
 | firejail（netblue30/firejail） | GPL-2.0（`COPYING`） | setuid 沙箱 + 应用配置文件 | 只借鉴思路：按应用的配置文件（profile） |
 | libkrun / krunvm（libkrun/*） | Apache-2.0（`LICENSE`） | 库形式的 KVM 微虚拟机（Linux KVM / macOS HVF） | “完整隔离档”在有 KVM 的机器上的候选；镜像即根文件系统目录的思路 |
-| Firecracker（firecracker-microvm/firecracker） | Apache-2.0（`LICENSE`） | KVM 微虚拟机，REST API 控制 | 用版本化的 API 控制后端的做法（见 environment-provider-protocol） |
+| Firecracker（firecracker-microvm/firecracker） | Apache-2.0（`LICENSE`） | KVM 微虚拟机，REST API 控制 | 用版本化的 API 控制后端的做法（见 environment-provider-protocol）；因没有显示设备，不作为带桌面的完整环境 VMM |
+| cloud-hypervisor（cloud-hypervisor/cloud-hypervisor） | Apache-2.0（`LICENSE`） | Rust VMM，KVM，virtio-blk / net / fs / console，virtio-gpu 路径，可跑 Linux 与 Windows 来宾 | **狐狸OS 操作系统上完整虚拟机的 VMM**：随 ISO 提供官方或构建脚本编出的二进制，保留 NOTICE；来宾桌面进狐狸OS 窗口。不把上游源码整树拷进仓库 |
+| wayvnc（any1/wayvnc） | ISC（`LICENSE`） | 把 Wayland 会话以 VNC/RFB 提供出去 | 完整虚拟机来宾桌面的过渡显示通道（经 vsock）；宿主窗口是狐狸OS 自己的，随后用 virtio-gpu 替换 |
 
 ## macOS
 
@@ -54,6 +56,6 @@
 ## 结论（已写入 docs/environments.md 的“隔离级别与平台选择”）
 
 - 每个智能体会话可选两档隔离：**轻量**（进程级沙箱，启动快，与宿主共享系统）和**完整**（独立发行版 / 虚拟机）
-- Linux：轻量 = 用户命名空间 + 只读宿主根 + Landlock + seccomp；完整 = 现有的命名空间 + overlayfs + pivot_root + cgroup / rlimit + seccomp 环境
+- Linux：轻量 = 用户命名空间 + 只读宿主根 + Landlock + seccomp；完整 = 有 KVM 时用 cloud-hypervisor 跑带桌面的虚拟机（见 [os.md](os.md)、[environments.md](environments.md)），否则用已有的命名空间 + overlayfs + pivot_root + cgroup / rlimit + seccomp 环境
 - Windows：轻量 = 受限令牌 + Job Object（后续 AppContainer）；完整 = WSL2 发行版、Windows Sandbox、Hyper-V 虚拟机
 - macOS：轻量 = Seatbelt（sandbox-exec 生成策略）；完整 = Virtualization.framework Linux 虚拟机

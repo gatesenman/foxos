@@ -1,13 +1,18 @@
 # 环境：狐狸OS 自带的隔离运行环境
 
 狐狸OS 自己实现了一层隔离环境，不依赖 Docker、Podman、LXC、VirtualBox、QEMU。
-三个平台各用系统自带的机制：
+使用体验靠近 `docker pull` / `docker run`（`foxos env pull` / `run` / `start` / `stop` / `exec` / `desktop-attach`），实现完全是另一套。
+
+在 **狐狸OS 操作系统（本仓库打出的 Linux ISO）** 上，环境是宿主机的一等功能，见 [os.md](os.md) 第 5 节。完整档的 Linux / Windows 来宾走内核自带的 KVM + 我们选用的 VMM（见下），来宾桌面显示为狐狸OS 的一个窗口。轻量档与已有的命名空间运行时仍然保留。
+
+在 Windows / macOS 伴侣程序里，三个平台各用系统自带的机制：
 
 | 平台 | 后端 ID | 实现 | 状态 |
 |---|---|---|---|
-| Linux | `linux-ns` | 自研运行时 `foxos/envs/linux.py`：用户命名空间（无特权）+ mount / pid / uts / ipc / 可选 net 命名空间、overlayfs、pivot_root、seccomp、cgroup v2（可委派时）或 rlimit | 在本机（内核 6.12，普通用户 uid 1000）端到端测试通过 |
-| Windows | `wsl2` | 驱动系统自带的 WSL2（`wsl.exe --import/--exec/--terminate/--export/--unregister`），进程限制用 Job Object | 有代码和单元测试（命令构造、路径换算、输出解析），**未在 Windows 实机上测试** |
-| macOS | `macos-vz` | Swift 小程序 `FoxVZ.swift` 调用 Virtualization.framework（Linux 内核引导、virtio 磁盘 / 网络 NAT / virtio-fs 共享工作空间 / 控制台） | 有代码和单元测试（配置生成、命令构造），**未在 Mac 实机上测试** |
+| 狐狸OS / Linux 宿主 | `linux-kvm` | 内核 KVM + cloud-hypervisor（Apache-2.0，随系统提供二进制并保留 NOTICE，不把源码整树拷进仓库）：完整 Linux / Windows 虚拟机，virtio-blk / virtio-net / virtio-fs（工作空间）、来宾桌面进狐狸OS 窗口 | 设计已定；第一张 ISO 起提供该功能，至少一条 Linux 来宾路径，随后补齐目录与显示通道 |
+| 狐狸OS / Linux 宿主 | `linux-ns` | 自研运行时 `foxos/envs/linux.py`：用户命名空间（无特权）+ mount / pid / uts / ipc / 可选 net 命名空间、overlayfs、pivot_root、seccomp、cgroup v2（可委派时）或 rlimit | 在本机（内核 6.12，普通用户 uid 1000）端到端测试通过；无 KVM 时仍可用 |
+| Windows 伴侣 | `wsl2` | 驱动系统自带的 WSL2（`wsl.exe --import/--exec/--terminate/--export/--unregister`），进程限制用 Job Object | 有代码和单元测试（命令构造、路径换算、输出解析），**未在 Windows 实机上测试** |
+| macOS 伴侣 | `macos-vz` | Swift 小程序 `FoxVZ.swift` 调用 Virtualization.framework（Linux 内核引导、virtio 磁盘 / 网络 NAT / virtio-fs 共享工作空间 / 控制台） | 有代码和单元测试（配置生成、命令构造），**未在 Mac 实机上测试** |
 
 ## 三个入口，同一套命令
 
@@ -20,10 +25,12 @@
 |---|---|---|
 | `images` | 官方镜像目录与本地镜像 | 左下“镜像” |
 | `pull IMAGE [--sha256]` | 下载镜像（目录 ID、https 地址或 .foxenv 文件）并校验 sha256 | 镜像页“下载” / “从地址安装” |
+| `run NAME --image [-- desktop-attach]` | 没有镜像就 `pull`，然后创建并启动（用法靠近 `docker run`）；可直接附上来宾桌面窗口 | “运行” |
 | `create NAME --image --network host\|none --workspace-mode rw\|ro\|none [--memory-mb --cpus --pids]` | 创建环境 | “新建” |
 | `list` / `info NAME` | 列表 / 详情（配置、快照、操作、cgroup 状态） | 左侧列表 / 详情页 |
 | `start` / `stop` / `restart` | 启停 | 快捷操作 |
 | `exec NAME -- CMD…` | 在环境里执行命令（默认工作目录 /workspace），返回退出码、stdout、stderr | 自定义操作的“运行” |
+| `desktop-attach NAME` | 把完整虚拟机的来宾桌面作为狐狸OS 的一个窗口打开，之后智能体可对来宾做与宿主相同的窗口操作 | “打开桌面” |
 | `shell NAME` | 交互式 shell | “终端”（在内置终端窗口里打开） |
 | `clone NAME NEW` | 复制可写层与设置 | “克隆” |
 | `snapshot NAME [--label]` / `restore NAME SNAPSHOT` | 快照 / 恢复（需先停止） | “快照”页 |
@@ -82,12 +89,42 @@
 | 档位 | 含义 | Linux | Windows | macOS |
 | --- | --- | --- | --- | --- |
 | **轻量**（进程级沙箱，[`foxos sandbox`](sandbox.md)） | 启动快、与宿主共享系统与已装工具；限制文件读写范围、网络与危险系统调用 | Landlock（文件、TCP、信号作用域）+ seccomp | 受限令牌（低完整性）或 AppContainer + 作业对象 | Seatbelt（sandbox-exec，按会话生成策略） |
-| **完整**（独立系统） | 独立根文件系统 / 虚拟机，可随意装软件、快照、导出 | `linux-ns` 提供者（本文前面各节） | `wsl2`（Linux 发行版）、`windows-sandbox`、`hyperv` | `macos-vz`（Virtualization.framework Linux 虚拟机） |
+| **完整**（独立系统 / 虚拟机） | 独立根文件系统或带桌面的虚拟机，可随意装软件、快照、导出；完整虚拟机的桌面显示为狐狸OS 窗口 | 有 KVM 时：`linux-kvm`（KVM + cloud-hypervisor）；否则：`linux-ns`（本文后面各节，命名空间，不是带桌面的独立电脑） | `wsl2`（Linux 发行版）、`windows-sandbox`、`hyperv` | `macos-vz`（Virtualization.framework Linux 虚拟机） |
 
 - 每个智能体会话在面板“运行位置”里选：宿主、轻量沙箱、轻量沙箱（不联网），或某个运行中的完整环境。
-- 不依赖 Docker / Podman / LXC / VirtualBox / QEMU；只用操作系统自带机制。GPL / LGPL / AGPL 项目只借鉴思路，不复制代码。
-- **状态**：完整档的 Linux 后端已实现并端到端测试；Windows 三个提供者有代码与单元测试，未在 Windows 硬件上验证；
+- 不依赖 Docker / Podman / LXC / VirtualBox / QEMU。完整虚拟机用的是内核 KVM（Linux 已有的功能）和 Apache-2.0 的 cloud-hypervisor（随系统提供，保留 NOTICE）。GPL / LGPL / AGPL 项目只借鉴思路，不复制代码。
+- **状态**：`linux-ns` 已实现并端到端测试；`linux-kvm` 随操作系统 ISO 落地（第一张 ISO 至少一条 Linux 来宾路径，目录其余条目随后补）。Windows 三个伴侣提供者有代码与单元测试，未在 Windows 硬件上验证；
   轻量档的 Linux 实现已完成并端到端测试（US-52）；macOS（Seatbelt）与 Windows（受限令牌 / AppContainer + 作业对象）有代码与单元测试，未在实机上验证。详见 [sandbox.md](sandbox.md)。
+
+
+## 狐狸OS 宿主上的完整虚拟机（KVM）
+
+这一节只适用于狐狸OS 操作系统（或一般 Linux 宿主）。Windows / macOS 伴侣仍用上一节的 WSL2 / Hyper-V / Virtualization.framework。
+
+### 为什么是 KVM + cloud-hypervisor
+
+- **KVM** 是 Linux 内核的一部分（`/dev/kvm`），不是我们附带的虚拟机软件。这与 WSL2 之于 Windows 相同：用操作系统已经提供的虚拟化接口。
+- **VMM** 必须能给来宾挂显示器，来宾桌面才能成为狐狸OS 的窗口。Apache-2.0 的 [cloud-hypervisor](https://github.com/cloud-hypervisor/cloud-hypervisor) 支持 virtio-blk、virtio-net、virtio-fs、virtio-console，并有 virtio-gpu 路径，也支持 Windows 来宾。同许可的 Firecracker 面向无界面微服务，不作为完整桌面环境的 VMM。QEMU / VirtualBox 不进入产品。
+- 二进制由 `scripts/os/` 在构建 ISO 时获取或编译，放进系统的 `/usr/lib/foxos/vmm/`，NOTICE 写明版本、来源与 Apache-2.0。不把上游源码整树拷进本仓库。
+- 没有 VMX/SVM，或宿主自己已是虚拟机且未打开嵌套虚拟化时：`foxos env doctor` 与 `run` 给出明确错误（如何在 BIOS / Hyper-V 里打开虚拟化，或改用 `linux-ns`），不静默失败。
+
+### 来宾桌面怎么变成狐狸OS 的窗口
+
+目标：人在狐狸OS 桌面上看到一个普通窗口，里面是来宾的完整桌面；`foxos env desktop-attach` 打开这个窗口后，智能体对来宾里的应用使用与宿主相同的操作语法。
+
+1. **目标路径**：virtio-gpu（以及 virtio-input）把来宾帧缓冲呈现在一个 GTK 窗口里，工作空间通过 virtio-fs 挂到来宾的 `/workspace`。
+2. **第一版可用的过渡路径**：来宾里的 Wayland 会话（如 labwc）通过 vsock 上的 [wayvnc](https://github.com/any1/wayvnc)（ISC）提供显示；宿主用狐狸OS 自己的小窗口显示，不引入 QEMU。随后用 virtio-gpu 替换，命令不变。
+
+### Windows 与 macOS 来宾
+
+- **Windows**：同一套 `linux-kvm`。镜像只能是用户给定的 ISO，或从微软评估中心 / 开发者渠道按目录条目下载的评估版、开发版（下载后校验 sha256，把许可条款记在目录与界面里）。**狐狸OS 的 GitHub Release 不包含任何 Windows ISO。** 来宾里安装 virtio 驱动与工具后，桌面同样进狐狸OS 窗口。首次启动可自动跑狐狸OS Windows 伴侣安装程序，以便来宾内也有 `foxos` 与 Everything。
+- **macOS**：Apple 只允许在 Apple 硬件上的 macOS 中虚拟化 macOS。狐狸OS ISO（PC）的目录里该条目可见但禁用，说明即此句。伴侣程序在 Mac 上运行时，走已有的 `macos-vz`；在 Mac 上虚拟化 macOS 本身属于后续工作，不在本 ISO 的范围里。
+
+### 来宾里的桌面与 Everything
+
+每个受支持的 Linux 来宾镜像应预装或在首次启动时安装：一个桌面会话、Everything 应用（在线获取，不把 AGPL 源码打进来宾镜像仓库）、以及 `foxos` CLI / MCP。这样在来宾里运行的智能体与在宿主上使用同一套操作。Windows 来宾通过首次启动自动安装伴侣程序达到同一效果。
+
+第一张 ISO 不要求目录里每一个发行版都已预构建，但目录要可见、可一键安装（官方根文件系统或 ISO + 校验和），并且至少一条 Linux 来宾桌面路径在 KVM 可用时能跑通。
 
 ## 一键安装系统（Windows 重点）
 
@@ -102,7 +139,7 @@
 - **Windows 来宾**：Windows Sandbox（生成 .wsb，把工作空间映射到沙箱桌面，可设网络 / 内存 / 只读）；Hyper-V 虚拟机（用户 ISO，或从微软评估中心下载的
   Windows 11 企业版 / Windows Server 2025 评估版 ISO；`New-VM` 第 2 代、vTPM、DVD 引导、`vmconnect`）。两者都检测 Windows 版本（家庭版不支持）与可选功能，可一键启用。
 - **macOS 来宾**：列出但禁用，说明原因（Apple 许可只允许在 Apple 硬件上的 macOS 中虚拟化 macOS）。
-- 在 Linux 宿主上，同一目录中的 Linux 条目由 `linux-ns` 提供者安装（端到端测试 US-50 真实安装 Alpine）。
+- 在狐狸OS / Linux 宿主上，同一目录中的 Linux 条目优先由 `linux-kvm` 安装为带桌面的完整虚拟机（KVM 可用时）；否则由 `linux-ns` 安装为命名空间环境（端到端测试 US-50 真实安装 Alpine）。Windows 来宾只在 `linux-kvm` 下提供。macOS 来宾条目在此宿主上禁用（见上节）。
 
 ## 在环境里运行智能体
 
