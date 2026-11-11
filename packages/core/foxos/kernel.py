@@ -181,7 +181,7 @@ def register(cmd: Command) -> Command:
 
 def load_apps() -> None:
     # 导入即注册
-    from .apps import docs, env, everything, sandbox, sheets, slides, system  # noqa: F401
+    from .apps import desktop, docs, env, everything, sandbox, sheets, slides, system  # noqa: F401
 
 
 def find(command_id: str) -> Command:

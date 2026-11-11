@@ -127,8 +127,14 @@ ACP：在狐狸OS 桌面右侧面板启动的 ACP 智能体（Claude Code ACP、
 
 ## 9. 环境
 
-`foxos env images|pull|create|list|info|start|stop|restart|exec|shell|clone|snapshot|restore|export|import|delete|mount|limits|stats|logs|action add|action run`，
-MCP 工具 `env_*`。详见 docs/environments.md。
+`foxos env images|pull|create|run|list|info|start|stop|restart|exec|shell|clone|snapshot|restore|export|import|delete|mount|limits|stats|logs|action add|action run|desktop-attach|providers|doctor|catalog|install`，
+MCP 工具 `env_*`。完整虚拟机用 `linux-kvm`（内核 KVM + cloud-hypervisor）。详见 docs/environments.md。
+
+## 10. 真实桌面会话
+
+在狐狸OS 的 labwc 会话里，智能体对**真实窗口**使用 `foxos desktop …` 或 `foxos session …`（同一组动词，MCP 为 `desktop_*` / `session_*`）：
+列出 / 聚焦 / 移动 / 关闭窗口，启动应用，键入、点击、截图，以及人工接管（`takeover` / `resume`，与 `foxos control pause` 同一状态）。
+这些不是 Electron 里画的矩形。操作清单见 docs/operations/desktop.md。人能做的，智能体用同一套命令也能做，效果相同。
 """
 
 
