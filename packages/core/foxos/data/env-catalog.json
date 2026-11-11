@@ -1,994 +1,1028 @@
 {
- "format": "foxos-env-catalog/1",
- "version": "2026.11.10",
- "generated_from": [
-  "https://raw.githubusercontent.com/microsoft/WSL/master/distributions/DistributionInfo.json",
-  "https://dl.rockylinux.org",
-  "https://dl-cdn.alpinelinux.org",
-  "https://images.linuxcontainers.org"
- ],
- "entries": [
-  {
-   "id": "wsl-ubuntu-26.04",
-   "name": "Ubuntu 26.04 LTS",
-   "family": "ubuntu",
-   "guest_os": "linux",
-   "arch": [
-    "x86_64",
-    "aarch64"
-   ],
-   "providers": [
-    "wsl2",
-    "linux-ns"
-   ],
-   "source": {
-    "kind": "rootfs",
-    "url": "https://releases.ubuntu.com/26.04.1/ubuntu-26.04.1-wsl-amd64.wsl",
-    "sha256": "48d56724b5c8e60f24893e83e73bbb58c60b3ca22fba3da977075420acd54104",
-    "wsl_name": "Ubuntu-26.04",
-    "origin": "microsoft/WSL DistributionInfo.json",
-    "arm64": {
-     "url": "https://cdimages.ubuntu.com/releases/26.04.1/release/ubuntu-26.04.1-wsl-arm64.wsl",
-     "sha256": "c7d893d7ccb291009e6096c5a946937337b6fd4c426f11b6541f6cd2bf894f7d"
+  "format": "foxos-env-catalog/1",
+  "version": "2026.11.10",
+  "generated_from": [
+    "https://raw.githubusercontent.com/microsoft/WSL/master/distributions/DistributionInfo.json",
+    "https://dl.rockylinux.org",
+    "https://dl-cdn.alpinelinux.org",
+    "https://images.linuxcontainers.org"
+  ],
+  "entries": [
+    {
+      "id": "wsl-ubuntu-26.04",
+      "name": "Ubuntu 26.04 LTS",
+      "family": "ubuntu",
+      "guest_os": "linux",
+      "arch": [
+        "x86_64",
+        "aarch64"
+      ],
+      "providers": [
+        "wsl2",
+        "linux-kvm",
+        "linux-ns"
+      ],
+      "source": {
+        "kind": "rootfs",
+        "url": "https://releases.ubuntu.com/26.04.1/ubuntu-26.04.1-wsl-amd64.wsl",
+        "sha256": "48d56724b5c8e60f24893e83e73bbb58c60b3ca22fba3da977075420acd54104",
+        "wsl_name": "Ubuntu-26.04",
+        "origin": "microsoft/WSL DistributionInfo.json",
+        "arm64": {
+          "url": "https://cdimages.ubuntu.com/releases/26.04.1/release/ubuntu-26.04.1-wsl-arm64.wsl",
+          "sha256": "c7d893d7ccb291009e6096c5a946937337b6fd4c426f11b6541f6cd2bf894f7d"
+        }
+      },
+      "default": true
+    },
+    {
+      "id": "wsl-ubuntu-24.04",
+      "name": "Ubuntu 24.04 LTS",
+      "family": "ubuntu",
+      "guest_os": "linux",
+      "arch": [
+        "x86_64",
+        "aarch64"
+      ],
+      "providers": [
+        "wsl2",
+        "linux-kvm",
+        "linux-ns"
+      ],
+      "source": {
+        "kind": "rootfs",
+        "url": "https://releases.ubuntu.com/24.04.5/ubuntu-24.04.5-wsl-amd64.wsl",
+        "sha256": "bb415d824822c4b878125729af451a5d18fb13d1cf5cbed9a7393ad64ac6039e",
+        "wsl_name": "Ubuntu-24.04",
+        "origin": "microsoft/WSL DistributionInfo.json",
+        "arm64": {
+          "url": "https://cdimages.ubuntu.com/releases/24.04.5/release/ubuntu-24.04.5-wsl-arm64.wsl",
+          "sha256": "74478b5024d9047397ba79d17c27f73caf85ada4988f88cffc2892d65e6a806b"
+        }
+      },
+      "default": false
+    },
+    {
+      "id": "wsl-ubuntu-22.04",
+      "name": "Ubuntu 22.04 LTS",
+      "family": "ubuntu",
+      "guest_os": "linux",
+      "arch": [
+        "x86_64",
+        "aarch64"
+      ],
+      "providers": [
+        "wsl2",
+        "linux-kvm",
+        "linux-ns"
+      ],
+      "source": {
+        "kind": "rootfs",
+        "url": "https://releases.ubuntu.com/jammy/ubuntu-22.04.5-wsl-amd64.wsl",
+        "sha256": "4499c4fe257f2fc83145b429ce211a0a43fd590e70d6261ede616210947d9f8f",
+        "wsl_name": "Ubuntu-22.04",
+        "origin": "microsoft/WSL DistributionInfo.json",
+        "arm64": {
+          "url": "https://cdimage.ubuntu.com/ubuntu/releases/jammy/release/ubuntu-22.04.5-wsl-arm64.wsl",
+          "sha256": "3e2d77b92cf9dad1095eaebcad96feba2781007f5f52431cd4fe6fff63b201e5"
+        }
+      },
+      "default": false
+    },
+    {
+      "id": "wsl-ubuntu-20.04",
+      "name": "Ubuntu 20.04 LTS",
+      "family": "ubuntu",
+      "guest_os": "linux",
+      "arch": [
+        "x86_64",
+        "aarch64"
+      ],
+      "providers": [
+        "wsl2",
+        "linux-kvm",
+        "linux-ns"
+      ],
+      "source": {
+        "kind": "rootfs",
+        "url": "https://releases.ubuntu.com/focal/ubuntu-20.04.6-wsl-amd64.wsl",
+        "sha256": "a9073f3726aab9661076506603706eadf284b80a791dec3adfde8e1989906fa4",
+        "wsl_name": "Ubuntu-20.04",
+        "origin": "microsoft/WSL DistributionInfo.json",
+        "arm64": {
+          "url": "https://cdimage.ubuntu.com/ubuntu/releases/focal/release/ubuntu-20.04.6-wsl-arm64.wsl",
+          "sha256": "16174012f9a3f6fb10729e648fd8c7dfa205d039d76902e4c28de746f85bf3c8"
+        }
+      },
+      "default": false
+    },
+    {
+      "id": "wsl-opensuse-tumbleweed",
+      "name": "openSUSE Tumbleweed",
+      "family": "opensuse",
+      "guest_os": "linux",
+      "arch": [
+        "x86_64",
+        "aarch64"
+      ],
+      "providers": [
+        "wsl2",
+        "linux-kvm",
+        "linux-ns"
+      ],
+      "source": {
+        "kind": "rootfs",
+        "url": "https://github.com/openSUSE/WSL-instarball/releases/download/v20261103.0/openSUSE-Tumbleweed-20261102.x86_64-3.329-Build3.329.wsl",
+        "sha256": "8dc758983be62edd24ff55f5f0c99df211925b48d73b33765acc01b1967ce314",
+        "wsl_name": "openSUSE-Tumbleweed",
+        "origin": "microsoft/WSL DistributionInfo.json",
+        "arm64": {
+          "url": "https://github.com/openSUSE/WSL-instarball/releases/download/v20261103.0/openSUSE-Tumbleweed-20261102.aarch64-4.273-Build4.273.wsl",
+          "sha256": "66997b5b1376ee488c1ea5ead74f841224f3fa00c42167ef5763fecd23adb01a"
+        }
+      },
+      "default": false
+    },
+    {
+      "id": "wsl-opensuse-leap-16.1",
+      "name": "openSUSE Leap 16.1",
+      "family": "opensuse",
+      "guest_os": "linux",
+      "arch": [
+        "x86_64",
+        "aarch64"
+      ],
+      "providers": [
+        "wsl2",
+        "linux-kvm",
+        "linux-ns"
+      ],
+      "source": {
+        "kind": "rootfs",
+        "url": "https://github.com/openSUSE/WSL-instarball/releases/download/v20261103.0/openSUSE-Leap-16.1-16.1.x86_64-26.34-Build26.34.wsl",
+        "sha256": "f37cb553c0eef8727585c4b52e6b4013fe95a31e2ea24da9cf15881026f09dba",
+        "wsl_name": "openSUSE-Leap-16.1",
+        "origin": "microsoft/WSL DistributionInfo.json",
+        "arm64": {
+          "url": "https://github.com/openSUSE/WSL-instarball/releases/download/v20261103.0/openSUSE-Leap-16.1-16.1.aarch64-26.34-Build26.34.wsl",
+          "sha256": "15e7b13350875719ac743c541112f71707307bbe308fdf87629ac23edfd8160d"
+        }
+      },
+      "default": false
+    },
+    {
+      "id": "wsl-rlcplus-9",
+      "name": "Rocky Linux Plus 9 (CIQ)",
+      "family": "rocky",
+      "guest_os": "linux",
+      "arch": [
+        "x86_64",
+        "aarch64"
+      ],
+      "providers": [
+        "wsl2",
+        "linux-kvm",
+        "linux-ns"
+      ],
+      "source": {
+        "kind": "rootfs",
+        "url": "https://github.com/ctrliq/rlcplus-wsl-images/releases/download/v20260812/RLCPlus-9-WSL-9-20260812.0.x86_64.wsl",
+        "sha256": "202ba60ac09205b3bb574f69bcad69c5c2463fd243019fc1067437a4bc9af939",
+        "wsl_name": "RLCPlus-9",
+        "origin": "microsoft/WSL DistributionInfo.json",
+        "arm64": {
+          "url": "https://github.com/ctrliq/rlcplus-wsl-images/releases/download/v20260812/RLCPlus-9-WSL-9-20260812.0.aarch64.wsl",
+          "sha256": "5b24a384fdfbf004e75441d5e7ade4ef9579e52d58223741b195c41075a28b1b"
+        }
+      },
+      "default": false
+    },
+    {
+      "id": "wsl-rlcplus-10",
+      "name": "Rocky Linux Plus 10 (CIQ)",
+      "family": "rocky",
+      "guest_os": "linux",
+      "arch": [
+        "x86_64",
+        "aarch64"
+      ],
+      "providers": [
+        "wsl2",
+        "linux-kvm",
+        "linux-ns"
+      ],
+      "source": {
+        "kind": "rootfs",
+        "url": "https://github.com/ctrliq/rlcplus-wsl-images/releases/download/v20260812/RLCPlus-10-WSL-10-20260812.0.x86_64.wsl",
+        "sha256": "2b181172c9aa3160a803d5ecaee517d237f59b41eb21848ee60699b89d5b8d84",
+        "wsl_name": "RLCPlus-10",
+        "origin": "microsoft/WSL DistributionInfo.json",
+        "arm64": {
+          "url": "https://github.com/ctrliq/rlcplus-wsl-images/releases/download/v20260812/RLCPlus-10-WSL-10-20260812.0.aarch64.wsl",
+          "sha256": "b87c820232b2ce1b76be3643be615c4fee7ebc6bb31de4ac222d52b58d9cdd67"
+        }
+      },
+      "default": false
+    },
+    {
+      "id": "wsl-suse-linux-enterprise-15-sp7",
+      "name": "SUSE Linux Enterprise 15 SP7",
+      "family": "sles",
+      "guest_os": "linux",
+      "arch": [
+        "x86_64"
+      ],
+      "providers": [
+        "wsl2",
+        "linux-kvm",
+        "linux-ns"
+      ],
+      "source": {
+        "kind": "rootfs",
+        "url": "https://github.com/SUSE/WSL-instarball/releases/download/v20260902.0/SUSE-Linux-Enterprise-15-SP7-15.7.x86_64-32.57-Build32.57.wsl",
+        "sha256": "a683af7e33d49f04aa7633bd85cdaab1a048d3789c0fcf64c019ac5c88f09754",
+        "wsl_name": "SUSE-Linux-Enterprise-15-SP7",
+        "origin": "microsoft/WSL DistributionInfo.json"
+      },
+      "default": false
+    },
+    {
+      "id": "wsl-suse-linux-enterprise-16.0",
+      "name": "SUSE Linux Enterprise 16.0",
+      "family": "sles",
+      "guest_os": "linux",
+      "arch": [
+        "x86_64"
+      ],
+      "providers": [
+        "wsl2",
+        "linux-kvm",
+        "linux-ns"
+      ],
+      "source": {
+        "kind": "rootfs",
+        "url": "https://github.com/SUSE/WSL-instarball/releases/download/v20260805.0/SUSE-Linux-Enterprise-16.0-16.0.x86_64-1.131-Build1.131.wsl",
+        "sha256": "c80dce10e2f7fd0bc0b4e7f3e489c36c60159f3a4a32adb74a36d0a4924b1460",
+        "wsl_name": "SUSE-Linux-Enterprise-16.0",
+        "origin": "microsoft/WSL DistributionInfo.json"
+      },
+      "default": false
+    },
+    {
+      "id": "wsl-kali-linux",
+      "name": "Kali Linux Rolling",
+      "family": "kali",
+      "guest_os": "linux",
+      "arch": [
+        "x86_64",
+        "aarch64"
+      ],
+      "providers": [
+        "wsl2",
+        "linux-kvm",
+        "linux-ns"
+      ],
+      "source": {
+        "kind": "rootfs",
+        "url": "https://kali.download/wsl-images/kali-2026.2/kali-linux-2026.2-wsl-rootfs-amd64.wsl",
+        "sha256": "1b172389e9109e9bb0c3d1fa18eda078271484dbcef8dbee4aab8b1f369466c6",
+        "wsl_name": "kali-linux",
+        "origin": "microsoft/WSL DistributionInfo.json",
+        "arm64": {
+          "url": "https://kali.download/wsl-images/kali-2026.2/kali-linux-2026.2-wsl-rootfs-arm64.wsl",
+          "sha256": "0ebc7b7ed93b20ed787b27e217e408179f6b816be505e56dd0db65ce5e73f5f0"
+        }
+      },
+      "default": false
+    },
+    {
+      "id": "wsl-debian",
+      "name": "Debian GNU/Linux",
+      "family": "debian",
+      "guest_os": "linux",
+      "arch": [
+        "x86_64",
+        "aarch64"
+      ],
+      "providers": [
+        "wsl2",
+        "linux-kvm",
+        "linux-ns"
+      ],
+      "source": {
+        "kind": "rootfs",
+        "url": "https://salsa.debian.org/debian/WSL/-/jobs/9606244/artifacts/raw/Debian_WSL_AMD64_v1.26.0.0.wsl",
+        "sha256": "5ec7dc68216e75d1d4d4761474e99d8461a98d316537110314b137122a879e0f",
+        "wsl_name": "Debian",
+        "origin": "microsoft/WSL DistributionInfo.json",
+        "arm64": {
+          "url": "https://salsa.debian.org/debian/WSL/-/jobs/9606244/artifacts/raw/Debian_WSL_ARM64_v1.26.0.0.wsl",
+          "sha256": "09120df4fadc36fb2a0f7298e197785e6f599f12aaf95d43cba07a8ac7fb316b"
+        }
+      },
+      "default": false
+    },
+    {
+      "id": "wsl-almalinux-8",
+      "name": "AlmaLinux OS 8",
+      "family": "almalinux",
+      "guest_os": "linux",
+      "arch": [
+        "x86_64",
+        "aarch64"
+      ],
+      "providers": [
+        "wsl2",
+        "linux-kvm",
+        "linux-ns"
+      ],
+      "source": {
+        "kind": "rootfs",
+        "url": "https://github.com/AlmaLinux/wsl-images/releases/download/v8.10.20260311.0/AlmaLinux-8.10_x64_20260311.0.wsl",
+        "sha256": "77a662e2947a1482087e3edf22595d62121ad8011385152f9209734adac87941",
+        "wsl_name": "AlmaLinux-8",
+        "origin": "microsoft/WSL DistributionInfo.json",
+        "arm64": {
+          "url": "https://github.com/AlmaLinux/wsl-images/releases/download/v8.10.20260311.0/AlmaLinux-8.10_ARM64_20260311.0.wsl",
+          "sha256": "7fb2e5d25cbba9bfeef1f9e1420fa4e30b671264aa92a015adf8f2901cdfb97f"
+        }
+      },
+      "default": false
+    },
+    {
+      "id": "wsl-almalinux-9",
+      "name": "AlmaLinux OS 9",
+      "family": "almalinux",
+      "guest_os": "linux",
+      "arch": [
+        "x86_64",
+        "aarch64"
+      ],
+      "providers": [
+        "wsl2",
+        "linux-kvm",
+        "linux-ns"
+      ],
+      "source": {
+        "kind": "rootfs",
+        "url": "https://github.com/AlmaLinux/wsl-images/releases/download/v9.8.20260526.0/AlmaLinux-9.8_x64_20260526.0.wsl",
+        "sha256": "4a4377d451a4ede509e61ab4e4870f9654bc99beb7a0b40c8b54e71a6752cd8e",
+        "wsl_name": "AlmaLinux-9",
+        "origin": "microsoft/WSL DistributionInfo.json",
+        "arm64": {
+          "url": "https://github.com/AlmaLinux/wsl-images/releases/download/v9.8.20260526.0/AlmaLinux-9.8_ARM64_20260526.0.wsl",
+          "sha256": "b94a298f207782d37c0e2c019e7f95f52a94f933ad702b8479340bcfde68c4b3"
+        }
+      },
+      "default": false
+    },
+    {
+      "id": "wsl-almalinux-kitten-10",
+      "name": "AlmaLinux OS Kitten 10",
+      "family": "almalinux",
+      "guest_os": "linux",
+      "arch": [
+        "x86_64",
+        "aarch64"
+      ],
+      "providers": [
+        "wsl2",
+        "linux-kvm",
+        "linux-ns"
+      ],
+      "source": {
+        "kind": "rootfs",
+        "url": "https://github.com/AlmaLinux/wsl-images/releases/download/v10-kitten.20260330.0/AlmaLinux-Kitten-10_x64_20260330.0.wsl",
+        "sha256": "ada0914f1331fddfa626eaffd2e21288cc35b1c9c7a07d466f488d36b9b90cca",
+        "wsl_name": "AlmaLinux-Kitten-10",
+        "origin": "microsoft/WSL DistributionInfo.json",
+        "arm64": {
+          "url": "https://github.com/AlmaLinux/wsl-images/releases/download/v10-kitten.20260330.0/AlmaLinux-Kitten-10_ARM64_20260330.0.wsl",
+          "sha256": "597bd7717d796550f85a3e9307f75fdd73d6c18a71b58898dd43a0dbca3da0fc"
+        }
+      },
+      "default": false
+    },
+    {
+      "id": "wsl-almalinux-10",
+      "name": "AlmaLinux OS 10",
+      "family": "almalinux",
+      "guest_os": "linux",
+      "arch": [
+        "x86_64",
+        "aarch64"
+      ],
+      "providers": [
+        "wsl2",
+        "linux-kvm",
+        "linux-ns"
+      ],
+      "source": {
+        "kind": "rootfs",
+        "url": "https://github.com/AlmaLinux/wsl-images/releases/download/v10.2.20260526.0/AlmaLinux-10.2_x64_20260526.0.wsl",
+        "sha256": "55e75d87bad292bdb14c8c57bc35aaa5bd253e4f565321dd196c3f25b692be48",
+        "wsl_name": "AlmaLinux-10",
+        "origin": "microsoft/WSL DistributionInfo.json",
+        "arm64": {
+          "url": "https://github.com/AlmaLinux/wsl-images/releases/download/v10.2.20260526.0/AlmaLinux-10.2_ARM64_20260526.0.wsl",
+          "sha256": "d3b3ecc7b58ee3cceaa656de04175e81df2e7969efb2e22aba95c9ff1f430949"
+        }
+      },
+      "default": false
+    },
+    {
+      "id": "wsl-archlinux",
+      "name": "Arch Linux",
+      "family": "arch",
+      "guest_os": "linux",
+      "arch": [
+        "x86_64"
+      ],
+      "providers": [
+        "wsl2",
+        "linux-kvm",
+        "linux-ns"
+      ],
+      "source": {
+        "kind": "rootfs",
+        "url": "https://fastly.mirror.pkgbuild.com/wsl/2026.11.01.182233/archlinux-2026.11.01.182233.wsl",
+        "sha256": "f8b934f77d0afcbe6e3730d6e4f378e8ee3c90d51479395004e1d92fe3b3c9b1",
+        "wsl_name": "archlinux",
+        "origin": "microsoft/WSL DistributionInfo.json"
+      },
+      "default": false
+    },
+    {
+      "id": "wsl-fedoralinux-45",
+      "name": "Fedora Linux 45",
+      "family": "fedora",
+      "guest_os": "linux",
+      "arch": [
+        "x86_64",
+        "aarch64"
+      ],
+      "providers": [
+        "wsl2",
+        "linux-kvm",
+        "linux-ns"
+      ],
+      "source": {
+        "kind": "rootfs",
+        "url": "https://download.fedoraproject.org/pub/fedora/linux/releases/45/Container/x86_64/images/Fedora-WSL-Base-45-1.4.x86_64.wsl",
+        "sha256": "d20e476140d4cb121b85b1ad2b8fd6bf9fc2750140a7212ad4051ae3c6bd1e23",
+        "wsl_name": "FedoraLinux-45",
+        "origin": "microsoft/WSL DistributionInfo.json",
+        "arm64": {
+          "url": "https://download.fedoraproject.org/pub/fedora/linux/releases/45/Container/aarch64/images/Fedora-WSL-Base-45-1.4.aarch64.wsl",
+          "sha256": "9a25779562113c10ce8f480857217d52f6a386cee2301752d2a34a320e8fd35c"
+        }
+      },
+      "default": false
+    },
+    {
+      "id": "wsl-fedoralinux-44",
+      "name": "Fedora Linux 44",
+      "family": "fedora",
+      "guest_os": "linux",
+      "arch": [
+        "x86_64",
+        "aarch64"
+      ],
+      "providers": [
+        "wsl2",
+        "linux-kvm",
+        "linux-ns"
+      ],
+      "source": {
+        "kind": "rootfs",
+        "url": "https://download.fedoraproject.org/pub/fedora/linux/releases/44/Container/x86_64/images/Fedora-WSL-Base-44-1.7.x86_64.wsl",
+        "sha256": "2e5b153ba4b639952bf546be577fc19b832fe8944caa7de342b32f10da7d319a",
+        "wsl_name": "FedoraLinux-44",
+        "origin": "microsoft/WSL DistributionInfo.json",
+        "arm64": {
+          "url": "https://download.fedoraproject.org/pub/fedora/linux/releases/44/Container/aarch64/images/Fedora-WSL-Base-44-1.7.aarch64.wsl",
+          "sha256": "1a3220262dc918b07d08410278205fb35e92c28a53455382028eea1a980476ee"
+        }
+      },
+      "default": false
+    },
+    {
+      "id": "wsl-elxr",
+      "name": "eLxr 12.12.0.0 GNU/Linux",
+      "family": "elxr",
+      "guest_os": "linux",
+      "arch": [
+        "x86_64"
+      ],
+      "providers": [
+        "wsl2",
+        "linux-kvm",
+        "linux-ns"
+      ],
+      "source": {
+        "kind": "rootfs",
+        "url": "https://gitlab.com/api/v4/projects/68007430/packages/generic/wsl/12.12.0.0/eLxr_WSL_AMD64_12.12.0.0.wsl",
+        "sha256": "f94e0c44be51550478100ea150b80535f955bf87487d1b964f4636d97478c05d",
+        "wsl_name": "eLxr",
+        "origin": "microsoft/WSL DistributionInfo.json"
+      },
+      "default": false
+    },
+    {
+      "id": "wsl-azurelinux-4",
+      "name": "Azure Linux 4",
+      "family": "azurelinux",
+      "guest_os": "linux",
+      "arch": [
+        "x86_64",
+        "aarch64"
+      ],
+      "providers": [
+        "wsl2",
+        "linux-kvm",
+        "linux-ns"
+      ],
+      "source": {
+        "kind": "rootfs",
+        "url": "https://osrelease.download.prss.microsoft.com/pr/download/a/AzureLinux-4-x86_64.wsl",
+        "sha256": "72475ebd5c2f985a34443b23365ae9cb9f4ebd5b8c6b12c96b98b5c28c7eed16",
+        "wsl_name": "AzureLinux-4",
+        "origin": "microsoft/WSL DistributionInfo.json",
+        "arm64": {
+          "url": "https://osrelease.download.prss.microsoft.com/pr/download/a/AzureLinux-4-aarch64.wsl",
+          "sha256": "a724b08b408a30b6d3a733ba93cbda70155c63d7d7c3934d2a23a5a5549a0070"
+        }
+      },
+      "default": false
+    },
+    {
+      "id": "wsl-oraclelinux-7-9",
+      "name": "Oracle Linux 7.9",
+      "family": "oracle",
+      "guest_os": "linux",
+      "arch": [
+        "x86_64"
+      ],
+      "providers": [
+        "wsl2"
+      ],
+      "source": {
+        "kind": "wsl-store",
+        "wsl_name": "OracleLinux_7_9",
+        "origin": "microsoft/WSL DistributionInfo.json（应用商店包）"
+      }
+    },
+    {
+      "id": "wsl-oraclelinux-8-10",
+      "name": "Oracle Linux 8.10",
+      "family": "oracle",
+      "guest_os": "linux",
+      "arch": [
+        "x86_64"
+      ],
+      "providers": [
+        "wsl2"
+      ],
+      "source": {
+        "kind": "wsl-store",
+        "wsl_name": "OracleLinux_8_10",
+        "origin": "microsoft/WSL DistributionInfo.json（应用商店包）"
+      }
+    },
+    {
+      "id": "wsl-oraclelinux-9-5",
+      "name": "Oracle Linux 9.5",
+      "family": "oracle",
+      "guest_os": "linux",
+      "arch": [
+        "x86_64"
+      ],
+      "providers": [
+        "wsl2"
+      ],
+      "source": {
+        "kind": "wsl-store",
+        "wsl_name": "OracleLinux_9_5",
+        "origin": "microsoft/WSL DistributionInfo.json（应用商店包）"
+      }
+    },
+    {
+      "id": "wsl-suse-linux-enterprise-15-sp6",
+      "name": "SUSE Linux Enterprise 15 SP6",
+      "family": "sles",
+      "guest_os": "linux",
+      "arch": [
+        "x86_64"
+      ],
+      "providers": [
+        "wsl2"
+      ],
+      "source": {
+        "kind": "wsl-store",
+        "wsl_name": "SUSE-Linux-Enterprise-15-SP6",
+        "origin": "microsoft/WSL DistributionInfo.json（应用商店包）"
+      }
+    },
+    {
+      "id": "rocky-9",
+      "name": "Rocky Linux 9",
+      "family": "rocky",
+      "guest_os": "linux",
+      "arch": [
+        "x86_64"
+      ],
+      "providers": [
+        "wsl2",
+        "linux-kvm",
+        "linux-ns"
+      ],
+      "source": {
+        "kind": "rootfs",
+        "url": "https://dl.rockylinux.org/pub/rocky/9/images/x86_64/Rocky-9-WSL-Base.latest.x86_64.wsl",
+        "sha256_url": "https://dl.rockylinux.org/pub/rocky/9/images/x86_64/Rocky-9-WSL-Base.latest.x86_64.wsl.CHECKSUM",
+        "origin": "Rocky Linux 官方 WSL 镜像"
+      }
+    },
+    {
+      "id": "rocky-10",
+      "name": "Rocky Linux 10",
+      "family": "rocky",
+      "guest_os": "linux",
+      "arch": [
+        "x86_64"
+      ],
+      "providers": [
+        "wsl2",
+        "linux-kvm",
+        "linux-ns"
+      ],
+      "source": {
+        "kind": "rootfs",
+        "url": "https://dl.rockylinux.org/pub/rocky/10/images/x86_64/Rocky-10-WSL-Base.latest.x86_64.wsl",
+        "sha256_url": "https://dl.rockylinux.org/pub/rocky/10/images/x86_64/Rocky-10-WSL-Base.latest.x86_64.wsl.CHECKSUM",
+        "origin": "Rocky Linux 官方 WSL 镜像"
+      }
+    },
+    {
+      "id": "alpine",
+      "name": "Alpine Linux（最新稳定版）",
+      "family": "alpine",
+      "guest_os": "linux",
+      "arch": [
+        "x86_64",
+        "aarch64"
+      ],
+      "providers": [
+        "wsl2",
+        "linux-kvm",
+        "linux-ns"
+      ],
+      "source": {
+        "kind": "alpine",
+        "branch": "latest-stable",
+        "origin": "Alpine 官方 minirootfs（latest-releases.yaml 提供 sha256）"
+      }
+    },
+    {
+      "id": "lxc-oracle-9",
+      "name": "Oracle Linux 9",
+      "family": "oracle",
+      "guest_os": "linux",
+      "arch": [
+        "x86_64",
+        "aarch64"
+      ],
+      "providers": [
+        "wsl2",
+        "linux-kvm",
+        "linux-ns"
+      ],
+      "source": {
+        "kind": "lxc",
+        "server": "https://images.linuxcontainers.org",
+        "distro": "oracle",
+        "release": "9",
+        "variant": "default",
+        "origin": "LXC 镜像服务器（每日构建，安装时解析最新构建并按 SHA256SUMS 校验）"
+      }
+    },
+    {
+      "id": "lxc-oracle-10",
+      "name": "Oracle Linux 10",
+      "family": "oracle",
+      "guest_os": "linux",
+      "arch": [
+        "x86_64",
+        "aarch64"
+      ],
+      "providers": [
+        "wsl2",
+        "linux-kvm",
+        "linux-ns"
+      ],
+      "source": {
+        "kind": "lxc",
+        "server": "https://images.linuxcontainers.org",
+        "distro": "oracle",
+        "release": "10",
+        "variant": "default",
+        "origin": "LXC 镜像服务器（每日构建，安装时解析最新构建并按 SHA256SUMS 校验）"
+      }
+    },
+    {
+      "id": "lxc-rockylinux-9",
+      "name": "Rocky Linux 9（LXC 构建）",
+      "family": "rocky",
+      "guest_os": "linux",
+      "arch": [
+        "x86_64",
+        "aarch64"
+      ],
+      "providers": [
+        "wsl2",
+        "linux-kvm",
+        "linux-ns"
+      ],
+      "source": {
+        "kind": "lxc",
+        "server": "https://images.linuxcontainers.org",
+        "distro": "rockylinux",
+        "release": "9",
+        "variant": "default",
+        "origin": "LXC 镜像服务器（每日构建，安装时解析最新构建并按 SHA256SUMS 校验）"
+      }
+    },
+    {
+      "id": "lxc-debian-trixie",
+      "name": "Debian 13 trixie（LXC 构建）",
+      "family": "debian",
+      "guest_os": "linux",
+      "arch": [
+        "x86_64",
+        "aarch64"
+      ],
+      "providers": [
+        "wsl2",
+        "linux-kvm",
+        "linux-ns"
+      ],
+      "source": {
+        "kind": "lxc",
+        "server": "https://images.linuxcontainers.org",
+        "distro": "debian",
+        "release": "trixie",
+        "variant": "default",
+        "origin": "LXC 镜像服务器（每日构建，安装时解析最新构建并按 SHA256SUMS 校验）"
+      }
+    },
+    {
+      "id": "lxc-ubuntu-noble",
+      "name": "Ubuntu 24.04（LXC 构建）",
+      "family": "ubuntu",
+      "guest_os": "linux",
+      "arch": [
+        "x86_64",
+        "aarch64"
+      ],
+      "providers": [
+        "wsl2",
+        "linux-kvm",
+        "linux-ns"
+      ],
+      "source": {
+        "kind": "lxc",
+        "server": "https://images.linuxcontainers.org",
+        "distro": "ubuntu",
+        "release": "noble",
+        "variant": "default",
+        "origin": "LXC 镜像服务器（每日构建，安装时解析最新构建并按 SHA256SUMS 校验）"
+      }
+    },
+    {
+      "id": "lxc-alpine-3.24",
+      "name": "Alpine 3.24（LXC 构建）",
+      "family": "alpine",
+      "guest_os": "linux",
+      "arch": [
+        "x86_64",
+        "aarch64"
+      ],
+      "providers": [
+        "wsl2",
+        "linux-kvm",
+        "linux-ns"
+      ],
+      "source": {
+        "kind": "lxc",
+        "server": "https://images.linuxcontainers.org",
+        "distro": "alpine",
+        "release": "3.24",
+        "variant": "default",
+        "origin": "LXC 镜像服务器（每日构建，安装时解析最新构建并按 SHA256SUMS 校验）"
+      }
+    },
+    {
+      "id": "lxc-archlinux-current",
+      "name": "Arch Linux（LXC 构建）",
+      "family": "arch",
+      "guest_os": "linux",
+      "arch": [
+        "x86_64",
+        "aarch64"
+      ],
+      "providers": [
+        "wsl2",
+        "linux-kvm",
+        "linux-ns"
+      ],
+      "source": {
+        "kind": "lxc",
+        "server": "https://images.linuxcontainers.org",
+        "distro": "archlinux",
+        "release": "current",
+        "variant": "default",
+        "origin": "LXC 镜像服务器（每日构建，安装时解析最新构建并按 SHA256SUMS 校验）"
+      }
+    },
+    {
+      "id": "lxc-opensuse-tumbleweed",
+      "name": "openSUSE Tumbleweed（LXC 构建）",
+      "family": "opensuse",
+      "guest_os": "linux",
+      "arch": [
+        "x86_64",
+        "aarch64"
+      ],
+      "providers": [
+        "wsl2",
+        "linux-kvm",
+        "linux-ns"
+      ],
+      "source": {
+        "kind": "lxc",
+        "server": "https://images.linuxcontainers.org",
+        "distro": "opensuse",
+        "release": "tumbleweed",
+        "variant": "default",
+        "origin": "LXC 镜像服务器（每日构建，安装时解析最新构建并按 SHA256SUMS 校验）"
+      }
+    },
+    {
+      "id": "lxc-fedora-45",
+      "name": "Fedora 45（LXC 构建）",
+      "family": "fedora",
+      "guest_os": "linux",
+      "arch": [
+        "x86_64",
+        "aarch64"
+      ],
+      "providers": [
+        "wsl2",
+        "linux-kvm",
+        "linux-ns"
+      ],
+      "source": {
+        "kind": "lxc",
+        "server": "https://images.linuxcontainers.org",
+        "distro": "fedora",
+        "release": "45",
+        "variant": "default",
+        "origin": "LXC 镜像服务器（每日构建，安装时解析最新构建并按 SHA256SUMS 校验）"
+      }
+    },
+    {
+      "id": "custom-rootfs",
+      "name": "自定义根文件系统（URL 或本地 .tar / .tar.gz / .tar.xz / .wsl）",
+      "family": "custom",
+      "guest_os": "linux",
+      "arch": [
+        "x86_64",
+        "aarch64"
+      ],
+      "providers": [
+        "wsl2",
+        "linux-kvm",
+        "linux-ns"
+      ],
+      "source": {
+        "kind": "custom",
+        "needs": [
+          "url"
+        ],
+        "origin": "用户提供，可附带 --sha256"
+      }
+    },
+    {
+      "id": "windows-sandbox",
+      "name": "Windows Sandbox（一次性 Windows 桌面）",
+      "family": "windows",
+      "guest_os": "windows",
+      "arch": [
+        "x86_64"
+      ],
+      "providers": [
+        "windows-sandbox"
+      ],
+      "source": {
+        "kind": "host",
+        "origin": "Windows 10/11 专业版、企业版、教育版自带"
+      },
+      "requires": {
+        "editions": "Pro/Enterprise/Education",
+        "feature": "Containers-DisposableClientVM"
+      }
+    },
+    {
+      "id": "hyperv-windows-11-eval",
+      "name": "Windows 11 企业版评估版（Hyper-V 虚拟机，90 天）",
+      "family": "windows",
+      "guest_os": "windows",
+      "arch": [
+        "x86_64"
+      ],
+      "providers": [
+        "hyperv"
+      ],
+      "tpm": true,
+      "source": {
+        "kind": "iso",
+        "needs": [
+          "iso"
+        ],
+        "download_page": "https://www.microsoft.com/en-us/evalcenter/download-windows-11-enterprise",
+        "origin": "微软评估中心（需在网页上登记后下载 ISO）"
+      },
+      "requires": {
+        "editions": "Pro/Enterprise/Education",
+        "feature": "Microsoft-Hyper-V-All",
+        "memory_mb": 4096
+      }
+    },
+    {
+      "id": "hyperv-windows-server-2025-eval",
+      "name": "Windows Server 2025 评估版（Hyper-V 虚拟机，180 天）",
+      "family": "windows",
+      "guest_os": "windows",
+      "arch": [
+        "x86_64"
+      ],
+      "providers": [
+        "hyperv"
+      ],
+      "source": {
+        "kind": "iso",
+        "needs": [
+          "iso"
+        ],
+        "download_page": "https://www.microsoft.com/en-us/evalcenter/download-windows-server-2025",
+        "origin": "微软评估中心"
+      },
+      "requires": {
+        "editions": "Pro/Enterprise/Education",
+        "feature": "Microsoft-Hyper-V-All",
+        "memory_mb": 2048
+      }
+    },
+    {
+      "id": "hyperv-custom-iso",
+      "name": "从 ISO 安装（Windows 或 Linux，Hyper-V 虚拟机）",
+      "family": "custom",
+      "guest_os": "any",
+      "arch": [
+        "x86_64"
+      ],
+      "providers": [
+        "hyperv"
+      ],
+      "secure_boot": false,
+      "source": {
+        "kind": "iso",
+        "needs": [
+          "iso"
+        ],
+        "origin": "用户提供的 ISO"
+      },
+      "requires": {
+        "editions": "Pro/Enterprise/Education",
+        "feature": "Microsoft-Hyper-V-All"
+      }
+    },
+    {
+      "id": "macos-guest",
+      "name": "macOS 虚拟机",
+      "family": "macos",
+      "guest_os": "macos",
+      "arch": [
+        "aarch64"
+      ],
+      "providers": [
+        "macos-guest"
+      ],
+      "disabled": true,
+      "reason": "Apple 的软件许可只允许在 Apple 硬件上运行的 macOS 中虚拟化 macOS；Windows 与 Linux 上不提供。在 Apple 芯片 Mac 上的支持尚未实现。",
+      "source": {
+        "kind": "none"
+      }
     }
-   },
-   "default": true
-  },
-  {
-   "id": "wsl-ubuntu-24.04",
-   "name": "Ubuntu 24.04 LTS",
-   "family": "ubuntu",
-   "guest_os": "linux",
-   "arch": [
-    "x86_64",
-    "aarch64"
-   ],
-   "providers": [
-    "wsl2",
-    "linux-ns"
-   ],
-   "source": {
-    "kind": "rootfs",
-    "url": "https://releases.ubuntu.com/24.04.5/ubuntu-24.04.5-wsl-amd64.wsl",
-    "sha256": "bb415d824822c4b878125729af451a5d18fb13d1cf5cbed9a7393ad64ac6039e",
-    "wsl_name": "Ubuntu-24.04",
-    "origin": "microsoft/WSL DistributionInfo.json",
-    "arm64": {
-     "url": "https://cdimages.ubuntu.com/releases/24.04.5/release/ubuntu-24.04.5-wsl-arm64.wsl",
-     "sha256": "74478b5024d9047397ba79d17c27f73caf85ada4988f88cffc2892d65e6a806b"
-    }
-   },
-   "default": false
-  },
-  {
-   "id": "wsl-ubuntu-22.04",
-   "name": "Ubuntu 22.04 LTS",
-   "family": "ubuntu",
-   "guest_os": "linux",
-   "arch": [
-    "x86_64",
-    "aarch64"
-   ],
-   "providers": [
-    "wsl2",
-    "linux-ns"
-   ],
-   "source": {
-    "kind": "rootfs",
-    "url": "https://releases.ubuntu.com/jammy/ubuntu-22.04.5-wsl-amd64.wsl",
-    "sha256": "4499c4fe257f2fc83145b429ce211a0a43fd590e70d6261ede616210947d9f8f",
-    "wsl_name": "Ubuntu-22.04",
-    "origin": "microsoft/WSL DistributionInfo.json",
-    "arm64": {
-     "url": "https://cdimage.ubuntu.com/ubuntu/releases/jammy/release/ubuntu-22.04.5-wsl-arm64.wsl",
-     "sha256": "3e2d77b92cf9dad1095eaebcad96feba2781007f5f52431cd4fe6fff63b201e5"
-    }
-   },
-   "default": false
-  },
-  {
-   "id": "wsl-ubuntu-20.04",
-   "name": "Ubuntu 20.04 LTS",
-   "family": "ubuntu",
-   "guest_os": "linux",
-   "arch": [
-    "x86_64",
-    "aarch64"
-   ],
-   "providers": [
-    "wsl2",
-    "linux-ns"
-   ],
-   "source": {
-    "kind": "rootfs",
-    "url": "https://releases.ubuntu.com/focal/ubuntu-20.04.6-wsl-amd64.wsl",
-    "sha256": "a9073f3726aab9661076506603706eadf284b80a791dec3adfde8e1989906fa4",
-    "wsl_name": "Ubuntu-20.04",
-    "origin": "microsoft/WSL DistributionInfo.json",
-    "arm64": {
-     "url": "https://cdimage.ubuntu.com/ubuntu/releases/focal/release/ubuntu-20.04.6-wsl-arm64.wsl",
-     "sha256": "16174012f9a3f6fb10729e648fd8c7dfa205d039d76902e4c28de746f85bf3c8"
-    }
-   },
-   "default": false
-  },
-  {
-   "id": "wsl-opensuse-tumbleweed",
-   "name": "openSUSE Tumbleweed",
-   "family": "opensuse",
-   "guest_os": "linux",
-   "arch": [
-    "x86_64",
-    "aarch64"
-   ],
-   "providers": [
-    "wsl2",
-    "linux-ns"
-   ],
-   "source": {
-    "kind": "rootfs",
-    "url": "https://github.com/openSUSE/WSL-instarball/releases/download/v20261103.0/openSUSE-Tumbleweed-20261102.x86_64-3.329-Build3.329.wsl",
-    "sha256": "8dc758983be62edd24ff55f5f0c99df211925b48d73b33765acc01b1967ce314",
-    "wsl_name": "openSUSE-Tumbleweed",
-    "origin": "microsoft/WSL DistributionInfo.json",
-    "arm64": {
-     "url": "https://github.com/openSUSE/WSL-instarball/releases/download/v20261103.0/openSUSE-Tumbleweed-20261102.aarch64-4.273-Build4.273.wsl",
-     "sha256": "66997b5b1376ee488c1ea5ead74f841224f3fa00c42167ef5763fecd23adb01a"
-    }
-   },
-   "default": false
-  },
-  {
-   "id": "wsl-opensuse-leap-16.1",
-   "name": "openSUSE Leap 16.1",
-   "family": "opensuse",
-   "guest_os": "linux",
-   "arch": [
-    "x86_64",
-    "aarch64"
-   ],
-   "providers": [
-    "wsl2",
-    "linux-ns"
-   ],
-   "source": {
-    "kind": "rootfs",
-    "url": "https://github.com/openSUSE/WSL-instarball/releases/download/v20261103.0/openSUSE-Leap-16.1-16.1.x86_64-26.34-Build26.34.wsl",
-    "sha256": "f37cb553c0eef8727585c4b52e6b4013fe95a31e2ea24da9cf15881026f09dba",
-    "wsl_name": "openSUSE-Leap-16.1",
-    "origin": "microsoft/WSL DistributionInfo.json",
-    "arm64": {
-     "url": "https://github.com/openSUSE/WSL-instarball/releases/download/v20261103.0/openSUSE-Leap-16.1-16.1.aarch64-26.34-Build26.34.wsl",
-     "sha256": "15e7b13350875719ac743c541112f71707307bbe308fdf87629ac23edfd8160d"
-    }
-   },
-   "default": false
-  },
-  {
-   "id": "wsl-rlcplus-9",
-   "name": "Rocky Linux Plus 9 (CIQ)",
-   "family": "rocky",
-   "guest_os": "linux",
-   "arch": [
-    "x86_64",
-    "aarch64"
-   ],
-   "providers": [
-    "wsl2",
-    "linux-ns"
-   ],
-   "source": {
-    "kind": "rootfs",
-    "url": "https://github.com/ctrliq/rlcplus-wsl-images/releases/download/v20260812/RLCPlus-9-WSL-9-20260812.0.x86_64.wsl",
-    "sha256": "202ba60ac09205b3bb574f69bcad69c5c2463fd243019fc1067437a4bc9af939",
-    "wsl_name": "RLCPlus-9",
-    "origin": "microsoft/WSL DistributionInfo.json",
-    "arm64": {
-     "url": "https://github.com/ctrliq/rlcplus-wsl-images/releases/download/v20260812/RLCPlus-9-WSL-9-20260812.0.aarch64.wsl",
-     "sha256": "5b24a384fdfbf004e75441d5e7ade4ef9579e52d58223741b195c41075a28b1b"
-    }
-   },
-   "default": false
-  },
-  {
-   "id": "wsl-rlcplus-10",
-   "name": "Rocky Linux Plus 10 (CIQ)",
-   "family": "rocky",
-   "guest_os": "linux",
-   "arch": [
-    "x86_64",
-    "aarch64"
-   ],
-   "providers": [
-    "wsl2",
-    "linux-ns"
-   ],
-   "source": {
-    "kind": "rootfs",
-    "url": "https://github.com/ctrliq/rlcplus-wsl-images/releases/download/v20260812/RLCPlus-10-WSL-10-20260812.0.x86_64.wsl",
-    "sha256": "2b181172c9aa3160a803d5ecaee517d237f59b41eb21848ee60699b89d5b8d84",
-    "wsl_name": "RLCPlus-10",
-    "origin": "microsoft/WSL DistributionInfo.json",
-    "arm64": {
-     "url": "https://github.com/ctrliq/rlcplus-wsl-images/releases/download/v20260812/RLCPlus-10-WSL-10-20260812.0.aarch64.wsl",
-     "sha256": "b87c820232b2ce1b76be3643be615c4fee7ebc6bb31de4ac222d52b58d9cdd67"
-    }
-   },
-   "default": false
-  },
-  {
-   "id": "wsl-suse-linux-enterprise-15-sp7",
-   "name": "SUSE Linux Enterprise 15 SP7",
-   "family": "sles",
-   "guest_os": "linux",
-   "arch": [
-    "x86_64"
-   ],
-   "providers": [
-    "wsl2",
-    "linux-ns"
-   ],
-   "source": {
-    "kind": "rootfs",
-    "url": "https://github.com/SUSE/WSL-instarball/releases/download/v20260902.0/SUSE-Linux-Enterprise-15-SP7-15.7.x86_64-32.57-Build32.57.wsl",
-    "sha256": "a683af7e33d49f04aa7633bd85cdaab1a048d3789c0fcf64c019ac5c88f09754",
-    "wsl_name": "SUSE-Linux-Enterprise-15-SP7",
-    "origin": "microsoft/WSL DistributionInfo.json"
-   },
-   "default": false
-  },
-  {
-   "id": "wsl-suse-linux-enterprise-16.0",
-   "name": "SUSE Linux Enterprise 16.0",
-   "family": "sles",
-   "guest_os": "linux",
-   "arch": [
-    "x86_64"
-   ],
-   "providers": [
-    "wsl2",
-    "linux-ns"
-   ],
-   "source": {
-    "kind": "rootfs",
-    "url": "https://github.com/SUSE/WSL-instarball/releases/download/v20260805.0/SUSE-Linux-Enterprise-16.0-16.0.x86_64-1.131-Build1.131.wsl",
-    "sha256": "c80dce10e2f7fd0bc0b4e7f3e489c36c60159f3a4a32adb74a36d0a4924b1460",
-    "wsl_name": "SUSE-Linux-Enterprise-16.0",
-    "origin": "microsoft/WSL DistributionInfo.json"
-   },
-   "default": false
-  },
-  {
-   "id": "wsl-kali-linux",
-   "name": "Kali Linux Rolling",
-   "family": "kali",
-   "guest_os": "linux",
-   "arch": [
-    "x86_64",
-    "aarch64"
-   ],
-   "providers": [
-    "wsl2",
-    "linux-ns"
-   ],
-   "source": {
-    "kind": "rootfs",
-    "url": "https://kali.download/wsl-images/kali-2026.2/kali-linux-2026.2-wsl-rootfs-amd64.wsl",
-    "sha256": "1b172389e9109e9bb0c3d1fa18eda078271484dbcef8dbee4aab8b1f369466c6",
-    "wsl_name": "kali-linux",
-    "origin": "microsoft/WSL DistributionInfo.json",
-    "arm64": {
-     "url": "https://kali.download/wsl-images/kali-2026.2/kali-linux-2026.2-wsl-rootfs-arm64.wsl",
-     "sha256": "0ebc7b7ed93b20ed787b27e217e408179f6b816be505e56dd0db65ce5e73f5f0"
-    }
-   },
-   "default": false
-  },
-  {
-   "id": "wsl-debian",
-   "name": "Debian GNU/Linux",
-   "family": "debian",
-   "guest_os": "linux",
-   "arch": [
-    "x86_64",
-    "aarch64"
-   ],
-   "providers": [
-    "wsl2",
-    "linux-ns"
-   ],
-   "source": {
-    "kind": "rootfs",
-    "url": "https://salsa.debian.org/debian/WSL/-/jobs/9606244/artifacts/raw/Debian_WSL_AMD64_v1.26.0.0.wsl",
-    "sha256": "5ec7dc68216e75d1d4d4761474e99d8461a98d316537110314b137122a879e0f",
-    "wsl_name": "Debian",
-    "origin": "microsoft/WSL DistributionInfo.json",
-    "arm64": {
-     "url": "https://salsa.debian.org/debian/WSL/-/jobs/9606244/artifacts/raw/Debian_WSL_ARM64_v1.26.0.0.wsl",
-     "sha256": "09120df4fadc36fb2a0f7298e197785e6f599f12aaf95d43cba07a8ac7fb316b"
-    }
-   },
-   "default": false
-  },
-  {
-   "id": "wsl-almalinux-8",
-   "name": "AlmaLinux OS 8",
-   "family": "almalinux",
-   "guest_os": "linux",
-   "arch": [
-    "x86_64",
-    "aarch64"
-   ],
-   "providers": [
-    "wsl2",
-    "linux-ns"
-   ],
-   "source": {
-    "kind": "rootfs",
-    "url": "https://github.com/AlmaLinux/wsl-images/releases/download/v8.10.20260311.0/AlmaLinux-8.10_x64_20260311.0.wsl",
-    "sha256": "77a662e2947a1482087e3edf22595d62121ad8011385152f9209734adac87941",
-    "wsl_name": "AlmaLinux-8",
-    "origin": "microsoft/WSL DistributionInfo.json",
-    "arm64": {
-     "url": "https://github.com/AlmaLinux/wsl-images/releases/download/v8.10.20260311.0/AlmaLinux-8.10_ARM64_20260311.0.wsl",
-     "sha256": "7fb2e5d25cbba9bfeef1f9e1420fa4e30b671264aa92a015adf8f2901cdfb97f"
-    }
-   },
-   "default": false
-  },
-  {
-   "id": "wsl-almalinux-9",
-   "name": "AlmaLinux OS 9",
-   "family": "almalinux",
-   "guest_os": "linux",
-   "arch": [
-    "x86_64",
-    "aarch64"
-   ],
-   "providers": [
-    "wsl2",
-    "linux-ns"
-   ],
-   "source": {
-    "kind": "rootfs",
-    "url": "https://github.com/AlmaLinux/wsl-images/releases/download/v9.8.20260526.0/AlmaLinux-9.8_x64_20260526.0.wsl",
-    "sha256": "4a4377d451a4ede509e61ab4e4870f9654bc99beb7a0b40c8b54e71a6752cd8e",
-    "wsl_name": "AlmaLinux-9",
-    "origin": "microsoft/WSL DistributionInfo.json",
-    "arm64": {
-     "url": "https://github.com/AlmaLinux/wsl-images/releases/download/v9.8.20260526.0/AlmaLinux-9.8_ARM64_20260526.0.wsl",
-     "sha256": "b94a298f207782d37c0e2c019e7f95f52a94f933ad702b8479340bcfde68c4b3"
-    }
-   },
-   "default": false
-  },
-  {
-   "id": "wsl-almalinux-kitten-10",
-   "name": "AlmaLinux OS Kitten 10",
-   "family": "almalinux",
-   "guest_os": "linux",
-   "arch": [
-    "x86_64",
-    "aarch64"
-   ],
-   "providers": [
-    "wsl2",
-    "linux-ns"
-   ],
-   "source": {
-    "kind": "rootfs",
-    "url": "https://github.com/AlmaLinux/wsl-images/releases/download/v10-kitten.20260330.0/AlmaLinux-Kitten-10_x64_20260330.0.wsl",
-    "sha256": "ada0914f1331fddfa626eaffd2e21288cc35b1c9c7a07d466f488d36b9b90cca",
-    "wsl_name": "AlmaLinux-Kitten-10",
-    "origin": "microsoft/WSL DistributionInfo.json",
-    "arm64": {
-     "url": "https://github.com/AlmaLinux/wsl-images/releases/download/v10-kitten.20260330.0/AlmaLinux-Kitten-10_ARM64_20260330.0.wsl",
-     "sha256": "597bd7717d796550f85a3e9307f75fdd73d6c18a71b58898dd43a0dbca3da0fc"
-    }
-   },
-   "default": false
-  },
-  {
-   "id": "wsl-almalinux-10",
-   "name": "AlmaLinux OS 10",
-   "family": "almalinux",
-   "guest_os": "linux",
-   "arch": [
-    "x86_64",
-    "aarch64"
-   ],
-   "providers": [
-    "wsl2",
-    "linux-ns"
-   ],
-   "source": {
-    "kind": "rootfs",
-    "url": "https://github.com/AlmaLinux/wsl-images/releases/download/v10.2.20260526.0/AlmaLinux-10.2_x64_20260526.0.wsl",
-    "sha256": "55e75d87bad292bdb14c8c57bc35aaa5bd253e4f565321dd196c3f25b692be48",
-    "wsl_name": "AlmaLinux-10",
-    "origin": "microsoft/WSL DistributionInfo.json",
-    "arm64": {
-     "url": "https://github.com/AlmaLinux/wsl-images/releases/download/v10.2.20260526.0/AlmaLinux-10.2_ARM64_20260526.0.wsl",
-     "sha256": "d3b3ecc7b58ee3cceaa656de04175e81df2e7969efb2e22aba95c9ff1f430949"
-    }
-   },
-   "default": false
-  },
-  {
-   "id": "wsl-archlinux",
-   "name": "Arch Linux",
-   "family": "arch",
-   "guest_os": "linux",
-   "arch": [
-    "x86_64"
-   ],
-   "providers": [
-    "wsl2",
-    "linux-ns"
-   ],
-   "source": {
-    "kind": "rootfs",
-    "url": "https://fastly.mirror.pkgbuild.com/wsl/2026.11.01.182233/archlinux-2026.11.01.182233.wsl",
-    "sha256": "f8b934f77d0afcbe6e3730d6e4f378e8ee3c90d51479395004e1d92fe3b3c9b1",
-    "wsl_name": "archlinux",
-    "origin": "microsoft/WSL DistributionInfo.json"
-   },
-   "default": false
-  },
-  {
-   "id": "wsl-fedoralinux-45",
-   "name": "Fedora Linux 45",
-   "family": "fedora",
-   "guest_os": "linux",
-   "arch": [
-    "x86_64",
-    "aarch64"
-   ],
-   "providers": [
-    "wsl2",
-    "linux-ns"
-   ],
-   "source": {
-    "kind": "rootfs",
-    "url": "https://download.fedoraproject.org/pub/fedora/linux/releases/45/Container/x86_64/images/Fedora-WSL-Base-45-1.4.x86_64.wsl",
-    "sha256": "d20e476140d4cb121b85b1ad2b8fd6bf9fc2750140a7212ad4051ae3c6bd1e23",
-    "wsl_name": "FedoraLinux-45",
-    "origin": "microsoft/WSL DistributionInfo.json",
-    "arm64": {
-     "url": "https://download.fedoraproject.org/pub/fedora/linux/releases/45/Container/aarch64/images/Fedora-WSL-Base-45-1.4.aarch64.wsl",
-     "sha256": "9a25779562113c10ce8f480857217d52f6a386cee2301752d2a34a320e8fd35c"
-    }
-   },
-   "default": false
-  },
-  {
-   "id": "wsl-fedoralinux-44",
-   "name": "Fedora Linux 44",
-   "family": "fedora",
-   "guest_os": "linux",
-   "arch": [
-    "x86_64",
-    "aarch64"
-   ],
-   "providers": [
-    "wsl2",
-    "linux-ns"
-   ],
-   "source": {
-    "kind": "rootfs",
-    "url": "https://download.fedoraproject.org/pub/fedora/linux/releases/44/Container/x86_64/images/Fedora-WSL-Base-44-1.7.x86_64.wsl",
-    "sha256": "2e5b153ba4b639952bf546be577fc19b832fe8944caa7de342b32f10da7d319a",
-    "wsl_name": "FedoraLinux-44",
-    "origin": "microsoft/WSL DistributionInfo.json",
-    "arm64": {
-     "url": "https://download.fedoraproject.org/pub/fedora/linux/releases/44/Container/aarch64/images/Fedora-WSL-Base-44-1.7.aarch64.wsl",
-     "sha256": "1a3220262dc918b07d08410278205fb35e92c28a53455382028eea1a980476ee"
-    }
-   },
-   "default": false
-  },
-  {
-   "id": "wsl-elxr",
-   "name": "eLxr 12.12.0.0 GNU/Linux",
-   "family": "elxr",
-   "guest_os": "linux",
-   "arch": [
-    "x86_64"
-   ],
-   "providers": [
-    "wsl2",
-    "linux-ns"
-   ],
-   "source": {
-    "kind": "rootfs",
-    "url": "https://gitlab.com/api/v4/projects/68007430/packages/generic/wsl/12.12.0.0/eLxr_WSL_AMD64_12.12.0.0.wsl",
-    "sha256": "f94e0c44be51550478100ea150b80535f955bf87487d1b964f4636d97478c05d",
-    "wsl_name": "eLxr",
-    "origin": "microsoft/WSL DistributionInfo.json"
-   },
-   "default": false
-  },
-  {
-   "id": "wsl-azurelinux-4",
-   "name": "Azure Linux 4",
-   "family": "azurelinux",
-   "guest_os": "linux",
-   "arch": [
-    "x86_64",
-    "aarch64"
-   ],
-   "providers": [
-    "wsl2",
-    "linux-ns"
-   ],
-   "source": {
-    "kind": "rootfs",
-    "url": "https://osrelease.download.prss.microsoft.com/pr/download/a/AzureLinux-4-x86_64.wsl",
-    "sha256": "72475ebd5c2f985a34443b23365ae9cb9f4ebd5b8c6b12c96b98b5c28c7eed16",
-    "wsl_name": "AzureLinux-4",
-    "origin": "microsoft/WSL DistributionInfo.json",
-    "arm64": {
-     "url": "https://osrelease.download.prss.microsoft.com/pr/download/a/AzureLinux-4-aarch64.wsl",
-     "sha256": "a724b08b408a30b6d3a733ba93cbda70155c63d7d7c3934d2a23a5a5549a0070"
-    }
-   },
-   "default": false
-  },
-  {
-   "id": "wsl-oraclelinux-7-9",
-   "name": "Oracle Linux 7.9",
-   "family": "oracle",
-   "guest_os": "linux",
-   "arch": [
-    "x86_64"
-   ],
-   "providers": [
-    "wsl2"
-   ],
-   "source": {
-    "kind": "wsl-store",
-    "wsl_name": "OracleLinux_7_9",
-    "origin": "microsoft/WSL DistributionInfo.json（应用商店包）"
-   }
-  },
-  {
-   "id": "wsl-oraclelinux-8-10",
-   "name": "Oracle Linux 8.10",
-   "family": "oracle",
-   "guest_os": "linux",
-   "arch": [
-    "x86_64"
-   ],
-   "providers": [
-    "wsl2"
-   ],
-   "source": {
-    "kind": "wsl-store",
-    "wsl_name": "OracleLinux_8_10",
-    "origin": "microsoft/WSL DistributionInfo.json（应用商店包）"
-   }
-  },
-  {
-   "id": "wsl-oraclelinux-9-5",
-   "name": "Oracle Linux 9.5",
-   "family": "oracle",
-   "guest_os": "linux",
-   "arch": [
-    "x86_64"
-   ],
-   "providers": [
-    "wsl2"
-   ],
-   "source": {
-    "kind": "wsl-store",
-    "wsl_name": "OracleLinux_9_5",
-    "origin": "microsoft/WSL DistributionInfo.json（应用商店包）"
-   }
-  },
-  {
-   "id": "wsl-suse-linux-enterprise-15-sp6",
-   "name": "SUSE Linux Enterprise 15 SP6",
-   "family": "sles",
-   "guest_os": "linux",
-   "arch": [
-    "x86_64"
-   ],
-   "providers": [
-    "wsl2"
-   ],
-   "source": {
-    "kind": "wsl-store",
-    "wsl_name": "SUSE-Linux-Enterprise-15-SP6",
-    "origin": "microsoft/WSL DistributionInfo.json（应用商店包）"
-   }
-  },
-  {
-   "id": "rocky-9",
-   "name": "Rocky Linux 9",
-   "family": "rocky",
-   "guest_os": "linux",
-   "arch": [
-    "x86_64"
-   ],
-   "providers": [
-    "wsl2",
-    "linux-ns"
-   ],
-   "source": {
-    "kind": "rootfs",
-    "url": "https://dl.rockylinux.org/pub/rocky/9/images/x86_64/Rocky-9-WSL-Base.latest.x86_64.wsl",
-    "sha256_url": "https://dl.rockylinux.org/pub/rocky/9/images/x86_64/Rocky-9-WSL-Base.latest.x86_64.wsl.CHECKSUM",
-    "origin": "Rocky Linux 官方 WSL 镜像"
-   }
-  },
-  {
-   "id": "rocky-10",
-   "name": "Rocky Linux 10",
-   "family": "rocky",
-   "guest_os": "linux",
-   "arch": [
-    "x86_64"
-   ],
-   "providers": [
-    "wsl2",
-    "linux-ns"
-   ],
-   "source": {
-    "kind": "rootfs",
-    "url": "https://dl.rockylinux.org/pub/rocky/10/images/x86_64/Rocky-10-WSL-Base.latest.x86_64.wsl",
-    "sha256_url": "https://dl.rockylinux.org/pub/rocky/10/images/x86_64/Rocky-10-WSL-Base.latest.x86_64.wsl.CHECKSUM",
-    "origin": "Rocky Linux 官方 WSL 镜像"
-   }
-  },
-  {
-   "id": "alpine",
-   "name": "Alpine Linux（最新稳定版）",
-   "family": "alpine",
-   "guest_os": "linux",
-   "arch": [
-    "x86_64",
-    "aarch64"
-   ],
-   "providers": [
-    "wsl2",
-    "linux-ns"
-   ],
-   "source": {
-    "kind": "alpine",
-    "branch": "latest-stable",
-    "origin": "Alpine 官方 minirootfs（latest-releases.yaml 提供 sha256）"
-   }
-  },
-  {
-   "id": "lxc-oracle-9",
-   "name": "Oracle Linux 9",
-   "family": "oracle",
-   "guest_os": "linux",
-   "arch": [
-    "x86_64",
-    "aarch64"
-   ],
-   "providers": [
-    "wsl2",
-    "linux-ns"
-   ],
-   "source": {
-    "kind": "lxc",
-    "server": "https://images.linuxcontainers.org",
-    "distro": "oracle",
-    "release": "9",
-    "variant": "default",
-    "origin": "LXC 镜像服务器（每日构建，安装时解析最新构建并按 SHA256SUMS 校验）"
-   }
-  },
-  {
-   "id": "lxc-oracle-10",
-   "name": "Oracle Linux 10",
-   "family": "oracle",
-   "guest_os": "linux",
-   "arch": [
-    "x86_64",
-    "aarch64"
-   ],
-   "providers": [
-    "wsl2",
-    "linux-ns"
-   ],
-   "source": {
-    "kind": "lxc",
-    "server": "https://images.linuxcontainers.org",
-    "distro": "oracle",
-    "release": "10",
-    "variant": "default",
-    "origin": "LXC 镜像服务器（每日构建，安装时解析最新构建并按 SHA256SUMS 校验）"
-   }
-  },
-  {
-   "id": "lxc-rockylinux-9",
-   "name": "Rocky Linux 9（LXC 构建）",
-   "family": "rocky",
-   "guest_os": "linux",
-   "arch": [
-    "x86_64",
-    "aarch64"
-   ],
-   "providers": [
-    "wsl2",
-    "linux-ns"
-   ],
-   "source": {
-    "kind": "lxc",
-    "server": "https://images.linuxcontainers.org",
-    "distro": "rockylinux",
-    "release": "9",
-    "variant": "default",
-    "origin": "LXC 镜像服务器（每日构建，安装时解析最新构建并按 SHA256SUMS 校验）"
-   }
-  },
-  {
-   "id": "lxc-debian-trixie",
-   "name": "Debian 13 trixie（LXC 构建）",
-   "family": "debian",
-   "guest_os": "linux",
-   "arch": [
-    "x86_64",
-    "aarch64"
-   ],
-   "providers": [
-    "wsl2",
-    "linux-ns"
-   ],
-   "source": {
-    "kind": "lxc",
-    "server": "https://images.linuxcontainers.org",
-    "distro": "debian",
-    "release": "trixie",
-    "variant": "default",
-    "origin": "LXC 镜像服务器（每日构建，安装时解析最新构建并按 SHA256SUMS 校验）"
-   }
-  },
-  {
-   "id": "lxc-ubuntu-noble",
-   "name": "Ubuntu 24.04（LXC 构建）",
-   "family": "ubuntu",
-   "guest_os": "linux",
-   "arch": [
-    "x86_64",
-    "aarch64"
-   ],
-   "providers": [
-    "wsl2",
-    "linux-ns"
-   ],
-   "source": {
-    "kind": "lxc",
-    "server": "https://images.linuxcontainers.org",
-    "distro": "ubuntu",
-    "release": "noble",
-    "variant": "default",
-    "origin": "LXC 镜像服务器（每日构建，安装时解析最新构建并按 SHA256SUMS 校验）"
-   }
-  },
-  {
-   "id": "lxc-alpine-3.24",
-   "name": "Alpine 3.24（LXC 构建）",
-   "family": "alpine",
-   "guest_os": "linux",
-   "arch": [
-    "x86_64",
-    "aarch64"
-   ],
-   "providers": [
-    "wsl2",
-    "linux-ns"
-   ],
-   "source": {
-    "kind": "lxc",
-    "server": "https://images.linuxcontainers.org",
-    "distro": "alpine",
-    "release": "3.24",
-    "variant": "default",
-    "origin": "LXC 镜像服务器（每日构建，安装时解析最新构建并按 SHA256SUMS 校验）"
-   }
-  },
-  {
-   "id": "lxc-archlinux-current",
-   "name": "Arch Linux（LXC 构建）",
-   "family": "arch",
-   "guest_os": "linux",
-   "arch": [
-    "x86_64",
-    "aarch64"
-   ],
-   "providers": [
-    "wsl2",
-    "linux-ns"
-   ],
-   "source": {
-    "kind": "lxc",
-    "server": "https://images.linuxcontainers.org",
-    "distro": "archlinux",
-    "release": "current",
-    "variant": "default",
-    "origin": "LXC 镜像服务器（每日构建，安装时解析最新构建并按 SHA256SUMS 校验）"
-   }
-  },
-  {
-   "id": "lxc-opensuse-tumbleweed",
-   "name": "openSUSE Tumbleweed（LXC 构建）",
-   "family": "opensuse",
-   "guest_os": "linux",
-   "arch": [
-    "x86_64",
-    "aarch64"
-   ],
-   "providers": [
-    "wsl2",
-    "linux-ns"
-   ],
-   "source": {
-    "kind": "lxc",
-    "server": "https://images.linuxcontainers.org",
-    "distro": "opensuse",
-    "release": "tumbleweed",
-    "variant": "default",
-    "origin": "LXC 镜像服务器（每日构建，安装时解析最新构建并按 SHA256SUMS 校验）"
-   }
-  },
-  {
-   "id": "lxc-fedora-45",
-   "name": "Fedora 45（LXC 构建）",
-   "family": "fedora",
-   "guest_os": "linux",
-   "arch": [
-    "x86_64",
-    "aarch64"
-   ],
-   "providers": [
-    "wsl2",
-    "linux-ns"
-   ],
-   "source": {
-    "kind": "lxc",
-    "server": "https://images.linuxcontainers.org",
-    "distro": "fedora",
-    "release": "45",
-    "variant": "default",
-    "origin": "LXC 镜像服务器（每日构建，安装时解析最新构建并按 SHA256SUMS 校验）"
-   }
-  },
-  {
-   "id": "custom-rootfs",
-   "name": "自定义根文件系统（URL 或本地 .tar / .tar.gz / .tar.xz / .wsl）",
-   "family": "custom",
-   "guest_os": "linux",
-   "arch": [
-    "x86_64",
-    "aarch64"
-   ],
-   "providers": [
-    "wsl2",
-    "linux-ns"
-   ],
-   "source": {
-    "kind": "custom",
-    "needs": [
-     "url"
-    ],
-    "origin": "用户提供，可附带 --sha256"
-   }
-  },
-  {
-   "id": "windows-sandbox",
-   "name": "Windows Sandbox（一次性 Windows 桌面）",
-   "family": "windows",
-   "guest_os": "windows",
-   "arch": [
-    "x86_64"
-   ],
-   "providers": [
-    "windows-sandbox"
-   ],
-   "source": {
-    "kind": "host",
-    "origin": "Windows 10/11 专业版、企业版、教育版自带"
-   },
-   "requires": {
-    "editions": "Pro/Enterprise/Education",
-    "feature": "Containers-DisposableClientVM"
-   }
-  },
-  {
-   "id": "hyperv-windows-11-eval",
-   "name": "Windows 11 企业版评估版（Hyper-V 虚拟机，90 天）",
-   "family": "windows",
-   "guest_os": "windows",
-   "arch": [
-    "x86_64"
-   ],
-   "providers": [
-    "hyperv"
-   ],
-   "tpm": true,
-   "source": {
-    "kind": "iso",
-    "needs": [
-     "iso"
-    ],
-    "download_page": "https://www.microsoft.com/en-us/evalcenter/download-windows-11-enterprise",
-    "origin": "微软评估中心（需在网页上登记后下载 ISO）"
-   },
-   "requires": {
-    "editions": "Pro/Enterprise/Education",
-    "feature": "Microsoft-Hyper-V-All",
-    "memory_mb": 4096
-   }
-  },
-  {
-   "id": "hyperv-windows-server-2025-eval",
-   "name": "Windows Server 2025 评估版（Hyper-V 虚拟机，180 天）",
-   "family": "windows",
-   "guest_os": "windows",
-   "arch": [
-    "x86_64"
-   ],
-   "providers": [
-    "hyperv"
-   ],
-   "source": {
-    "kind": "iso",
-    "needs": [
-     "iso"
-    ],
-    "download_page": "https://www.microsoft.com/en-us/evalcenter/download-windows-server-2025",
-    "origin": "微软评估中心"
-   },
-   "requires": {
-    "editions": "Pro/Enterprise/Education",
-    "feature": "Microsoft-Hyper-V-All",
-    "memory_mb": 2048
-   }
-  },
-  {
-   "id": "hyperv-custom-iso",
-   "name": "从 ISO 安装（Windows 或 Linux，Hyper-V 虚拟机）",
-   "family": "custom",
-   "guest_os": "any",
-   "arch": [
-    "x86_64"
-   ],
-   "providers": [
-    "hyperv"
-   ],
-   "secure_boot": false,
-   "source": {
-    "kind": "iso",
-    "needs": [
-     "iso"
-    ],
-    "origin": "用户提供的 ISO"
-   },
-   "requires": {
-    "editions": "Pro/Enterprise/Education",
-    "feature": "Microsoft-Hyper-V-All"
-   }
-  },
-  {
-   "id": "macos-guest",
-   "name": "macOS 虚拟机",
-   "family": "macos",
-   "guest_os": "macos",
-   "arch": [
-    "aarch64"
-   ],
-   "providers": [
-    "macos-guest"
-   ],
-   "disabled": true,
-   "reason": "Apple 的软件许可只允许在 Apple 硬件上运行的 macOS 中虚拟化 macOS；Windows 与 Linux 上不提供。在 Apple 芯片 Mac 上的支持尚未实现。",
-   "source": {
-    "kind": "none"
-   }
-  }
- ]
+  ]
 }

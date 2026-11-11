@@ -29,6 +29,10 @@ IS_LINUX = sys.platform.startswith("linux")
 BACKEND = "linux-ns" if IS_LINUX else ("wsl2" if os.name == "nt" else "macos-vz")
 
 
+def _provider_id(cfg: dict) -> str:
+    return cfg.get("provider") or cfg.get("backend") or BACKEND
+
+
 def home() -> Path:
     return desktop_client.foxos_home() / "envs"
 
@@ -86,12 +90,17 @@ def _pid(name: str) -> int | None:
 
 
 def _state(name: str) -> str:
+    cfg = _cfg(name)
+    pid = _provider_id(cfg)
+    if pid == "linux-kvm":
+        from ..envs import kvm
+        return kvm.state(env_dir(name), cfg)
     if not IS_LINUX:
         from ..envs import wsl
         if os.name != "nt":
             return "unknown"
         try:
-            return wsl.state(_cfg(name))
+            return wsl.state(cfg)
         except FoxError:
             return "unknown"
     return "running" if _pid(name) else "stopped"
@@ -160,6 +169,55 @@ def _summary(cfg: dict) -> dict:
 
 
 # ---------------------------------------------------------------- 命令实现
+def env_run(ctx: Context, name: str, image: str | None = None, iso: str | None = None, provider: str | None = None,
+            network: str = "user", workspace_mode: str = "rw", memory_mb: int | None = None, cpus: float | None = None,
+            pids: int | None = None, desktop_attach: bool = False, no_start: bool = False) -> dict:
+    """没有就创建并启动（靠近 docker run）。--iso 默认走 linux-kvm。"""
+    _valid(name)
+    prov = provider or ("linux-kvm" if iso else BACKEND)
+    exists = (env_dir(name) / "env.json").exists()
+    if not exists:
+        if prov == "linux-kvm":
+            if iso:
+                iso_path = str(Path(iso).expanduser())
+                if not Path(iso_path).is_file():
+                    # 也允许工作空间相对路径
+                    cand = ctx.workspace.root / iso
+                    iso_path = str(cand) if cand.is_file() else iso_path
+                if not Path(iso_path).is_file():
+                    raise FoxError("NOT_FOUND", tr("env.iso_not_found", iso))
+            cfg = {"name": name, "image": image or (Path(iso).name if iso else "linux-kvm"),
+                   "backend": "linux-kvm", "provider": "linux-kvm", "guest_os": "linux",
+                   "iso": str(Path(iso_path).resolve()) if iso else None,
+                   "network": network if network != "host" else "user",
+                   "workspace": {"path": str(ctx.workspace.root), "mode": workspace_mode},
+                   "limits": {k: v for k, v in {"memory_mb": memory_mb, "cpus": cpus, "pids": pids}.items() if v},
+                   "mounts": [], "snapshots": [], "actions": {}, "shell": "/bin/sh",
+                   "created": datetime.now(timezone.utc).isoformat(timespec="seconds"), "created_by": ctx.agent}
+            for sub in ("logs", "run"):
+                (env_dir(name) / sub).mkdir(parents=True, exist_ok=True)
+            _save(cfg)
+            _log(name, f"created by {ctx.agent} provider=linux-kvm iso={cfg.get('iso')}")
+        else:
+            env_create(ctx, name, image=image or "alpine-3.20", network="host" if network == "user" else network,
+                       workspace_mode=workspace_mode, memory_mb=memory_mb, cpus=cpus, pids=pids)
+    if no_start:
+        return {"message": tr("env.created_environment_not_started", name), "env": _summary(_cfg(name))}
+    started = env_start(ctx, name)
+    if desktop_attach:
+        att = env_desktop_attach(ctx, name)
+        started["attach"] = att
+    return started
+
+
+def env_desktop_attach(ctx: Context, name: str) -> dict:
+    cfg = _cfg(name)
+    if _provider_id(cfg) != "linux-kvm":
+        raise FoxError("USAGE", tr("env.desktop_attach_is_for_linux_kvm"), hint=tr("env.use_provider_linux_kvm_or_pass_iso"))
+    from ..envs import kvm
+    return kvm.desktop_attach(cfg, env_dir(name))
+
+
 def env_images(ctx: Context) -> dict:
     local = []
     for d in sorted(images_dir().iterdir()) if images_dir().exists() else []:
@@ -215,6 +273,11 @@ def env_info(ctx: Context, name: str) -> dict:
 
 def env_start(ctx: Context, name: str) -> dict:
     cfg = _cfg(name)
+    if _provider_id(cfg) == "linux-kvm":
+        from ..envs import kvm
+        r = kvm.start(cfg, env_dir(name))
+        _log(name, f"started by {ctx.agent}: {r.get('vmm')}")
+        return {**r, "env": _summary(_cfg(name))}
     if cfg.get("start_steps"):
         from ..envs import providers
         providers.execute(cfg["start_steps"])
@@ -254,6 +317,11 @@ def env_start(ctx: Context, name: str) -> dict:
 
 def env_stop(ctx: Context, name: str, timeout: float = 5.0) -> dict:
     cfg = _cfg(name)
+    if _provider_id(cfg) == "linux-kvm":
+        from ..envs import kvm
+        r = kvm.stop(cfg, env_dir(name), timeout=timeout)
+        _log(name, f"stopped by {ctx.agent}")
+        return r
     if BACKEND == "wsl2":
         from ..envs import wsl
         return wsl.stop(cfg)
@@ -278,6 +346,9 @@ def env_restart(ctx: Context, name: str) -> dict:
 
 def _exec(name: str, argv: list[str], cwd: str = "/workspace", capture: bool = True, envs: dict | None = None, timeout: float | None = None):
     cfg = _cfg(name)
+    if _provider_id(cfg) == "linux-kvm":
+        from ..envs import kvm
+        return kvm.exec_in(cfg, env_dir(name), argv, cwd=cwd, timeout=timeout)
     if BACKEND == "wsl2":
         from ..envs import wsl
         return wsl.exec_(cfg, argv, cwd, capture=capture, timeout=timeout)
@@ -417,6 +488,11 @@ def env_delete(ctx: Context, name: str) -> dict:
     if cfg.get("backend") in ("windows-sandbox", "hyperv"):
         _rmtree(env_dir(name))
         return {"message": tr("env.removed_from_the_list", name) + (tr("env.delete_the_hyper_v_virtual_machine") if cfg.get("backend") == "hyperv" else "")}
+    if _provider_id(cfg) == "linux-kvm":
+        if _state(name) == "running":
+            env_stop(ctx, name)
+        _rmtree(env_dir(name))
+        return {"message": tr("env.deleted_environment_image_kept", name)}
     if _pid(name):
         env_stop(ctx, name)
     _rmtree(env_dir(name))
@@ -566,6 +642,12 @@ def env_install(ctx: Context, entry: str, name: str, provider: str | None = None
     host = providers.host_os()
     provs = providers.providers()
     cands = [provider] if provider else [p for p in e["providers"] if p in provs and host in provs[p].platforms] or e["providers"][:1]
+    if not provider and host == "linux" and "linux-kvm" in cands:
+        kvm_doc = providers.get("linux-kvm").doctor()
+        if kvm_doc.get("available") and kvm_doc.get("kvm", {}).get("available"):
+            cands = ["linux-kvm"] + [c for c in cands if c != "linux-kvm"]
+        else:
+            cands = [c for c in cands if c != "linux-kvm"] + (["linux-kvm"] if "linux-kvm" in cands else [])
     p = providers.get(cands[0])
     opts = {"url": url, "sha256": sha256, "iso": iso, "location": location, "memory_mb": memory_mb, "cpus": cpus, "disk_gb": disk_gb, "workspace": str(ctx.workspace.root)}
     if not dry_run and (env_dir(name) / "env.json").exists():
@@ -620,6 +702,18 @@ register(Command("env", "images", tr("env.list_available_images_official"), env_
 register(Command("env", "pull", tr("env.download_an_image_and_verify_its"), env_pull,
                  params=[Param("image", "string", tr("env.image"), required=True, positional=True, metavar="IMAGE"), Param("sha256", "string", tr("env.expected_sha256_recommended_for"))],
                  examples=["foxos env pull alpine-3.20", "foxos env pull ubuntu-24.04"], permission="run"))
+register(Command("env", "run", tr("env.pull_if_needed_create_and_start"), env_run,
+                 params=[NAME, Param("image", "string", tr("env.image_id")), Param("iso", "string", tr("env.installation_media_iso_path_hyper_v")),
+                         Param("provider", "string", tr("env.use_a_specific_provider")),
+                         Param("network", "string", tr("env.network_user_or_none_for_kvm"), enum=["user", "host", "none"], default="user"),
+                         Param("workspace_mode", "string", tr("env.how_the_workspace_is_mounted"), enum=["rw", "ro", "none"], default="rw", cli_flag="--workspace-mode"),
+                         Param("memory_mb", "integer", tr("env.memory_limit_mb")), Param("cpus", "number", tr("env.cpu_limit_cores_needs_cgroup")), Param("pids", "integer", tr("env.process_limit")),
+                         Param("desktop_attach", "boolean", tr("env.attach_the_guest_desktop_after_start"), cli_flag="--desktop-attach"),
+                         Param("no_start", "boolean", tr("env.only_create_do_not_start"), cli_flag="--no-start")],
+                 examples=["foxos env run dev --image alpine-3.20", "foxos env run live --provider linux-kvm --iso FoxOS-0.3.0-amd64.iso --desktop-attach"],
+                 permission="run"))
+register(Command("env", "desktop-attach", tr("env.open_the_guest_desktop_as_a_display"), env_desktop_attach,
+                 params=[NAME], examples=["foxos env desktop-attach live --json"], permission="run"))
 register(Command("env", "create", tr("common.create_an_environment"), env_create,
                  params=[NAME, Param("image", "string", tr("env.image_id"), default="alpine-3.20"), Param("network", "string", tr("env.network_host_shares_the_host_network"), enum=["host", "none"], default="host"),
                          Param("workspace_mode", "string", tr("env.how_the_workspace_is_mounted"), enum=["rw", "ro", "none"], default="rw", cli_flag="--workspace-mode"),

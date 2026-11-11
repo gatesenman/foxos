@@ -6,7 +6,7 @@
  "type": "object",
  "$ref": "#/$defs/manifest",
  "$defs": {
-  "capability": {"enum": ["create", "start", "stop", "exec", "shell", "snapshot", "restore", "clone", "export", "import", "delete", "mount", "limits", "stats", "logs", "agent", "list-online"]},
+  "capability": {"enum": ["create", "start", "stop", "exec", "shell", "snapshot", "restore", "clone", "export", "import", "delete", "mount", "limits", "stats", "logs", "agent", "list-online", "run", "desktop-attach"]},
   "platform": {"enum": ["linux", "windows", "macos"]},
   "manifest": {
    "type": "object",

@@ -206,7 +206,7 @@ def test_wsl_cwd_mapping():
 # ---------------------------------------------------------------- 提供者协议
 def test_builtin_providers_describe():
     ids = {p.id for p in P.BUILTIN}
-    assert {"linux-ns", "wsl2", "windows-sandbox", "hyperv", "macos-vz", "macos-guest"} <= ids
+    assert {"linux-ns", "linux-kvm", "wsl2", "windows-sandbox", "hyperv", "macos-vz", "macos-guest"} <= ids
     for p in P.BUILTIN:
         d = p.describe()
         assert d["protocol"] == P.PROTOCOL and d["platforms"]

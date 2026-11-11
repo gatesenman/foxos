@@ -44,7 +44,7 @@ def main():
             modern_names.add(d["Name"])
             a = d.get("Amd64Url") or {}
             e = {"id": "wsl-" + slug(d["Name"]), "name": d["FriendlyName"], "family": FAMILY.get(fam, slug(fam)), "guest_os": "linux",
-                 "arch": ["x86_64"] + (["aarch64"] if d.get("Arm64Url") else []), "providers": ["wsl2", "linux-ns"],
+                 "arch": ["x86_64"] + (["aarch64"] if d.get("Arm64Url") else []), "providers": ["wsl2", "linux-kvm", "linux-ns"],
                  "source": {"kind": "rootfs", "url": a.get("Url"), "sha256": (a.get("Sha256") or "").removeprefix("0x").lower() or None,
                             "wsl_name": d["Name"], "origin": "microsoft/WSL DistributionInfo.json"},
                  "default": bool(alias_url) and a.get("Url") == alias_url}
@@ -59,19 +59,19 @@ def main():
                         "providers": ["wsl2"], "source": {"kind": "wsl-store", "wsl_name": d["Name"], "origin": "microsoft/WSL DistributionInfo.json（应用商店包）"}})
     for v, f in (("9", "Rocky-9-WSL-Base.latest.x86_64.wsl"), ("10", "Rocky-10-WSL-Base.latest.x86_64.wsl")):
         base = f"https://dl.rockylinux.org/pub/rocky/{v}/images/x86_64/"
-        entries.append({"id": f"rocky-{v}", "name": f"Rocky Linux {v}", "family": "rocky", "guest_os": "linux", "arch": ["x86_64"], "providers": ["wsl2", "linux-ns"],
+        entries.append({"id": f"rocky-{v}", "name": f"Rocky Linux {v}", "family": "rocky", "guest_os": "linux", "arch": ["x86_64"], "providers": ["wsl2", "linux-kvm", "linux-ns"],
                         "source": {"kind": "rootfs", "url": base + f, "sha256_url": base + f + ".CHECKSUM", "origin": "Rocky Linux 官方 WSL 镜像"}})
-    entries.append({"id": "alpine", "name": "Alpine Linux（最新稳定版）", "family": "alpine", "guest_os": "linux", "arch": ["x86_64", "aarch64"], "providers": ["wsl2", "linux-ns"],
+    entries.append({"id": "alpine", "name": "Alpine Linux（最新稳定版）", "family": "alpine", "guest_os": "linux", "arch": ["x86_64", "aarch64"], "providers": ["wsl2", "linux-kvm", "linux-ns"],
                     "source": {"kind": "alpine", "branch": "latest-stable", "origin": "Alpine 官方 minirootfs（latest-releases.yaml 提供 sha256）"}})
     for distro, rel, name, fam in (("oracle", "9", "Oracle Linux 9", "oracle"), ("oracle", "10", "Oracle Linux 10", "oracle"), ("rockylinux", "9", "Rocky Linux 9（LXC 构建）", "rocky"),
                                    ("debian", "trixie", "Debian 13 trixie（LXC 构建）", "debian"), ("ubuntu", "noble", "Ubuntu 24.04（LXC 构建）", "ubuntu"),
                                    ("alpine", "3.24", "Alpine 3.24（LXC 构建）", "alpine"), ("archlinux", "current", "Arch Linux（LXC 构建）", "arch"),
                                    ("opensuse", "tumbleweed", "openSUSE Tumbleweed（LXC 构建）", "opensuse"), ("fedora", "45", "Fedora 45（LXC 构建）", "fedora")):
-        entries.append({"id": f"lxc-{distro}-{rel}", "name": name, "family": fam, "guest_os": "linux", "arch": ["x86_64", "aarch64"], "providers": ["wsl2", "linux-ns"],
+        entries.append({"id": f"lxc-{distro}-{rel}", "name": name, "family": fam, "guest_os": "linux", "arch": ["x86_64", "aarch64"], "providers": ["wsl2", "linux-kvm", "linux-ns"],
                         "source": {"kind": "lxc", "server": "https://images.linuxcontainers.org", "distro": distro, "release": rel, "variant": "default",
                                    "origin": "LXC 镜像服务器（每日构建，安装时解析最新构建并按 SHA256SUMS 校验）"}})
     entries.append({"id": "custom-rootfs", "name": "自定义根文件系统（URL 或本地 .tar / .tar.gz / .tar.xz / .wsl）", "family": "custom", "guest_os": "linux", "arch": ["x86_64", "aarch64"],
-                    "providers": ["wsl2", "linux-ns"], "source": {"kind": "custom", "needs": ["url"], "origin": "用户提供，可附带 --sha256"}})
+                    "providers": ["wsl2", "linux-kvm", "linux-ns"], "source": {"kind": "custom", "needs": ["url"], "origin": "用户提供，可附带 --sha256"}})
     entries += [
         {"id": "windows-sandbox", "name": "Windows Sandbox（一次性 Windows 桌面）", "family": "windows", "guest_os": "windows", "arch": ["x86_64"], "providers": ["windows-sandbox"],
          "source": {"kind": "host", "origin": "Windows 10/11 专业版、企业版、教育版自带"}, "requires": {"editions": "Pro/Enterprise/Education", "feature": "Containers-DisposableClientVM"}},

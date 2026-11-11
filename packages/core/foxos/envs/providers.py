@@ -169,6 +169,52 @@ class LinuxNs(Provider):
                 {"foxos": ["env", "create", name, "--image", image_id], "why": tr("common.create_an_environment"), "registers": name, "workspace": ws}]
 
 
+
+class LinuxKvm(Provider):
+    id = "linux-kvm"
+    name = tr("envs.providers.linux_kvm_kernel_kvm_plus")
+    platforms = ["linux"]
+    isolation = "full"
+    capabilities = ["create", "start", "stop", "run", "desktop-attach", "exec", "logs"]
+
+    def doctor(self) -> dict:
+        d = super().doctor()
+        if not d["available"]:
+            return d
+        from . import kvm
+        probe = kvm.kvm_probe()
+        ch = kvm.cloud_hypervisor()
+        qemu = kvm.qemu_bin()
+        checks = [
+            {"id": "kvm", "ok": probe["available"], "detail": probe["reason"] or tr("envs.providers.kvm_device_ready")},
+            {"id": "cloud-hypervisor", "ok": bool(ch), "detail": ch or tr("envs.providers.cloud_hypervisor_not_found_on_this")},
+            {"id": "qemu-tcg-test-only", "ok": bool(qemu), "detail": (tr("envs.providers.qemu_present_for_tests") if qemu else tr("envs.providers.qemu_not_installed_needed_only"))},
+        ]
+        available = probe["available"] and bool(ch)
+        reason = None
+        actions = []
+        if not available:
+            if probe["reason"]:
+                reason = probe["reason"]
+            elif not ch:
+                reason = tr("envs.providers.cloud_hypervisor_not_found_on_this")
+            if kvm.test_vmm_allowed() and qemu:
+                available = True
+                reason = tr("envs.providers.using_qemu_tcg_test_vmm")
+            else:
+                actions.append({"id": "allow-test-vmm", "label": tr("envs.providers.set_foxos_allow_test_vmm_qemu_tcg"),
+                                "hint": tr("envs.providers.qemu_is_test_only_not_a_product")})
+        return {"available": available, "reason": reason, "checks": checks, "actions": actions, "kvm": probe, "product_vmm": "cloud-hypervisor"}
+
+    def plan_install(self, entry, name, opts):
+        iso = opts.get("iso") or (entry.get("source") or {}).get("iso")
+        if not iso and (entry.get("source") or {}).get("kind") not in ("iso", "custom"):
+            # 目录里的 Linux 条目通常是 rootfs：完整虚拟机需要一张 ISO 或已做好的磁盘。
+            raise FoxError("USAGE", tr("envs.providers.linux_kvm_install_needs_an_iso"), hint=tr("envs.providers.pass_iso_or_use_env_run"))
+        return [{"why": tr("envs.providers.register_a_linux_kvm_environment"), "registers": name,
+                 "foxos": ["env", "run", name, "--provider", "linux-kvm"] + (["--iso", iso] if iso else []) + (["--no-start"] if opts.get("dry_run") else [])}]
+
+
 class Wsl2(Provider):
     id = "wsl2"
     name = tr("envs.providers.wsl2_windows_subsystem_for_linux")
@@ -370,7 +416,7 @@ def _edition() -> str:
         return ""
 
 
-BUILTIN = [LinuxNs(), Wsl2(), WindowsSandbox(), HyperV(), MacVZ(), MacGuestUnavailable()]
+BUILTIN = [LinuxNs(), LinuxKvm(), Wsl2(), WindowsSandbox(), HyperV(), MacVZ(), MacGuestUnavailable()]
 
 
 def external_dirs() -> list[Path]:
