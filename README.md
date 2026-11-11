@@ -240,6 +240,54 @@ flowchart LR
 
 更多：[docs/architecture.md](docs/architecture.md)。
 
+## 技术栈
+
+| 层 | 技术 |
+| --- | --- |
+| 操作系统（ISO） | Ubuntu 24.04、XFCE（xfwm4 / Whisker 菜单）、Calamares 安装器，构建脚本在 `scripts/os/` |
+| 桌面 / 伴侣程序 | Electron 45、node-pty（真实 PTY）、xterm、Monaco、electron-builder（NSIS / AppImage） |
+| 内核与 CLI | Python ≥ 3.10、openpyxl、python-docx、python-pptx、zstandard；argparse 命令注册表同时生成 JSON Schema / MCP 工具 / 文档 |
+| 智能体接口 | MCP（stdio 与 Streamable HTTP）、ACP 客户端与官方注册表 |
+| 隔离 | Linux 用户命名空间 + overlayfs + pivot_root + seccomp / Landlock、cgroup v2；KVM + cloud-hypervisor；WSL2 / Windows Sandbox / Hyper-V |
+| 测试 | pytest、Playwright + Electron（xvfb）、MCP 官方 SDK |
+
+## 项目结构
+
+```text
+foxos/
+├── apps/desktop/          # Electron 桌面（伴侣程序）
+│   ├── src/main/          # 主进程：内核调用、ACP、PTY、Everything 运行时、设置、安装向导
+│   ├── src/renderer/      # 窗口管理与内置应用界面
+│   ├── src/locales/       # 界面词条（zh-CN / en-US）
+│   └── e2e/               # Playwright + Electron 端到端测试
+├── packages/core/         # Python 内核 `foxos`（CLI、MCP 服务、工作空间、审计、锁、环境、沙箱）
+│   ├── foxos/
+│   └── tests/
+├── scripts/
+│   ├── os/                # 可引导 ISO 构建（品牌、Calamares、面板、systemd、QEMU 引导测试）
+│   ├── test_all.py        # 全量测试入口，生成 docs/test-report.md
+│   └── gen_*.py           # 生成命令参考、应用目录、环境目录等文档
+├── docker/os/             # 可选的 Docker 分发
+├── docs/                  # 架构、CLI / MCP 参考、环境、测试报告、截图
+└── AGENTS.md              # 给智能体的接入说明
+```
+
+## 配置
+
+常用环境变量（桌面与内核都读取）：
+
+| 变量 | 作用 |
+| --- | --- |
+| `FOXOS_HOME` | 数据目录（Everything 应用、智能体、环境）。默认 Linux `$XDG_DATA_HOME/foxos`（即 `~/.local/share/foxos`），Windows `%LOCALAPPDATA%\FoxOS`，macOS `~/Library/Application Support/FoxOS` |
+| `FOXOS_LANG` | 界面与命令行语言：`zh-CN`（默认）或 `en-US`；也可用 `--lang` |
+| `FOXOS_MCP_TOKEN` | `foxos mcp --http` 的访问令牌 |
+| `FOXOS_PYTHON` | 桌面调用内核时使用的 Python 解释器 |
+| `FOXOS_SOFFICE` | LibreOffice `soffice` 可执行文件路径 |
+| `FOXOS_SESSION_BACKEND` | 强制指定图形会话后端（X11 / Wayland） |
+| `FOXOS_CHROME_FLAGS` | 启动 Chrome 时追加的命令行参数 |
+
+工作空间用全局参数 `--workspace <目录>` 指定；界面语言等设置也可在桌面「设置」里修改并保存。
+
 ## 测试
 
 ```bash
@@ -263,6 +311,14 @@ npm run test:all      # 仓库根目录：pytest + 桌面端到端测试（Playw
 - [ ] Linux 安装包与发布、macOS 构建
 - [x] 中英文界面（默认中文）与狐狸OS 细滚动条
 - [ ] 代码签名、自动更新
+
+## 参与贡献
+
+欢迎提交 Issue 和 Pull Request。提交前请：
+
+1. 在仓库根目录运行 `npm run test:all`（或至少 `cd packages/core && pytest`），确认没有新增失败；
+2. 修改界面词条后运行 `cd apps/desktop && npm run lint:i18n`；
+3. 新增命令时同步更新生成的文档（`scripts/gen_cli_docs.py` 等）。
 
 ## 许可
 
