@@ -274,7 +274,9 @@ def case_runtime() -> str:
     assert p.returncode == 0 and d.get("ok", True), json.dumps(d, ensure_ascii=False)[:800]
     tools = d.get("tools") or d.get("runtimes") or []
     names = [t.get("id") or t.get("name") for t in tools] if isinstance(tools, list) else list(tools)
-    return f"runtime doctor 退出码 0，ok={d.get('ok')}，{len(names)} 项：{', '.join(map(str, names[:14]))}"
+    ad = ssh("agent-desktop --version && test -f /usr/share/doc/foxos/NOTICE.agent-desktop && echo notice-ok").stdout.split()
+    assert "1.2.0" in ad and "notice-ok" in ad, ad
+    return f"runtime doctor 退出码 0，ok={d.get('ok')}，{len(names)} 项：{', '.join(map(str, names[:14]))}；agent-desktop 1.2.0 已预装（含 NOTICE）"
 
 
 def case_acp() -> str:

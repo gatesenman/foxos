@@ -28,6 +28,15 @@ gtk-update-icon-cache -f /usr/share/icons/hicolor 2>/dev/null || true
 install -d /usr/share/doc/foxos
 install -m 644 /usr/lib/foxos/python/foxos/data/pstack/NOTICE /usr/share/doc/foxos/NOTICE.pstack
 install -m 644 /usr/lib/foxos/python/foxos/botchat/static/vendor/tabler/LICENSE /usr/share/doc/foxos/LICENSE.tabler-icons
+# agent-desktop（Vercel，Apache-2.0）：默认的电脑操作（computer use）栈，适配代码在 foxos 的 computer-use 部分
+cat > /usr/share/doc/foxos/NOTICE.agent-desktop <<'N'
+agent-desktop 1.2.0 — https://github.com/vercel-labs/agent-desktop (npm: agent-desktop)
+Copyright Vercel, Inc. and the agent-desktop contributors.
+Licensed under the Apache License, Version 2.0 (https://www.apache.org/licenses/LICENSE-2.0).
+狐狸OS ships the unmodified npm package and its official prebuilt linux-x64 binary
+(installed with npm install -g agent-desktop@1.2.0; the binary's sha256 is checked by the package's postinstall).
+It is the default computer-use stack together with Jev.
+N
 "$PY" - <<'J' > /usr/share/doc/foxos/agent-runtime.txt
 import json
 from foxos import runtime
