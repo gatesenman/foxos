@@ -76,7 +76,8 @@ test('US-126..US-133 智能体窗口：真实 Chrome 窗口里的完整流程', 
     await until(() => spawnSync('wmctrl', ['-m'], { env: E.env }).status === 0, 20000, 'xfwm4');
 
     // 真实的代码智能体：opencode（默认免费模型，不需要密钥）；编辑 / 执行默认要人批准
-    assert.ok(E.cli(['runtime', 'install', 'opencode']).results[0].ok);
+    const rt = E.cli(['runtime', 'install', 'opencode']);
+    assert.ok(rt.results[0].ok, JSON.stringify(rt.results[0]));
     const cdp = await freePort();
     E.env.FOXOS_BOTS_BROWSER_ARGS = `--remote-debugging-port=${cdp} --disable-gpu --password-store=basic`;
     const out = JSON.parse(E.x(PY, ['-m', 'foxos.botchat.launch', '--workspace', E.ws, '--undock']).trim().split('\n').pop());
