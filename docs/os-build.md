@@ -4,8 +4,8 @@
 
 ## 产出
 
-- `build/os/FoxOS-0.3.0-amd64.iso`：Live（可试用）+ Calamares 安装器，UEFI 与传统 BIOS 都能引导
-- `build/os/SHA256SUMS`：该 ISO 的 sha256。当前代码在构建机上产出 `FoxOS-0.3.0-amd64.iso`（1534500864 字节，SHA-256 `8d70c6514df41dd85ddaff0b53ce4308e0b27ed13afd441687f23d536b1ef3bb`）。该文件已在 `.gitignore` 中，不会提交进 git。
+- `build/os/FoxOS-0.3.1-amd64.iso`：Live（可试用）+ Calamares 安装器，UEFI 与传统 BIOS 都能引导
+- `build/os/SHA256SUMS`：该 ISO 的 sha256。当前代码在构建机上产出 `FoxOS-0.3.1-amd64.iso`（1562474496 字节，SHA-256 `7acb74c92d159034966821900d43ddeec1815d0d7456d57232811371c31b4500`，即 Release v0.3.1-os-preview 上的镜像）。该文件已在 `.gitignore` 中，不会提交进 git。
 - 单个 ISO 必须小于 2 GB（GitHub Release 的文件上限）。LibreOffice、Everything 应用、ACP 智能体等较大组件不打进 ISO，安装后在线获取。
 
 `build/` 已在 `.gitignore` 里，不把 ISO 提交进 git。
@@ -64,14 +64,22 @@ Live 用户名为 `foxos`（见 `scripts/os/branding/casper.conf`）。在 Live 
 ## 测试引导
 
 ```bash
-scripts/os/qemu-boot.sh                          # UEFI；有可用 KVM 时用 KVM，否则 TCG
-scripts/os/qemu-boot.sh --tcg --gtk              # 强制软件模拟（部分嵌套虚拟机上 KVM 会踩内核 BUG）
-scripts/os/qemu-boot.sh build/os/FoxOS-0.3.0-amd64.iso --install-disk /tmp/foxos-disk.qcow2
+scripts/os/qemu-boot.sh                          # UEFI + KVM；KVM 不可用时直接报错，不会悄悄改用 TCG
+scripts/os/qemu-boot.sh --tcg --gtk              # 明确要求软件模拟（也可设 FOXOS_ALLOW_TEST_VMM=qemu-tcg）
+scripts/os/qemu-boot.sh build/os/FoxOS-0.3.1-amd64.iso --install-disk /tmp/foxos-disk.qcow2
 ```
 
 默认把内核串口写到 `$FOXOS_OS_WORK/qemu/serial.log`（`console=ttyS0`）。若构建机上的 QEMU 没有 VNC 显示模块，脚本会改用 gtk。
 
 QEMU 只用于在本开发机上自动测试，**不是狐狸OS 的一部分**，也不进入 ISO。在真实电脑或 Hyper-V 里测试请看 [os-test-guide.md](os-test-guide.md)（该文件随第一张可引导 ISO 一起补齐）。
+
+## 真实桌面截图
+
+```bash
+sudo scripts/os/tools/shoot-desktop.sh /tmp/foxos-shots 1920x1080
+```
+
+在构建出的根文件系统（`$FOXOS_OS_WORK/chroot`）上叠一层临时 overlay，不改 chroot 本身；建 Live 用户 `foxos`（全名「狐狸OS」），用独立 UTS 命名空间把主机名设为 `foxos`，在 Xvfb 上以 `startxfce4` 启动和 ISO 完全相同的 XFCE 会话，然后打开终端、Whisker 开始菜单和 Mousepad 截图。`docs/screenshots/os-*.png` 就是这样生成的。
 
 ## 许可证方面的处理
 
@@ -87,5 +95,5 @@ QEMU 只用于在本开发机上自动测试，**不是狐狸OS 的一部分**�
 - ISO 引导后掉进 initramfs 的 busybox，并提示 `/cow format specified as 'overlay' and no support found`：检查 `scripts/os/branding/casper.conf` 里的 `BUILD_SYSTEM` 必须是 `Ubuntu` 或 `Debian`（这是 casper 的内部字段，不是产品名）。写成其它值时，casper 会执行 `modprobe "" -b overlay` 而失败。`scripts/os/verify-initrd.sh` 会在打包时拦下这个问题。Ubuntu 24.04 的 `linux-image-generic` 已把 squashfs / loop / virtio_blk / sr_mod 编进内核，不必以模块形式存在于 initrd；overlay 仍是模块，必须在 initrd 里。
 - 启动日志里出现 `plymouthd: not found`：initramfs 里有 plymouth 脚本但没有守护进程（没装主题时 hook 会跳过复制）。构建 hook 会在没有 plymouthd 时删掉这些脚本；grub 也不再传 `splash`。
 - ISO 引导后没有图形：用菜单里的「安全模式」看启动日志，或读 QEMU 串口日志；确认 `casper` 找到了 squashfs。
-- 此宿主 `/dev/kvm` 存在但创建 vCPU 触发内核 BUG：`qemu-boot.sh --tcg` 改用软件模拟。这只影响本机构建测试，不影响 ISO 在真实电脑或正常 Hyper-V 上使用 KVM。
+- 此宿主 `/dev/kvm` 存在但创建 vCPU 触发内核 BUG：`qemu-boot.sh` 会报错退出，需明确加 `--tcg`（或 `FOXOS_ALLOW_TEST_VMM=qemu-tcg`）才用软件模拟。这只影响本机构建测试，不影响 ISO 在真实电脑或正常 Hyper-V 上使用 KVM。
 - ISO ≥ 2 GB：从 `packages.list` 再减包，或提高 squashfs 压缩（脚本已用 xz）。

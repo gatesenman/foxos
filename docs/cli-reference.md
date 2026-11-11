@@ -794,7 +794,7 @@ foxos env run NAME [--image IMAGE] [--iso ISO] [--provider PROVIDER] [--network 
 
 ```bash
 foxos env run dev --image alpine-3.20
-foxos env run live --provider linux-kvm --iso FoxOS-0.3.0-amd64.iso --desktop-attach
+foxos env run live --provider linux-kvm --iso FoxOS-0.3.1-amd64.iso --desktop-attach
 ```
 
 ### `foxos env desktop-attach`

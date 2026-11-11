@@ -35,7 +35,15 @@
 3. 智能体控制窗口走成熟的 X11 工具：`wmctrl` 列出 / 聚焦 / 关闭 / 移动 / 缩放，`xdotool` 键入与点击，`scrot` 截图。
 4. 配置是普通的 xfconf XML 与面板插件，行为可审计、可测试。
 
-外观用狐狸OS 自己的窗口装饰与面板样式（暖色、克制，不以默认 Greybird 灰皮肤示人），GTK 控件建立在 Adwaita 之上；图标主题优先 Yaru（否则 Adwaita）。来源与许可见 `scripts/os/branding/xfce/ATTRIBUTION.md`。
+外观用狐狸OS 自己的窗口装饰与面板样式（暖色、克制，不以默认 Greybird 灰皮肤示人），GTK 控件建立在 Adwaita 之上：
+
+- **图标**：Papirus（`papirus-icon-theme`），开始菜单分类、应用和面板状态图标都完整渲染；没有 Papirus 时退回 Yaru / Adwaita。
+- **壁纸**：项目自制的暖色渐变与山脊，狐狸OS 图标和字样居中（`gen-wallpaper.py` 生成，可按分辨率重出）。
+- **底栏**：46 像素高，「开始」为狐狸橙圆角按钮；时钟、**人工接管**、**系统** 各带一个符号图标和左右留白。
+- **终端**：xfce4-terminal 用暖色深色配色（背景 `#1F1915`、光标狐狸橙）、Noto Sans Mono CJK SC 等宽中日韩字体，内容区四周留白。
+- **输入法**：Fcitx5 默认英文键盘，Ctrl+空格 切到简体拼音（拼音不放第一位，否则开机就是拼音，智能体键入的英文会变成候选词）。
+
+来源与许可见 `scripts/os/branding/xfce/ATTRIBUTION.md`。
 
 ### 面板、登录、安装器
 
@@ -96,7 +104,7 @@
 - 构建脚本在 `scripts/os/`，步骤写在 [os-build.md](os-build.md)。方法是 **debootstrap（Ubuntu 24.04）→ 在 chroot 里装包与换品牌 → squashfs → GRUB 混合 ISO（UEFI + BIOS）**。每一步都在脚本里，不使用说不清的封装器。
 - 可复现：固定发行版代号与软件源，记录包列表；可选组件不打进 ISO。
 - 端到端：用 QEMU/KVM **测试**引导 ISO（UEFI）、登录、给真实桌面和真实窗口截图、跑 `foxos` 与一次 MCP 会话、安装到虚拟磁盘并再引导。另测环境：在支持 KVM 的机器上启动一个 Linux 来宾。测试结果写入 `docs/test-report.md` 与用户故事 US-6x。`npm run test:all` 增加 `test:os` 目标。
-- 预发布（如 `v0.3.0-os-preview`）附 ISO、`SHA256SUMS` 和中文测试说明 [os-test-guide.md](os-test-guide.md)（Ventoy / Rufus / dd 写 U 盘，以及在 Hyper-V / 狐狸OS 环境里引导）。
+- 预发布（如 `v0.3.1-os-preview`）附 ISO、`SHA256SUMS` 和中文测试说明 [os-test-guide.md](os-test-guide.md)（Ventoy / Rufus / dd 写 U 盘，以及在 Hyper-V / 狐狸OS 环境里引导）。
 
 ## 7. 第一张 ISO 包含什么、稍后补什么
 

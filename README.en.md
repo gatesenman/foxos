@@ -4,7 +4,7 @@
 
 <p align="center">A desktop operating system for agents: real desktop apps, one <code>foxos</code> command line and MCP tool set for everything, audit log and human takeover, and a home-grown isolation layer.</p>
 
-<p align="center"><a href="README.md">中文</a> · <a href="https://github.com/gatesenman/foxos/releases/tag/v0.3.0-os-preview">Bootable ISO</a> · <a href="https://github.com/gatesenman/foxos/releases/tag/v0.2.0-windows-preview">Windows companion preview</a> · <a href="docs/os-test-guide.md">ISO test guide</a> · <a href="AGENTS.md">AGENTS.md</a></p>
+<p align="center"><a href="README.md">中文</a> · <a href="https://github.com/gatesenman/foxos/releases/tag/v0.3.1-os-preview">Bootable ISO</a> · <a href="https://github.com/gatesenman/foxos/releases/tag/v0.2.0-windows-preview">Windows companion preview</a> · <a href="docs/os-test-guide.md">ISO test guide</a> · <a href="AGENTS.md">AGENTS.md</a></p>
 
 ![FoxOS real desktop: XFCE, start menu, bottom panel, and terminal](docs/screenshots/os-desktop.png)
 
@@ -48,31 +48,38 @@ Captured from the running desktop (xvfb, 1600×1000) with real files created in 
 
 ## Download
 
-**Bootable ISO (recommended):** [v0.3.0-os-preview](https://github.com/gatesenman/foxos/releases/tag/v0.3.0-os-preview) (pre-release). Write it to USB or boot it in Hyper-V; see the [ISO test guide](docs/os-test-guide.md).
+**Bootable ISO (recommended):** [v0.3.1-os-preview](https://github.com/gatesenman/foxos/releases/tag/v0.3.1-os-preview) (pre-release). Write it to USB or boot it in Hyper-V; see the [ISO test guide](docs/os-test-guide.md).
 
 | File | What it is |
 | --- | --- |
-| `FoxOS-0.3.0-amd64.iso.part1` / `.part2` | Two parts of the complete ISO (1507059712 bytes after concat, ~1.40 GiB) |
-| `FoxOS-0.3.0-amd64.iso` | The assembled Live + installer image (UEFI + BIOS), amd64, under 2 GB |
+| `FoxOS-0.3.1-amd64.iso.part1` / `.part2` | Two parts of the complete ISO (838860800 + 723613696 bytes, 1562474496 bytes after concat, ~1.46 GiB) |
+| `FoxOS-0.3.1-amd64.iso` | The assembled Live + installer image (UEFI + BIOS), amd64, under 2 GB, SHA-256 `7acb74c92d159034966821900d43ddeec1815d0d7456d57232811371c31b4500` |
 | `SHA256SUMS` | Checksums (complete ISO and both parts) |
 
-Uploading the single 1.4 GiB asset from this build environment was cut off mid-transfer, so the Release ships two parts. Concatenate them, then verify.
+The Release ships only the two parts: a single-file upload of the ~1.46 GiB ISO from this build environment was cut off mid-transfer, so concatenate the parts and then verify.
 
 ```bash
-base=https://github.com/gatesenman/foxos/releases/download/v0.3.0-os-preview
-curl -L -O "$base/FoxOS-0.3.0-amd64.iso.part1"
-curl -L -O "$base/FoxOS-0.3.0-amd64.iso.part2"
+base=https://github.com/gatesenman/foxos/releases/download/v0.3.1-os-preview
+curl -L -O "$base/FoxOS-0.3.1-amd64.iso.part1"
+curl -L -O "$base/FoxOS-0.3.1-amd64.iso.part2"
 curl -L -O "$base/SHA256SUMS"
-cat FoxOS-0.3.0-amd64.iso.part1 FoxOS-0.3.0-amd64.iso.part2 > FoxOS-0.3.0-amd64.iso
-sha256sum -c SHA256SUMS
+cat FoxOS-0.3.1-amd64.iso.part1 FoxOS-0.3.1-amd64.iso.part2 > FoxOS-0.3.1-amd64.iso
+sha256sum -c SHA256SUMS --ignore-missing
+```
+
+Windows (PowerShell):
+
+```powershell
+cmd /c copy /b FoxOS-0.3.1-amd64.iso.part1+FoxOS-0.3.1-amd64.iso.part2 FoxOS-0.3.1-amd64.iso
+Get-FileHash -Algorithm SHA256 .\FoxOS-0.3.1-amd64.iso
 ```
 
 Real-desktop screenshots:
 
 | | |
 | --- | --- |
-| ![FoxOS desktop](docs/screenshots/os-desktop.png)<br>**Desktop**: XFCE, bottom panel, start menu, terminal | ![Terminal](docs/screenshots/os-terminal.png)<br>**XFCE Terminal**: a real `foxos@foxos` session |
-| ![Text editor](docs/screenshots/os-editor.png)<br>**Text editor**: a standalone editor window (Mousepad is preinstalled on the ISO) | |
+| ![FoxOS desktop](docs/screenshots/os-desktop.png)<br>**Desktop**: XFCE, Whisker start menu (Chinese, Papirus icons), clock / takeover / system on the panel | ![Terminal](docs/screenshots/os-terminal.png)<br>**XFCE Terminal**: a real `foxos@foxos` session |
+| ![Text editor](docs/screenshots/os-editor.png)<br>**Text editor**: Mousepad with Chinese menus | ![Booted from the ISO](docs/screenshots/os-live-boot.png)<br>**Booted from the ISO**: the 0.3.1 live session in a VM, logged in as `foxos` on XFCE |
 
 **Windows x64 companion preview:** [v0.2.0-windows-preview](https://github.com/gatesenman/foxos/releases/tag/v0.2.0-windows-preview) (pre-release, not yet verified on real Windows hardware — see the [test checklist](docs/windows-test-guide.md)).
 

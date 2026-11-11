@@ -12,15 +12,15 @@ The intended public repository is [`gatesenman/foxos`](https://hub.docker.com/r/
 
 ## 镜像标签 / Tags
 
-标签与 GitHub Release 版本对齐，例如 `v0.3.0-os-preview` 对应：
+标签与 GitHub Release 版本对齐，例如 `v0.3.1-os-preview` 对应：
 
 | 标签 | 作用 |
 |---|---|
-| `gatesenman/foxos:0.3.0-os-preview` | 试用：在有 KVM 的 Linux 宿主上，用 **cloud-hypervisor** 引导 **真正的** FoxOS ISO，把来宾桌面以 VNC / 网页暴露出来 |
-| `gatesenman/foxos:0.3.0-os-preview-installer` | 在线安装助手：只下载 GitHub Release 里的 ISO 并校验 sha256，不启动虚拟机 |
+| `gatesenman/foxos:0.3.1-os-preview` | 试用：在有 KVM 的 Linux 宿主上，用 **cloud-hypervisor** 引导 **真正的** FoxOS ISO，把来宾桌面以 VNC / 网页暴露出来 |
+| `gatesenman/foxos:0.3.1-os-preview-installer` | 在线安装助手：只下载 GitHub Release 里的 ISO 并校验 sha256，不启动虚拟机 |
 | `gatesenman/foxos:os-preview` | 指向当前预览试用标签（推送成功后才会有） |
 
-Tags follow the GitHub Release version. `v0.3.0-os-preview` maps to `gatesenman/foxos:0.3.0-os-preview` (trial) and `gatesenman/foxos:0.3.0-os-preview-installer` (ISO download + checksum only).
+Tags follow the GitHub Release version. `v0.3.1-os-preview` maps to `gatesenman/foxos:0.3.1-os-preview` (trial) and `gatesenman/foxos:0.3.1-os-preview-installer` (ISO download + checksum only).
 
 ## 试用（真 ISO，不是假桌面）/ Trial (real ISO, not a fake desktop)
 
@@ -30,7 +30,7 @@ The container does not paint a fake desktop. It boots the real release ISO with 
 
 ```bash
 # 需要 Linux 宿主，并且 CPU 支持虚拟化（VMX/SVM），把 KVM 传进容器
-docker pull gatesenman/foxos:0.3.0-os-preview
+docker pull gatesenman/foxos:0.3.1-os-preview
 
 docker run --rm -it \
   --device /dev/kvm \
@@ -38,7 +38,7 @@ docker run --rm -it \
   --cap-add NET_ADMIN \
   -p 5900:5900 -p 6080:6080 \
   -e FOXOS_ISO_SHA256='<把 Release 里 SHA256SUMS 的值贴这里>' \
-  gatesenman/foxos:0.3.0-os-preview
+  gatesenman/foxos:0.3.1-os-preview
 ```
 
 浏览器打开 `http://127.0.0.1:6080/vnc.html`，或用 VNC 客户端连 `127.0.0.1:5900`。来宾要到图形会话起来之后桌面才会出现，请多等一会儿。
@@ -56,14 +56,14 @@ If `/dev/kvm` is missing, the entrypoint exits with an explanation. It will **no
 ## 在线安装（只拉 ISO）/ Online install (ISO only)
 
 ```bash
-docker pull gatesenman/foxos:0.3.0-os-preview-installer
+docker pull gatesenman/foxos:0.3.1-os-preview-installer
 
 docker run --rm \
   -v "$PWD:/out" \
-  gatesenman/foxos:0.3.0-os-preview-installer
+  gatesenman/foxos:0.3.1-os-preview-installer
 ```
 
-当前目录会得到 `FoxOS-0.3.0-amd64.iso` 和 `SHA256SUMS`，脚本会按校验和验证。若 Release 上没有单个完整 ISO（目前是两个分卷），入口脚本会下载分卷、拼接后再校验。然后把 ISO 写到 U 盘，或在 Hyper-V / 本机虚拟机里启动。安装步骤见 [os-test-guide.md](os-test-guide.md)。
+当前目录会得到 `FoxOS-0.3.1-amd64.iso` 和 `SHA256SUMS`，脚本会按校验和验证。若 Release 上没有单个完整 ISO（目前是两个分卷），入口脚本会下载分卷、拼接后再校验。然后把 ISO 写到 U 盘，或在 Hyper-V / 本机虚拟机里启动。安装步骤见 [os-test-guide.md](os-test-guide.md)。
 
 The current directory receives the ISO and `SHA256SUMS`, verified by checksum. If the Release has no single ISO asset (it currently ships two parts), the entrypoint downloads the parts, concatenates them, and then verifies. Write it to USB or boot it in Hyper-V / a local VM. See [os-test-guide.md](os-test-guide.md).
 
@@ -72,8 +72,8 @@ The current directory receives the ISO and `SHA256SUMS`, verified by checksum. I
 在仓库根目录：
 
 ```bash
-docker build -f docker/os/Dockerfile -t gatesenman/foxos:0.3.0-os-preview .
-docker build -f docker/os/Dockerfile.installer -t gatesenman/foxos:0.3.0-os-preview-installer .
+docker build -f docker/os/Dockerfile -t gatesenman/foxos:0.3.1-os-preview .
+docker build -f docker/os/Dockerfile.installer -t gatesenman/foxos:0.3.1-os-preview-installer .
 ```
 
 不要在未得到 Sarah 同意、未登录其账号之前执行 `docker login` 或 `docker push`。CI 工作流是 `.github/workflows/docker.yml`，默认只构建；把 `push` 设为 true 且 Secrets 配好之后才会推送。

@@ -5,7 +5,7 @@
 <p align="center">给智能体使用的桌面操作系统：真实的桌面与应用、统一的 <code>foxos</code> 命令与 MCP 工具、审计与人工接管、自研隔离环境。</p>
 
 <p align="center">
-  <a href="https://github.com/gatesenman/foxos/releases/tag/v0.3.0-os-preview">下载可引导 ISO</a> ·
+  <a href="https://github.com/gatesenman/foxos/releases/tag/v0.3.1-os-preview">下载可引导 ISO</a> ·
   <a href="https://github.com/gatesenman/foxos/releases/tag/v0.2.0-windows-preview">Windows 伴侣预览</a> ·
   <a href="#快速开始">快速开始</a> ·
   <a href="AGENTS.md">智能体接入</a> ·
@@ -69,32 +69,39 @@ Windows 上的 `.exe` 是**伴侣程序**（预览版见 [v0.2.0-windows-preview
 
 ## 下载
 
-**可引导 ISO（推荐）**：[v0.3.0-os-preview](https://github.com/gatesenman/foxos/releases/tag/v0.3.0-os-preview)（预发布）。写到 U 盘或在 Hyper-V 里启动，步骤见 [ISO 测试指南](docs/os-test-guide.md)。
+**可引导 ISO（推荐）**：[v0.3.1-os-preview](https://github.com/gatesenman/foxos/releases/tag/v0.3.1-os-preview)（预发布）。写到 U 盘或在 Hyper-V 里启动，步骤见 [ISO 测试指南](docs/os-test-guide.md)。
 
 | 文件 | 说明 |
 | --- | --- |
-| `FoxOS-0.3.0-amd64.iso.part1` / `.part2` | 完整 ISO 的两个分卷（拼接后 1507059712 字节，约 1.40 GiB） |
-| `FoxOS-0.3.0-amd64.iso` | 拼接得到的 Live + 安装镜像（UEFI + BIOS），amd64，小于 2 GB |
+| `FoxOS-0.3.1-amd64.iso.part1` / `.part2` | 完整 ISO 的两个分卷（838860800 + 723613696 字节，拼接后 1562474496 字节，约 1.46 GiB） |
+| `FoxOS-0.3.1-amd64.iso` | 拼接得到的 Live + 安装镜像（UEFI + BIOS），amd64，小于 2 GB，SHA-256 `7acb74c92d159034966821900d43ddeec1815d0d7456d57232811371c31b4500` |
 | `SHA256SUMS` | 校验和（含完整 ISO 与两个分卷） |
 
-本构建环境向 GitHub 上传单个约 1.4 GiB 附件会在中途断开，所以 Release 上是两个分卷，拼起来后再校验。
+Release 上只有两个分卷：本构建环境单个上传约 1.46 GiB 的完整 ISO 时连接在中途断开，所以请把分卷拼起来再校验。
 
 ```bash
 # 下载两个分卷和校验和，拼回 ISO（版本号以 Release 页面为准）
-base=https://github.com/gatesenman/foxos/releases/download/v0.3.0-os-preview
-curl -L -O "$base/FoxOS-0.3.0-amd64.iso.part1"
-curl -L -O "$base/FoxOS-0.3.0-amd64.iso.part2"
+base=https://github.com/gatesenman/foxos/releases/download/v0.3.1-os-preview
+curl -L -O "$base/FoxOS-0.3.1-amd64.iso.part1"
+curl -L -O "$base/FoxOS-0.3.1-amd64.iso.part2"
 curl -L -O "$base/SHA256SUMS"
-cat FoxOS-0.3.0-amd64.iso.part1 FoxOS-0.3.0-amd64.iso.part2 > FoxOS-0.3.0-amd64.iso
-sha256sum -c SHA256SUMS
+cat FoxOS-0.3.1-amd64.iso.part1 FoxOS-0.3.1-amd64.iso.part2 > FoxOS-0.3.1-amd64.iso
+sha256sum -c SHA256SUMS --ignore-missing
+```
+
+Windows（PowerShell）：
+
+```powershell
+cmd /c copy /b FoxOS-0.3.1-amd64.iso.part1+FoxOS-0.3.1-amd64.iso.part2 FoxOS-0.3.1-amd64.iso
+Get-FileHash -Algorithm SHA256 .\FoxOS-0.3.1-amd64.iso
 ```
 
 真实桌面截图：
 
 | | |
 | --- | --- |
-| ![狐狸OS 桌面](docs/screenshots/os-desktop.png)<br>**桌面**：XFCE、底部面板、开始菜单、终端 | ![终端](docs/screenshots/os-terminal.png)<br>**XFCE 终端**：真实的 `foxos@foxos` 会话 |
-| ![文本编辑器](docs/screenshots/os-editor.png)<br>**文本编辑器**：系统里的独立编辑器窗口（ISO 预装 Mousepad） | |
+| ![狐狸OS 桌面](docs/screenshots/os-desktop.png)<br>**桌面**：XFCE、Whisker 开始菜单（中文、Papirus 图标）、底栏的时钟 / 人工接管 / 系统 | ![终端](docs/screenshots/os-terminal.png)<br>**XFCE 终端**：真实的 `foxos@foxos` 会话，`foxos desktop windows` 列出真实窗口 |
+| ![文本编辑器](docs/screenshots/os-editor.png)<br>**文本编辑器**：Mousepad，中文菜单 | ![从 ISO 引导](docs/screenshots/os-live-boot.png)<br>**从 ISO 引导**：0.3.1 Live 会话在虚拟机里自动登录 `foxos` 进入 XFCE |
 
 **Windows x64 伴侣预览**：[v0.2.0-windows-preview](https://github.com/gatesenman/foxos/releases/tag/v0.2.0-windows-preview)（预发布，尚未在 Windows 实机上验收，见 [Windows 测试清单](docs/windows-test-guide.md)）
 
