@@ -193,7 +193,8 @@ def password_attempt(user: str, password: str) -> subprocess.CompletedProcess:
 
 
 def wait_ssh(timeout: float) -> float:
-    t0 = time.time()
+    """返回从 VM 启动到密钥登录成功的秒数。"""
+    t0 = dt.datetime.strptime(state()["started"], "%Y-%m-%d %H:%M:%S").replace(tzinfo=TZ).timestamp()
     while time.time() - t0 < timeout:
         try:
             if ssh("true", timeout=60).returncode == 0:
