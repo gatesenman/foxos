@@ -31,6 +31,14 @@
   }
 
   const KIND = { env: 'client.kind_env', ssh: 'client.kind_ssh', machine: 'client.kind_machine' };
+  // 与 main/policy.js 的 guestCompat 相同：来宾版本 >= 最低版本为 ok
+  const MIN = (FX.env && FX.env.guestMin) || '0.3.3';
+  const compat = (v) => {
+    const p = (x) => (/(\d+)\.(\d+)\.(\d+)/.exec(String(x || '')) || []).slice(1).map(Number);
+    const a = p(v); const b = p(MIN); if (a.length < 3) return 'unknown';
+    for (let i = 0; i < 3; i++) if (a[i] !== b[i]) return a[i] > b[i] ? 'ok' : 'old';
+    return 'ok';
+  };
 
   FX.registerApp('computer', {
     title: () => FX.t('client.computer_title'),
@@ -92,10 +100,13 @@
         labelEl.textContent = `${st.label || ''} · ${FX.t(KIND[st.config.kind])}${st.provider ? ` · ${st.provider}` : ''}`;
         const ok = st.reach && st.reach.ok;
         statusEl.textContent = st.error ? st.error : ok ? FX.t('client.reachable', st.reach.version || '') : (st.state === 'running' ? FX.t('client.booting') : (st.state || FX.t('client.unreachable')));
-        statusEl.className = `badge ${ok ? 'ok' : 'warn'}`;
+        const old = ok && st.reach.compat === 'old';
+        if (old) statusEl.textContent = FX.t('client.version_old', st.reach.version || '?', st.reach.min || MIN);
+        statusEl.className = `badge ${ok && !old ? 'ok' : 'warn'}`;
         statusEl.dataset.guestStatus = ok ? 'ok' : (st.state || 'down');
+        statusEl.dataset.guestCompat = ok ? (st.reach.compat || 'unknown') : '';
         statusEl.title = (st.reach && st.reach.error) || '';
-        note.textContent = ok ? '' : (st.reach && st.reach.error) || '';
+        note.textContent = old ? FX.t('client.version_old_note', st.reach.min || MIN) : ok ? '' : (st.reach && st.reach.error) || '';
         return st;
       }
 
@@ -105,6 +116,14 @@
         const pane = el('div', { class: 'computer-setup scroll pad', 'data-guest-setup': '' });
         view.replaceChildren(pane);
         pane.append(el('h2', { text: FX.t('client.setup_title') }), el('p', { class: 'muted', text: FX.t('client.setup_intro') }));
+        // 0. 需要什么版本、没有狐狸OS 电脑时怎么拿到一台（首次运行时用户最需要的信息）
+        const L = FX.env.guestLinks || {};
+        const link = (key, href, ic) => el('button', { class: 'btn ghost sm', 'data-link': key, disabled: !href, onclick: () => window.foxos.openExternal(href) }, icon(ic), FX.t(`client.link_${key}`));
+        pane.append(el('div', { class: 'card', 'data-setup': 'need', 'data-guest-min': MIN }, el('h3', {}, icon('info-circle'), ` ${FX.t('client.need_title')}`),
+          el('div', { class: 'small', text: FX.t('client.need_version', MIN) }),
+          el('ol', { class: 'small' }, el('li', { text: FX.t('client.need_iso', MIN) }), el('li', { text: FX.t('client.need_ssh') }),
+            el('li', { text: FX.t('client.need_create') }), el('li', { text: FX.t('client.need_remote', MIN) })),
+          el('div', { class: 'row' }, link('releases', L.releases, 'download'), link('iso_guide', L.isoGuide, 'book'), link('client_guide', L.clientGuide, 'help-circle'))));
         // A. 本机虚拟机
         const envBox = el('div', { class: 'card', 'data-setup': 'env' }, el('h3', {}, icon('box'), ` ${FX.t('client.kind_env')}`), el('div', { class: 'muted small', text: '…' }));
         // B. 远程（SSH）
@@ -137,7 +156,10 @@
         const list = envs.length ? envs.map((e) => el('div', { class: 'row', 'data-env': e.name }, icon(e.state === 'running' ? 'player-play' : 'box'), el('span', { class: 'grow', text: `${e.name} · ${e.provider || e.backend || ''} · ${e.state}` }),
           el('button', { class: 'btn sm', 'data-act': 'use-env', onclick: () => use({ kind: 'env', env: e.name }) }, FX.t('client.use_this')))) : [el('div', { class: 'muted small', text: FX.t('client.no_vms') })];
         const name = el('input', { value: envs.find((e) => e.name === 'foxos') ? `foxos-${envs.length + 1}` : 'foxos', size: 12, 'data-f': 'env-name' });
-        const preset = el('select', { 'data-f': 'preset' }, presets.map((p) => el('option', { value: p.id, text: p.name })));
+        // 狐狸OS ISO 预设低于最低版本时标出来（装好也连不上：没有 sshd），排在后面，不默认选中
+        const tooOld = (p) => p.kind === 'foxos-iso' && compat(p.version) === 'old';
+        presets.sort((a, b) => tooOld(a) - tooOld(b));
+        const preset = el('select', { 'data-f': 'preset' }, presets.map((p) => el('option', { value: p.id, 'data-too-old': tooOld(p) ? '1' : '0', text: tooOld(p) ? `${p.name} — ${FX.t('client.preset_too_old', MIN)}` : p.name })));
         const prov = el('select', { 'data-f': 'provider' }, providers.length ? providers.map((p) => el('option', { value: p.id, text: p.name })) : [el('option', { value: '', text: FX.t('client.no_provider') })]);
         box.replaceChildren(box.firstChild, ...list,
           el('div', { class: 'muted small', text: FX.t('client.create_intro') }),

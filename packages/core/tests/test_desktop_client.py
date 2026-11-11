@@ -168,3 +168,28 @@ def test_US86_cli_starts_without_posix_only_modules_like_windows():
                        env={**__import__("os").environ, "PYTHONPATH": str(core)})
     assert "ModuleNotFoundError" not in (r.stdout + r.stderr), r.stderr[-2000:]
     assert '"ok": true' in r.stdout, (r.stdout[-500:], r.stderr[-2000:])
+
+
+def test_US87_guest_version_requirement_and_first_run_help():
+    """没有来宾的用户不能卡住：首次运行说明需要哪个版本、怎么拿到一台；连上旧版本时明确提示。"""
+    out = node("""
+const p = require('./src/main/policy');
+console.log(JSON.stringify({min: p.GUEST_MIN_VERSION, links: p.GUEST_LINKS,
+  c: [p.guestCompat('0.3.2'), p.guestCompat('foxos 0.3.3'), p.guestCompat('0.10.0'), p.guestCompat(null), p.guestCompat('0.2.9')]}));
+""")
+    assert out["min"] == "0.3.3"
+    assert out["c"] == ["old", "ok", "ok", "unknown", "old"]
+    assert all(u.startswith("https://github.com/gatesenman/foxos/") for u in out["links"].values())
+    assert "os-preview" in out["links"]["releases"]
+    assert "compat: policy.guestCompat(" in _src(MAIN / "guest.js")
+    assert "guestLinks: policy.GUEST_LINKS" in _src(MAIN / "index.js")
+    comp = _src(DESK / "src" / "renderer" / "js" / "apps" / "computer.js")
+    for needle in ("'data-setup': 'need'", "client.need_iso", "client.need_ssh", "client.need_create", "client.need_remote",
+                   "link('releases'", "link('iso_guide'", "client.version_old", "client.preset_too_old"):
+        assert needle in comp, needle
+    for loc in ("zh-CN", "en-US"):
+        d = json.loads((DESK / "src" / "locales" / f"{loc}.json").read_text(encoding="utf-8"))
+        for k in ("need_title", "need_version", "need_iso", "need_ssh", "need_create", "need_remote", "link_releases",
+                  "link_iso_guide", "link_client_guide", "preset_too_old", "version_old", "version_old_note"):
+            assert d.get(f"client.{k}"), (loc, k)
+        assert "{0}" in d["client.need_version"] and "{1}" in d["client.version_old"]

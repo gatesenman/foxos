@@ -121,6 +121,8 @@ handle('env', () => ({
   mode: kernel.executionMode(),
   hostExecution: settings.load().hostExecution === true,
   guest: guest.config(),
+  guestMin: policy.GUEST_MIN_VERSION,
+  guestLinks: policy.GUEST_LINKS,
   encryption: settings.encryptionInfo(),
   setupDone: settings.load().setupDone,
   screenshot: Boolean(SCREENSHOT),
