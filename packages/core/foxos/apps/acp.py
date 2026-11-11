@@ -59,7 +59,7 @@ def fetch_registry(offline: bool = False) -> dict:
     cache = home() / "registry-cache.json"
     if not offline and not os.environ.get("FOXOS_OFFLINE"):
         try:
-            with urllib.request.urlopen(REGISTRY_URL, timeout=15) as r:
+            with urllib.request.urlopen(urllib.request.Request(REGISTRY_URL, headers={"User-Agent": "foxos-acp"}), timeout=15) as r:
                 data = json.loads(r.read().decode("utf-8"))
             cache.parent.mkdir(parents=True, exist_ok=True)
             cache.write_text(json.dumps(data), encoding="utf-8")
@@ -126,7 +126,7 @@ def fetch_icon(entry: dict) -> Path | None:
     if p.is_file():
         return p
     try:
-        with urllib.request.urlopen(url, timeout=15) as r:
+        with urllib.request.urlopen(urllib.request.Request(url, headers={"User-Agent": "foxos-acp"}), timeout=15) as r:
             data = r.read()
         if b"<svg" not in data[:2000] or len(data) > 512 * 1024:
             return None
@@ -152,7 +152,7 @@ def _run(argv: list[str], cwd: Path, log) -> None:
 
 
 def _download(url: str, log, progress) -> tuple[bytes, str]:
-    with urllib.request.urlopen(url, timeout=60) as r:
+    with urllib.request.urlopen(urllib.request.Request(url, headers={"User-Agent": "foxos-acp"}), timeout=60) as r:
         total = int(r.headers.get("Content-Length") or 0)
         buf = io.BytesIO()
         h = hashlib.sha256()
