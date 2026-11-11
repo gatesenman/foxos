@@ -373,6 +373,53 @@ def memory_forget(ws, ref: str, mem_id: str) -> dict:
     return {"forgotten": mem_id}
 
 
+def _alive(pid) -> bool:
+    """等待回答的进程是否还在（进程退出后，它的审批和未结束的回合不再显示）。没有记录 pid 的旧记录视为在。"""
+    if not isinstance(pid, int):
+        return True
+    try:
+        os.kill(pid, 0)
+    except ProcessLookupError:
+        return False
+    except PermissionError:
+        return True
+    return True
+
+
+def open_turn_offset(ws, bid: str, window: int = 4 << 20) -> int:
+    """events.jsonl 里尚未结束的最后一个回合的起始偏移；没有则返回文件末尾。
+    界面连上时从这里回放，正在进行的回合（含等待审批的卡片）就能完整显示。"""
+    p = root(ws) / bid / "events.jsonl"
+    if not p.exists():
+        return 0
+    size = p.stat().st_size
+    start = max(0, size - window)
+    with open(p, "rb") as f:
+        f.seek(start)
+        data = f.read()
+    if start:
+        nl = data.find(b"\n")
+        data, start = data[nl + 1:], start + nl + 1
+    pos, open_at, ended = 0, None, set()
+    starts: list[tuple[str, int]] = []
+    for line in data.splitlines(keepends=True):
+        if b'"turn_start"' in line or b'"turn_end"' in line:
+            try:
+                e = json.loads(line)
+            except ValueError:
+                e = {}
+            if e.get("type") == "turn_start" and _alive(e.get("pid")):
+                starts.append((e.get("turn"), start + pos))
+            elif e.get("type") == "turn_end":
+                ended.add(e.get("turn"))
+        pos += len(line)
+    for turn, off in reversed(starts):
+        if turn not in ended:
+            open_at = off
+            break
+    return size if open_at is None else open_at
+
+
 def events_since(ws, bid: str, offset: int) -> tuple[list[dict], int]:
     p = root(ws) / bid / "events.jsonl"
     if not p.exists():
@@ -409,7 +456,7 @@ def approvals_pending(ws) -> list[dict]:
             a = json.loads(f.read_text(encoding="utf-8"))
         except ValueError:
             continue
-        if a.get("status") == "pending" and a.get("expires", 0) > time.time():
+        if a.get("status") == "pending" and a.get("expires", 0) > time.time() and _alive(a.get("pid")):
             out.append(a)
     return out
 
@@ -455,7 +502,7 @@ def ask_file(ws, bot: dict, tool_call: dict, options: list[dict], turn: str | No
     """不在聊天回合里的审批（例如连接器的写工具经 MCP 调用）：写审批请求，等人在界面或命令行回答。"""
     rid = "apr-" + uuid.uuid4().hex[:10]
     a = {"id": rid, "status": "pending", "bot": bot["id"], "bot_name": bot["name"], "turn": turn, "toolCall": tool_call,
-         "options": options, "created": audit.now_iso(), "expires": time.time() + APPROVAL_TIMEOUT}
+         "options": options, "created": audit.now_iso(), "expires": time.time() + APPROVAL_TIMEOUT, "pid": os.getpid()}
     f = _approvals_dir(ws) / f"{rid}.json"
     f.write_text(json.dumps(a, ensure_ascii=False), encoding="utf-8")
     if turn:
@@ -609,6 +656,16 @@ _pool: dict[str, dict] = {}
 _pool_lock = threading.Lock()
 
 
+def cancel(bid: str) -> bool:
+    """停止智能体正在进行的这一轮（ACP session/cancel）。只对聊天窗口里复用的连接有效。"""
+    with _pool_lock:
+        p = _pool.get(bid)
+    if not p or p["conn"].closed:
+        return False
+    p["conn"].cancel(p["session"])
+    return True
+
+
 def _pool_drop(bid: str):
     with _pool_lock:
         p = _pool.pop(bid, None)
@@ -697,7 +754,7 @@ def run_turn(ws, ref: str, text: str, *, attachments: list | None = None, actor:
                 "attachments": attachments or [], "origin": origin, "ts": audit.now_iso(),
                 **({"delegated_by": delegated_by, "envelope": envelope} if delegated_by else {})}
     _append(_bot_dir(ws, bot["id"]) / "messages.jsonl", user_msg)
-    turn.emit({"type": "turn_start", "message": user_msg})
+    turn.emit({"type": "turn_start", "message": user_msg, "pid": os.getpid()})
     ident = f"bot:{bot['id']}"
     stop = "end_turn"
     error = None
@@ -801,7 +858,8 @@ def _run_acp(ws, bot, turn: _Turn, text, skill_block, envelope, attachments, ide
             return opt
         rid = "apr-" + uuid.uuid4().hex[:10]
         a = {"id": rid, "status": "pending", "bot": bot["id"], "bot_name": bot["name"], "turn": turn.turn, "toolCall": tc,
-             "options": opts, "created": audit.now_iso(), "expires": time.time() + APPROVAL_TIMEOUT, "machine": turn.machine}
+             "options": opts, "created": audit.now_iso(), "expires": time.time() + APPROVAL_TIMEOUT, "machine": turn.machine,
+             "pid": os.getpid()}
         f = _approvals_dir(ws) / f"{rid}.json"
         f.write_text(json.dumps(a, ensure_ascii=False), encoding="utf-8")
         cd["approval"] = {"request": rid, "options": opts, "decision": "pending"}
