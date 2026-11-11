@@ -508,8 +508,11 @@ function tabSetup(body, d, ctx) {
       <select id="f-agent">${agents.map(a => `<option value="${esc(a.id)}" ${a.id === (be.agent || "foxos-local") ? "selected" : ""}>${esc(a.name)} (${esc(a.id)})</option>`).join("")}</select>
       <div class="help">${esc(t("settings.agent_help"))} <a href="#" id="go-agents">${esc(t("nav.agents"))}</a></div></div>
       <div class="field"><label>${esc(t("settings.model_pref"))}</label><input id="f-model-pref" value="${esc(d.model || "")}" placeholder="${esc(t("settings.optional"))}"></div></div>
-    <div id="f-model" class="${be.kind === "model" ? "" : "hidden"}"><div class="field"><label>${esc(t("settings.endpoint"))}</label><input id="f-base" value="${esc(be.base_url || "")}" placeholder="https://api.example.com/v1"></div>
-      <div class="two"><div class="field"><label>${esc(t("settings.model"))}</label><input id="f-model-name" value="${esc(be.model || "")}"></div>
+    <div id="f-model" class="${be.kind === "model" ? "" : "hidden"}"><div class="field"><label>${esc(t("settings.provider"))}</label>
+      <select id="f-provider">${Object.entries(d.providers || {}).map(([k, v]) => `<option value="${esc(k)}" ${k === (be.provider || (be.base_url ? "custom" : "deepseek")) ? "selected" : ""}>${esc(v.title)}</option>`).join("")}</select>
+      <div class="help" id="f-provider-help"></div></div>
+      <div class="field"><label>${esc(t("settings.endpoint"))}</label><input id="f-base" value="${esc(be.base_url || "")}" placeholder="https://api.example.com/v1"></div>
+      <div class="two"><div class="field"><label>${esc(t("settings.model"))}</label><input id="f-model-name" list="f-model-list" value="${esc(be.model || "")}"><datalist id="f-model-list"></datalist></div>
       <div class="field"><label>${esc(t("settings.api_key"))}${d.has_api_key ? ` <span class="chip ok">${esc(t("settings.saved_key"))}</span>` : ""}</label><input type="password" id="f-key" autocomplete="off" placeholder="${esc(d.has_api_key ? "••••••••" : "")}"></div></div>
       <div class="help">${esc(t("settings.model_help"))}</div></div></div>
   <div class="section"><h4><i class="ti ti-eye"></i>${esc(t("settings.visibility"))}</h4>
@@ -520,6 +523,14 @@ function tabSetup(body, d, ctx) {
   $$("#f-icons button", body).forEach(x => x.onclick = () => { icon = x.dataset.icon; $("#f-image").value = ""; $$("#f-icons button").forEach(y => y.classList.toggle("sel", y === x)); });
   $$("#f-colors button", body).forEach(x => x.onclick = () => { color = x.dataset.color; $$("#f-colors button").forEach(y => y.classList.toggle("sel", y === x)); });
   $$("#f-kind button", body).forEach(x => x.onclick = () => { kind = x.dataset.k; $$("#f-kind button").forEach(y => y.classList.toggle("sel", y === x)); $("#f-acp").classList.toggle("hidden", kind === "model"); $("#f-model").classList.toggle("hidden", kind !== "model"); });
+  const provs = d.providers || {};
+  const fillProvider = (first) => {
+    const k = $("#f-provider").value, v = provs[k] || {};
+    if (!first || !$("#f-base").value) { if (v.base_url || k === "custom") $("#f-base").value = v.base_url || $("#f-base").value; if (v.model) $("#f-model-name").value = v.model; }
+    $("#f-model-list").innerHTML = (v.models || []).map(m => `<option value="${esc(m)}">`).join("");
+    $("#f-provider-help").innerHTML = v.keys ? `${esc(t("settings.provider_keys"))} <a href="${esc(v.keys)}" target="_blank" rel="noopener">${esc(v.keys)}</a>` : "";
+  };
+  if ($("#f-provider")) { $("#f-provider").onchange = () => fillProvider(false); fillProvider(true); }
   $$("#f-vis button", body).forEach(x => x.onclick = () => { vis = x.dataset.v; $$("#f-vis button").forEach(y => y.classList.toggle("sel", y === x)); });
   $("#go-agents").onclick = e => { e.preventDefault(); showView("agents"); };
   $("#f-upload").onclick = () => $("#f-img-file").click();
@@ -528,7 +539,7 @@ function tabSetup(body, d, ctx) {
     const p = { name: $("#f-name").value.trim(), title: $("#f-title").value, role: $("#f-role").value, instructions: $("#f-instr").value,
       color, visibility: vis, isolated: $("#f-isolated").checked, scope: $("#f-scope").value.trim() || "." };
     const img = $("#f-image").value.trim(); if (img) p.image = img; else if (icon) { p.icon = icon; p.image = ""; }
-    if (kind === "model") { p.base_url = $("#f-base").value.trim(); p.model = $("#f-model-name").value.trim(); const k = $("#f-key").value; if (k) p.api_key = k; }
+    if (kind === "model") { p.provider = $("#f-provider").value; p.base_url = $("#f-base").value.trim(); p.model = $("#f-model-name").value.trim(); const k = $("#f-key").value; if (k) p.api_key = k; }
     else { p.agent = $("#f-agent").value; p.model = $("#f-model-pref").value.trim(); }
     await patchBot(d.id, p);
   });

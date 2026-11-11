@@ -23,7 +23,7 @@ test('US-53 每个程序使用其开源项目自带的图标', async () => {
   const { app, page } = await launch(ws, { extraEnv: { FOXOS_HOME } });
   try {
     const report = await page.evaluate(() => window.foxos.icons.report());
-    const own = ['files', 'environments', 'appcenter', 'settings'];
+    const own = ['files', 'environments', 'appcenter', 'settings', 'bots'];
 
     // 桌面快捷方式与开始菜单
     await settle(page, '#desktop-icons');

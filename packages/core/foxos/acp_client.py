@@ -344,6 +344,25 @@ class AcpConnection:
         sid = session.get("sessionId")
         models = (session.get("models") or {}).get("availableModels") or []
         modes = (session.get("modes") or {}).get("availableModes") or []
+        # 新版 ACP：会话配置项（configOptions，category=model/mode），用 session/set_config_option 设置（opencode 等）
+        opts = {o.get("category") or o.get("id"): o for o in (session.get("configOptions") or []) if isinstance(o, dict)}
+        for cat, want in (("model", model), ("mode", mode)):
+            o = opts.get(cat)
+            if not want or not o:
+                continue
+            values = [v.get("value") for v in o.get("options") or []]
+            if values and want not in values:
+                out[cat] = {"ok": False, "error": f"unknown {cat}", "available": values}
+            else:
+                try:
+                    self.request("session/set_config_option", {"sessionId": sid, "configId": o["id"], "value": want}, timeout)
+                    out[cat] = {"ok": True, "id": want}
+                except AcpError as e:
+                    out[cat] = {"ok": False, "error": str(e)}
+            if cat == "model":
+                model = None
+            else:
+                mode = None
         if model:
             if models and not any(m.get("modelId") == model for m in models):
                 out["model"] = {"ok": False, "error": "unknown model", "available": [m.get("modelId") for m in models]}

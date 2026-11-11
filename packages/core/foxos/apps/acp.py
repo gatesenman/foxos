@@ -260,8 +260,15 @@ def install_agent(id_: str, log=print, progress=lambda got, total: None) -> dict
 
 
 # ---------------------------------------------------------------------- 握手
+# 让智能体在改文件、跑命令前走 ACP session/request_permission（狐狸OS 的审批卡片），而不是自己默认放行。
+# 用户在 acp agent config --env 里设了同名变量时以用户的为准。
+DEFAULT_ENV = {
+    "opencode": {"OPENCODE_CONFIG_CONTENT": json.dumps({"permission": {"edit": "ask", "bash": "ask", "webfetch": "ask"}})},
+}
+
+
 def agent_env(id_: str, info: dict) -> dict:
-    return {**(info.get("env") or {}), **secrets.env_for(f"acp:{id_}:")}
+    return {**DEFAULT_ENV.get(id_, {}), **(info.get("env") or {}), **secrets.env_for(f"acp:{id_}:")}
 
 
 def probe(ws, id_: str, new_session: bool = True, timeout: float = 90.0) -> dict:
@@ -282,7 +289,8 @@ def probe(ws, id_: str, new_session: bool = True, timeout: float = 90.0) -> dict
         if new_session:
             try:
                 s = conn.new_session([foxos_mcp_server(ws.root, ident)], timeout)
-                out["session"] = {"ok": True, "sessionId": s.get("sessionId"), "models": s.get("models"), "modes": s.get("modes")}
+                out["session"] = {"ok": True, "sessionId": s.get("sessionId"), "models": s.get("models"), "modes": s.get("modes"),
+                                  "configOptions": s.get("configOptions")}
             except AcpError as e:
                 out["session"] = {"ok": False, "code": e.code, "message": str(e), "auth_required": e.code == -32000}
     except AcpError as e:

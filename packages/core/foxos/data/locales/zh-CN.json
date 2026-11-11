@@ -1304,5 +1304,7 @@
   "env.expose_summary": "把虚拟机的 SSH 端口转发开放到主机的所有地址，或收回到本机",
   "env.expose_ssh_param": "on（对外开放）或 off（只在本机）",
   "env.expose_port_param": "主机上的固定端口（默认自动挑一个）",
-  "env.expose_limit": "开放只有人能执行；下次启动生效；主机防火墙需放行该端口"
+  "env.expose_limit": "开放只有人能执行；下次启动生效；主机防火墙需放行该端口",
+  "bot.p_provider": "模型服务商预设：deepseek、openai、dashscope、ollama 或 custom（填好地址与默认模型；密钥用 --api-key-stdin 存进本机密钥库）",
+  "bots.model_unknown_tool": "模型调用了不存在的工具：{0}"
 }
