@@ -1,0 +1,36 @@
+# Maintainer: gaosichun <gatesenman@users.noreply.github.com>
+pkgname=foxos-bin
+pkgver=0.3.2
+pkgrel=1
+pkgdesc="FoxOS desktop companion and foxos CLI for agents (bundled Python 3.12 and kernel)"
+arch=('x86_64' 'aarch64')
+url="https://github.com/gatesenman/foxos"
+license=('LicenseRef-FoxOS')
+depends=('gtk3' 'nss' 'alsa-lib' 'libxss' 'libxtst' 'libnotify' 'libsecret' 'xdg-utils' 'at-spi2-core' 'ttf-font')
+optdepends=('noto-fonts-cjk: Chinese UI font')
+provides=('foxos')
+conflicts=('foxos')
+options=('!strip' '!debug')
+_tag=v0.3.2-os-preview
+source_x86_64=("FoxOS-$pkgver-linux-x64.tar.gz::https://github.com/gatesenman/foxos/releases/download/$_tag/FoxOS-$pkgver-linux-x64.tar.gz")
+source_aarch64=("FoxOS-$pkgver-linux-arm64.tar.gz::https://github.com/gatesenman/foxos/releases/download/$_tag/FoxOS-$pkgver-linux-arm64.tar.gz")
+sha256sums_x86_64=('f18f5bc3cf8f65e1d73e087e4f75a9a78730e2e7ffef9163e54de3c7dfb97a57')
+sha256sums_aarch64=('d46c150c91a0500e1dd78826829120d8c31a56f9d1240121118f03ed7d8c5c55')
+
+package() {
+  install -d "$pkgdir/opt/foxos" "$pkgdir/usr/bin"
+  case $CARCH in x86_64) _a=x64 ;; aarch64) _a=arm64 ;; esac
+  cp -a "$srcdir/FoxOS-$pkgver-linux-$_a/." "$pkgdir/opt/foxos/"
+  ln -s /opt/foxos/foxos-desktop "$pkgdir/usr/bin/foxos-desktop"
+  ln -s /opt/foxos/resources/bin/foxos "$pkgdir/usr/bin/foxos"
+  install -Dm644 "$pkgdir/opt/foxos/resources/icon.png" "$pkgdir/usr/share/pixmaps/foxos.png"
+  install -Dm644 /dev/stdin "$pkgdir/usr/share/applications/foxos.desktop" <<EOF
+[Desktop Entry]
+Type=Application
+Name=FoxOS
+Name[zh_CN]=狐狸OS
+Exec=/usr/bin/foxos-desktop %U
+Icon=foxos
+Categories=Office;
+EOF
+}
