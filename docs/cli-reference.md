@@ -2776,7 +2776,7 @@ foxos env fix --provider wsl2 --action enable-wsl
 可一键安装的系统目录（WSL 发行版、LXC/官方根文件系统、Windows Sandbox、Hyper-V、macOS）
 
 ```text
-foxos env catalog [--guest {linux,windows,macos,any}] [--provider PROVIDER] [--available]
+foxos env catalog [--guest {linux,windows,macos,any}] [--provider PROVIDER] [--available] [--presets]
 ```
 
 工具接口名：`env_catalog` · 权限：`read`
@@ -2786,11 +2786,13 @@ foxos env catalog [--guest {linux,windows,macos,any}] [--provider PROVIDER] [--a
 | `guest` | `--guest` | string |  | 来宾系统；可选：linux / windows / macos / any |
 | `provider` | `--provider` | string |  | 只看某个提供者 |
 | `available` | `--available` | boolean |  | 只显示本机可安装的 |
+| `presets` | `--presets` | boolean |  | 只显示狐狸OS 预设系统 |
 
 示例：
 
 ```bash
 foxos env catalog --json
+foxos env catalog --presets
 foxos env catalog --guest windows
 ```
 
@@ -2799,7 +2801,7 @@ foxos env catalog --guest windows
 从目录一键安装一个系统为新环境（下载、校验 sha256、导入）
 
 ```text
-foxos env install ENTRY NAME [--provider PROVIDER] [--url URL] [--sha256 SHA256] [--iso ISO] [--location LOCATION] [--memory-mb MEMORY_MB] [--cpus CPUS] [--disk-gb DISK_GB] [--dry-run]
+foxos env install ENTRY NAME [--provider PROVIDER] [--url URL] [--sha256 SHA256] [--iso ISO] [--location LOCATION] [--memory-mb MEMORY_MB] [--cpus CPUS] [--disk-gb DISK_GB] [--dry-run] [--product-key PRODUCT_KEY] [--start] [--wait-ready WAIT_READY]
 ```
 
 工具接口名：`env_install` · 权限：`create`
@@ -2817,10 +2819,15 @@ foxos env install ENTRY NAME [--provider PROVIDER] [--url URL] [--sha256 SHA256]
 | `cpus` | `--cpus` | integer |  | CPU 数（Hyper-V） |
 | `disk_gb` | `--disk-gb` | integer |  | 磁盘 GB（Hyper-V） |
 | `dry_run` | `--dry-run` | boolean |  | 只输出安装计划，不执行 |
+| `product_key` | `--product-key` | string |  | Windows 产品密钥（可选；评估版不需要） |
+| `start` | `--start` | boolean |  | 装好后启动（Linux KVM） |
+| `wait_ready` | `--wait-ready` | number |  | 启动后等待来宾报告就绪的秒数（0 = 不等） |
 
 示例：
 
 ```bash
+foxos env install foxos-debian-12 dev --start --wait-ready 900
+foxos env install windows-11-enterprise-eval win11 --dry-run
 foxos env install wsl-ubuntu-24.04 ubuntu
 foxos env install alpine tiny --dry-run --json
 foxos env install hyperv-windows-11-eval win11 --iso D:\iso\win11.iso

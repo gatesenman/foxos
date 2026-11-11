@@ -1,0 +1,29 @@
+#!/bin/sh
+# 狐狸OS 预设镜像：每次开机读取「种子」（FOXOSSEED 光盘/磁盘，由 foxos env install 生成），
+# 应用用户、SSH 公钥、主机名、语言、时区；然后在串口上报 FOXOS-PRESET-READY。
+# 这就是来宾里的 foxos 桥：主机经 SSH（端口转发到 127.0.0.1）运行 foxos env exec，
+# 来宾里 foxos-mcp 用户服务给 ACP 智能体提供同一套 foxos 工具。
+set -u
+SEED=/run/foxos-seed
+mkdir -p "$SEED"
+dev=$(blkid -L FOXOSSEED 2>/dev/null || true)
+if [ -n "$dev" ] && mount -o ro "$dev" "$SEED" 2>/dev/null; then
+  j="$SEED/seed.json"
+  val() { python3 -c "import json,sys;d=json.load(open('$j'));v=d.get('$1');print('' if v is None else v)" 2>/dev/null; }
+  if [ -f "$j" ]; then
+    u=$(val user); u=${u:-foxos}
+    id "$u" >/dev/null 2>&1 || useradd -m -s /bin/bash -G sudo "$u"
+    key=$(val ssh_authorized_key)
+    if [ -n "$key" ]; then
+      h=$(getent passwd "$u" | cut -d: -f6)
+      install -d -m 700 -o "$u" -g "$u" "$h/.ssh"
+      printf '%s\n' "$key" > "$h/.ssh/authorized_keys"
+      chown "$u:$u" "$h/.ssh/authorized_keys"; chmod 600 "$h/.ssh/authorized_keys"
+    fi
+    pw=$(val password_hash); [ -n "$pw" ] && usermod -p "$pw" "$u"
+    hn=$(val hostname); [ -n "$hn" ] && { echo "$hn" > /etc/hostname; hostname "$hn"; sed -i "s/^127.0.1.1.*/127.0.1.1 $hn/" /etc/hosts; }
+    lang=$(val lang); [ -n "$lang" ] && localectl set-locale "LANG=$lang" 2>/dev/null || true
+    tz=$(val timezone); [ -n "$tz" ] && timedatectl set-timezone "$tz" 2>/dev/null || true
+  fi
+  umount "$SEED" 2>/dev/null || true
+fi

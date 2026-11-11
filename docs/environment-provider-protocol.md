@@ -125,3 +125,25 @@ foxos env progress <名>                      # 安装进度
 ```
 
 同名 MCP 工具：`env_providers`、`env_doctor`、`env_fix`、`env_catalog`、`env_install`、`env_progress`。
+
+## 预设目录 `foxos-env-presets/1`
+
+狐狸OS 预设（[presets.md](presets.md)）和普通目录条目合并显示在 `foxos env catalog` 里，条目带 `"preset": true`。文件 `packages/core/foxos/data/env-presets.json`：
+
+```json
+{"format": "foxos-env-presets/1", "version": "2026.11",
+ "release_base": "https://github.com/gatesenman/foxos/releases/download",
+ "entries": [{
+   "id": "foxos-debian-12", "kind": "foxos-image", "guest_os": "linux", "release": "presets-2026.11", "disk_gb": 8,
+   "features": ["desktop-xfce", "zh-CN", "node", "bun", "python", "acp-gemini-cli", "foxos-cli", "foxos-mcp", "foxos-bridge-ssh"],
+   "artifacts": {"qcow2": {"name": "foxos-debian-12.qcow2", "size": 0, "sha256": "…",
+                           "parts": [{"name": "foxos-debian-12.qcow2.part1", "size": 0, "sha256": "…"}]},
+                 "wsl":   {"name": "foxos-debian-12-wsl.tar.gz", "size": 0, "sha256": "…"}},
+   "hosts": {"linux": {"provider": "linux-kvm", "artifact": "qcow2", "arch": ["x86_64"]},
+             "windows": {"provider": "wsl2", "artifact": "wsl", "arch": ["x86_64"]}},
+   "unavailable": {"macos": "原因（显示在界面上）"}}]}
+```
+
+- `kind`：`foxos-image`（qcow2 / WSL 根文件系统）、`foxos-iso`、`windows-media`（`media.url` 指向微软官方，带 `size`、`license`、`tpm`）、`macos-ipsw`。
+- 下载地址 = `release_base/release/name`；每个分卷与整体都有 `size` 与 `sha256`。`FOXOS_PRESETS_BASE` 可指向镜像站（同样的目录结构，`file://` 也可以），`FOXOS_PRESETS_FILE` 可替换整个目录文件。
+- `env catalog` 给每个条目算出 `installable`、`reason`、`host_providers`、`download_bytes`、`disk_bytes`（下载 + 解压后的磁盘 + 余量）。

@@ -80,7 +80,7 @@ def _epilog(cmd) -> str:
         parts.append(tr("cli.examples") + "\n".join("  " + e for e in cmd.examples))
     if cmd.limits:
         parts.append(tr("cli.limits") + "\n".join("  - " + l for l in cmd.limits))
-    parts.append(tr("cli.exit_codes") + "  ".join(f"{k}={v.split(tr("cli.text"))[0]}" for k, v in EXIT_CODE_DOCS.items()))
+    parts.append(tr('cli.exit_codes') + "  ".join(f"{k}={v.split(tr('cli.text'))[0]}" for k, v in EXIT_CODE_DOCS.items()))
     return "\n\n".join(parts)
 
 

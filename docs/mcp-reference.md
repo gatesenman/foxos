@@ -2250,7 +2250,7 @@ Chrome 是否安装、版本、CDP 开关与端口。CLI：foxos browser status�
 
 ### `env_catalog`
 
-可一键安装的系统目录（WSL 发行版、LXC/官方根文件系统、Windows Sandbox、Hyper-V、macOS）。CLI：foxos env catalog [--guest {linux,windows,macos,any}] [--provider PROVIDER] [--available]。示例：foxos env catalog --json
+可一键安装的系统目录（WSL 发行版、LXC/官方根文件系统、Windows Sandbox、Hyper-V、macOS）。CLI：foxos env catalog [--guest {linux,windows,macos,any}] [--provider PROVIDER] [--available] [--presets]。示例：foxos env catalog --json
 
 只读：是 · 破坏性：否 · CLI：`foxos env catalog`
 
@@ -2259,6 +2259,7 @@ Chrome 是否安装、版本、CDP 开关与端口。CLI：foxos browser status�
 | `guest` | string |  | 来宾系统 可选：linux / windows / macos / any |
 | `provider` | string |  | 只看某个提供者 |
 | `available` | boolean |  | 只显示本机可安装的 |
+| `presets` | boolean |  | 只显示狐狸OS 预设系统 |
 | `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
 
 调用示例：
@@ -2269,7 +2270,7 @@ Chrome 是否安装、版本、CDP 开关与端口。CLI：foxos browser status�
 
 ### `env_install`
 
-从目录一键安装一个系统为新环境（下载、校验 sha256、导入）。CLI：foxos env install ENTRY NAME [--provider PROVIDER] [--url URL] [--sha256 SHA256] [--iso ISO] [--location LOCATION] [--memory-mb MEMORY_MB] [--cpus CPUS] [--disk-gb DISK_GB] [--dry-run]。示例：foxos env install wsl-ubuntu-24.04 ubuntu
+从目录一键安装一个系统为新环境（下载、校验 sha256、导入）。CLI：foxos env install ENTRY NAME [--provider PROVIDER] [--url URL] [--sha256 SHA256] [--iso ISO] [--location LOCATION] [--memory-mb MEMORY_MB] [--cpus CPUS] [--disk-gb DISK_GB] [--dry-run] [--product-key PRODUCT_KEY] [--start] [--wait-ready WAIT_READY]。示例：foxos env install foxos-debian-12 dev --start --wait-ready 900
 
 只读：否 · 破坏性：否 · CLI：`foxos env install`
 
@@ -2286,6 +2287,9 @@ Chrome 是否安装、版本、CDP 开关与端口。CLI：foxos browser status�
 | `cpus` | integer |  | CPU 数（Hyper-V） |
 | `disk_gb` | integer |  | 磁盘 GB（Hyper-V） |
 | `dry_run` | boolean |  | 只输出安装计划，不执行 |
+| `product_key` | string |  | Windows 产品密钥（可选；评估版不需要） |
+| `start` | boolean |  | 装好后启动（Linux KVM） |
+| `wait_ready` | number |  | 启动后等待来宾报告就绪的秒数（0 = 不等） |
 | `machine` | string |  | 在哪台狐狸OS 上执行：local 或已配对机器名（foxos machine list） |
 
 调用示例：

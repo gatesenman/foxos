@@ -1,0 +1,11 @@
+[Unit]
+Description=FoxOS preset: apply seed (user, SSH key, hostname, language)
+DefaultDependencies=no
+After=local-fs.target systemd-udev-settle.service
+Before=ssh.service sshd.service display-manager.service
+[Service]
+Type=oneshot
+ExecStart=/usr/lib/foxos/foxos-preset-firstboot
+RemainAfterExit=yes
+[Install]
+WantedBy=multi-user.target

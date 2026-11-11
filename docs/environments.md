@@ -130,6 +130,8 @@
 
 “环境”应用左下角 **安装系统**，或 `foxos env catalog` / `foxos env install`。详见 [environment-provider-protocol.md](environment-provider-protocol.md)。
 
+**狐狸OS 预设系统**（已配置好桌面、中文、Node / Bun / Python、ACP 智能体与 foxos 桥的 Linux / Windows / macOS）在同一个目录的顶部：分卷断点续传、逐卷 sha256 校验，Windows 与 macOS 的介质在安装时从微软 / Apple 官方下载。详见 [presets.md](presets.md)。
+
 - **Linux 发行版（WSL2）**：Ubuntu 20.04 / 22.04 / 24.04 / 26.04、Debian、Kali、openSUSE Leap / Tumbleweed、SUSE Linux Enterprise、Fedora、AlmaLinux、
   Rocky Linux（官方 WSL 镜像与 CIQ 版）、Oracle Linux（应用商店包，或 LXC 构建）、Arch、Alpine、eLxr、Azure Linux，以及 LXC 镜像服务器的每日构建和自定义 URL / 本地 tar。
   默认安装方式：下载官方根文件系统 → 校验 sha256 → `wsl.exe --import foxos-<名> <目录> <文件> --version 2`；只有应用商店包的发行版用 `wsl.exe --install -d <名> --no-launch`。
