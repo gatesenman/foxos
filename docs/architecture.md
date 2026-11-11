@@ -93,7 +93,7 @@ scripts/gen_cli_docs.py   生成 docs/cli-reference.md
 
 | 依赖 | 用途 | 许可 | 方式 |
 |---|---|---|---|
-| Python 3.10+ | 内核运行时 | PSF | 宿主系统安装 |
+| Python 3.12+ | 内核运行时 | PSF | 宿主系统安装 |
 | openpyxl 3.1 | 读写 xlsx、原生图表 | MIT | pip 依赖 |
 | et-xmlfile | openpyxl 依赖 | MIT | pip 依赖 |
 | LibreOffice | 公式求值、PDF / ODS 导出 | MPL-2.0 | 可选外部程序，以子进程调用，不随狐狸OS 分发 |
