@@ -104,8 +104,11 @@ def test_US87_main_process_routes_actions_to_the_guest_and_gates_host_execution(
         assert frag in idx, frag
     # 本机执行闸门：默认关闭，打开后每次原生对话框确认
     gate = idx[idx.index("async function hostGate"):idx.index("handle('apps:detect'")]
-    assert "settings.load().hostExecution !== true" in gate and "dialog.showMessageBox" in gate and "cancelId: 1" in gate and "defaultId: 1" in gate
-    assert "patch.hostExecution = patch.hostExecution === true" in idx
+    assert "if (!(await hostaccess.enabled())) throw" in gate and "dialog.showMessageBox" in gate and "cancelId: 1" in gate and "defaultId: 1" in gate
+    # 开关只有一个来源：核心的 foxos bot host-access（US-156），settings.json 里不再存
+    assert "await hostaccess.set(patch.hostExecution === true)" in idx and "delete s.hostExecution" in idx
+    ha = _src(MAIN / "hostaccess.js")
+    assert "['bot', 'host-access', on ? 'enable' : 'disable']" in ha and ".enabled === true" in ha
     assert "hostExecution" not in _src(MAIN / "settings.js")      # 没有默认 true
     # kernel.run：客户端模式下除 env / machine 外都去来宾
     k = _src(MAIN / "kernel.js")
