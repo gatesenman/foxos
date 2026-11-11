@@ -63,7 +63,7 @@ test('US-87 客户端模式：所有动作都在狐狸OS 电脑里执行，本�
     await page.waitForFunction(() => FX.windows().find((x) => x.appId === 'terminal').screenText().includes('ID=foxos'), null, { timeout: 30000 });
 
     // 4. 应用中心“安装”（Everything 应用）：在来宾终端里运行 foxos everything …，不是本机 PowerShell
-    const code = await page.evaluate(() => FX.runFoxosInTerminal('guest-everything', ['everything', 'info', 'circuits']));
+    const code = await page.evaluate(() => FX.runFoxosInTerminal('guest-everything', ['everything', 'info', 'circuits', '--json']));
     assert.equal(code, 0);
     await page.waitForFunction(() => /Circuits|circuits/.test(FX.windows().find((x) => x.appId === 'terminal' && x.title().includes('guest-everything'))?.screenText() || ''), null, { timeout: 30000 })
       .catch(async (e) => { throw new Error(`${e.message}\n${await termText(page, 'guest-everything')}`); });
