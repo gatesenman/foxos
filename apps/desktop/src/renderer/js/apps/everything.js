@@ -4,6 +4,10 @@
   const { el, icon } = FX;
   const GROUP_ICON = { office: 'briefcase', collaboration: 'users', creative: 'palette', engineering: 'ruler-2', productivity: 'checklist', finance: 'coin', business: 'building-store', developer: 'api', games: 'chess' };
   FX.groupIcon = (g) => GROUP_ICON[g] || 'app-window';
+  // 分组名与应用说明随界面语言（词条 ev.group.* / ev.desc.* / ev.issue.*；应用名保持上游名称）
+  FX.groupName = (g) => FX.t(`ev.group.${g.id || g}`);
+  FX.evDesc = (a) => (FX.has(`ev.desc.${a.id}`) ? FX.t(`ev.desc.${a.id}`) : a.description || '');
+  FX.evIssue = (a) => (a.upstreamIssue ? (FX.has(`ev.issue.${a.id}`) ? FX.t(`ev.issue.${a.id}`) : a.upstreamIssue) : null);
   FX.evCatalog = null;
   FX.loadEverything = async (force) => { if (!FX.evCatalog || force) FX.evCatalog = await window.foxos.everything.list(); return FX.evCatalog; };
   const appInfo = (id) => FX.evCatalog && FX.evCatalog.apps.find((a) => a.id === id);

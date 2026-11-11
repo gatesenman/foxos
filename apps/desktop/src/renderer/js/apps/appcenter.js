@@ -112,13 +112,13 @@
             const apps = c.apps.filter((a) => a.group === g.id);
             const missing = apps.filter((a) => !a.installed && !a.upstreamIssue).map((a) => a.id);
             return el('div', { class: 'ev-group', 'data-group': g.id },
-              el('div', { class: 'row' }, icon(FX.groupIcon(g.id)), el('b', { text: `${g.zh} ${g.en}` }), el('span', { class: 'muted small', text: `${apps.filter((a) => a.installed).length}/${apps.length}` }), el('div', { class: 'spacer' }),
-                missing.length ? el('button', { class: 'btn sm ghost', 'data-install-group': g.id, onclick: () => evInstall(missing, FX.t('appcenter.the_group', g.zh)) }, icon('download'), FX.t('appcenter.install_group', missing.length)) : null),
+              el('div', { class: 'row' }, icon(FX.groupIcon(g.id)), el('b', { text: FX.groupName(g) }), el('span', { class: 'muted small', text: `${apps.filter((a) => a.installed).length}/${apps.length}` }), el('div', { class: 'spacer' }),
+                missing.length ? el('button', { class: 'btn sm ghost', 'data-install-group': g.id, onclick: () => evInstall(missing, FX.t('appcenter.the_group', FX.groupName(g))) }, icon('download'), FX.t('appcenter.install_group', missing.length)) : null),
               el('div', { class: 'card-grid' }, apps.map((a) => el('div', { class: `app-card ${a.installed ? 'ok' : 'missing'}`, 'data-ev-app': a.id },
                 el('div', { class: 'app-card-icon' }, FX.appIcon(FX.evIcon(a))),
                 el('div', { class: 'app-card-main' },
                   el('div', { class: 'app-card-name' }, a.name, el('span', { class: `badge ${a.installed ? 'ok' : a.upstreamIssue ? 'error' : 'warn'}`, text: a.installed ? FX.t('common.installed') : a.upstreamIssue ? FX.t('appcenter.upstream_does_not_build') : FX.t('common.not_installed') }), a.agpl ? el('span', { class: 'badge', text: 'AGPL' }) : null),
-                  el('div', { class: 'muted small', text: a.upstreamIssue || a.description || '' })),
+                  el('div', { class: 'muted small', text: FX.evIssue(a) || FX.evDesc(a) })),
                 el('div', { class: 'app-card-actions' }, a.installed
                   ? [el('button', { class: 'btn sm ghost', onclick: () => FX.openWindow('everything', { app: a.id }) }, FX.t('common.open')),
                     el('button', { class: 'btn sm ghost', onclick: async () => { if (await FX.confirm(FX.t('appcenter.uninstall'), FX.t('appcenter.uninstall_data_in_the_workspace_is', a.name), { danger: true, okText: FX.t('appcenter.uninstall') })) { await FX.k(['everything', 'uninstall', a.id]); renderEverything(); FX.emit('everything-changed'); } } }, FX.t('appcenter.uninstall'))]

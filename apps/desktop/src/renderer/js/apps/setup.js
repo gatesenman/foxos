@@ -23,6 +23,7 @@
           el('div', { class: 'wizard-hero' }, el('img', { src: 'icon-64.png', alt: '' }), el('div', {},
             el('h2', { text: FX.t('setup.welcome_to_foxos') }),
             el('p', { class: 'muted', text: FX.t('setup.a_desktop_shared_by_agents_and') }))),
+          el('div', { class: 'field', 'data-field': 'language' }, el('label', { class: 'lang-label', text: FX.t('util.language') }), FX.langPicker()),
           el('div', { class: 'field' }, el('label', { text: FX.t('setup.workspace_the_folder_you_share_with') }),
             el('div', { class: 'row' }, el('code', { class: 'grow', text: FX.env.workspace }),
               el('button', { class: 'btn ghost sm', onclick: async () => {
@@ -63,7 +64,7 @@
         const evComps = ev ? ev.groups.map((g) => {
           const apps = ev.apps.filter((a) => a.group === g.id);
           const n = apps.filter((a) => a.installed).length;
-          return { id: `everything:${g.id}`, name: FX.t('setup.group_label', g.zh, g.en, apps.map((a) => a.name).join(FX.t('common.list_sep'))), installed: n === apps.filter((a) => !a.upstreamIssue).length, version: FX.t('setup.installed', n, apps.length), cmd: plan.components[`everything:${g.id}`] };
+          return { id: `everything:${g.id}`, name: FX.t('setup.group_label', FX.groupName(g), apps.map((a) => a.name).join(FX.t('common.list_sep'))), installed: n === apps.filter((a) => !a.upstreamIssue).length, version: FX.t('setup.installed', n, apps.length), cmd: plan.components[`everything:${g.id}`] };
         }) : [];
         const featured = ['claude-acp', 'codex-acp', 'gemini', 'opencode', 'qwen-code', 'goose'];
         const agents = featured.map((id) => agentList.agents.find((a) => a.id === id)).filter(Boolean);

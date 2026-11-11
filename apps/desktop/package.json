@@ -12,10 +12,13 @@
     "dist:win": "npm run prepare:win-pty && npm run prepare:win-python && electron-builder --win --x64",
     "test:smoke": "bash scripts/smoke.sh",
     "prepare:win-python": "bash scripts/prepare-win-python.sh",
-    "prepare:win-pty": "npm install --no-save --force @lydell/node-pty-win32-x64@1.2.0-beta.18"
+    "prepare:win-pty": "npm install --no-save --force @lydell/node-pty-win32-x64@1.2.0-beta.18",
+    "lint:i18n": "node scripts/lint-i18n.js"
   },
   "devDependencies": {
     "@modelcontextprotocol/sdk": "^1.32.2",
+    "acorn": "^8.19.0",
+    "acorn-walk": "^8.3.5",
     "electron": "^45.2.3",
     "electron-builder": "^26.18.0",
     "playwright": "^1.65.0"

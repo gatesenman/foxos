@@ -19,6 +19,8 @@
         const keyVal = el('input', { class: 'input', type: 'password', placeholder: FX.t('settings.value_leave_empty_to_delete') });
         const py = el('input', { class: 'input mono', value: s.python || '', placeholder: env.python });
         root.replaceChildren(
+          el('section', { 'data-section': 'language' }, el('h3', { class: 'lang-label', text: FX.t('util.language') }), FX.langPicker(),
+            el('div', { class: 'muted small', text: FX.t('settings.language_hint') })),
           el('section', {}, el('h3', { text: FX.t('common.workspace') }),
             el('div', { class: 'row' }, el('code', { class: 'grow', text: env.workspace }),
               el('button', { class: 'btn ghost sm', onclick: async () => {

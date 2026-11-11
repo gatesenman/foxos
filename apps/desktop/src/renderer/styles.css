@@ -285,3 +285,7 @@ body.paused .desktop { box-shadow: inset 0 0 0 2px var(--warn); }
 .start-ev-app .app-img { width: 18px; height: 18px; }
 .start-ev-app .ti { font-size: 16px; color: var(--accent2); }
 #palette-results .app-img { width: 16px; height: 16px; display: inline-block; vertical-align: middle; }
+
+/* 语言选择 */
+.lang-picker { display: flex; gap: 8px; flex-wrap: wrap; }
+.lang-picker .btn { min-width: 110px; justify-content: center; }

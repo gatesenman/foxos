@@ -56,7 +56,7 @@
     const groups = c.groups.map((g) => ({ g, apps: c.apps.filter((a) => a.group === g.id && a.installed) })).filter((x) => x.apps.length);
     if (!groups.length) return el('div', { class: 'start-ev muted small', text: FX.t('boot.no_everything_apps_installed_yet_app') });
     return el('div', { class: 'start-ev scroll' }, groups.map(({ g, apps }) => el('div', { class: 'start-ev-group', 'data-group': g.id },
-      el('div', { class: 'muted small' }, icon(FX.groupIcon(g.id)), ` ${g.zh}`),
+      el('div', { class: 'muted small' }, icon(FX.groupIcon(g.id)), ` ${FX.groupName(g)}`),
       el('div', { class: 'start-ev-apps' }, apps.map((a) => el('button', { class: 'start-ev-app', 'data-ev-launch': a.id, title: a.name, onclick: () => { hideStart(); FX.openWindow('everything', { app: a.id }); } }, FX.appIcon(FX.evIcon(a)), el('span', { text: a.name })))))));
   }
   FX.on('everything-changed', () => FX.loadEverything(true).catch(() => {}));

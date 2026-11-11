@@ -9,7 +9,7 @@ window.FX = window.FX || {};
   FX.languages = I.supported;
   FX.t = (key, ...args) => {
     const s = I.messages[FX.lang][key] ?? I.messages['zh-CN'][key];
-    if (s === undefined) { window.foxos.log(`缺少词条 ${key}`); return key; }
+    if (s === undefined) { window.foxos.log(`missing i18n key ${key}`); return key; }
     return String(s).replace(/\{(\d+)\}/g, (m, i) => (args[i] === undefined ? m : String(args[i])));
   };
   FX.has = (key) => I.messages[FX.lang][key] !== undefined;
@@ -152,4 +152,8 @@ FX.confirm = (title, body, { okText = FX.t('util.ok'), danger = false } = {}) =>
 FX.bus = new EventTarget();
 FX.emit = (name, detail) => FX.bus.dispatchEvent(new CustomEvent(name, { detail }));
 FX.on = (name, fn) => FX.bus.addEventListener(name, (e) => fn(e.detail));
+// 语言选择（安装向导第一步与设置共用）：每种语言用它自己的名字显示
+FX.LANG_NAMES = { 'zh-CN': '简体中文', 'en-US': 'English' };
+FX.langPicker = () => FX.el('div', { class: 'lang-picker', role: 'radiogroup', 'aria-label': FX.t('util.language') },
+  FX.languages.map((l) => FX.el('button', { class: `btn ${l === FX.lang ? 'primary' : 'ghost'}`, role: 'radio', 'aria-checked': String(l === FX.lang), 'data-lang': l, lang: l, onclick: () => FX.setLanguage(l) }, FX.LANG_NAMES[l] || l)));
 FX.applyI18n();

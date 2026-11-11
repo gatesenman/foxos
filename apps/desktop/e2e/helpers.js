@@ -27,10 +27,10 @@ function cli(ws, args, { agent = 'e2e-cli', extraEnv = {}, check = true } = {}) 
   return data;
 }
 
-async function launch(ws, { extraEnv = {}, userData } = {}) {
+async function launch(ws, { extraEnv = {}, userData, keepSettings = false } = {}) {
   const ud = userData || fs.mkdtempSync(path.join(os.tmpdir(), 'foxos-e2e-ud-'));
   // 预先标记安装向导已完成，避免首次运行向导挡住测试（向导本身由独立用例覆盖）
-  fs.writeFileSync(path.join(ud, 'settings.json'), JSON.stringify({ setupDone: true, workspace: ws }));
+  if (!keepSettings) fs.writeFileSync(path.join(ud, 'settings.json'), JSON.stringify({ setupDone: true, workspace: ws }));
   const app = await _electron.launch({
     args: ['.', '--no-sandbox', `--user-data-dir=${ud}`, `--workspace=${ws}`],
     cwd: path.join(ROOT, 'apps', 'desktop'),
