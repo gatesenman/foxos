@@ -1256,6 +1256,7 @@
   "ssh.app_summary": "OpenSSH: status, on/off, public keys (authorized_keys), password login; key-only and no root login by default",
   "ssh.human_only": "Only a human (human identity) can run {0}: agents cannot open remote login for themselves or others",
   "ssh.no_such_user": "No user {0}",
+  "ssh.posix_only": "SSH settings are only available on FoxOS / Linux; on Windows, manage SSH in the FoxOS computer (guest).",
   "ssh.no_admin_helper": "SSH admin helper {0} not found (it ships with the FoxOS system)",
   "ssh.admin_timeout": "The SSH admin helper timed out",
   "ssh.admin_failed": "SSH admin action {0} failed: {1}",

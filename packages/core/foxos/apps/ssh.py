@@ -10,7 +10,6 @@ from __future__ import annotations
 
 import json
 import os
-import pwd
 import re
 import shutil
 import socket
@@ -18,6 +17,11 @@ import subprocess
 import tempfile
 import urllib.request
 from pathlib import Path
+
+try:
+    import pwd  # 只有 POSIX 有；Windows 上导入失败不能拖垮整个 CLI（应用注册时会导入所有应用）
+except ImportError:  # pragma: no cover - Windows
+    pwd = None  # type: ignore[assignment]
 
 from ..errors import FoxError
 from ..i18n import tr
@@ -40,6 +44,8 @@ def _need_human(ctx: Context, what: str) -> None:
 
 
 def _user(user: str | None = None) -> pwd.struct_passwd:
+    if pwd is None:
+        raise FoxError("DEPENDENCY_MISSING", tr("ssh.posix_only"))
     try:
         return pwd.getpwnam(user) if user else pwd.getpwuid(os.getuid())
     except KeyError:

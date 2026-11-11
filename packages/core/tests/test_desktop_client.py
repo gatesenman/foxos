@@ -151,3 +151,20 @@ def test_US87_json_flag_goes_before_the_command_so_desktop_launch_does_not_swall
         src = _src(MAIN / f)
         assert "...(json ? ['--json'] : []), ...args]" in src, f
         assert "...args, ...(json ? ['--json'] : [])" not in src, f
+
+
+def test_US86_cli_starts_without_posix_only_modules_like_windows():
+    """Windows 没有 pwd 模块：顶层 import pwd 曾让 Windows 上的 foxos 每个命令都报 ModuleNotFoundError。"""
+    import subprocess
+    import sys
+    code = (
+        "import sys; sys.modules['pwd'] = None; sys.modules['grp'] = None\n"
+        "from foxos.cli import main\n"
+        "sys.argv = ['foxos', '--json', 'acp', 'list']\n"
+        "sys.exit(main())\n"
+    )
+    core = Path(__file__).resolve().parents[1]
+    r = subprocess.run([sys.executable, "-c", code], cwd=core, capture_output=True, text=True, timeout=300,
+                       env={**__import__("os").environ, "PYTHONPATH": str(core)})
+    assert "ModuleNotFoundError" not in (r.stdout + r.stderr), r.stderr[-2000:]
+    assert '"ok": true' in r.stdout, (r.stdout[-500:], r.stderr[-2000:])
