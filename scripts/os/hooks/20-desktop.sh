@@ -21,6 +21,11 @@ cat > /etc/systemd/system/lightdm.service.d/foxos-live.conf <<'U'
 [Service]
 ExecStartPre=/usr/lib/foxos/live-autologin
 U
+# 面板在 labwc 上必须用 gtk-layer-shell 才能贴底；完整构建已写进 packages.list。
+# 这里再装一次，方便 REPACK 或本次构建在 apt 阶段之后才补上该依赖。
+if ! python3 -c "import gi; gi.require_version('GtkLayerShell','0.1'); from gi.repository import GtkLayerShell" 2>/dev/null; then
+  apt-get install -y --no-install-recommends libgtk-layer-shell0 gir1.2-gtklayershell-0.1
+fi
 # 面板
 install -d /usr/lib/foxos/panel
 install -m 755 "$SRC/panel/foxos-panel" /usr/lib/foxos/panel/foxos-panel
