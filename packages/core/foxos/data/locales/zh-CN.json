@@ -874,6 +874,7 @@
   "machines.c_remove": "移除配对的机器",
   "machines.c_revoke": "（被控端）撤销授权",
   "machines.c_unpair": "（被控端）解除一台控制端的配对",
+  "machines.client_cert_needed": "配对请求里缺少控制端证书",
   "machines.code_hint": "在控制端运行 foxos machine pair --name … --url … --code … --fingerprint …（指纹见 fingerprint）",
   "machines.fingerprint_mismatch": "{0} 的证书指纹与配对时不一致，已拒绝连接",
   "machines.grant_hint": "在被控端运行 foxos machine host grant --client <控制端> --bot {0} --permissions read",

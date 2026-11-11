@@ -31,6 +31,11 @@ SYSTEM_BIN = Path("/usr/local/bin")
 SYSTEM_AGENTS = Path(os.environ.get("FOXOS_SYSTEM_AGENTS", "/usr/lib/foxos/agents"))
 
 
+def _foxos_home() -> Path:
+    from .desktop_client import foxos_home
+    return foxos_home()
+
+
 def manifest() -> dict:
     return json.loads(MANIFEST.read_text(encoding="utf-8"))
 
@@ -168,7 +173,7 @@ def _env() -> dict:
 
 def _register_acp(t: dict, cmd: Path, system: bool, home: Path | None = None):
     a = t["acp"]
-    base = SYSTEM_AGENTS if system else Path(os.environ.get("FOXOS_HOME") or Path.home() / ".foxos") / "agents"
+    base = SYSTEM_AGENTS if system else _foxos_home() / "agents"
     d = base / a["id"]
     d.mkdir(parents=True, exist_ok=True)
     info = {"id": a["id"], "name": t["title"], "version": t["version"], "method": "runtime:" + t["kind"], "command": str(cmd), "args": a.get("args", []),
@@ -268,7 +273,7 @@ def status(t: dict) -> dict:
         return {"ok": True}
     if not chk:  # 没有 --version 的适配器：看 ACP 登记文件
         a = t.get("acp") or {}
-        for base in (Path(os.environ.get("FOXOS_HOME") or Path.home() / ".foxos") / "agents", SYSTEM_AGENTS):
+        for base in (_foxos_home() / "agents", SYSTEM_AGENTS):
             f = base / a.get("id", "?") / "foxos-agent.json"
             if f.is_file():
                 info = json.loads(f.read_text(encoding="utf-8"))

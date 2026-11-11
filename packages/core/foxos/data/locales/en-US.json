@@ -874,6 +874,7 @@
   "machines.c_remove": "Remove a paired machine",
   "machines.c_revoke": "(Host) revoke grants",
   "machines.c_unpair": "(Host) unpair a controller",
+  "machines.client_cert_needed": "The pairing request is missing the controller certificate",
   "machines.code_hint": "On the controller run foxos machine pair --name … --url … --code … --fingerprint … (see fingerprint)",
   "machines.fingerprint_mismatch": "The certificate fingerprint of {0} differs from the paired one; connection refused",
   "machines.grant_hint": "On the host run foxos machine host grant --client <controller> --bot {0} --permissions read",
