@@ -115,7 +115,7 @@
 
 基准（Jev 与 DeepSeek）见 [computer-use-research.md](computer-use-research.md)：数据没有显示 Jev 在成功率或费用上更好，只在单步延迟上更快（约 0.13 秒对 1.3 秒）；第二轮因为盒子内存耗尽、Chrome 被 OOM 杀掉而作废。
 
-未做：UI-TARS-1.5-7B 本地定位没有跑（需要约 8.3 GB 内存，盒子上只有约 1.3 GB 可用）；`test_envs.py` 的 US-32/US-33 在这台盒子上因缺 `zstandard` 模块失败（与本次改动无关）。截图：`docs/screenshots/cu-bot-settings.png`、`cu-bot-settings-en.png`（智能体设置的“电脑操控”页）。
+未做：UI-TARS-1.5-7B 本地定位没有跑（需要约 8.3 GB 内存，盒子上只有约 1.3 GB 可用）；`test_envs.py` 的 US-32/US-33 在这台盒子上因缺 `zstandard` 模块失败（与本次改动无关）。截图：`docs/screenshots/cu-bot-settings.png`、`cu-bot-settings-en.png`（智能体设置的“电脑操控”页）；`cu-desktop-default-path.png` 是默认路径一次真实任务后的 XFCE 桌面（04:38 运行：`foxos computer task` 在 Mousepad 写入并保存，6 步，59.0 秒，Jev 平均每步 105 毫秒，交给规划器 6 次）。同一任务前两次在负载约 70–100 时失败：scrot、wmctrl 超时被当成未处理的异常结束了任务。已改为结构化错误并重试观察（`d89d302`、`67ab5ba`），第三次通过。
 
 ## Everything 应用覆盖（51 个）
 
