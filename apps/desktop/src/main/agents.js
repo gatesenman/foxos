@@ -53,7 +53,7 @@ async function list() {
     if (d.binary && d.binary[pk]) methods.push('binary');
     const info = installedInfo(a.id);
     return {
-      id: a.id, name: a.name, version: a.version, description: a.description, license: a.license,
+      id: a.id, name: a.name, version: a.version, description: a.description, license: a.license, icon: a.icon,
       repository: a.repository, website: a.website, methods,
       installed: Boolean(info && fs.existsSync(info.command)), installedVersion: info?.version || null,
     };

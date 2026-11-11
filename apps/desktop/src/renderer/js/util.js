@@ -21,6 +21,31 @@ FX.el = (tag, attrs = {}, ...children) => {
 
 // Tabler Icons 图标字体（本地打包，离线可用）
 FX.icon = (name, cls = '') => FX.el('i', { class: `ti ti-${name} ${cls}`.trim(), 'aria-hidden': 'true' });
+// 程序图标：用开源项目自带的图标（<img>）；加载失败时退回字体图标并记下来（FX.iconMissing）。
+// spec 是字体图标名（狐狸OS 自己的程序）或 { src, fallback }。
+FX.iconMissing = new Set();
+FX.appIcon = (spec, cls = '') => {
+  if (!spec || typeof spec === 'string') return FX.icon(spec || 'box', cls);
+  const img = FX.el('img', { class: `app-img ${cls}`.trim(), src: spec.src, alt: '', draggable: 'false', 'data-icon-src': spec.src });
+  img.addEventListener('error', () => {
+    FX.iconMissing.add(spec.src);
+    const f = FX.icon(spec.fallback || 'box', cls); f.dataset.iconMissing = spec.src;
+    img.replaceWith(f);
+  }, { once: true });
+  return img;
+};
+// 各程序的图标来源（见 main/icons.js）
+const PROGRAM_ICONS = {
+  terminal: { src: 'foxicon://builtin/terminal', fallback: 'terminal-2' },
+  editor: { src: 'foxicon://builtin/editor', fallback: 'code' },
+  browser: { src: 'foxicon://builtin/browser', fallback: 'world' },
+  writer: { src: 'foxicon://libreoffice/writer', fallback: 'file-text' },
+  calc: { src: 'foxicon://libreoffice/calc', fallback: 'file-spreadsheet' },
+  impress: { src: 'foxicon://libreoffice/impress', fallback: 'presentation' },
+};
+FX.programIcon = (id, fallback) => PROGRAM_ICONS[id] || fallback;
+FX.evIcon = (app) => ({ src: `foxicon://everything/${app.id || app}`, fallback: FX.groupIcon ? FX.groupIcon(app.group) : 'app-window' });
+FX.agentIcon = (a) => (a.icon && /^https:\/\//.test(a.icon) ? { src: a.icon, fallback: 'robot' } : 'robot');
 
 FX.fmtBytes = (n) => (n < 1024 ? `${n} B` : n < 1048576 ? `${(n / 1024).toFixed(1)} KB` : `${(n / 1048576).toFixed(1)} MB`);
 FX.fmtTime = (ts) => {

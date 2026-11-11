@@ -86,13 +86,14 @@ function resolve(kind, id) {
       // 编辑器是 Monaco（VS Code 的编辑器核心）；monaco-editor 包没有自带图标，用本机安装的 VS Code 的图标
       if (process.platform === 'linux') {
         const f = themeIcon(['vscode', 'code', 'com.visualstudio.code', 'visual-studio-code', 'vscodium', 'codium']);
-        return f ? { file: f, source: 'vscode' } : null;
+        if (f) return { file: f, source: 'vscode' };
       }
       if (process.platform === 'win32') {
         for (const p of [path.join(process.env.LOCALAPPDATA || '', 'Programs', 'Microsoft VS Code', 'Code.exe'), path.join(process.env.ProgramFiles || '', 'Microsoft VS Code', 'Code.exe')]) if (exists(p)) return { exe: p, source: 'vscode' };
-        return null;
       }
-      return fs.existsSync('/Applications/Visual Studio Code.app') ? { exe: '/Applications/Visual Studio Code.app', source: 'vscode' } : null;
+      if (process.platform === 'darwin' && fs.existsSync('/Applications/Visual Studio Code.app')) return { exe: '/Applications/Visual Studio Code.app', source: 'vscode' };
+      // 没装 VS Code：用 Monaco 所属开源项目 Code - OSS（microsoft/vscode，MIT）自带的图标
+      return { file: path.join(TP, 'code-oss.png'), source: 'code-oss' };
     }
   }
   return null;

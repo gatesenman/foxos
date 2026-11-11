@@ -42,7 +42,7 @@
       let agentData = null;
 
       const card = (a, actions, extra) => el('div', { class: `app-card ${a.installed ? 'ok' : 'missing'}`, 'data-app-id': a.id },
-        el('div', { class: 'app-card-icon' }, icon(ICONS[a.id] || 'box')),
+        el('div', { class: 'app-card-icon' }, FX.appIcon(a.iconSpec || FX.programIcon(a.id, ICONS[a.id] || 'box'))),
         el('div', { class: 'app-card-main' },
           el('div', { class: 'app-card-name' }, a.name, el('span', { class: `badge ${a.installed ? 'ok' : 'warn'}`, text: a.installed ? '已安装' : '未安装' })),
           el('div', { class: 'muted small', text: a.version || a.hint || '' }), extra || null),
@@ -80,7 +80,7 @@
             st ? el('div', { class: 'install-state' },
               st.ratio != null && !st.done ? el('progress', { max: '1', value: String(st.ratio) }) : null,
               el('pre', { class: 'install-log', text: st.log.slice(-1200) || '准备中…' })) : null);
-          grid.append(card({ ...a, version: null, hint: null }, actions, extra));
+          grid.append(card({ ...a, version: null, hint: null, iconSpec: FX.agentIcon(a) }, actions, extra));
         }
         box.append(grid);
       }
@@ -115,7 +115,7 @@
               el('div', { class: 'row' }, icon(FX.groupIcon(g.id)), el('b', { text: `${g.zh} ${g.en}` }), el('span', { class: 'muted small', text: `${apps.filter((a) => a.installed).length}/${apps.length}` }), el('div', { class: 'spacer' }),
                 missing.length ? el('button', { class: 'btn sm ghost', 'data-install-group': g.id, onclick: () => evInstall(missing, `${g.zh}分组`) }, icon('download'), `安装本组（${missing.length}）`) : null),
               el('div', { class: 'card-grid' }, apps.map((a) => el('div', { class: `app-card ${a.installed ? 'ok' : 'missing'}`, 'data-ev-app': a.id },
-                el('div', { class: 'app-card-icon' }, icon(FX.groupIcon(a.group))),
+                el('div', { class: 'app-card-icon' }, FX.appIcon(FX.evIcon(a))),
                 el('div', { class: 'app-card-main' },
                   el('div', { class: 'app-card-name' }, a.name, el('span', { class: `badge ${a.installed ? 'ok' : a.upstreamIssue ? 'error' : 'warn'}`, text: a.installed ? '已安装' : a.upstreamIssue ? '上游不可构建' : '未安装' }), a.agpl ? el('span', { class: 'badge', text: 'AGPL' }) : null),
                   el('div', { class: 'muted small', text: a.upstreamIssue || a.description || '' })),

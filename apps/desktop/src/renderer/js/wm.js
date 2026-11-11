@@ -95,7 +95,7 @@
       width: `${Math.min(g.w, r.width - 16)}px`, height: `${Math.min(g.h, r.height - 16)}px`,
     } },
     el('div', { class: 'win-titlebar' },
-      el('span', { class: 'win-icon' }, icon(def.icon)), titleEl,
+      el('span', { class: 'win-icon' }, FX.appIcon(FX.programIcon(appId, def.icon))), titleEl,
       el('span', { class: 'win-controls' },
         el('button', { class: 'wc min', title: '最小化', 'data-action': 'minimize' }, icon('minus')),
         el('button', { class: 'wc max', title: '最大化 / 还原', 'data-action': 'maximize' }, icon('square')),
@@ -169,13 +169,13 @@
       box.append(el('button', {
         class: `task ${active ? 'active' : ''} ${w.state === 'minimized' ? 'min' : ''}`, title: w.title(), 'data-win': w.id, 'data-app': w.appId,
         onclick: () => { if (active) setState(w, 'minimized'); else FX.focusWindow(w); },
-      }, icon(def.icon), el('span', { text: w.title() })));
+      }, w.iconSpec ? FX.appIcon(w.iconSpec) : FX.appIcon(FX.programIcon(w.appId, def.icon)), el('span', { text: w.title() })));
     }
     for (const nw of FX.nativeWindows) {
       box.append(el('button', {
         class: 'task native', title: `${nw.title}（原生窗口）`, 'data-native': nw.wid,
         onclick: () => window.foxos.office.focus(nw.wid).catch(() => {}),
-      }, icon(/Calc/.test(nw.title) ? 'file-spreadsheet' : /Impress/.test(nw.title) ? 'presentation' : 'file-text'), el('span', { text: nw.title }), el('i', { class: 'ti ti-external-link native-mark' })));
+      }, FX.appIcon(FX.programIcon(/Calc/.test(nw.title) ? 'calc' : /Impress/.test(nw.title) ? 'impress' : 'writer')), el('span', { text: nw.title }), el('i', { class: 'ti ti-external-link native-mark' })));
     }
   };
 })();

@@ -15,7 +15,7 @@
     key: (p) => `everything:${p.app}`,
     mount(body, params, win) {
       const a = appInfo(params.app);
-      if (a) win.node.querySelector('.win-icon').replaceChildren(icon(FX.groupIcon(a.group)));
+      if (a) { win.iconSpec = FX.evIcon(a); win.node.querySelector('.win-icon').replaceChildren(FX.appIcon(win.iconSpec)); FX.renderTaskbar(); }
       if (!a || !a.installed) {
         body.append(el('div', { class: 'empty' }, icon('package-off'), el('div', { text: `${a ? a.name : params.app} 尚未安装` }),
           el('div', { class: 'muted small', text: '在应用中心或安装向导里安装（从上游源码在本机构建）。' }),

@@ -34,7 +34,7 @@
     $('#desktop-icons').replaceChildren(...LAUNCHERS.map((l) => el('button', {
       class: `desk-icon ${l.office && !officeInstalled(l.id) ? 'missing' : ''}`, 'data-launch': l.id, title: l.office && !officeInstalled(l.id) ? '未安装' : l.name,
       ondblclick: () => l.run(), onkeydown: (e) => { if (e.key === 'Enter') l.run(); },
-    }, el('span', { class: 'desk-icon-img' }, icon(l.icon)), el('span', { text: l.name }))));
+    }, el('span', { class: 'desk-icon-img' }, FX.appIcon(FX.programIcon(l.id, l.icon))), el('span', { text: l.name }))));
   }
 
   // 开始菜单
@@ -43,7 +43,7 @@
     menu.replaceChildren(
       el('div', { class: 'start-head' }, el('img', { src: 'icon-64.png', alt: '' }), el('div', {}, el('b', { text: '狐狸OS' }), el('div', { class: 'muted small', text: FX.env.workspace }))),
       el('div', { class: 'start-grid' }, LAUNCHERS.map((l) => el('button', { class: `start-app ${l.office && !officeInstalled(l.id) ? 'missing' : ''}`, 'data-launch': l.id, onclick: () => { hideStart(); l.run(); } },
-        icon(l.icon), el('span', { text: l.name }), l.office && !officeInstalled(l.id) ? el('span', { class: 'badge warn', text: '未安装' }) : null))),
+        FX.appIcon(FX.programIcon(l.id, l.icon)), el('span', { text: l.name }), l.office && !officeInstalled(l.id) ? el('span', { class: 'badge warn', text: '未安装' }) : null))),
       evStart(),
       el('div', { class: 'start-foot' },
         el('button', { class: 'btn ghost sm', onclick: () => { hideStart(); FX.openWindow('setup', {}); } }, icon('wand'), '安装向导'),
@@ -57,7 +57,7 @@
     if (!groups.length) return el('div', { class: 'start-ev muted small', text: 'Everything 应用尚未安装（应用中心 → Everything 应用）' });
     return el('div', { class: 'start-ev scroll' }, groups.map(({ g, apps }) => el('div', { class: 'start-ev-group', 'data-group': g.id },
       el('div', { class: 'muted small' }, icon(FX.groupIcon(g.id)), ` ${g.zh}`),
-      el('div', { class: 'start-ev-apps' }, apps.map((a) => el('button', { class: 'start-ev-app', 'data-ev-launch': a.id, onclick: () => { hideStart(); FX.openWindow('everything', { app: a.id }); } }, a.name))))));
+      el('div', { class: 'start-ev-apps' }, apps.map((a) => el('button', { class: 'start-ev-app', 'data-ev-launch': a.id, title: a.name, onclick: () => { hideStart(); FX.openWindow('everything', { app: a.id }); } }, FX.appIcon(FX.evIcon(a)), el('span', { text: a.name })))))));
   }
   FX.on('everything-changed', () => FX.loadEverything(true).catch(() => {}));
   FX.loadEverything().catch(() => {});
@@ -79,7 +79,7 @@
     try { files = (await FX.k(['files', 'list', '-r'])).entries.filter((f) => f.path.toLowerCase().includes(q)).slice(0, 12); } catch { /* 忽略 */ }
     const done = () => { pal.value = ''; results.classList.add('hidden'); };
     results.replaceChildren(
-      ...apps.map((l) => el('button', { onclick: () => { done(); l.run(); } }, icon(l.icon), l.name, el('span', { class: 'muted small', text: '应用' }))),
+      ...apps.map((l) => el('button', { onclick: () => { done(); l.run(); } }, FX.appIcon(FX.programIcon(l.id, l.icon)), l.name, el('span', { class: 'muted small', text: '应用' }))),
       ...files.map((f) => el('button', { onclick: () => { done(); FX.openPath(f.path, f.type); } }, icon(FX.fileKind(f.name, f.type).icon), f.path, el('span', { class: 'muted small', text: FX.fileKind(f.name, f.type).label }))),
       ...(apps.length || files.length ? [] : [el('div', { class: 'muted small', text: '没有匹配的应用或文件' })]));
     results.classList.remove('hidden');

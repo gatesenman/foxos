@@ -270,3 +270,18 @@ body.paused .desktop { box-shadow: inset 0 0 0 2px var(--warn); }
 .envs .warn-text { color: #f5a524; }
 .envs .progress { height: 8px; border-radius: 4px; background: rgba(255,255,255,.08); overflow: hidden; margin: 12px 0 6px; }
 .envs .progress-bar { height: 100%; background: #ff8a3d; transition: width .4s; }
+
+/* 程序图标（开源项目自带的图片图标） */
+.app-img { display: block; object-fit: contain; image-rendering: auto; user-select: none; }
+.desk-icon-img .app-img { width: 36px; height: 36px; }
+.desk-icon-img:has(.app-img) { background: transparent; border-color: transparent; }
+.start-app .app-img { width: 30px; height: 30px; }
+.win-icon .app-img { width: 16px; height: 16px; }
+.task .app-img { width: 16px; height: 16px; flex: none; }
+.app-card-icon .app-img { width: 32px; height: 32px; }
+.app-card-icon:has(.app-img) { background: transparent; }
+.app-card.missing .app-card-icon .app-img { filter: grayscale(.7); opacity: .75; }
+.start-ev-app { display: inline-flex; align-items: center; gap: 6px; }
+.start-ev-app .app-img { width: 18px; height: 18px; }
+.start-ev-app .ti { font-size: 16px; color: var(--accent2); }
+#palette-results .app-img { width: 16px; height: 16px; display: inline-block; vertical-align: middle; }
