@@ -70,4 +70,7 @@
     const args = isWin ? ['-NoProfile', '-Command', commandLine] : ['-c', `${commandLine}`];
     FX.openWindow('terminal', { title, command, args, onExit: resolve });
   });
+  // 在终端里运行 foxos：主进程给出 foxos 的绝对路径命令行（不依赖 PATH 上有 foxos）
+  FX.foxosCommandLine = (args) => window.foxos.cli.commandLine(args);
+  FX.runFoxosInTerminal = async (title, args) => FX.runInTerminal(title, await FX.foxosCommandLine(args));
 })();

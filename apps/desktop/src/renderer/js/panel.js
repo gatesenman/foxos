@@ -32,10 +32,12 @@
   const sessList = el('div', { class: 'sess-tabs' });
   const transcript = el('div', { class: 'transcript scroll', id: 'transcript' });
   const input = el('textarea', { class: 'input composer-input', id: 'composer', rows: '3', placeholder: FX.t('panel.give_the_agent_a_task_enter_to_send') });
+  // 没有装 ACP 智能体时给出去处（应用中心 → ACP 智能体），而不是只显示“没有已安装的 ACP 智能体”
+  const installAgentsBtn = el('button', { class: 'btn ghost sm', id: 'panel-install-agents', hidden: true, onclick: () => FX.openWindow('appcenter', {}) }, FX.t('panel.install_acp_agents'));
   const sendBtn = el('button', { class: 'btn primary', id: 'composer-send', onclick: () => send() }, icon('send'), FX.t('panel.send'));
   const stopBtn = el('button', { class: 'btn ghost', id: 'composer-stop', onclick: () => active && cancel(active) }, icon('player-stop'), FX.t('common.stop'));
   sessionTab.append(
-    el('div', { class: 'panel-head' }, picker, where, startBtn),
+    el('div', { class: 'panel-head' }, picker, where, startBtn, installAgentsBtn),
     sessList, transcript,
     el('div', { class: 'composer' }, input, el('div', { class: 'row' }, el('span', { class: 'muted small grow', id: 'composer-hint' }), stopBtn, sendBtn)));
   input.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } });
@@ -45,6 +47,7 @@
     try { list = await window.foxos.agents.installed(); } catch { /* 忽略 */ }
     picker.replaceChildren(...(list.length ? list.map((a) => el('option', { value: a.id, text: `${a.name || a.id} ${a.version || ''}` })) : [el('option', { value: '', text: FX.t('panel.no_acp_agents_installed') })]));
     startBtn.disabled = !list.length;
+    installAgentsBtn.hidden = list.length > 0;
     render();
   }
   FX.on('agents-changed', loadAgents);

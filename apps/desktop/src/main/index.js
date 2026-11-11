@@ -113,12 +113,15 @@ handle('env', () => ({
   versions: { electron: process.versions.electron, chrome: process.versions.chrome, node: process.versions.node, app: app.getVersion() },
   userData: app.getPath('userData'),
   python: kernel.pythonPath(),
+  pythonInfo: kernel.pythonInfo(),
+  cli: kernel.cliPath(),
   encryption: settings.encryptionInfo(),
   setupDone: settings.load().setupDone,
   screenshot: Boolean(SCREENSHOT),
   shell: process.env.SHELL || '/bin/sh',
 }));
 
+handle('cli:commandLine', (args) => kernel.cliCommandLine(args));
 handle('apps:detect', () => apps.detect());
 handle('bots:url', () => bots.ensure());
 
@@ -244,6 +247,8 @@ app.whenReady().then(() => {
   const launch = { exec: process.execPath, args: [...(app.isPackaged ? [] : [app.getAppPath()]), ...process.argv.filter((a) => a === '--no-sandbox' || a.startsWith('--user-data-dir='))] };
   control.start(controlHandler, { launch });
   try { fs.mkdirSync(everything.foxosHome(), { recursive: true }); fs.writeFileSync(path.join(everything.foxosHome(), 'desktop-launch.json'), JSON.stringify(launch)); } catch { /* 忽略 */ }
+  // Windows 安装版 / 便携版：把 resources\bin（foxos.cmd）放到用户 PATH（NSIS 装时已加；zip、MSI 靠这里补上）
+  if (app.isPackaged && process.platform === 'win32') require('./userpath').ensureUserPath(process.resourcesPath).catch(() => {});
   if (!HEADLESS) createWindow();
   app.on('activate', () => { if (BrowserWindow.getAllWindows().length === 0) createWindow(); });
 });

@@ -206,7 +206,7 @@
           running ? el('button', { class: 'btn sm', 'data-act': 'stop', onclick: () => act(FX.t('common.stop'), ['env', 'stop', n], refresh) }, icon('player-stop'), FX.t('common.stop'))
             : el('button', { class: 'btn primary sm', 'data-act': 'start', onclick: () => act(FX.t('common.start'), ['env', 'start', n], refresh) }, icon('player-play'), FX.t('common.start')),
           el('button', { class: 'btn sm', 'data-act': 'restart', onclick: () => act(FX.t('common.restart'), ['env', 'restart', n], refresh) }, icon('refresh'), FX.t('common.restart')),
-          el('button', { class: 'btn sm', 'data-act': 'terminal', onclick: () => openShell(n) }, icon('terminal-2'), FX.t('common.terminal')),
+          el('button', { class: 'btn sm', 'data-act': 'terminal', onclick: () => openShell(n).catch((e) => FX.toast(e.message, 'error')) }, icon('terminal-2'), FX.t('common.terminal')),
           el('button', { class: 'btn sm', 'data-act': 'files', onclick: () => FX.openWindow('files', { path: '' }) }, icon('folder'), FX.t('environments.workspace_files')),
           el('button', { class: 'btn sm', 'data-act': 'editor', onclick: () => FX.openWindow('editor', {}) }, icon('code'), FX.t('common.editor')),
           el('button', { class: 'btn sm', 'data-act': 'clone', onclick: async () => { const nn = await FX.prompt(FX.t('environments.clone_as'), { value: `${n}-copy` }); if (nn) act(FX.t('environments.clone'), ['env', 'clone', n, nn], refresh); } }, icon('copy'), FX.t('environments.clone')),
@@ -294,10 +294,11 @@
         try { const r = await FX.k(['env', 'logs', n, '-n', '200']); pre.textContent = Object.entries(r.logs || {}).map(([f, ls]) => `== ${f} ==\n${ls.join('\n')}`).join('\n\n') || FX.t('environments.no_logs'); } catch (e) { pre.textContent = e.message; }
       }
 
-      function openShell(n) {
-        // 终端里的 PATH 已包含 foxos 命令（与内置终端相同）
+      async function openShell(n) {
+        // 用 foxos 的绝对路径（不依赖 PATH）；环境名作为单独的参数，由主进程按 shell 加引号
         const isWin = FX.env.platform === 'win32';
-        FX.openWindow('terminal', { title: FX.t('common.environment', n), command: isWin ? 'powershell.exe' : (FX.env.shell || '/bin/sh'), args: isWin ? ['-NoProfile', '-Command', `foxos env shell ${n}`] : ['-c', `foxos env shell '${n}'`] });
+        const line = await FX.foxosCommandLine(['env', 'shell', n]);
+        FX.openWindow('terminal', { title: FX.t('common.environment', n), command: isWin ? 'powershell.exe' : (FX.env.shell || '/bin/sh'), args: isWin ? ['-NoProfile', '-Command', line] : ['-c', line] });
       }
 
       async function createDialog() {

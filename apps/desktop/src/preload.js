@@ -15,6 +15,7 @@ contextBridge.exposeInMainWorld('foxos', {
   run: (args, opts) => ipcRenderer.invoke('foxos:run', args, opts),
   openExternal: (url) => ipcRenderer.invoke('foxos:openExternal', url),
   env: () => call('env'),
+  cli: { commandLine: (args) => call('cli:commandLine', args) },
   detectApps: () => call('apps:detect'),
   office: {
     launch: (appId, file) => call('office:launch', appId, file),
