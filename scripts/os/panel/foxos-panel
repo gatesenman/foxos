@@ -1,0 +1,248 @@
+#!/usr/bin/python3
+"""狐狸OS 桌面底部面板：开始菜单、时钟、会话、人工接管。GTK 3，不是假桌面。"""
+import gi, os, sys, signal, subprocess, glob
+gi.require_version("Gtk", "3.0")
+from gi.repository import Gtk, Gdk, GLib, GdkPixbuf
+
+CSS = """
+window.foxos-panel { background: #11141b; color: #e6e8ee; border-top: 1px solid #262c3a; }
+button { background: transparent; color: #e6e8ee; border: 0; border-radius: 6px; padding: 2px 10px; font: 13px "Noto Sans CJK SC", sans-serif; }
+button:hover { background: #1f2430; }
+button.primary { background: #ff8a3d; color: #1a0f05; font-weight: 600; }
+button.primary:hover { background: #ffb27a; }
+button.warn { background: #3a2e12; color: #f5b84a; }
+button.warn.on { background: #f5b84a; color: #1a0f05; }
+#clock { padding: 0 12px; color: #a9afbe; font-variant-numeric: tabular-nums; }
+#brand { font-weight: 600; padding-left: 4px; }
+popover { background: #11141b; border: 1px solid #262c3a; }
+.pop-item { padding: 6px 14px; }
+.pop-item:hover { background: #1f2430; }
+.section { color: #6f7789; padding: 8px 14px 2px; font-size: 11px; }
+"""
+
+SOCK = os.environ.get("XDG_RUNTIME_DIR", "/tmp") + "/foxos-panel.pid"
+TOGGLE = "--toggle-menu" in sys.argv
+
+def run(*cmd, timeout=8):
+    try:
+        return subprocess.run(cmd, capture_output=True, text=True, timeout=timeout)
+    except Exception:
+        return None
+
+def paused():
+    p = run("foxos", "control", "status", "--json")
+    if not p or p.returncode != 0:
+        return False
+    try:
+        import json
+        d = json.loads(p.stdout)
+        return bool(d.get("paused") or (d.get("result") or d.get("data") or {}).get("paused"))
+    except Exception:
+        return "paused" in (p.stdout or "").lower() and "true" in (p.stdout or "").lower()
+
+def desktop_files():
+    seen, out = set(), []
+    dirs = ["/usr/share/applications", os.path.expanduser("~/.local/share/applications")]
+    for d in dirs:
+        for f in sorted(glob.glob(d + "/*.desktop")):
+            info = {}
+            try:
+                text = open(f, encoding="utf-8").read().splitlines()
+            except Exception:
+                continue
+            in_entry = False
+            for line in text:
+                if line.strip() == "[Desktop Entry]":
+                    in_entry = True
+                    continue
+                if line.startswith("[") and in_entry:
+                    break
+                if in_entry and "=" in line:
+                    k, v = line.split("=", 1)
+                    info[k] = v
+            if info.get("NoDisplay") == "true" or info.get("Type") != "Application":
+                continue
+            if info.get("Hidden") == "true" or "OnlyShowIn" in info and "FoxOS" not in info["OnlyShowIn"] and "labwc" not in info["OnlyShowIn"]:
+                continue
+            name = info.get("Name[zh_CN]") or info.get("Name[zh]") or info.get("Name")
+            exec_cmd = info.get("Exec")
+            if not name or not exec_cmd:
+                continue
+            exec_cmd = exec_cmd.split("%")[0].strip()
+            if exec_cmd in seen:
+                continue
+            seen.add(exec_cmd)
+            out.append((name, exec_cmd, info.get("Categories", "")))
+    out.sort(key=lambda x: x[0].lower())
+    return out
+
+class Panel(Gtk.Window):
+    def __init__(self):
+        super().__init__(type=Gtk.WindowType.TOPLEVEL)
+        self.set_name("foxos-panel")
+        self.get_style_context().add_class("foxos-panel")
+        self.set_type_hint(Gdk.WindowTypeHint.DOCK)
+        self.set_decorated(False)
+        self.set_skip_taskbar_hint(True)
+        self.set_skip_pager_hint(True)
+        self.set_accept_focus(False)
+        self.set_app_paintable(True)
+        self.menu = None
+        self.paused = False
+        bar = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=4)
+        bar.set_margin_start(6); bar.set_margin_end(6)
+        self.add(bar)
+        start = Gtk.Button()
+        start.get_style_context().add_class("primary")
+        hb = Gtk.Box(spacing=6)
+        icon = "/usr/share/pixmaps/foxos.png"
+        if os.path.exists(icon):
+            try:
+                pix = GdkPixbuf.Pixbuf.new_from_file_at_size(icon, 20, 20)
+                hb.pack_start(Gtk.Image.new_from_pixbuf(pix), False, False, 0)
+            except Exception:
+                pass
+        lab = Gtk.Label(label="开始"); lab.set_name("brand")
+        hb.pack_start(lab, False, False, 0)
+        start.add(hb)
+        start.connect("clicked", self.toggle_menu)
+        bar.pack_start(start, False, False, 0)
+        self.status = Gtk.Label(label="")
+        self.status.set_xalign(0)
+        bar.pack_start(self.status, True, True, 8)
+        self.take = Gtk.Button(label="人工接管")
+        self.take.get_style_context().add_class("warn")
+        self.take.connect("clicked", self.on_takeover)
+        bar.pack_end(self.take, False, False, 0)
+        power = Gtk.Button(label="系统")
+        power.connect("clicked", self.on_power)
+        bar.pack_end(power, False, False, 0)
+        self.clock = Gtk.Label(label="")
+        self.clock.set_name("clock")
+        bar.pack_end(self.clock, False, False, 0)
+        self.connect("realize", self.place)
+        self.connect("destroy", Gtk.main_quit)
+        GLib.timeout_add_seconds(1, self.tick)
+        self.tick()
+
+    def screen_box(self):
+        geo = self.get_screen().get_monitor_geometry(self.get_screen().get_primary_monitor())
+        return geo
+
+    def place(self, *_):
+        geo = self.screen_box()
+        h = 40
+        self.set_size_request(geo.width, h)
+        self.resize(geo.width, h)
+        self.move(geo.x, geo.y + geo.height - h)
+        try:
+            self.get_window().set_override_redirect(False)
+        except Exception:
+            pass
+        # wlr layer shell 更稳，但 GTK3 不一定直接支持；底部 dock 提示足够让 labwc 预留空间
+        self.set_strut()
+
+    def set_strut(self):
+        try:
+            from gi.repository import GdkX11  # noqa: F401
+        except Exception:
+            return
+        # Wayland 下 strut 无效；labwc 可用 window rules 预留。先把面板放底部。
+
+    def tick(self):
+        import time
+        self.clock.set_text(time.strftime("%Y-%m-%d  %H:%M"))
+        self.paused = paused()
+        self.take.set_label("接管中 · 点击恢复" if self.paused else "人工接管")
+        if self.paused:
+            self.take.get_style_context().add_class("on")
+            self.status.set_text("智能体写操作已暂停")
+        else:
+            self.take.get_style_context().remove_class("on")
+            if not self.status.get_text() or self.status.get_text().startswith("智能体"):
+                self.status.set_text("")
+        return True
+
+    def toggle_menu(self, *_):
+        if self.menu and self.menu.get_visible():
+            self.menu.popdown(); return
+        pop = Gtk.Popover()
+        pop.set_relative_to(self.get_child().get_children()[0])
+        pop.set_position(Gtk.PositionType.TOP)
+        box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0)
+        box.set_size_request(280, -1)
+        title = Gtk.Label(label="应用程序"); title.get_style_context().add_class("section"); title.set_xalign(0)
+        box.pack_start(title, False, False, 0)
+        # 常驻项（中文）
+        pinned = [("终端", "gnome-terminal"), ("文件", "thunar"), ("浏览器", "firefox"),
+                  ("编辑器", "gnome-text-editor"), ("安装 狐狸OS", "pkexec calamares")]
+        for name, cmd in pinned:
+            b = Gtk.Button(label=name, relief=Gtk.ReliefStyle.NONE)
+            b.get_style_context().add_class("pop-item"); b.set_xalign(0)
+            b.connect("clicked", lambda _w, c=cmd: (subprocess.Popen(c, shell=True), pop.popdown()))
+            box.pack_start(b, False, False, 0)
+        more = Gtk.Label(label="全部"); more.get_style_context().add_class("section"); more.set_xalign(0)
+        box.pack_start(more, False, False, 0)
+        scroll = Gtk.ScrolledWindow(); scroll.set_min_content_height(240); scroll.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
+        inner = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        for name, cmd, _cat in desktop_files()[:80]:
+            b = Gtk.Button(label=name, relief=Gtk.ReliefStyle.NONE)
+            b.get_style_context().add_class("pop-item"); b.set_xalign(0)
+            b.connect("clicked", lambda _w, c=cmd: (subprocess.Popen(c, shell=True), pop.popdown()))
+            inner.pack_start(b, False, False, 0)
+        scroll.add(inner)
+        box.pack_start(scroll, True, True, 0)
+        pop.add(box); box.show_all(); pop.popup()
+        self.menu = pop
+
+    def on_takeover(self, *_):
+        if self.paused:
+            run("foxos", "control", "resume")
+        else:
+            run("foxos", "control", "pause", "--reason", "面板按钮")
+        self.tick()
+
+    def on_power(self, btn):
+        pop = Gtk.Popover(); pop.set_relative_to(btn); pop.set_position(Gtk.PositionType.TOP)
+        box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        actions = [("退出会话", ["labwc", "--exit"]),
+                   ("锁定", ["loginctl", "lock-session"]),
+                   ("关机", ["systemctl", "poweroff"]),
+                   ("重新启动", ["systemctl", "reboot"])]
+        for name, cmd in actions:
+            b = Gtk.Button(label=name, relief=Gtk.ReliefStyle.NONE)
+            b.get_style_context().add_class("pop-item"); b.set_xalign(0)
+            b.connect("clicked", lambda _w, c=cmd: (subprocess.Popen(c), pop.popdown()))
+            box.pack_start(b, False, False, 0)
+        pop.add(box); box.show_all(); pop.popup()
+
+def css():
+    p = Gtk.CssProvider()
+    p.load_from_data(CSS.encode())
+    Gtk.StyleContext.add_provider_for_screen(Gdk.Screen.get_default(), p, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
+
+def main():
+    if TOGGLE:
+        if os.path.exists(SOCK):
+            try:
+                os.kill(int(open(SOCK).read().strip()), signal.SIGUSR1)
+                return
+            except Exception:
+                pass
+        # 面板还没起来就直接退出，避免再开一个
+        return
+    css()
+    win = Panel()
+    def toggle(*_):
+        GLib.idle_add(win.toggle_menu)
+    signal.signal(signal.SIGUSR1, toggle)
+    open(SOCK, "w").write(str(os.getpid()))
+    win.show_all()
+    try:
+        Gtk.main()
+    finally:
+        try: os.remove(SOCK)
+        except Exception: pass
+
+if __name__ == "__main__":
+    main()

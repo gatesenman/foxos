@@ -1,0 +1,16 @@
+#!/bin/sh
+# Live 介质（存在 /cdrom/casper 或 /run/live）时让 lightdm 自动登录 foxos 用户；安装后的磁盘没有这些路径。
+set -eu
+CONF=/etc/lightdm/lightdm.conf.d/10-live.conf
+if [ -d /cdrom/casper ] || [ -d /run/live ] || [ -d /run/casper ]; then
+  mkdir -p /etc/lightdm/lightdm.conf.d
+  cat > "$CONF" <<'U'
+[Seat:*]
+autologin-user=foxos
+autologin-user-timeout=0
+user-session=foxos
+U
+else
+  rm -f "$CONF"
+fi
+exit 0

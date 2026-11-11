@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=狐狸OS
+Name[en]=FoxOS
+Comment=狐狸OS 桌面（labwc）
+Comment[en]=FoxOS desktop (labwc)
+Exec=dbus-run-session -- labwc
+Type=Application
+DesktopNames=FoxOS

@@ -1,0 +1,14 @@
+[Unit]
+Description=狐狸OS MCP 服务器（本机回环，供本机会话与 ACP 智能体使用）
+After=graphical-session.target
+
+[Service]
+Type=simple
+ExecStartPre=/bin/mkdir -p %h/FoxOS/workspace
+ExecStart=/usr/bin/foxos --workspace %h/FoxOS/workspace mcp --http 127.0.0.1:8765
+Restart=on-failure
+RestartSec=3
+Environment=FOXOS_LANG=zh-CN
+
+[Install]
+WantedBy=default.target

@@ -1,0 +1,14 @@
+NAME="狐狸OS"
+VERSION="0.3.0"
+ID=foxos
+ID_LIKE="ubuntu debian"
+PRETTY_NAME="狐狸OS 0.3.0"
+VERSION_ID="0.3.0"
+VERSION_CODENAME=foxos
+HOME_URL="https://github.com/gatesenman/foxos"
+SUPPORT_URL="https://github.com/gatesenman/foxos/issues"
+BUG_REPORT_URL="https://github.com/gatesenman/foxos/issues"
+PRIVACY_POLICY_URL="https://github.com/gatesenman/foxos"
+UBUNTU_CODENAME=noble
+LOGO=foxos
+DEFAULT_HOSTNAME=foxos

@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=狐狸OS 面板
+Name[en]=FoxOS Panel
+Exec=/usr/lib/foxos/panel/foxos-panel
+X-GNOME-Autostart-Phase=WindowManager
+OnlyShowIn=FoxOS;labwc;
+NoDisplay=true
