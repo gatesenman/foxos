@@ -66,7 +66,23 @@
 
 见 `docs/test-report.md` 的 US-120 起，以及下面的基准表（`python3 scripts/cu_bench.py` 生成）。
 
-<!-- BENCH -->
+### 基准：Jev 与 DeepSeek（真实 XFCE 桌面，2026-11-12，UTC+8）
+
+5 个任务（Mousepad 替换 / 追加并保存、没有无障碍信息的 xedit 走截图、本地表单网页、维基百科查询），每个配置每个任务跑 1 次。`llm` = 只用 DeepSeek v4 pro 工具调用循环；`deepseek` = 第一层 DeepSeek flash + 第二层 v4 pro；`jev` = 第一层 Jev + 第二层 v4 pro（默认栈）。费用按公开价格从实际 token 数算出。
+
+第一轮（`docs/test-results/cu-bench.json`，负载约 100）：
+
+| 配置 | 成功 | 平均步数 | 平均耗时（秒） | 总费用（美元） |
+|---|---|---|---|---|
+| llm | 4/5（xedit 失败） | 7.6 | 55.4 | 0.1924 |
+| deepseek | 5/5 | 6.6 | 34.8 | 0.0468 |
+| jev | 4/5（维基百科失败） | 8.8 | 54.6 | 0.1047 |
+
+- 修正“规划器记住读到的内容”后重跑维基百科（`cu-bench-rerun.json`）：jev **通过**（5 步，98.2 秒，0.0421 美元）；deepseek **失败**（14 步用完）。
+- 第二轮（`cu-bench-oom.json`）作废：跑到一半盒子负载升到 75–100、内存耗尽，内核 OOM 杀掉了 Chrome，3 个网页任务因此报错；只有 Mousepad 替换可比（两者都通过，jev 4 步 17.1 秒，deepseek 5 步 28.4 秒）。
+- 每一步决策：Jev 约 0.13 秒，DeepSeek flash 约 1.3 秒。Jev 把置信度低的步交给规划器的次数更多（第一轮 17 次，DeepSeek 7 次），所以总步数和总费用并没有更低。
+- 结论如实说：这些单次运行噪声很大，数据**没有**显示 Jev 在成功率或费用上更好，它赢在单步延迟。默认仍按 Sarah 的决定用 Jev（没有 TypeSafe 密钥时自动退到 DeepSeek）；要下结论需要在空闲机器上每项跑多次。
+
 
 ## 3. 许可
 
@@ -103,7 +119,7 @@ Only one optional local vision model is kept (**UI-TARS-1.5-7B**, one-click, not
 
 ## Measurements
 
-See `docs/test-report.md` (US-120+) and the benchmark table above (`scripts/cu_bench.py`).
+See `docs/test-report.md` (US-120+). Benchmark (real XFCE desktop, single run per cell, box load ~100): first pass llm 4/5 ($0.1924, 55.4 s mean), deepseek 5/5 ($0.0468, 34.8 s), jev 4/5 ($0.1047, 54.6 s). After the planner fix the Wikipedia task passed with Jev (5 steps, 98.2 s) and failed with DeepSeek (14 steps). A second pass was invalidated by the kernel OOM killer taking Chrome down mid-run. Jev decides a step in ~0.13 s vs ~1.3 s for DeepSeek flash but escalated more often (17 vs 7), so the data does not show Jev winning on success or cost, only on step latency. Jev stays the default per Sarah's decision; repeated runs on an idle machine are needed for a firm conclusion.
 
 ## Licenses
 

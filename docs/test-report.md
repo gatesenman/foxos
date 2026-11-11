@@ -90,6 +90,33 @@
 
 没有用真实模型账号跑过回答。Gemini CLI、codex-acp、Qwen Code、Cursor CLI 的握手结果是「需要登录」；opencode 和 claude-agent-acp 能建立会话。详见 [agent-runtime.md](agent-runtime.md)。截图在 `docs/screenshots/bots-*.png`，是 overlay 里真实 XFCE 会话中的「智能体」窗口（Firefox 后备浏览器）。
 
+## 电脑、浏览器、命令行操控（2026-11-12 03:01，Asia/Shanghai）
+
+默认栈：agent-desktop 1.2.0 读界面并执行（AT-SPI），Jev（TypeSafe）选每一步，DeepSeek v4 pro 做规划；读不到界面时自动退到截图操控（scrot + xdotool + 视觉定位）或浏览器操控（Chrome CDP + agent-browser 0.42.0）。所有动作在狐狸OS 机器里的 XFCE 会话（Xvfb :55）里执行，不碰宿主。删除、发送、支付等动作要求批准，每一步写审计。
+
+先用真实请求核对 Jev 密钥（密钥只在测试时放进环境变量，不打印）：`GET /v1/models` 200，108 毫秒；`POST /v1/systemone`（Choice）200，156 毫秒，模型 jev-1.14.0，置信度 1.0。
+
+真实端到端 `FOXOS_CU_E2E=1 pytest tests/test_cu_real.py`（合并主线后的 `8eb13be`）：**7 通过、0 失败**，134.6 秒。
+
+| 故事 | 用例 | 结果 | 耗时（秒） |
+|---|---|---|---|
+| US-120 | 体检显示默认栈与两条兜底 | 通过 | 1.7 |
+| US-121 | 默认路径：agent-desktop + Jev + DeepSeek 规划，在 Mousepad 改写并保存 | 通过 | 21.4 |
+| US-122 | 没有 TypeSafe 密钥时退到 DeepSeek 单步策略 | 通过 | 39.2 |
+| US-123 | xedit 没有无障碍信息，自动退到截图操控 | 通过 | 31.9 |
+| US-124 | 网页内容读不到，自动退到浏览器操控（本地商店下单并读出订单号） | 通过 | 18.0 |
+| US-125 | 按次 `--surface` 与按智能体设置手动选择 | 通过 | 20.4 |
+| US-126 | TypeSafe 服务商真实调用 | 通过 | 1.9 |
+| US-127 | 离线单元测试 `test_computer_use.py`（20 个） | 通过 | — |
+
+另外 `test_computer_use.py`、`test_catalog_and_mcp.py`、`test_i18n.py`、`test_os_runtime.py` 合并后共 27 通过、2 跳过（`test_os_runtime` 需要镜像 chroot）。
+
+开发过程中出现过、已经修好的失败（都是真实运行）：Mousepad 弹出对话框时 agent-desktop 返回 AMBIGUOUS_TARGET，第一次跑到步数上限（改为多窗口快照）；维基百科走浏览器操控时先后出现“Unknown ref”、答案正确但校验判为未完成、标签页超时（分别修为不重复切换标签、校验带上页面文字、观察出错时重试）。
+
+基准（Jev 与 DeepSeek）见 [computer-use-research.md](computer-use-research.md)：数据没有显示 Jev 在成功率或费用上更好，只在单步延迟上更快（约 0.13 秒对 1.3 秒）；第二轮因为盒子内存耗尽、Chrome 被 OOM 杀掉而作废。
+
+未做：UI-TARS-1.5-7B 本地定位没有跑（需要约 8.3 GB 内存，盒子上只有约 1.3 GB 可用）；`test_envs.py` 的 US-32/US-33 在这台盒子上因缺 `zstandard` 模块失败（与本次改动无关）。截图：`docs/screenshots/cu-bot-settings.png`、`cu-bot-settings-en.png`（智能体设置的“电脑操控”页）。
+
 ## Everything 应用覆盖（51 个）
 
 等价检查：同一个操作分别用真实鼠标 / 键盘事件（GUI）和 `foxos` CLI 执行，两次结束后的界面状态与应用数据必须一致。操作数来自 [操作清单](operations/)。
