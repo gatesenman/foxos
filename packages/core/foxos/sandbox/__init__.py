@@ -16,6 +16,7 @@
 
 from __future__ import annotations
 
+from foxos.i18n import tr
 import os
 import shutil
 import sys
@@ -137,7 +138,7 @@ def capabilities() -> dict:
     if PLATFORM == "windows":
         from . import windows
         return windows.capabilities()
-    return {"platform": PLATFORM, "available": False, "reason": "不支持的平台"}
+    return {"platform": PLATFORM, "available": False, "reason": tr("sandbox.unsupported_platform")}
 
 
 def run(policy: Policy, argv: list[str], cwd: str | None = None, timeout: float | None = None, capture: bool = True, profile: str = "default"):
@@ -153,7 +154,7 @@ def run(policy: Policy, argv: list[str], cwd: str | None = None, timeout: float 
     if PLATFORM == "windows":
         from . import windows
         return windows.run(p, argv, cwd=cwd, timeout=timeout, capture=capture)
-    raise OSError(f"轻量隔离不支持平台 {PLATFORM}")
+    raise OSError(tr("sandbox.the_light_sandbox_does_not_support", PLATFORM))
 
 
 def launcher_argv(policy: Policy, argv: list[str], profile: str = "default", python: str | None = None) -> list[str]:

@@ -10,6 +10,7 @@
   - `--workspace PATH`：工作空间根目录（默认 $FOXOS_WORKSPACE 或 ~/FoxOS/workspace）
   - `--agent NAME`：调用者身份，写入审计日志（默认 $FOXOS_AGENT 或 human）
   - `--task ID`：关联的任务 ID（默认 $FOXOS_TASK）
+  - `--lang LANG`：界面语言：zh-CN（默认）或 en-US；也可用环境变量 FOXOS_LANG。JSON 字段名与错误码不随语言变化
   - `--lock-wait SECONDS`：目标文件被锁时最多等待的秒数（默认 0，立即返回 LOCKED）
 - **exit_codes**
   - 0：OK：成功

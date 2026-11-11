@@ -13,6 +13,7 @@
 
 from __future__ import annotations
 
+from foxos.i18n import tr
 import re
 import subprocess
 from pathlib import Path, PureWindowsPath
@@ -29,7 +30,7 @@ def distro(name: str) -> str:
 def win_to_wsl_path(p: str) -> str:
     w = PureWindowsPath(p)
     if not w.drive or not w.drive.endswith(":"):
-        raise FoxError("USAGE", f"不是 Windows 绝对路径：{p}")
+        raise FoxError("USAGE", tr("envs.wsl.not_an_absolute_windows_path", p))
     rest = "/".join(w.parts[1:])
     return f"/mnt/{w.drive[0].lower()}/{rest}".rstrip("/")
 
@@ -71,7 +72,7 @@ def _run(cmd: list[str], **kw):
     try:
         return subprocess.run(cmd, capture_output=True, **kw)
     except FileNotFoundError as e:
-        raise FoxError("DEPENDENCY_MISSING", "没有找到 wsl.exe：请启用“适用于 Linux 的 Windows 子系统”", hint="环境 → 安装系统 → 启用 WSL，或管理员 PowerShell 运行 wsl --install --no-distribution") from e
+        raise FoxError("DEPENDENCY_MISSING", tr("envs.wsl.wsl_exe_not_found_enable_windows"), hint=tr("envs.wsl.environments_install_a_system_enable")) from e
 
 
 def _text(raw: bytes) -> str:
@@ -122,20 +123,20 @@ def create(name, image, workspace, home):
     inst.mkdir(parents=True, exist_ok=True)
     r = _run(cmd_import(name, str(inst / "disk"), str(tar)))
     if r.returncode:
-        raise FoxError("ERROR", _text(r.stdout + r.stderr).strip() or "wsl --import 失败")
-    return {"message": f"已创建 WSL2 环境 {distro(name)}", "workspace_in_env": win_to_wsl_path(str(workspace)), "image": m["id"]}
+        raise FoxError("ERROR", _text(r.stdout + r.stderr).strip() or tr("envs.wsl.wsl_import_failed"))
+    return {"message": tr("envs.wsl.created_wsl2_environment", distro(name)), "workspace_in_env": win_to_wsl_path(str(workspace)), "image": m["id"]}
 
 
 def start(cfg):
     r = _run(cmd_exec_d(dname(cfg), ["/bin/sh", "-c", "true"]))
     if r.returncode:
-        raise FoxError("ERROR", "WSL 启动失败：" + _text(r.stdout + r.stderr).strip()[-500:])
-    return {"message": f"已启动 {dname(cfg)}"}
+        raise FoxError("ERROR", tr("envs.wsl.wsl_failed_to_start") + _text(r.stdout + r.stderr).strip()[-500:])
+    return {"message": tr("envs.wsl.started", dname(cfg))}
 
 
 def stop(cfg):
     _run(["wsl.exe", "--terminate", dname(cfg)])
-    return {"message": f"已停止 {dname(cfg)}"}
+    return {"message": tr("common.stopped", dname(cfg))}
 
 
 def exec_(cfg, argv, cwd, capture=True, timeout=None):
@@ -148,10 +149,10 @@ def exec_(cfg, argv, cwd, capture=True, timeout=None):
 def export(cfg, out: str):
     r = _run(["wsl.exe", "--export", dname(cfg), out])
     if r.returncode:
-        raise FoxError("ERROR", _text(r.stdout + r.stderr).strip()[-500:] or "wsl --export 失败")
+        raise FoxError("ERROR", _text(r.stdout + r.stderr).strip()[-500:] or tr("envs.wsl.wsl_export_failed"))
 
 
 def unregister(cfg):
     r = _run(["wsl.exe", "--unregister", dname(cfg)])
     if r.returncode and "not found" not in _text(r.stdout + r.stderr).lower():
-        raise FoxError("ERROR", _text(r.stdout + r.stderr).strip()[-500:] or "wsl --unregister 失败")
+        raise FoxError("ERROR", _text(r.stdout + r.stderr).strip()[-500:] or tr("envs.wsl.wsl_unregister_failed"))

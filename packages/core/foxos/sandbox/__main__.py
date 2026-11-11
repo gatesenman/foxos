@@ -5,6 +5,7 @@
 
 from __future__ import annotations
 
+from foxos.i18n import tr
 import argparse
 import json
 import sys
@@ -17,7 +18,7 @@ def main(argv: list[str] | None = None) -> None:
     e.add_argument("--policy", required=True)
     e.add_argument("--cwd")
     e.add_argument("command", nargs=argparse.REMAINDER)
-    w = sub.add_parser("wrap", help="补全策略（私有 HOME / tmp、程序目录）后执行，供桌面端启动智能体")
+    w = sub.add_parser("wrap", help=tr("sandbox.main.complete_the_policy_private_home_tmp"))
     w.add_argument("--workspace", required=True)
     w.add_argument("--read", action="append", default=[])
     w.add_argument("--write", action="append", default=[])
@@ -37,7 +38,7 @@ def main(argv: list[str] | None = None) -> None:
         return
     cmd = a.command[1:] if a.command[:1] == ["--"] else a.command
     if not cmd:
-        ap.error("缺少要执行的命令")
+        ap.error(tr("common.missing_the_command_to_run"))
     if a.cmd == "wrap":
         import os
         import re
@@ -59,7 +60,7 @@ def main(argv: list[str] | None = None) -> None:
     if PLATFORM == "windows":
         from . import windows
         sys.exit(windows.run(p, cmd, cwd=a.cwd, capture=False).returncode)
-    sys.stderr.write(f"不支持的平台 {PLATFORM}\n")
+    sys.stderr.write(tr("sandbox.main.unsupported_platform", PLATFORM))
     sys.exit(6)
 
 

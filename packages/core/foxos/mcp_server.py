@@ -6,6 +6,7 @@
 
 from __future__ import annotations
 
+from foxos.i18n import tr
 import json
 import sys
 
@@ -38,10 +39,8 @@ def handle(msg: dict, state: dict) -> dict | None:
         return _resp(id_, {
             "protocolVersion": pv if pv in SUPPORTED else SUPPORTED[0],
             "capabilities": {"tools": {"listChanged": False}},
-            "serverInfo": {"name": "foxos", "title": "狐狸OS", "version": __version__},
-            "instructions": ("狐狸OS 命令内核。路径相对于工作空间；先调用 tools/list 了解参数与限制。"
-                             "Everything 应用（51 个）的操作：先 everything_commands {app} 查看，再 everything_run {app, command, args} 执行；"
-                             "写操作会写审计、遵守写锁；人工接管时返回 PAUSED。" + catalog.ERROR_CODES),
+            "serverInfo": {"name": "foxos", "title": tr("mcp_server.foxos"), "version": __version__},
+            "instructions": (tr("mcp_server.foxos_command_kernel_paths_are") + catalog.ERROR_CODES),
         })
     if method == "ping":
         return _resp(id_, {})
@@ -128,7 +127,7 @@ def serve_http(ws: Workspace, host: str = "127.0.0.1", port: int = 8765, token: 
             return secrets.compare_digest(got, f"Bearer {token}")
 
         def do_GET(self):  # noqa: N802
-            self._send(405, {"error": "本服务器不提供 SSE 推送流"}, {"Allow": "POST, DELETE"})
+            self._send(405, {"error": tr("mcp_server.this_server_does_not_provide_an_sse")}, {"Allow": "POST, DELETE"})
 
         def do_DELETE(self):  # noqa: N802
             sessions.pop(self.headers.get("Mcp-Session-Id", ""), None)
@@ -156,7 +155,7 @@ def serve_http(ws: Workspace, host: str = "127.0.0.1", port: int = 8765, token: 
                 sid = uuid.uuid4().hex
                 sessions[sid] = {"ws": ws, "agent": agent_default, "task": task, "profile": profile, "apps": apps, "names": names}
             elif not sid or sid not in sessions:
-                return self._send(404 if sid else 400, _resp(None, error={"code": -32000, "message": "缺少或无效的 Mcp-Session-Id"}))
+                return self._send(404 if sid else 400, _resp(None, error={"code": -32000, "message": tr("mcp_server.missing_or_invalid_mcp_session_id")}))
             outs = [o for o in (handle(m, sessions[sid]) for m in msgs if isinstance(m, dict)) if o is not None]
             hdr = {"Mcp-Session-Id": sid}
             if not outs:

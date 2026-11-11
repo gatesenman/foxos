@@ -10,6 +10,7 @@ overlayfs（镜像只读层 + 环境可写层）、pivot_root、seccomp 系统�
 
 from __future__ import annotations
 
+from foxos.i18n import tr
 import ctypes
 import fcntl  # noqa: F401  pivot_root 之后无法再导入扩展模块，提前导入
 import ctypes.util
@@ -202,10 +203,10 @@ def cgroup_setup(name: str, limits: dict) -> str:
     try:
         line = next(l for l in Path("/proc/self/cgroup").read_text().splitlines() if l.startswith("0::"))
     except (OSError, StopIteration):
-        return "unavailable: 不是 cgroup v2"
+        return tr("envs.linux.unavailable_not_cgroup_v2")
     base = Path("/sys/fs/cgroup") / line[3:].lstrip("/")
     if not os.access(base, os.W_OK):
-        return f"unavailable: {base} 不可写（cgroup 未委派给当前用户）"
+        return tr("envs.linux.unavailable_is_not_writable_cgroup", base)
     want = [c for c, k in (("memory", "memory_mb"), ("pids", "pids"), ("cpu", "cpus")) if limits.get(k)]
     try:
         avail = (base / "cgroup.controllers").read_text().split()
@@ -244,7 +245,7 @@ def supervise(env_dir: Path) -> int:
     if pid:
         os.close(w)
         (run / "init.pid").write_text(str(pid))
-        status = os.read(r, 4096).decode() or "init 启动失败"
+        status = os.read(r, 4096).decode() or tr("envs.linux.init_failed_to_start")
         (run / "status").write_text(status)
         _, st = os.waitpid(pid, 0)
         for f in ("init.pid",):
@@ -325,7 +326,7 @@ def init_pid(env_dir: Path) -> int | None:
 def exec_in(env_dir: Path, argv: list[str], cwd: str = "/", env: dict | None = None, user_env: bool = True) -> int:
     pid = init_pid(env_dir)
     if not pid:
-        print("环境没有运行", file=sys.stderr)
+        print(tr("envs.linux.the_environment_is_not_running"), file=sys.stderr)
         return 6
     cfg = load(env_dir)
     fds = {}
@@ -345,7 +346,7 @@ def exec_in(env_dir: Path, argv: list[str], cwd: str = "/", env: dict | None = N
             apply_seccomp()
             os.execvpe(argv[0], argv, {**CONTAINER_ENV, **(env or {})})
         except OSError as e:
-            print(f"无法执行 {argv[0]}：{e.strerror}", file=sys.stderr)
+            print(tr("envs.linux.cannot_run", argv[0], e.strerror), file=sys.stderr)
             os._exit(127)
     signal.signal(signal.SIGINT, signal.SIG_IGN)
     _, st = os.waitpid(child, 0)

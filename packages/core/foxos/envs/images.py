@@ -8,6 +8,7 @@
 
 from __future__ import annotations
 
+from foxos.i18n import tr
 import hashlib
 import io
 import json
@@ -33,11 +34,11 @@ CATALOG = [
      "url": f"https://dl-cdn.alpinelinux.org/alpine/v3.20/releases/{ARCH}/alpine-minirootfs-3.20.3-{ARCH}.tar.gz",
      "sha256_url": f"https://dl-cdn.alpinelinux.org/alpine/v3.20/releases/{ARCH}/alpine-minirootfs-3.20.3-{ARCH}.tar.gz.sha256",
      "shell": "/bin/sh", "packages": "apk add"},
-    {"id": "ubuntu-24.04", "name": "Ubuntu 24.04 LTS（ubuntu-base）", "size_mb": 29,
+    {"id": "ubuntu-24.04", "name": tr("envs.images.ubuntu_24_04_lts_ubuntu_base"), "size_mb": 29,
      "url": f"https://cdimage.ubuntu.com/ubuntu-base/releases/24.04/release/ubuntu-base-24.04.5-base-{DEB_ARCH}.tar.gz",
      "sha256_url": "https://cdimage.ubuntu.com/ubuntu-base/releases/24.04/release/SHA256SUMS",
      "shell": "/bin/bash", "packages": "apt-get install"},
-    {"id": "ubuntu-22.04", "name": "Ubuntu 22.04 LTS（ubuntu-base）", "size_mb": 28,
+    {"id": "ubuntu-22.04", "name": tr("envs.images.ubuntu_22_04_lts_ubuntu_base"), "size_mb": 28,
      "url": f"https://cdimage.ubuntu.com/ubuntu-base/releases/22.04/release/ubuntu-base-22.04.5-base-{DEB_ARCH}.tar.gz",
      "sha256_url": "https://cdimage.ubuntu.com/ubuntu-base/releases/22.04/release/SHA256SUMS",
      "shell": "/bin/bash", "packages": "apt-get install"},
@@ -76,7 +77,7 @@ def _expected_sha(entry: dict, filename: str) -> str:
             return parts[0].lower()
     if re.fullmatch(r"[0-9a-f]{64}", text.strip().split()[0] if text.strip() else ""):
         return text.strip().split()[0]
-    raise FoxError("ERROR", f"在官方校验文件中找不到 {filename}")
+    raise FoxError("ERROR", tr("envs.images.not_found_in_the_official_checksum", filename))
 
 
 def extract_rootfs(archive: Path, dest: Path) -> None:
@@ -91,18 +92,18 @@ def extract_rootfs(archive: Path, dest: Path) -> None:
             p.stdin.close()
             err = p.stderr.read().decode()
             if p.wait() not in (0, 2):
-                raise FoxError("ERROR", f"解包失败：{err[-500:]}")
+                raise FoxError("ERROR", tr("envs.images.unpacking_failed", err[-500:]))
         return
     r = subprocess.run(["tar", "-x", "--no-same-owner", "--exclude=./dev/*", "-f", str(archive), "-C", str(dest)], capture_output=True, text=True)
     if r.returncode not in (0, 2):
-        raise FoxError("ERROR", f"解包失败：{r.stderr[-500:]}")
+        raise FoxError("ERROR", tr("envs.images.unpacking_failed", r.stderr[-500:]))
 
 
 def pull(entry_or_url: str, images_dir: Path, sha256: str | None = None, progress=None) -> dict:
     entry = next((c for c in CATALOG if c["id"] == entry_or_url), None)
     url = entry["url"] if entry else entry_or_url
     if not re.match(r"^https://", url) and not Path(url).exists():
-        raise FoxError("USAGE", "镜像必须是目录中的 ID、https:// 地址或本地文件")
+        raise FoxError("USAGE", tr("envs.images.the_image_must_be_a_catalog_id_an"))
     image_id = entry["id"] if entry else re.sub(r"[^a-z0-9.-]+", "-", Path(url.split("?")[0]).name.lower()).strip("-")[:60]
     out = images_dir / image_id
     if (out / "manifest.json").exists():
@@ -118,7 +119,7 @@ def pull(entry_or_url: str, images_dir: Path, sha256: str | None = None, progres
         got = _sha256(arc)
         want = sha256 or (_expected_sha(entry, fname) if entry else None)
         if want and got != want.lower():
-            raise FoxError("CONFLICT", f"sha256 不匹配：期望 {want}，实际 {got}")
+            raise FoxError("CONFLICT", tr("common.sha256_mismatch_expected_got", want, got))
         if fname.endswith(".foxenv"):
             return import_foxenv(arc, images_dir)
         extract_rootfs(arc, tmp / "rootfs")
@@ -146,7 +147,7 @@ def write_foxenv(rootfs_dirs: list[Path], dest: Path, meta: dict) -> dict:
             shutil.copyfileobj(tar.stdout, zw)
             err = tar.stderr.read().decode()
             if tar.wait() not in (0, 1):
-                raise FoxError("ERROR", f"打包失败：{err[-500:]}")
+                raise FoxError("ERROR", tr("envs.images.packing_failed", err[-500:]))
         m = {"format": "foxenv/1", **meta, "arch": ARCH, "created": datetime.now(timezone.utc).isoformat(timespec="seconds"),
              "rootfs": "rootfs.tar.zst", "sha256": _sha256(rfs), "size": rfs.stat().st_size}
         dest.parent.mkdir(parents=True, exist_ok=True)
@@ -164,11 +165,11 @@ def read_foxenv(arc: Path, work: Path) -> tuple[dict, Path]:
     with tarfile.open(arc, "r") as t:
         m = json.loads(t.extractfile("manifest.json").read())
         if m.get("format") != "foxenv/1":
-            raise FoxError("USAGE", "不是狐狸OS 环境镜像（foxenv/1）")
+            raise FoxError("USAGE", tr("envs.images.not_a_foxos_environment_image_foxenv"))
         t.extract("rootfs.tar.zst", work, filter="data")
     rfs = work / "rootfs.tar.zst"
     if _sha256(rfs) != m["sha256"]:
-        raise FoxError("CONFLICT", "镜像校验失败（sha256 不匹配），文件可能损坏或被篡改")
+        raise FoxError("CONFLICT", tr("envs.images.image_verification_failed_sha256"))
     return m, rfs
 
 

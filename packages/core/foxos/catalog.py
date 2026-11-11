@@ -2,24 +2,26 @@
 
 from __future__ import annotations
 
+from foxos.i18n import tr
 from . import __version__
 from .errors import EXIT_CODE_DOCS, FoxError
 from .kernel import APPS, REGISTRY, load_apps
 
 CONVENTIONS = {
-    "invocation": "foxos [全局选项] <app> <command> [参数]；全局选项可放在任意位置",
+    "invocation": tr("catalog.foxos_global_options_app_command"),
     "global_options": {
-        "--json": "以 JSON 输出：成功 {ok:true, command, result}，失败 {ok:false, command, error:{code, exit_code, message, hint}}",
-        "--workspace PATH": "工作空间根目录（默认 $FOXOS_WORKSPACE 或 ~/FoxOS/workspace）",
-        "--agent NAME": "调用者身份，写入审计日志（默认 $FOXOS_AGENT 或 human）",
-        "--task ID": "关联的任务 ID（默认 $FOXOS_TASK）",
-        "--lock-wait SECONDS": "目标文件被锁时最多等待的秒数（默认 0，立即返回 LOCKED）",
+        "--json": tr("catalog.json_output_success_failure"),
+        "--workspace PATH": tr("catalog.workspace_root_default_foxos"),
+        "--agent NAME": tr("catalog.caller_identity_written_to_the_audit"),
+        "--task ID": tr("catalog.related_task_id_default_foxos_task"),
+        "--lang LANG": tr("cli.lang_option"),
+        "--lock-wait SECONDS": tr("catalog.maximum_seconds_to_wait_when_the"),
     },
     "exit_codes": {str(k): v for k, v in EXIT_CODE_DOCS.items()},
-    "paths": "所有路径相对于工作空间根目录；越出工作空间或访问 .foxos/ 返回 PERMISSION_DENIED（4）",
-    "formulas": "单元格值以 = 开头即为 Excel 公式，如 =SUM(B2:B13)；以 ' 开头强制为文本",
-    "audit": "每次调用（含失败与拒绝）都追加到 <workspace>/.foxos/audit.jsonl；只读自省命令 audit tail、control status 成功时不记录",
-    "tool_names": "工具接口名 = 命令 ID 把 . 换成 _，如 sheets.chart.create → sheets_chart_create",
+    "paths": tr("catalog.all_paths_are_relative_to_the"),
+    "formulas": tr("catalog.a_cell_value_starting_with_is_an"),
+    "audit": tr("catalog.every_call_including_failures_and"),
+    "tool_names": tr("catalog.tool_name_command_id_with_replaced"),
 }
 
 
@@ -54,7 +56,7 @@ def command_entry(cmd) -> dict:
 def catalog(app: str | None = None) -> dict:
     load_apps()
     if app and app not in APPS:
-        raise FoxError("NOT_FOUND", f"未知应用：{app}", details={"apps": sorted(APPS)})
+        raise FoxError("NOT_FOUND", tr("catalog.unknown_app", app), details={"apps": sorted(APPS)})
     apps = []
     for name, meta in APPS.items():
         if app and name != app:
@@ -64,17 +66,17 @@ def catalog(app: str | None = None) -> dict:
     return {"name": "foxos", "version": __version__, "conventions": CONVENTIONS, "apps": apps}
 
 
-ERROR_CODES = "错误码：USAGE(2) NOT_FOUND(3) PERMISSION_DENIED(4) LOCKED(5) DEPENDENCY_MISSING(6) CONFLICT(7) PAUSED(8)，失败时 isError=true，structuredContent.error.code 给出错误码"
+ERROR_CODES = tr("catalog.error_codes_usage_2_not_found_3")
 
 
 def tool_description(cmd) -> str:
-    d = f"{cmd.summary}。CLI：{cmd.usage()}"
+    d = tr("catalog.cli", cmd.summary, cmd.usage())
     if cmd.description:
-        d += f"。{cmd.description}"
+        d += tr("catalog.text", cmd.description)
     if cmd.limits:
-        d += "。限制：" + "；".join(cmd.limits)
+        d += tr("catalog.limits") + tr("common.text").join(cmd.limits)
     if cmd.examples:
-        d += "。示例：" + cmd.examples[0]
+        d += tr("catalog.examples") + cmd.examples[0]
     return d
 
 

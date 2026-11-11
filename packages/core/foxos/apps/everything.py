@@ -7,6 +7,7 @@ data/ops/<应用>.json 生成的语义命令 `foxos <应用> <资源> <动作>`�
 
 from __future__ import annotations
 
+from foxos.i18n import tr
 import base64
 import hashlib
 import json
@@ -53,8 +54,8 @@ def _row(a: dict) -> dict:
 
 
 # ---------------------------------------------------------------- 目录与安装
-register_app("everything", "Everything 应用", "上游 HeyPuter/everything 的 51 个应用：从上游源码在本机构建安装，在狐狸OS 中本地运行（不连接 puter.com）。",
-             limits=["AGPL-3.0 应用作为独立组件在安装时从上游获取，狐狸OS 不分发其源码或修改版"])
+register_app("everything", tr("everything.everything_apps"), tr("everything.the_51_apps_of_upstream_heyputer"),
+             limits=[tr("everything.agpl_3_0_apps_are_fetched_from")])
 
 
 def ev_list(ctx: Context, group: str | None = None, installed_only: bool = False) -> dict:
@@ -73,7 +74,7 @@ def ev_info(ctx: Context, app: str) -> dict:
 
 def _need(app: str) -> dict:
     if app not in APPS:
-        raise FoxError("NOT_FOUND", f"没有名为 {app} 的 Everything 应用", hint="foxos everything list")
+        raise FoxError("NOT_FOUND", tr("everything.no_everything_app_named", app), hint="foxos everything list")
     return APPS[app]
 
 
@@ -83,7 +84,7 @@ def _run(cmd: list[str], cwd: Path, log, env=None, timeout=1800) -> None:
     out = p.stdout.decode("utf-8", "replace")
     log(out[-4000:])
     if p.returncode != 0:
-        raise FoxError("ERROR", f"命令失败（退出码 {p.returncode}）：{' '.join(cmd[:3])}", details={"output": out[-2000:]})
+        raise FoxError("ERROR", tr("everything.command_failed_exit_code", p.returncode, ' '.join(cmd[:3])), details={"output": out[-2000:]})
 
 
 def _fetch_source(apps: list[str], dest: Path, source: str | None, log) -> Path:
@@ -93,7 +94,7 @@ def _fetch_source(apps: list[str], dest: Path, source: str | None, log) -> Path:
         src = Path(source).expanduser().resolve()
         if (src / ".git").exists() and shutil.which("git"):
             for a in apps:
-                log(f"从本地仓库 {src} 导出 {commit[:8]} 的 src/{a}\n")
+                log(tr("everything.exporting_src_of_from_local", src, commit[:8], a))
             tar = subprocess.run(["git", "-C", str(src), "archive", commit, "dev", "LICENSE", *[f"src/{a}" for a in apps]], stdout=subprocess.PIPE, check=True).stdout
             subprocess.run(["tar", "-x", "-C", str(dest)], input=tar, check=True)
             return dest
@@ -103,7 +104,7 @@ def _fetch_source(apps: list[str], dest: Path, source: str | None, log) -> Path:
         shutil.copy2(src / "LICENSE", dest / "LICENSE")
         return dest
     if not shutil.which("git"):
-        raise FoxError("DEPENDENCY_MISSING", "需要 git 才能从上游获取 Everything 源码", hint="在安装向导中安装 git")
+        raise FoxError("DEPENDENCY_MISSING", tr("everything.git_is_needed_to_fetch_the"), hint=tr("everything.install_git_from_the_setup_wizard"))
     g = ["git", "-C", str(dest)]
     _run(["git", "init", "-q", str(dest)], dest.parent, log)
     _run([*g, "remote", "add", "origin", UPSTREAM_GIT], dest, log)
@@ -138,26 +139,26 @@ def ev_icons(ctx: Context, source: str | None = None) -> dict:
         finally:
             shutil.rmtree(work, ignore_errors=True)
     have = [a["id"] for a in CATALOG["apps"] if (app_dir(a["id"]) / "icon.png").exists()]
-    return {"message": f"补齐 {len(done)} 个应用的图标；已安装应用中有图标的共 {len(have)} 个", "added": done, "missing": missing, "with_icon": have}
+    return {"message": tr("everything.added_icons_for_app_s_installed_app", len(done), len(have)), "added": done, "missing": missing, "with_icon": have}
 
 
 def install_app(app: str, source: str | None = None, log=lambda s: None, keep_build: bool = False) -> dict:
     a = _need(app)
     npm = shutil.which("npm")
     if not npm:
-        raise FoxError("DEPENDENCY_MISSING", "需要 Node.js 22.12+ 与 npm 才能构建 Everything 应用", hint="在安装向导中安装 Node.js")
+        raise FoxError("DEPENDENCY_MISSING", tr("everything.node_js_22_12_and_npm_are_needed_to"), hint=tr("everything.install_node_js_from_the_setup"))
     work = Path(tempfile.mkdtemp(prefix=f"foxos-ev-{app}-"))
     try:
         _fetch_source([app], work, source, log)
         adir = work / "src" / app
         if not (adir / "package.json").exists():
-            raise FoxError("NOT_FOUND", f"上游源码里没有 src/{app}")
+            raise FoxError("NOT_FOUND", tr("everything.the_upstream_source_has_no_src", app))
         html = (adir / "index.html").read_text(encoding="utf-8", errors="replace") if (adir / "index.html").exists() else ""
         import re as _re
         for ref in _re.findall(r'<script[^>]+type="module"[^>]+src="/([^"]+)"', html):
             if not (adir / ref).exists():
-                raise FoxError("DEPENDENCY_MISSING", f"上游 src/{app} 缺少 index.html 引用的 /{ref}，无法构建",
-                               hint=a.get("upstreamIssue") or "这是上游仓库的问题，等待上游修复后重新安装")
+                raise FoxError("DEPENDENCY_MISSING", tr("everything.upstream_src_lacks_referenced_by", app, ref),
+                               hint=a.get("upstreamIssue") or tr("everything.this_is_an_upstream_problem"))
         env = {**os.environ, "npm_config_fund": "false", "npm_config_audit": "false", "CI": "1"}
         _run([npm, "ci", "--no-audit", "--no-fund", "--loglevel=error"] if (adir / "package-lock.json").exists() else [npm, "install", "--no-audit", "--no-fund"], adir, log, env=env)
         out = app_dir(app)
@@ -187,7 +188,7 @@ def install_app(app: str, source: str | None = None, log=lambda s: None, keep_bu
         (stage / "manifest.json").write_text(json.dumps(m, ensure_ascii=False, indent=1), encoding="utf-8")
         shutil.rmtree(out, ignore_errors=True)
         stage.rename(out)
-        log(f"已安装 {a['name']} → {out}\n")
+        log(tr("everything.installed", a['name'], out))
         return m
     finally:
         if not keep_build:
@@ -201,7 +202,7 @@ def ev_install(ctx: Context, apps: list | None = None, all: bool = False, group:
     if group:
         targets += [a["id"] for a in CATALOG["apps"] if a["group"] == group]
     if not targets:
-        raise FoxError("USAGE", "指定要安装的应用，或用 --all / --group")
+        raise FoxError("USAGE", tr("everything.name_the_apps_to_install_or_use_all"))
     for t in targets:
         _need(t)
     source = source or os.environ.get("FOXOS_EVERYTHING_SOURCE")
@@ -212,13 +213,13 @@ def ev_install(ctx: Context, apps: list | None = None, all: bool = False, group:
             skipped.append(t)
             continue
         if verbose:
-            print(f"[{i + 1}/{len(targets)}] 安装 {t} …", flush=True)
+            print(tr("everything.installing", i + 1, len(targets), t), flush=True)
         try:
             install_app(t, source, log=(lambda s: print(s, end="", flush=True)) if verbose else (lambda s: None))
             done.append(t)
         except FoxError as e:
             failed.append({"app": t, "code": e.code, "message": e.message})
-    msg = f"安装完成 {len(done)} 个，已是最新 {len(skipped)} 个，失败 {len(failed)} 个"
+    msg = tr("everything.installed_already_up_to_date_failed", len(done), len(skipped), len(failed))
     if failed and not done and not skipped:
         raise FoxError("ERROR", msg, details={"failed": failed})
     return {"message": msg, "installed": done, "skipped": skipped, "failed": failed}
@@ -227,7 +228,7 @@ def ev_install(ctx: Context, apps: list | None = None, all: bool = False, group:
 def ev_uninstall(ctx: Context, app: str) -> dict:
     _need(app)
     shutil.rmtree(app_dir(app), ignore_errors=True)
-    return {"message": f"已卸载 {app}（工作空间里的数据 AppData/{app} 保留）", "app": app}
+    return {"message": tr("everything.uninstalled_workspace_data_in", app, app), "app": app}
 
 
 def ev_commands(ctx: Context, app: str) -> dict:
@@ -246,35 +247,35 @@ def ev_run(ctx: Context, app: str, command: str, args: dict | None = None) -> di
     return {"app": app, "command": cid, "result": invoke(cid, args or {}, ctx)}
 
 
-APPP = Param("app", "string", "应用 ID（foxos everything list 查看）", required=True, positional=True, metavar="APP")
-register(Command("everything", "list", "列出 51 个 Everything 应用（分组、许可证、安装状态、操作数）", ev_list,
-                 params=[Param("group", "string", "只看某个分组", enum=list(GROUPS)), Param("installed_only", "boolean", "只列出已安装的", cli_flag="--installed")],
+APPP = Param("app", "string", tr("everything.app_id_see_foxos_everything_list"), required=True, positional=True, metavar="APP")
+register(Command("everything", "list", tr("everything.list_the_51_everything_apps_group"), ev_list,
+                 params=[Param("group", "string", tr("everything.show_only_one_group"), enum=list(GROUPS)), Param("installed_only", "boolean", tr("everything.list_only_installed_apps"), cli_flag="--installed")],
                  examples=["foxos everything list", "foxos everything list --group office --json"]))
-register(Command("everything", "info", "查看一个应用的详情、许可证与可用命令", ev_info, params=[APPP], examples=["foxos everything info tasks --json"]))
-register(Command("everything", "install", "从上游源码在本机构建并安装应用（固定提交，含许可证声明）", ev_install,
-                 params=[Param("apps", "array", "应用 ID", positional=True, items={"type": "string"}, metavar="APP"),
-                         Param("all", "boolean", "安装全部 51 个"), Param("group", "string", "安装整个分组", enum=list(GROUPS)),
-                         Param("source", "string", "使用本地上游仓库目录（离线 / 镜像），默认从 GitHub 获取"),
-                         Param("force", "boolean", "已安装也重新构建", cli_short="-f")],
+register(Command("everything", "info", tr("everything.show_an_app_s_details_license_and"), ev_info, params=[APPP], examples=["foxos everything info tasks --json"]))
+register(Command("everything", "install", tr("everything.build_and_install_an_app_locally"), ev_install,
+                 params=[Param("apps", "array", tr("everything.app_id"), positional=True, items={"type": "string"}, metavar="APP"),
+                         Param("all", "boolean", tr("everything.install_all_51")), Param("group", "string", tr("everything.install_a_whole_group"), enum=list(GROUPS)),
+                         Param("source", "string", tr("everything.use_a_local_upstream_repository")),
+                         Param("force", "boolean", tr("everything.rebuild_even_if_installed"), cli_short="-f")],
                  examples=["foxos everything install tasks chess", "foxos everything install --group games", "foxos everything install --all"],
-                 limits=["需要 git、Node.js 22.12+ 与 npm；每个应用构建约 2–20 秒（不含下载）"], permission="run"))
-register(Command("everything", "commands", "列出一个应用的全部命令（语义操作 + 通用界面命令）及参数 Schema", ev_commands, params=[APPP],
+                 limits=[tr("everything.needs_git_node_js_22_12_and_npm_each")], permission="run"))
+register(Command("everything", "commands", tr("everything.list_all_commands_of_an_app_semantic"), ev_commands, params=[APPP],
                  examples=["foxos everything commands tasks --json"]))
-register(Command("everything", "run", "执行一个应用的任意命令（与 foxos <app> <资源> <动词> 相同；权限、审计、写锁按被执行的命令计）", ev_run,
-                 params=[APPP, Param("command", "string", "命令，如 \"task create\" 或 \"ui snapshot\"", required=True, positional=True, metavar="COMMAND"),
-                         Param("args", "object", "命令参数（JSON 对象）")],
-                 examples=["foxos everything run tasks \"add-task set\" --args '{\"value\": \"买牛奶\", \"submit\": true}' --json"],
+register(Command("everything", "run", tr("everything.run_any_command_of_an_app_same_as"), ev_run,
+                 params=[APPP, Param("command", "string", tr("everything.command_such_as_task_create_or_ui"), required=True, positional=True, metavar="COMMAND"),
+                         Param("args", "object", tr("everything.command_arguments_json_object"))],
+                 examples=[tr("everything.foxos_everything_run_tasks_add_task")],
                  audited=False))
-register(Command("everything", "icons", "给已安装的应用补上上游自带的程序图标（不重新构建）", ev_icons,
-                 params=[Param("source", "string", "本地上游仓库路径（缺省从 GitHub 获取固定提交）")], examples=["foxos everything icons --json"], permission="modify"))
-register(Command("everything", "uninstall", "卸载应用（保留工作空间中的数据）", ev_uninstall, params=[APPP], permission="delete",
+register(Command("everything", "icons", tr("everything.add_the_upstream_app_icons_to"), ev_icons,
+                 params=[Param("source", "string", tr("everything.local_upstream_repository_path_by"))], examples=["foxos everything icons --json"], permission="modify"))
+register(Command("everything", "uninstall", tr("everything.uninstall_an_app_workspace_data_is"), ev_uninstall, params=[APPP], permission="delete",
                  examples=["foxos everything uninstall chess"]))
 
 
 # ---------------------------------------------------------------- 每个应用的通用命令
 def _ensure_installed(app: str) -> None:
     if not installed(app):
-        raise FoxError("DEPENDENCY_MISSING", f"{APPS[app]['name']} 未安装", hint=f"foxos everything install {app}")
+        raise FoxError("DEPENDENCY_MISSING", tr("everything.is_not_installed", APPS[app]['name']), hint=f"foxos everything install {app}")
 
 
 def _ui_lock(ctx: Context, app: str):
@@ -301,13 +302,13 @@ def make_handlers(app: str) -> dict:
         _ensure_installed(app)
         rel = ctx.rel(file) if file else None
         st = desktop_client.call(ctx.workspace, "ev.open", app, {"file": rel, "window": not headless}, agent=ctx.agent)
-        return {"message": f"已打开 {name}" + (f"：{rel}" if rel else ""), **st}
+        return {"message": tr("everything.opened", name) + (tr("everything.text_2", rel) if rel else ""), **st}
 
     def app_close(ctx):
-        return {"message": f"已关闭 {name}", **desktop_client.call(ctx.workspace, "ev.close", app, agent=ctx.agent)}
+        return {"message": tr("everything.closed", name), **desktop_client.call(ctx.workspace, "ev.close", app, agent=ctx.agent)}
 
     def app_reset(ctx):
-        return {"message": f"已重置 {name}（清空本工作空间下的应用数据）", **desktop_client.call(ctx.workspace, "ev.reset", app, agent=ctx.agent)}
+        return {"message": tr("everything.reset_cleared_its_data_in_this", name), **desktop_client.call(ctx.workspace, "ev.reset", app, agent=ctx.agent)}
 
     def app_status(ctx):
         try:
@@ -326,7 +327,7 @@ def make_handlers(app: str) -> dict:
 
     def ui_click(ctx, ref=None, name=None, role=None, force=False):
         if not ref and not name:
-            raise FoxError("USAGE", "需要 --ref 或 --name")
+            raise FoxError("USAGE", tr("everything.needs_ref_or_name"))
         return {"clicked": _bridge(ctx, app, "click", {"ref": ref, "name": name, "role": role, "force": force}, mutate=True)}
 
     def ui_type(ctx, text, ref=None, clear=False):
@@ -343,7 +344,7 @@ def make_handlers(app: str) -> dict:
         if out:
             out.parent.mkdir(parents=True, exist_ok=True)
             out.write_bytes(base64.b64decode(r["png_base64"]))
-            return {"message": f"已保存截图 {ctx.rel(out)}", "path": ctx.rel(out), "width": r["width"], "height": r["height"]}
+            return {"message": tr("everything.saved_screenshot", ctx.rel(out)), "path": ctx.rel(out), "width": r["width"], "height": r["height"]}
         return r
 
     def data_list(ctx, pattern="*"):
@@ -357,7 +358,7 @@ def make_handlers(app: str) -> dict:
         p = _kv_path(ctx, app)
         d = json.loads(p.read_text(encoding="utf-8")) if p.exists() else {}
         if key not in d:
-            raise FoxError("NOT_FOUND", f"{app} 没有数据键 {key}")
+            raise FoxError("NOT_FOUND", tr("everything.has_no_data_key", app, key))
         return {"key": key, "value": d[key]}
 
     def module_list(ctx):
@@ -403,7 +404,7 @@ def _op_example(app: str, o: dict) -> str:
     for p in o.get("params", []):
         if p.get("required") and p.get("positional"):
             ex = (o.get("ui") or {}).get("examples") or []
-            v = ex[0] if p["name"] == "target" and ex else (p.get("enum") or ["示例"])[0]
+            v = ex[0] if p["name"] == "target" and ex else (p.get("enum") or [tr("everything.examples")])[0]
             parts.append(shlex.quote(str(v)))
     return " ".join(parts) + " --json"
 
@@ -429,7 +430,7 @@ def _op_handler(app: str, op: dict):
         if b.get("open"):
             _ensure_installed(app)
         results = _bridge(ctx, app, "run", {"steps": steps}, mutate=op.get("permission", "modify") != "read")
-        return {"message": f"{APPS[app]['name']}：{op['summary']}", "op": op["id"], "results": results}
+        return {"message": tr("everything.text", APPS[app]['name'], op['summary']), "op": op["id"], "results": results}
     return handler
 
 
@@ -439,32 +440,32 @@ def _app_command_list(app: str) -> list[str]:
 
 
 GENERIC = [
-    ("app open", "打开应用（桌面窗口；--headless 用无界面实例）", "app_open", [Param("file", "string", "同时打开工作空间中的文件", path="read"), Param("headless", "boolean", "不显示窗口")], "run"),
-    ("app close", "关闭应用实例", "app_close", [], "run"),
-    ("app status", "应用是否已安装、是否在运行", "app_status", [], "read"),
-    ("app reset", "重置应用：关闭实例并清空本工作空间下的应用数据（AppData/<应用> 与浏览器存储）", "app_reset", [], "delete"),
-    ("file open", "在应用中打开工作空间里的文件（与在文件管理器里双击相同）", "file_open", [Param("path", "string", "文件路径", required=True, positional=True, path="read", metavar="PATH")], "run"),
-    ("ui snapshot", "界面可访问性快照：可交互元素及其引用（ref）、角色、名称、值", "ui_snapshot", [Param("all", "boolean", "包括不可见元素"), Param("limit", "integer", "最多返回元素数", default=400)], "read"),
-    ("ui text", "读取界面上的可见文本", "ui_text", [], "read"),
-    ("ui click", "点击控件（按 ref 或名称），与人点击相同", "ui_click", [Param("ref", "string", "snapshot 返回的元素引用"), Param("name", "string", "按可访问名称查找"), Param("role", "string", "限定角色，如 button"), Param("force", "boolean", "控件被弹窗挡住时也强制点击")], "modify"),
-    ("ui type", "向控件输入文本（真实输入事件）", "ui_type", [Param("text", "string", "要输入的文本", required=True, positional=True, metavar="TEXT"), Param("ref", "string", "元素引用，缺省为当前焦点"), Param("clear", "boolean", "先清空")], "modify"),
-    ("ui set", "设置输入框 / 下拉框 / 复选框的值", "ui_set", [Param("ref", "string", "元素引用", required=True), Param("value", "string", "值", required=True), Param("force", "boolean", "控件被挡住时也强制设置")], "modify"),
-    ("ui press", "按键或快捷键（如 Enter、ctrl+z、mod+s）", "ui_press", [Param("key", "string", "按键", required=True, positional=True, metavar="KEY"), Param("ref", "string", "先聚焦的元素引用")], "modify"),
-    ("ui screenshot", "应用窗口截图（PNG）", "ui_screenshot", [Param("out", "string", "保存到工作空间路径", path="write")], "read"),
-    ("data list", "列出应用保存的数据键（工作空间 AppData/<应用>/kv.json）", "data_list", [Param("pattern", "string", "通配符", default="*", positional=True, metavar="PATTERN")], "read"),
-    ("data get", "读取应用保存的一项数据", "data_get", [Param("key", "string", "数据键", required=True, positional=True, metavar="KEY")], "read"),
-    ("module list", "列出应用自己的 ES 模块及导出（供 module call 使用）", "module_list", [], "read"),
-    ("module read", "读取应用模块中的值（如 store 状态）", "module_read", [Param("target", "string", "模块路径#导出.属性，如 src/lib/store.js#store.tasks", required=True, positional=True, metavar="TARGET")], "read"),
-    ("module call", "调用应用自己的函数 / 方法（应用内部逻辑，与界面调用同一代码）", "module_call", [Param("target", "string", "模块路径#导出.方法", required=True, positional=True, metavar="TARGET"), Param("args", "array", "参数（JSON 数组）", items={})], "modify"),
-    ("op list", "列出该应用的操作清单（界面路径、快捷键、参数、是否已有语义命令）", "op_list", [], "read"),
+    ("app open", tr("everything.open_the_app_desktop_window_headless"), "app_open", [Param("file", "string", tr("everything.also_open_a_file_from_the_workspace"), path="read"), Param("headless", "boolean", tr("everything.don_t_show_a_window"))], "run"),
+    ("app close", tr("everything.close_the_app_instance"), "app_close", [], "run"),
+    ("app status", tr("everything.whether_the_app_is_installed_and"), "app_status", [], "read"),
+    ("app reset", tr("everything.reset_the_app_close_the_instance_and"), "app_reset", [], "delete"),
+    ("file open", tr("everything.open_a_workspace_file_in_the_app"), "file_open", [Param("path", "string", tr("common.file_path"), required=True, positional=True, path="read", metavar="PATH")], "run"),
+    ("ui snapshot", tr("everything.accessibility_snapshot_of_the_ui"), "ui_snapshot", [Param("all", "boolean", tr("everything.include_invisible_elements")), Param("limit", "integer", tr("everything.maximum_number_of_elements_returned"), default=400)], "read"),
+    ("ui text", tr("everything.read_the_visible_text_of_the_ui"), "ui_text", [], "read"),
+    ("ui click", tr("everything.click_a_control_by_ref_or_name_the"), "ui_click", [Param("ref", "string", tr("everything.element_reference_returned_by")), Param("name", "string", tr("everything.find_by_accessible_name")), Param("role", "string", tr("everything.limit_to_a_role_such_as_button")), Param("force", "boolean", tr("everything.click_even_when_a_dialog_covers_the"))], "modify"),
+    ("ui type", tr("everything.type_text_into_a_control_real_input"), "ui_type", [Param("text", "string", tr("everything.text_to_type"), required=True, positional=True, metavar="TEXT"), Param("ref", "string", tr("everything.element_reference_the_focused")), Param("clear", "boolean", tr("everything.clear_first"))], "modify"),
+    ("ui set", tr("everything.set_the_value_of_an_input_select"), "ui_set", [Param("ref", "string", tr("everything.element_reference"), required=True), Param("value", "string", tr("everything.value"), required=True), Param("force", "boolean", tr("everything.set_even_when_the_control_is_covered"))], "modify"),
+    ("ui press", tr("everything.press_a_key_or_shortcut_such_as"), "ui_press", [Param("key", "string", tr("everything.key"), required=True, positional=True, metavar="KEY"), Param("ref", "string", tr("everything.element_reference_to_focus_first"))], "modify"),
+    ("ui screenshot", tr("everything.screenshot_of_the_app_window_png"), "ui_screenshot", [Param("out", "string", tr("everything.save_to_a_workspace_path"), path="write")], "read"),
+    ("data list", tr("everything.list_the_data_keys_the_app_saved"), "data_list", [Param("pattern", "string", tr("everything.wildcard_pattern"), default="*", positional=True, metavar="PATTERN")], "read"),
+    ("data get", tr("everything.read_one_item_the_app_saved"), "data_get", [Param("key", "string", tr("everything.data_key"), required=True, positional=True, metavar="KEY")], "read"),
+    ("module list", tr("everything.list_the_app_s_own_es_modules_and"), "module_list", [], "read"),
+    ("module read", tr("everything.read_a_value_from_an_app_module_such"), "module_read", [Param("target", "string", tr("everything.module_path_export_property_such_as"), required=True, positional=True, metavar="TARGET")], "read"),
+    ("module call", tr("everything.call_the_app_s_own_function_method"), "module_call", [Param("target", "string", tr("everything.module_path_export_method"), required=True, positional=True, metavar="TARGET"), Param("args", "array", tr("everything.arguments_json_array"), items={})], "modify"),
+    ("op list", tr("everything.list_the_app_s_operation_inventory"), "op_list", [], "read"),
 ]
 
 
 def register_everything_apps() -> None:
     for a in CATALOG["apps"]:
         app = a["id"]
-        register_app(app, a["name"], f"{GROUPS[a['group']]['zh']} · 替代 {a['alternativeTo']}。上游 Everything 应用，在狐狸OS 中本地运行。",
-                     limits=[f"许可证：{a['license']}"])
+        register_app(app, a["name"], tr("everything.alternative_to_an_upstream", GROUPS[a['group']]['zh'], a['alternativeTo']),
+                     limits=[tr("everything.license", a['license'])])
         h = make_handlers(app)
         for verb, summary, key, params, perm in GENERIC:
             ex = {"app open": [f"foxos {app} app open", f"foxos {app} app open --headless --json"], "ui snapshot": [f"foxos {app} ui snapshot --json"],
@@ -486,7 +487,7 @@ def register_everything_apps() -> None:
                             enum=p.get("enum"), positional=p.get("positional", False), metavar=p["name"].upper()) for p in o.get("params", [])]
             ui = o.get("ui") or {}
             register(Command(app, verb, o["summary"], _op_handler(app, o), params=params,
-                             description=f"界面：{ui.get('path', '')}" + (f"；快捷键 {ui['shortcut']}" if ui.get("shortcut") else "") + f"。效果：{o.get('effect', '')}",
+                             description=tr("everything.ui", ui.get('path', '')) + (tr("everything.shortcut", ui['shortcut']) if ui.get("shortcut") else "") + tr("everything.effect", o.get('effect', '')),
                              examples=o.get("examples") or [_op_example(app, o)], permission=o.get("permission", "modify")))
 
 

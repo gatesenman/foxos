@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from foxos.i18n import tr
 import json
 import os
 import subprocess
@@ -55,10 +56,10 @@ def ensure_desktop(ws: Workspace, autostart: bool = True) -> dict:
     if d:
         return d
     if not autostart or os.environ.get("FOXOS_NO_AUTOSTART") == "1":
-        raise FoxError("DEPENDENCY_MISSING", "狐狸OS 桌面没有运行", hint="先启动桌面，或运行 foxos desktop start --headless")
+        raise FoxError("DEPENDENCY_MISSING", tr("desktop_client.the_foxos_desktop_is_not_running"), hint=tr("desktop_client.start_the_desktop_first_or_run_foxos"))
     cmd = _launch_cmd()
     if not cmd:
-        raise FoxError("DEPENDENCY_MISSING", "狐狸OS 桌面没有运行，且找不到启动命令", hint="先手动启动一次桌面（会记录启动方式），或设置 FOXOS_DESKTOP_CMD")
+        raise FoxError("DEPENDENCY_MISSING", tr("desktop_client.the_foxos_desktop_is_not_running_and"), hint=tr("desktop_client.start_the_desktop_manually_once_its"))
     args = [a for a in cmd if not a.startswith("--workspace=") and a != "--headless"]
     args += [f"--workspace={ws.root}", "--headless"]
     log = open(ws.data_dir / "desktop-headless.log", "ab")
@@ -69,7 +70,7 @@ def ensure_desktop(ws: Workspace, autostart: bool = True) -> dict:
         d = _info(ws)
         if d:
             return d
-    raise FoxError("ERROR", "无界面桌面启动超时", hint=f"查看 {ws.data_dir / 'desktop-headless.log'}")
+    raise FoxError("ERROR", tr("desktop_client.the_headless_desktop_timed_out_while"), hint=tr("common.see", ws.data_dir / 'desktop-headless.log'))
 
 
 def call(ws: Workspace, op: str, app: str | None = None, params: dict | None = None, agent: str = "agent", timeout: float = 120) -> dict:
@@ -81,8 +82,8 @@ def call(ws: Workspace, op: str, app: str | None = None, params: dict | None = N
         with urllib.request.urlopen(req, timeout=timeout) as r:
             res = json.loads(r.read().decode("utf-8"))
     except OSError as e:
-        raise FoxError("ERROR", f"无法连接桌面控制通道：{e}") from e
+        raise FoxError("ERROR", tr("desktop_client.cannot_connect_to_the_desktop", e)) from e
     if not res.get("ok"):
         err = res.get("error") or {}
-        raise FoxError(err.get("code", "ERROR"), err.get("message", "桌面返回错误"))
+        raise FoxError(err.get("code", "ERROR"), err.get("message", tr("desktop_client.the_desktop_returned_an_error")))
     return res["result"]

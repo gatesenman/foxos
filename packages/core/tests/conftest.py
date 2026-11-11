@@ -14,6 +14,7 @@ def _env(extra=None):
     env["PYTHONPATH"] = str(CORE) + os.pathsep + env.get("PYTHONPATH", "")
     env.pop("FOXOS_AGENT", None)
     env.pop("FOXOS_WORKSPACE", None)
+    env.pop("FOXOS_LANG", None)  # 默认语言（中文），个别用例显式传入
     env.update(extra or {})
     return env
 

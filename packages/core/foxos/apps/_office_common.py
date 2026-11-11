@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from foxos.i18n import tr
 import shutil
 import tempfile
 from pathlib import Path
@@ -13,12 +14,12 @@ from ..kernel import Context
 
 def check_ext(path: Path, exts: set[str], kind: str) -> None:
     if path.suffix.lower() not in exts:
-        raise FoxError("USAGE", f"只支持 {' / '.join(sorted(exts))} 文件：{path.name}", hint=f"{kind}文件名以 {sorted(exts)[0]} 结尾")
+        raise FoxError("USAGE", tr("office_common.only_files_are_supported", ' / '.join(sorted(exts)), path.name), hint=tr("office_common.file_names_end_in", kind, sorted(exts)[0]))
 
 
 def require_exists(ctx: Context, path: Path, create_hint: str) -> None:
     if not path.exists():
-        raise FoxError("NOT_FOUND", f"文件不存在：{ctx.rel(path)}", hint=create_hint)
+        raise FoxError("NOT_FOUND", tr("common.file_not_found", ctx.rel(path)), hint=create_hint)
 
 
 def lo_export(ctx: Context, src: Path, output: Path, fmt: str) -> dict:

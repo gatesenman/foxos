@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from foxos.i18n import tr
 from pathlib import Path
 
 import docx
@@ -16,19 +17,19 @@ EXT = {".docx"}
 
 register_app(
     APP,
-    "文档：读写标准 .docx（段落、标题、列表、表格），替换文本与导出",
-    "基于 python-docx 读写 Word 2007+ (.docx)。样式名使用 Word 内置英文样式名，如 Heading 1、List Bullet。",
-    limits=["只读写 .docx；.doc / .odt 输入暂不支持", "图片、页眉页脚、批注暂不可编辑", "替换在段落内进行，跨段落的文本不会匹配"],
+    tr("docs.documents_read_and_write_standard"),
+    tr("docs.reads_and_writes_word_2007_docx_with"),
+    limits=[tr("docs.only_docx_is_read_and_written_doc"), tr("docs.images_headers_footers_and_comments"), tr("docs.replacement_happens_within_a")],
 )
 
 
 def _open(ctx: Context, path: Path):
-    check_ext(path, EXT, "文档")
-    require_exists(ctx, path, "先用 foxos docs create 创建")
+    check_ext(path, EXT, tr("docs.documents"))
+    require_exists(ctx, path, tr("docs.create_it_first_with_foxos_docs"))
     try:
         return docx.Document(str(path))
     except (PackageNotFoundError, KeyError, ValueError) as e:
-        raise FoxError("USAGE", f"无法作为 docx 打开：{ctx.rel(path)}（{e}）") from e
+        raise FoxError("USAGE", tr("docs.cannot_open_as_docx", ctx.rel(path), e)) from e
 
 
 def _style_ok(d, style: str) -> str:
@@ -36,20 +37,20 @@ def _style_ok(d, style: str) -> str:
         d.styles[style]
     except KeyError as e:
         names = sorted(s.name for s in d.styles if s.type == 1)[:40]
-        raise FoxError("USAGE", f"文档中没有样式：{style}", details={"styles": names}) from e
+        raise FoxError("USAGE", tr("docs.the_document_has_no_style", style), details={"styles": names}) from e
     return style
 
 
 def create(ctx: Context, file: Path, title: str | None = None, force: bool = False) -> dict:
-    check_ext(file, EXT, "文档")
+    check_ext(file, EXT, tr("docs.documents"))
     if file.exists() and not force:
-        raise FoxError("CONFLICT", f"文件已存在：{ctx.rel(file)}", hint="使用 --force 覆盖（会保留上一版本）")
+        raise FoxError("CONFLICT", tr("common.file_already_exists", ctx.rel(file)), hint=tr("common.use_force_to_overwrite_the_previous"))
     d = docx.Document()
     if title:
         d.add_heading(title, level=0)
         d.core_properties.title = title
     saved = ctx.save_atomic(file, lambda p: d.save(str(p)))
-    return {"message": f"已创建 {ctx.rel(file)}", "file": ctx.rel(file), "title": title, **saved}
+    return {"message": tr("common.created", ctx.rel(file)), "file": ctx.rel(file), "title": title, **saved}
 
 
 def read(ctx: Context, file: Path) -> dict:
@@ -69,9 +70,9 @@ def append(ctx: Context, file: Path, text: list, style: str | None = None, headi
            table: list | None = None) -> dict:
     d = _open(ctx, file)
     if not text and not table:
-        raise FoxError("USAGE", "没有要追加的内容", hint="foxos docs append report.docx '第一段' '第二段' 或 --table-json")
+        raise FoxError("USAGE", tr("docs.nothing_to_append"), hint=tr("docs.foxos_docs_append_report_docx_first"))
     if heading is not None and not 0 <= heading <= 9:
-        raise FoxError("USAGE", "heading 取值 0–9")
+        raise FoxError("USAGE", tr("docs.heading_must_be_0_9"))
     added = 0
     for t in text or []:
         if heading is not None:
@@ -81,7 +82,7 @@ def append(ctx: Context, file: Path, text: list, style: str | None = None, headi
         added += 1
     if table:
         if not all(isinstance(r, list) for r in table) or not table:
-            raise FoxError("USAGE", "table 必须是二维数组，如 [[\"月份\",\"销售额\"],[\"1月\",120]]")
+            raise FoxError("USAGE", tr("docs.table_must_be_a_2_d_array_such_as"))
         cols = max(len(r) for r in table)
         tb = d.add_table(rows=len(table), cols=cols)
         tb.style = "Table Grid"
@@ -89,7 +90,7 @@ def append(ctx: Context, file: Path, text: list, style: str | None = None, headi
             for ci in range(cols):
                 tb.cell(ri, ci).text = "" if ci >= len(r) or r[ci] is None else str(r[ci])
     saved = ctx.save_atomic(file, lambda p: d.save(str(p)))
-    return {"message": f"已向 {ctx.rel(file)} 追加 {added} 段" + ("和 1 个表格" if table else ""),
+    return {"message": tr("docs.appended_paragraph_s_to", ctx.rel(file), added) + (tr("docs.and_1_table") if table else ""),
             "file": ctx.rel(file), "paragraphs_added": added, "table_added": bool(table),
             "paragraphs_total": len(d.paragraphs), **saved}
 
@@ -112,7 +113,7 @@ def _replace_in_paragraph(p, find: str, repl: str) -> int:
 
 def replace(ctx: Context, file: Path, find: str, replace: str) -> dict:
     if not find:
-        raise FoxError("USAGE", "find 不能为空")
+        raise FoxError("USAGE", tr("common.find_cannot_be_empty"))
     d = _open(ctx, file)
     n = 0
     for p in d.paragraphs:
@@ -123,16 +124,16 @@ def replace(ctx: Context, file: Path, find: str, replace: str) -> dict:
                 for p in c.paragraphs:
                     n += _replace_in_paragraph(p, find, replace)
     saved = ctx.save_atomic(file, lambda p: d.save(str(p))) if n else {"previous_version": None}
-    return {"message": f"在 {ctx.rel(file)} 中替换了 {n} 处", "file": ctx.rel(file), "replacements": n, **saved}
+    return {"message": tr("common.replaced_occurrence_s_in", ctx.rel(file), n), "file": ctx.rel(file), "replacements": n, **saved}
 
 
 def export(ctx: Context, file: Path, output: Path, force: bool = False) -> dict:
     _open(ctx, file)
     fmt = output.suffix.lower().lstrip(".")
     if fmt not in ("pdf", "odt", "html", "txt", "md"):
-        raise FoxError("USAGE", f"不支持导出为 .{fmt}", hint="支持 .pdf / .odt / .html / .txt / .md")
+        raise FoxError("USAGE", tr("common.cannot_export_to", fmt), hint=tr("docs.supported_pdf_odt_html_txt_md"))
     if output.exists() and not force:
-        raise FoxError("CONFLICT", f"输出文件已存在：{ctx.rel(output)}", hint="使用 --force 覆盖")
+        raise FoxError("CONFLICT", tr("common.output_file_already_exists", ctx.rel(output)), hint=tr("common.use_force_to_overwrite"))
     if fmt in ("txt", "md"):
         d = docx.Document(str(file))
         blocks: list[tuple[str, str]] = []  # (kind, text)
@@ -167,35 +168,35 @@ def export(ctx: Context, file: Path, output: Path, force: bool = False) -> dict:
         saved = ctx.save_atomic(output, lambda p: p.write_text(body, encoding="utf-8"))
     else:
         saved = lo_export(ctx, file, output, "html:XHTML Writer File:UTF8" if fmt == "html" else fmt)
-    return {"message": f"已导出 {ctx.rel(file)} → {ctx.rel(output)}", "file": ctx.rel(file),
+    return {"message": tr("common.exported", ctx.rel(file), ctx.rel(output)), "file": ctx.rel(file),
             "output": ctx.rel(output), "format": fmt, "bytes": output.stat().st_size, **saved}
 
 
-FILE = lambda access: Param("file", "string", "文档路径（.docx）", required=True, positional=True, path=access, metavar="FILE")  # noqa: E731
+FILE = lambda access: Param("file", "string", tr("docs.document_path_docx"), required=True, positional=True, path=access, metavar="FILE")  # noqa: E731
 
-register(Command(APP, "create", "新建一个 .docx 文档", create,
-                 params=[FILE("write"), Param("title", "string", "文档标题（写成 Title 样式的第一段，并写入文档属性）"),
-                         Param("force", "boolean", "已存在时覆盖", default=False, cli_short="-f")],
-                 examples=["foxos docs create report.docx --title '2026 年销售分析'"], permission="create"))
-register(Command(APP, "read", "读取文档段落（含样式名）、表格与字数统计", read,
+register(Command(APP, "create", tr("docs.create_a_new_docx_document"), create,
+                 params=[FILE("write"), Param("title", "string", tr("docs.document_title_written_as_the_first")),
+                         Param("force", "boolean", tr("common.overwrite_if_it_exists"), default=False, cli_short="-f")],
+                 examples=[tr("docs.foxos_docs_create_report_docx_title")], permission="create"))
+register(Command(APP, "read", tr("docs.read_paragraphs_with_style_names"), read,
                  params=[FILE("read")], examples=["foxos docs read report.docx --json"]))
-register(Command(APP, "append", "在文档末尾追加段落、标题或表格", append,
+register(Command(APP, "append", tr("docs.append_paragraphs_a_heading_or_a"), append,
                  params=[FILE("write"),
-                         Param("text", "array", "要追加的段落，每个参数一段", positional=True, items={"type": "string"}, metavar="TEXT"),
-                         Param("style", "string", "段落样式（Word 内置英文名），如 List Bullet、Quote"),
-                         Param("heading", "integer", "作为标题追加：0=Title，1–9=Heading 1–9"),
-                         Param("table", "array", "追加表格：二维数组；CLI 中用 --table-json", items={"type": "array"})],
-                 examples=["foxos docs append report.docx '一、总体情况' --heading 1",
-                           "foxos docs append report.docx '全年销售额 2013 万元。' '同比增长 12%。'",
-                           "foxos docs append report.docx '要点一' '要点二' --style 'List Bullet'",
-                           "foxos docs append report.docx --table-json '[[\"月份\",\"销售额\"],[\"1月\",120]]'"],
+                         Param("text", "array", tr("docs.paragraphs_to_append_one_per"), positional=True, items={"type": "string"}, metavar="TEXT"),
+                         Param("style", "string", tr("docs.paragraph_style_word_built_in")),
+                         Param("heading", "integer", tr("docs.append_as_a_heading_0_title_1_9")),
+                         Param("table", "array", tr("docs.append_a_table_a_2_d_array_use_table"), items={"type": "array"})],
+                 examples=[tr("docs.foxos_docs_append_report_docx_1"),
+                           tr("docs.foxos_docs_append_report_docx_annual"),
+                           tr("docs.foxos_docs_append_report_docx_point"),
+                           tr("docs.foxos_docs_append_report_docx_table")],
                  permission="modify"))
-register(Command(APP, "replace", "查找并替换文本（正文与表格）", replace,
-                 params=[FILE("write"), Param("find", "string", "要查找的文本", required=True),
-                         Param("replace", "string", "替换为", required=True)],
+register(Command(APP, "replace", tr("docs.find_and_replace_text_body_and"), replace,
+                 params=[FILE("write"), Param("find", "string", tr("common.text_to_find"), required=True),
+                         Param("replace", "string", tr("common.replace_with"), required=True)],
                  examples=["foxos docs replace report.docx --find 2025 --replace 2026"], permission="modify"))
-register(Command(APP, "export", "导出为 pdf / odt / html / txt / md（由扩展名决定）", export,
-                 params=[FILE("read"), Param("output", "string", "输出路径", required=True, positional=True, path="write", metavar="OUTPUT"),
-                         Param("force", "boolean", "输出已存在时覆盖", default=False, cli_short="-f")],
+register(Command(APP, "export", tr("docs.export_to_pdf_odt_html_txt_md_chosen"), export,
+                 params=[FILE("read"), Param("output", "string", tr("common.output_path"), required=True, positional=True, path="write", metavar="OUTPUT"),
+                         Param("force", "boolean", tr("common.overwrite_the_output_if_it_exists"), default=False, cli_short="-f")],
                  examples=["foxos docs export report.docx report.pdf", "foxos docs export report.docx report.md"],
-                 limits=["pdf / odt / html 需要 LibreOffice"], permission="create"))
+                 limits=[tr("docs.pdf_odt_html_need_libreoffice")], permission="create"))

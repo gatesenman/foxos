@@ -9,6 +9,7 @@
 
 from __future__ import annotations
 
+from foxos.i18n import tr
 import os
 from pathlib import Path
 
@@ -41,9 +42,9 @@ class Workspace:
     def resolve(self, user_path: str) -> Path:
         """把用户/智能体给出的路径解析为工作空间内的绝对路径，越界则拒绝。"""
         if not isinstance(user_path, str) or not user_path.strip():
-            raise FoxError("USAGE", "路径不能为空")
+            raise FoxError("USAGE", tr("workspace.the_path_cannot_be_empty"))
         if "\x00" in user_path:
-            raise FoxError("USAGE", "路径包含非法字符")
+            raise FoxError("USAGE", tr("workspace.the_path_contains_invalid_characters"))
         candidate = Path(user_path).expanduser()
         if not candidate.is_absolute():
             candidate = self.root / candidate
@@ -56,15 +57,15 @@ class Workspace:
         if not inside:
             raise FoxError(
                 "PERMISSION_DENIED",
-                f"路径越出工作空间：{user_path}",
-                hint=f"只能访问工作空间 {self.root} 内的文件",
+                tr("workspace.path_is_outside_the_workspace", user_path),
+                hint=tr("workspace.only_files_inside_workspace_can_be", self.root),
                 details={"path": user_path, "workspace": str(self.root)},
             )
         rel_parts = Path(os.path.relpath(real, root)).parts
         if rel_parts and os.path.normcase(rel_parts[0]) == os.path.normcase(RESERVED_DIR):
             raise FoxError(
                 "PERMISSION_DENIED",
-                f"{RESERVED_DIR}/ 是狐狸OS 保留目录，不能直接访问：{user_path}",
+                tr("workspace.is_reserved_for_foxos_and_cannot_be", RESERVED_DIR, user_path),
                 details={"path": user_path},
             )
         return Path(os.path.realpath(candidate))

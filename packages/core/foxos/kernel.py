@@ -6,6 +6,7 @@ CLI 参数、JSON Schema、能力目录（foxos help --json）都从这份定义
 
 from __future__ import annotations
 
+from foxos.i18n import tr
 import os
 import shutil
 import time
@@ -191,7 +192,7 @@ def find(command_id: str) -> Command:
     for c in REGISTRY.values():
         if c.tool_name == command_id or c.id == command_id:
             return c
-    raise FoxError("NOT_FOUND", f"未知命令：{command_id}", hint="运行 foxos help --json 查看全部命令")
+    raise FoxError("NOT_FOUND", tr("kernel.unknown_command", command_id), hint=tr("kernel.run_foxos_help_json_to_see_all"))
 
 
 # ----------------------------------------------------------------------
@@ -206,9 +207,9 @@ def _check_type(p: Param, v: Any) -> Any:
         "array": lambda x: isinstance(x, list),
     }[t]
     if not ok(v):
-        raise FoxError("USAGE", f"参数 {p.name} 应为 {t}，实际为 {type(v).__name__}", details={"param": p.name})
+        raise FoxError("USAGE", tr("kernel.parameter_should_be_got", p.name, t, type(v).__name__), details={"param": p.name})
     if p.enum and v not in p.enum:
-        raise FoxError("USAGE", f"参数 {p.name} 取值必须是 {', '.join(map(str, p.enum))} 之一，实际为 {v!r}", details={"param": p.name})
+        raise FoxError("USAGE", tr("kernel.parameter_must_be_one_of_got", p.name, ', '.join(map(str, p.enum)), v), details={"param": p.name})
     return v
 
 
@@ -217,12 +218,12 @@ def validate(cmd: Command, params: dict) -> dict:
     known = {p.name for p in cmd.params}
     unknown = sorted(set(params) - known)
     if unknown:
-        raise FoxError("USAGE", f"{cmd.cli} 不接受参数：{', '.join(unknown)}", hint=f"用法：{cmd.usage()}")
+        raise FoxError("USAGE", tr("kernel.does_not_accept_parameter", cmd.cli, ', '.join(unknown)), hint=tr("kernel.usage", cmd.usage()))
     out = {}
     for p in cmd.params:
         if p.name not in params or params[p.name] is None:
             if p.required:
-                raise FoxError("USAGE", f"缺少必填参数 {p.name}", hint=f"用法：{cmd.usage()}", details={"param": p.name})
+                raise FoxError("USAGE", tr("kernel.missing_required_parameter", p.name), hint=tr("kernel.usage", cmd.usage()), details={"param": p.name})
             out[p.name] = p.default
             continue
         out[p.name] = _check_type(p, params[p.name])
@@ -249,8 +250,8 @@ def invoke(command_id: str, params: dict | None, ctx: Context) -> dict:
             st = control_state(ctx.workspace)
             raise FoxError(
                 "PAUSED",
-                f"人工接管中（{st.get('by', '未知')}），智能体写操作已暂停",
-                hint="等待人工执行 foxos control resume 后重试",
+                tr("kernel.human_takeover_is_active_agent", st.get('by', tr("common.unknown"))),
+                hint=tr("kernel.wait_for_a_person_to_run_foxos"),
                 details=st,
             )
         targets = []

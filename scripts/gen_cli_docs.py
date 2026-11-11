@@ -6,8 +6,11 @@
 """
 
 import json
+import os
 import sys
 from pathlib import Path
+
+os.environ["FOXOS_LANG"] = "zh-CN"  # 参考文档固定用默认语言（中文）生成
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "packages" / "core"))

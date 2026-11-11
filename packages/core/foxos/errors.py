@@ -15,6 +15,7 @@
 
 from __future__ import annotations
 
+from foxos.i18n import tr
 EXIT_CODES = {
     "OK": 0,
     "ERROR": 1,
@@ -28,15 +29,15 @@ EXIT_CODES = {
 }
 
 EXIT_CODE_DOCS = {
-    0: "OK：成功",
-    1: "ERROR：未分类错误或内部错误",
-    2: "USAGE：参数错误",
-    3: "NOT_FOUND：文件、工作表或命令不存在",
-    4: "PERMISSION_DENIED：路径越出工作空间或访问保留目录",
-    5: "LOCKED：目标文件正被其他写入者锁定",
-    6: "DEPENDENCY_MISSING：缺少外部依赖（如 LibreOffice）",
-    7: "CONFLICT：目标已存在等冲突（可用 --force 覆盖时会提示）",
-    8: "PAUSED：人工接管中，智能体的写操作被暂停",
+    0: tr("errors.ok_success"),
+    1: tr("errors.error_unclassified_or_internal_error"),
+    2: tr("errors.usage_invalid_arguments"),
+    3: tr("errors.not_found_file_sheet_or_command_does"),
+    4: tr("errors.permission_denied_path_outside_the"),
+    5: tr("errors.locked_the_target_file_is_locked_by"),
+    6: tr("errors.dependency_missing_an_external"),
+    7: tr("errors.conflict_the_target_already_exists"),
+    8: tr("errors.paused_human_takeover_is_active_and"),
 }
 
 

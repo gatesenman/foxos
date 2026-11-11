@@ -14,6 +14,7 @@
 
 from __future__ import annotations
 
+from foxos.i18n import tr
 import json
 import os
 import platform
@@ -130,16 +131,16 @@ class Provider:
 
     def doctor(self) -> dict:
         if host_os() not in self.platforms:
-            return {"available": False, "reason": f"需要 {'/'.join(self.platforms)} 宿主", "checks": [], "actions": []}
+            return {"available": False, "reason": tr("envs.providers.needs_a_host", '/'.join(self.platforms)), "checks": [], "actions": []}
         return {"available": True, "reason": None, "checks": [], "actions": []}
 
     def plan_install(self, entry: dict, name: str, opts: dict) -> list[dict]:
-        raise FoxError("USAGE", f"{self.id} 不支持安装目录条目")
+        raise FoxError("USAGE", tr("envs.providers.does_not_support_installing_catalog", self.id))
 
 
 class LinuxNs(Provider):
     id = "linux-ns"
-    name = "Linux 命名空间（狐狸OS 自研运行时）"
+    name = tr("envs.providers.linux_namespaces_foxos_s_own_runtime")
     platforms = ["linux"]
     capabilities = ["create", "start", "stop", "exec", "shell", "snapshot", "restore", "clone", "export", "import", "mount", "limits", "stats", "logs", "agent"]
 
@@ -149,28 +150,28 @@ class LinuxNs(Provider):
             return d
         checks = []
         ok = subprocess.run(["unshare", "-U", "true"], capture_output=True).returncode == 0 if shutil.which("unshare") else None
-        checks.append({"id": "userns", "ok": ok, "detail": "无特权用户命名空间" + ("可用" if ok else "不可用（内核或 sysctl kernel.unprivileged_userns_clone 禁止）")})
+        checks.append({"id": "userns", "ok": ok, "detail": tr("envs.providers.unprivileged_user_namespaces") + (tr("envs.providers.available") if ok else tr("envs.providers.unavailable_blocked_by_the_kernel_or"))})
         try:
             import zstandard  # noqa: F401
-            checks.append({"id": "zstd", "ok": True, "detail": "zstandard 可用"})
+            checks.append({"id": "zstd", "ok": True, "detail": tr("envs.providers.zstandard_available")})
         except ImportError:
-            checks.append({"id": "zstd", "ok": False, "detail": "缺少 Python 包 zstandard"})
-        return {"available": bool(ok), "reason": None if ok else "用户命名空间不可用", "checks": checks, "actions": []}
+            checks.append({"id": "zstd", "ok": False, "detail": tr("envs.providers.missing_the_python_package_zstandard")})
+        return {"available": bool(ok), "reason": None if ok else tr("envs.providers.user_namespaces_are_unavailable"), "checks": checks, "actions": []}
 
     def plan_install(self, entry, name, opts):
         src = opts.get("_resolved") or entry["source"]
         if not src.get("url"):
-            raise FoxError("USAGE", f"{entry['id']} 在 Linux 后端上需要可下载的根文件系统")
+            raise FoxError("USAGE", tr("envs.providers.needs_a_downloadable_root_file", entry['id']))
         image_id = re.sub(r"[^a-z0-9.-]+", "-", Path(src["url"].split("?")[0]).name.lower()).strip("-")[:60]
         pull = ["env", "pull", src["url"]] + (["--sha256", src["sha256"]] if src.get("sha256") else [])
         ws = opts.get("workspace")
-        return [{"foxos": pull, "why": "下载并校验根文件系统", "workspace": ws},
-                {"foxos": ["env", "create", name, "--image", image_id], "why": "创建环境", "registers": name, "workspace": ws}]
+        return [{"foxos": pull, "why": tr("envs.providers.download_and_verify_the_root_file"), "workspace": ws},
+                {"foxos": ["env", "create", name, "--image", image_id], "why": tr("common.create_an_environment"), "registers": name, "workspace": ws}]
 
 
 class Wsl2(Provider):
     id = "wsl2"
-    name = "WSL2（适用于 Linux 的 Windows 子系统）"
+    name = tr("envs.providers.wsl2_windows_subsystem_for_linux")
     platforms = ["windows"]
     capabilities = ["create", "start", "stop", "exec", "shell", "export", "import", "delete", "list-online", "agent"]
 
@@ -185,12 +186,12 @@ class Wsl2(Provider):
         st = parse_wsl_status(r.returncode, decode_wsl(r.stdout + r.stderr)) if r else {"installed": False, "needs_reboot": False, "missing_component": True}
         actions = []
         if not st["installed"]:
-            actions.append({"id": "enable-wsl", "label": "启用 WSL（需要管理员权限，完成后可能需要重启）", "argv": ["wsl.exe", "--install", "--no-distribution"], "elevate": True})
+            actions.append({"id": "enable-wsl", "label": tr("envs.providers.enable_wsl_needs_administrator"), "argv": ["wsl.exe", "--install", "--no-distribution"], "elevate": True})
         if st.get("virtualization_disabled"):
-            actions.append({"id": "bios", "label": "在电脑固件（BIOS/UEFI）设置里开启虚拟化（Intel VT-x / AMD-V），并运行 wsl --install --no-distribution", "manual": True})
+            actions.append({"id": "bios", "label": tr("envs.providers.turn_on_virtualization_intel_vt_x"), "manual": True})
         if st.get("needs_reboot"):
-            actions.append({"id": "reboot", "label": "重启电脑以完成 WSL 安装", "argv": ["shutdown.exe", "/r", "/t", "0"], "confirm": True})
-        return {"available": st["installed"] and not st.get("needs_reboot"), "reason": None if st["installed"] else "WSL 未安装或未启用",
+            actions.append({"id": "reboot", "label": tr("envs.providers.restart_the_computer_to_finish"), "argv": ["shutdown.exe", "/r", "/t", "0"], "confirm": True})
+        return {"available": st["installed"] and not st.get("needs_reboot"), "reason": None if st["installed"] else tr("envs.providers.wsl_is_not_installed_or_not_enabled"),
                 "checks": [{"id": "wsl", "ok": st["installed"], "detail": json.dumps(st, ensure_ascii=False)}], "actions": actions}
 
     def plan_install(self, entry, name, opts):
@@ -198,25 +199,25 @@ class Wsl2(Provider):
         base = opts.get("location") or os.path.join(os.environ.get("LOCALAPPDATA", r"C:\Users\Public"), "FoxOS", "envs", name)
         if src["kind"] == "wsl-store":
             # 只在应用商店提供的旧式发行版：由 wsl.exe 安装，发行版名由 WSL 决定
-            return [{"argv": ["wsl.exe", "--install", "-d", src["wsl_name"], "--no-launch"], "why": f"用 WSL 官方渠道安装 {entry['name']}", "registers": src["wsl_name"]}]
+            return [{"argv": ["wsl.exe", "--install", "-d", src["wsl_name"], "--no-launch"], "why": tr("envs.providers.install_through_the_official_wsl", entry['name']), "registers": src["wsl_name"]}]
         if not src.get("url"):
-            raise FoxError("USAGE", f"{entry['id']} 需要先解析下载地址")
+            raise FoxError("USAGE", tr("envs.providers.needs_its_download_url_resolved", entry['id']))
         fname = os.path.basename(src["url"].split("?")[0]) or "rootfs.tar"
         file = os.path.join(base, fname)
-        dl = {"download": src["url"], "to": file, "sha256": src.get("sha256"), "why": f"下载 {entry['name']} 根文件系统并校验 sha256"}
+        dl = {"download": src["url"], "to": file, "sha256": src.get("sha256"), "why": tr("envs.providers.download_the_root_file_system_and", entry['name'])}
         if src.get("wsl_import_needs_convert"):
             dl["convert"] = "tar.gz"
             file = file.rsplit(".tar.xz", 1)[0] + ".tar.gz"
         return [
             dl,
-            {"argv": ["wsl.exe", "--import", wsl_name(name), os.path.join(base, "disk"), file, "--version", "2"], "why": "导入为 WSL2 发行版", "registers": wsl_name(name)},
-            {"argv": ["wsl.exe", "-d", wsl_name(name), "--exec", "/bin/sh", "-c", "true"], "why": "首次启动检查"},
+            {"argv": ["wsl.exe", "--import", wsl_name(name), os.path.join(base, "disk"), file, "--version", "2"], "why": tr("envs.providers.import_as_a_wsl2_distro"), "registers": wsl_name(name)},
+            {"argv": ["wsl.exe", "-d", wsl_name(name), "--exec", "/bin/sh", "-c", "true"], "why": tr("envs.providers.first_start_check")},
         ]
 
 
 class WindowsSandbox(Provider):
     id = "windows-sandbox"
-    name = "Windows Sandbox（一次性 Windows 桌面）"
+    name = tr("envs.providers.windows_sandbox_disposable_windows")
     platforms = ["windows"]
     guest_os = "windows"
     capabilities = ["create", "start", "delete"]
@@ -227,23 +228,23 @@ class WindowsSandbox(Provider):
             return d
         ed = _edition()
         exe = Path(os.environ.get("WINDIR", r"C:\Windows")) / "System32" / "WindowsSandbox.exe"
-        checks = [{"id": "edition", "ok": edition_supports_hyperv(ed), "detail": f"Windows 版本 EditionID={ed or '未知'}（家庭版不支持）"},
+        checks = [{"id": "edition", "ok": edition_supports_hyperv(ed), "detail": tr("envs.providers.windows_edition_editionid_home_is", ed or tr("common.unknown"))},
                   {"id": "feature", "ok": exe.exists(), "detail": str(exe)}]
         actions = [] if exe.exists() or not edition_supports_hyperv(ed) else [
-            {"id": "enable-sandbox", "label": "启用 Windows Sandbox（管理员，完成后需要重启）", "elevate": True,
+            {"id": "enable-sandbox", "label": tr("envs.providers.enable_windows_sandbox_administrator"), "elevate": True,
              "powershell": "Enable-WindowsOptionalFeature -Online -FeatureName Containers-DisposableClientVM -All -NoRestart"}]
         ok = exe.exists() and edition_supports_hyperv(ed)
-        return {"available": ok, "reason": None if ok else ("家庭版不支持 Windows Sandbox" if not edition_supports_hyperv(ed) else "Windows Sandbox 未启用"), "checks": checks, "actions": actions}
+        return {"available": ok, "reason": None if ok else (tr("envs.providers.windows_sandbox_is_not_supported_on") if not edition_supports_hyperv(ed) else tr("envs.providers.windows_sandbox_is_not_enabled")), "checks": checks, "actions": actions}
 
     def plan_install(self, entry, name, opts):
         wsb = os.path.join(opts.get("location") or os.path.join(os.environ.get("LOCALAPPDATA", r"C:\Users\Public"), "FoxOS", "envs"), f"{name}.wsb")
         xml = wsb_xml(opts.get("workspace") or "", networking=opts.get("network", "host") != "none", memory_mb=opts.get("memory_mb"), readonly=opts.get("workspace_mode") == "ro")
-        return [{"write": wsb, "content": xml, "why": "生成 Windows Sandbox 配置"}, {"argv": ["cmd.exe", "/c", "start", "", wsb], "why": "启动沙箱（关闭窗口后内容全部丢弃）"}]
+        return [{"write": wsb, "content": xml, "why": tr("envs.providers.generate_the_windows_sandbox")}, {"argv": ["cmd.exe", "/c", "start", "", wsb], "why": tr("envs.providers.start_the_sandbox_everything_is")}]
 
 
 class HyperV(Provider):
     id = "hyperv"
-    name = "Hyper-V 虚拟机"
+    name = tr("envs.providers.hyper_v_virtual_machine")
     platforms = ["windows"]
     guest_os = "windows"
     capabilities = ["create", "start", "stop", "delete", "snapshot", "restore", "export", "import", "limits"]
@@ -256,16 +257,16 @@ class HyperV(Provider):
         r = subprocess.run(["powershell.exe", "-NoProfile", "-Command", "if (Get-Command New-VM -ErrorAction SilentlyContinue) { 'yes' } else { 'no' }"], capture_output=True, text=True)
         has = r.stdout.strip() == "yes"
         actions = [] if has or not edition_supports_hyperv(ed) else [
-            {"id": "enable-hyperv", "label": "启用 Hyper-V（管理员，完成后需要重启）", "elevate": True,
+            {"id": "enable-hyperv", "label": tr("envs.providers.enable_hyper_v_administrator_a"), "elevate": True,
              "powershell": "Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Hyper-V-All -All -NoRestart"}]
-        return {"available": has, "reason": None if has else ("家庭版不支持 Hyper-V" if not edition_supports_hyperv(ed) else "Hyper-V 未启用"),
-                "checks": [{"id": "edition", "ok": edition_supports_hyperv(ed), "detail": f"EditionID={ed or '未知'}"}, {"id": "cmdlets", "ok": has, "detail": "Hyper-V PowerShell 模块"}], "actions": actions}
+        return {"available": has, "reason": None if has else (tr("envs.providers.hyper_v_is_not_supported_on_home") if not edition_supports_hyperv(ed) else tr("envs.providers.hyper_v_is_not_enabled")),
+                "checks": [{"id": "edition", "ok": edition_supports_hyperv(ed), "detail": f"EditionID={ed or tr("common.unknown")}"}, {"id": "cmdlets", "ok": has, "detail": tr("envs.providers.hyper_v_powershell_module")}], "actions": actions}
 
     def plan_install(self, entry, name, opts):
         iso = opts.get("iso") or entry["source"].get("iso")
         if not iso:
-            raise FoxError("USAGE", "Hyper-V 虚拟机需要安装介质：--iso <Windows 或 Linux ISO 路径>",
-                           hint=entry["source"].get("download_page") and f"官方下载页：{entry['source']['download_page']}")
+            raise FoxError("USAGE", tr("envs.providers.a_hyper_v_virtual_machine_needs"),
+                           hint=entry["source"].get("download_page") and tr("envs.providers.official_download_page", entry['source']['download_page']))
         vm = wsl_name(name)
         base = opts.get("location") or os.path.join(os.environ.get("PUBLIC", r"C:\Users\Public"), "Documents", "Hyper-V", "FoxOS", name)
         mem = int(opts.get("memory_mb") or 4096) * 1024 * 1024
@@ -279,13 +280,13 @@ class HyperV(Provider):
             f"Set-VMKeyProtector -VMName {ps_quote(vm)} -NewLocalKeyProtector; Enable-VMTPM -VMName {ps_quote(vm)}" if entry.get("tpm") else "$null",
             f"Start-VM -Name {ps_quote(vm)}",
         ])
-        return [{"powershell": ps, "elevate": True, "why": "用 Hyper-V 创建并启动虚拟机（从 ISO 引导，按安装程序提示完成安装）"},
-                {"argv": ["vmconnect.exe", "localhost", vm], "why": "打开虚拟机控制台"}]
+        return [{"powershell": ps, "elevate": True, "why": tr("envs.providers.create_and_start_a_hyper_v_virtual")},
+                {"argv": ["vmconnect.exe", "localhost", vm], "why": tr("envs.providers.open_the_virtual_machine_console")}]
 
 
 class MacVZ(Provider):
     id = "macos-vz"
-    name = "Virtualization.framework（macOS）"
+    name = tr("envs.providers.virtualization_framework_macos")
     platforms = ["macos"]
     capabilities = ["create", "start", "stop", "exec"]
 
@@ -294,22 +295,22 @@ class MacVZ(Provider):
         if not d["available"]:
             return d
         helper = Path.home() / "Library" / "Application Support" / "FoxOS" / "bin" / "foxvz"
-        return {"available": helper.exists(), "reason": None if helper.exists() else "FoxVZ 辅助程序未编译（安装向导 → 环境）",
+        return {"available": helper.exists(), "reason": None if helper.exists() else tr("envs.providers.the_foxvz_helper_is_not_built_setup"),
                 "checks": [{"id": "helper", "ok": helper.exists(), "detail": str(helper)}], "actions": []}
 
 
 class MacGuestUnavailable(Provider):
     """macOS 来宾：Apple 许可只允许在 Apple 硬件上的 macOS 里虚拟化 macOS。"""
     id = "macos-guest"
-    name = "macOS 来宾（仅 Apple 硬件）"
+    name = tr("envs.providers.macos_guest_apple_hardware_only")
     platforms = ["macos"]
     guest_os = "macos"
     capabilities = []
 
     def doctor(self) -> dict:
         if host_os() != "macos":
-            return {"available": False, "reason": "Apple 的软件许可只允许在 Apple 硬件上运行的 macOS 中虚拟化 macOS；Windows / Linux 宿主上不提供", "checks": [], "actions": []}
-        return {"available": False, "reason": "计划中：在 Apple 芯片的 Mac 上通过 Virtualization.framework（VZMacOSInstaller）实现，当前版本尚未实现", "checks": [], "actions": []}
+            return {"available": False, "reason": tr("envs.providers.apple_s_software_license_only_allows"), "checks": [], "actions": []}
+        return {"available": False, "reason": tr("envs.providers.planned_implemented_with"), "checks": [], "actions": []}
 
 
 class ExternalProvider(Provider):
@@ -332,7 +333,7 @@ class ExternalProvider(Provider):
         try:
             r = subprocess.run(cmd, input="".join(json.dumps(m) + "\n" for m in msgs), capture_output=True, text=True, timeout=timeout)
         except (OSError, subprocess.TimeoutExpired) as e:
-            raise FoxError("DEPENDENCY_MISSING", f"无法运行提供者 {self.id}：{e}") from e
+            raise FoxError("DEPENDENCY_MISSING", tr("envs.providers.cannot_run_provider", self.id, e)) from e
         replies = {}
         for line in r.stdout.splitlines():
             try:
@@ -342,10 +343,10 @@ class ExternalProvider(Provider):
                 continue
         init = replies.get(1, {}).get("result") or {}
         if init.get("protocol") != PROTOCOL:
-            raise FoxError("CONFLICT", f"提供者 {self.id} 的协议版本 {init.get('protocol')!r} 不受支持（需要 {PROTOCOL}）")
+            raise FoxError("CONFLICT", tr("envs.providers.protocol_version_of_provider_is_not", self.id, init.get('protocol'), PROTOCOL))
         rep = replies.get(2) or {}
         if "error" in rep:
-            raise FoxError(rep["error"].get("data", {}).get("code", "ERROR"), rep["error"].get("message", "提供者返回错误"))
+            raise FoxError(rep["error"].get("data", {}).get("code", "ERROR"), rep["error"].get("message", tr("envs.providers.the_provider_returned_an_error")))
         return rep.get("result") or {}
 
     def describe(self) -> dict:
@@ -393,7 +394,7 @@ def providers() -> dict[str, Provider]:
 def get(pid: str) -> Provider:
     p = providers().get(pid)
     if not p:
-        raise FoxError("NOT_FOUND", f"没有提供者 {pid}", hint="foxos env providers")
+        raise FoxError("NOT_FOUND", tr("envs.providers.no_provider", pid), hint="foxos env providers")
     return p
 
 
@@ -401,7 +402,7 @@ def get(pid: str) -> Provider:
 def catalog() -> dict:
     c = json.loads((DATA / "env-catalog.json").read_text(encoding="utf-8"))
     if c.get("format") != CATALOG_FORMAT:
-        raise FoxError("CONFLICT", f"目录格式 {c.get('format')} 不受支持")
+        raise FoxError("CONFLICT", tr("envs.providers.catalog_format_is_not_supported", c.get('format')))
     return c
 
 
@@ -409,7 +410,7 @@ def entry(eid: str) -> dict:
     for e in catalog()["entries"]:
         if e["id"] == eid:
             return e
-    raise FoxError("NOT_FOUND", f"目录里没有 {eid}", hint="foxos env catalog")
+    raise FoxError("NOT_FOUND", tr("envs.providers.is_not_in_the_catalog", eid), hint="foxos env catalog")
 
 
 # ---------------------------------------------------------------- 动态来源解析（LXC 每日构建、Alpine 最新版、CHECKSUM 文件）
@@ -459,7 +460,7 @@ def resolve_source(entry: dict, opts: dict | None = None, fetch=_get) -> dict:
     arm = os.environ.get("PROCESSOR_ARCHITECTURE", platform.machine()).lower() in ("arm64", "aarch64")
     if kind == "custom":
         if not opts.get("url"):
-            raise FoxError("USAGE", "自定义系统需要 --url（https 地址或本地 .tar/.tar.gz/.tar.xz/.wsl 文件）")
+            raise FoxError("USAGE", tr("envs.providers.a_custom_system_needs_url_an_https"))
         src.update(url=opts["url"], sha256=opts.get("sha256"))
     elif kind == "rootfs":
         if arm and src.get("arm64"):
@@ -472,13 +473,13 @@ def resolve_source(entry: dict, opts: dict | None = None, fetch=_get) -> dict:
         base = f"https://dl-cdn.alpinelinux.org/alpine/{src.get('branch', 'latest-stable')}/releases/{a}/"
         rel = parse_alpine_releases(fetch(base + "latest-releases.yaml"))
         if not rel:
-            raise FoxError("ERROR", "无法解析 Alpine 最新版本信息")
+            raise FoxError("ERROR", tr("envs.providers.cannot_parse_the_latest_alpine"))
         src.update(url=base + rel["file"], sha256=rel["sha256"], version=rel.get("version"))
     elif kind == "lxc":
         server = src["server"].rstrip("/")
         path = parse_lxc_index(fetch(f"{server}/meta/1.0/index-system"), src["distro"], src["release"], "arm64" if arm else "amd64", src.get("variant", "default"))
         if not path:
-            raise FoxError("NOT_FOUND", f"LXC 镜像服务器上没有 {src['distro']} {src['release']}")
+            raise FoxError("NOT_FOUND", tr("envs.providers.the_lxc_image_server_has_no", src['distro'], src['release']))
         src.update(url=f"{server}{path}rootfs.tar.xz", sha256=parse_checksum(fetch(f"{server}{path}SHA256SUMS"), "rootfs.tar.xz"))
     if src.get("url"):
         u = src["url"].split("?")[0].lower()
@@ -533,7 +534,7 @@ def execute(steps: list[dict], report=lambda **k: None) -> list[dict]:
             got = images._sha256(to)
             if s.get("sha256") and got != s["sha256"].lower():
                 to.unlink(missing_ok=True)
-                raise FoxError("CONFLICT", f"sha256 不匹配：期望 {s['sha256']}，实际 {got}")
+                raise FoxError("CONFLICT", tr("common.sha256_mismatch_expected_got", s['sha256'], got))
             if s.get("convert") == "tar.gz":
                 gz = to.with_name(to.name.rsplit(".tar.xz", 1)[0] + ".tar.gz")
                 convert_xz_to_gz(to, gz)
@@ -549,7 +550,7 @@ def execute(steps: list[dict], report=lambda **k: None) -> list[dict]:
                 env["FOXOS_WORKSPACE"] = s["workspace"]
             r = subprocess.run([sys.executable, "-m", "foxos", *s["foxos"], "--json"], capture_output=True, text=True, env=env)
             if r.returncode:
-                raise FoxError("ERROR", f"步骤失败：foxos {' '.join(s['foxos'])}：{(r.stdout + r.stderr)[-800:]}")
+                raise FoxError("ERROR", tr("envs.providers.step_failed_foxos", ' '.join(s['foxos']), (r.stdout + r.stderr)[-800:]))
             results.append({"step": i, "ok": True})
         else:
             argv = step_argv(s)
@@ -557,8 +558,8 @@ def execute(steps: list[dict], report=lambda **k: None) -> list[dict]:
             out = decode_wsl(r.stdout + r.stderr)
             if r.returncode and not (s.get("ok_codes") and r.returncode in s["ok_codes"]):
                 if is_reboot_required(r.returncode, out):
-                    raise FoxError("CONFLICT", "需要重启电脑才能继续", hint="重启后在“环境 → 安装系统”里重试")
-                raise FoxError("ERROR", f"步骤失败（退出码 {r.returncode}）：{out.strip()[-800:]}")
+                    raise FoxError("CONFLICT", tr("envs.providers.the_computer_must_restart_before"), hint=tr("envs.providers.after_restarting_retry_in"))
+                raise FoxError("ERROR", tr("envs.providers.step_failed_exit_code", r.returncode, out.strip()[-800:]))
             results.append({"step": i, "ok": True, "output": out.strip()[-2000:], "reboot_required": is_reboot_required(r.returncode, out)})
         report(step=i, total=len(steps), why=s.get("why"), state="done")
     return results

@@ -11,6 +11,7 @@ profile() 根据策略生成 SBPL 配置文件：
 
 from __future__ import annotations
 
+from foxos.i18n import tr
 import os
 import shutil
 import subprocess
@@ -63,7 +64,7 @@ def profile(policy) -> str:
 def capabilities() -> dict:
     ok = os.path.exists(SANDBOX_EXEC)
     return {"platform": "macos", "mechanism": "seatbelt", "available": ok, "filesystem": ok, "network": ok, "signal_scope": ok,
-            "verified_on_hardware": False, "reason": None if ok else "找不到 /usr/bin/sandbox-exec"}
+            "verified_on_hardware": False, "reason": None if ok else tr("sandbox.macos.usr_bin_sandbox_exec_not_found")}
 
 
 def command(policy, argv: list[str]) -> list[str]:
@@ -72,7 +73,7 @@ def command(policy, argv: list[str]) -> list[str]:
 
 def run(policy, argv: list[str], cwd: str | None = None, timeout: float | None = None, capture: bool = True):
     if not os.path.exists(SANDBOX_EXEC):
-        raise OSError(2, "找不到 /usr/bin/sandbox-exec")
+        raise OSError(2, tr("sandbox.macos.usr_bin_sandbox_exec_not_found"))
     pd = policy.to_dict() if hasattr(policy, "to_dict") else policy
     env = {**os.environ, **(pd.get("env") or {}), "FOXOS_SANDBOX": "light"}
     exe = shutil.which(argv[0], path=env.get("PATH")) or argv[0]

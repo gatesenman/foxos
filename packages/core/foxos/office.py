@@ -6,6 +6,7 @@ LibreOffice 是智能体非常熟悉的无头办公工具（MPL-2.0），这里�
 
 from __future__ import annotations
 
+from foxos.i18n import tr
 import os
 import shutil
 import subprocess
@@ -41,8 +42,8 @@ def require_soffice() -> str:
     if not p:
         raise FoxError(
             "DEPENDENCY_MISSING",
-            "需要 LibreOffice（soffice）来重算公式或导出 PDF/ODS，但未找到",
-            hint="安装 LibreOffice，或设置环境变量 FOXOS_SOFFICE 指向 soffice 可执行文件",
+            tr("office.libreoffice_soffice_is_needed_to"),
+            hint=tr("office.install_libreoffice_or_set_the_foxos"),
         )
     return p
 
@@ -66,13 +67,13 @@ def convert(src: Path, fmt: str, outdir: Path, timeout: int = 120) -> Path:
     try:
         proc = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout)
     except subprocess.TimeoutExpired as e:
-        raise FoxError("ERROR", f"LibreOffice 转换超时（{timeout}s）") from e
+        raise FoxError("ERROR", tr("office.libreoffice_conversion_timed_out_s", timeout)) from e
     finally:
         shutil.rmtree(profile, ignore_errors=True)
     ext = fmt.split(":")[0]
     out = outdir / (src.stem + "." + ext)
     if proc.returncode != 0 or not out.exists():
-        raise FoxError("ERROR", f"LibreOffice 转换失败：{(proc.stderr or proc.stdout).strip()[:500]}")
+        raise FoxError("ERROR", tr("office.libreoffice_conversion_failed", (proc.stderr or proc.stdout).strip()[:500]))
     return out
 
 

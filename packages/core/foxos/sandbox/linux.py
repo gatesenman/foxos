@@ -10,6 +10,7 @@
 
 from __future__ import annotations
 
+from foxos.i18n import tr
 import ctypes
 import ctypes.util
 import errno
@@ -176,7 +177,7 @@ def capabilities() -> dict:
         "landlock_abi": abi, "seccomp": sec, "arch": ARCH,
         "filesystem": abi >= 1, "network": "tcp+socket" if abi >= 4 else ("socket" if sec else False),
         "signal_scope": abi >= 6, "abstract_unix_scope": abi >= 6, "truncate": abi >= 3, "ioctl_dev": abi >= 5,
-        "reason": None if abi >= 1 and sec else ("内核没有启用 Landlock（需要 5.13+ 且 lsm= 包含 landlock）" if abi < 1 else "seccomp 不可用"),
+        "reason": None if abi >= 1 and sec else (tr("sandbox.linux.landlock_is_not_enabled_in_the_2") if abi < 1 else tr("sandbox.linux.seccomp_is_unavailable")),
     }
 
 
@@ -218,7 +219,7 @@ def apply(policy: dict) -> dict:
     """在当前进程上施加限制（不可撤销）。"""
     abi = abi_version()
     if abi < 1:
-        raise OSError(errno.EOPNOTSUPP, "内核没有启用 Landlock")
+        raise OSError(errno.EOPNOTSUPP, tr("sandbox.linux.landlock_is_not_enabled_in_the"))
     acc = access_sets(abi)
     network = bool(policy.get("network", True))
     handled_net = (NET_BIND_TCP | NET_CONNECT_TCP) if (abi >= 4 and not network) else 0
@@ -263,7 +264,7 @@ def exec_(policy: dict, argv: list[str], cwd: str | None = None) -> None:
     try:
         os.execvpe(argv[0], argv, env)
     except OSError as e:
-        sys.stderr.write(f"foxos sandbox: 无法执行 {argv[0]}：{e.strerror}\n")
+        sys.stderr.write(tr("sandbox.linux.foxos_sandbox_cannot_run", argv[0], e.strerror))
         os._exit(127)
 
 

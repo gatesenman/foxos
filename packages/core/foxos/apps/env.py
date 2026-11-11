@@ -7,6 +7,7 @@ macOS：Apple Virtualization.framework（Swift 小助手 foxos-vz），见 foxos
 
 from __future__ import annotations
 
+from foxos.i18n import tr
 import json
 import os
 import re
@@ -44,14 +45,14 @@ def env_dir(name: str) -> Path:
 
 def _valid(name: str) -> str:
     if not re.fullmatch(r"[a-z0-9][a-z0-9-]{0,40}", name or ""):
-        raise FoxError("USAGE", "环境名只能包含小写字母、数字和连字符（最长 41 个字符）")
+        raise FoxError("USAGE", tr("env.environment_names_may_only_contain"))
     return name
 
 
 def _cfg(name: str) -> dict:
     f = env_dir(_valid(name)) / "env.json"
     if not f.exists():
-        raise FoxError("NOT_FOUND", f"没有名为 {name} 的环境", hint="foxos env list")
+        raise FoxError("NOT_FOUND", tr("env.no_environment_named", name), hint="foxos env list")
     return json.loads(f.read_text(encoding="utf-8"))
 
 
@@ -72,7 +73,7 @@ def _log(name: str, text: str) -> None:
 
 def _need_linux():
     if not IS_LINUX:
-        raise FoxError("DEPENDENCY_MISSING", f"本机后端为 {BACKEND}；该命令目前由 Linux 后端实现", hint="Windows 使用 foxos env 的 WSL2 后端（见 docs/environments.md）")
+        raise FoxError("DEPENDENCY_MISSING", tr("env.this_machine_s_backend_is_this", BACKEND), hint=tr("env.on_windows_use_the_wsl2_backend_of"))
 
 
 def _linux():
@@ -169,14 +170,14 @@ def env_images(ctx: Context) -> dict:
 
 def env_pull(ctx: Context, image: str, sha256: str | None = None) -> dict:
     m = images.pull(image, images_dir(), sha256)
-    return {"message": f"镜像就绪：{m['id']}（sha256 {m['sha256'][:12]}…{'，已校验' if m.get('verified') else '，未提供校验值'}）", "image": m}
+    return {"message": tr("env.image_ready_sha256", m['id'], m['sha256'][:12], tr("env.verified") if m.get('verified') else tr("env.no_checksum_given")), "image": m}
 
 
 def env_create(ctx: Context, name: str, image: str = "alpine-3.20", network: str = "host", workspace_mode: str = "rw",
                memory_mb: int | None = None, cpus: float | None = None, pids: int | None = None) -> dict:
     _valid(name)
     if (env_dir(name) / "env.json").exists():
-        raise FoxError("CONFLICT", f"环境 {name} 已存在")
+        raise FoxError("CONFLICT", tr("env.environment_already_exists", name))
     if BACKEND == "wsl2":
         from ..envs import wsl
         r = wsl.create(name, image, ctx.workspace.root, home())
@@ -192,7 +193,7 @@ def env_create(ctx: Context, name: str, image: str = "alpine-3.20", network: str
         (env_dir(name) / sub).mkdir(parents=True, exist_ok=True)
     _save(cfg)
     _log(name, f"created by {ctx.agent} from {m['id']}")
-    return {"message": f"已创建环境 {name}（{m['id']}，工作空间以 {workspace_mode} 挂载到 /workspace）", "env": _summary(cfg)}
+    return {"message": tr("env.created_environment_workspace", name, m['id'], workspace_mode), "env": _summary(cfg)}
 
 
 def env_list(ctx: Context) -> dict:
@@ -204,9 +205,9 @@ def env_list(ctx: Context) -> dict:
 def env_info(ctx: Context, name: str) -> dict:
     cfg = _cfg(name)
     cg = env_dir(name) / "run" / "cgroup"
-    cgs = cg.read_text() if cg.exists() else "未启动过"
-    note = ("cgroup v2 已启用，限制按整个环境计算" if cgs.startswith("on")
-            else f"cgroup v2 不可用（{cgs}）；内存（RLIMIT_AS，每进程）与进程数（RLIMIT_NPROC，按用户）以 rlimit 生效，CPU 上限不生效")
+    cgs = cg.read_text() if cg.exists() else tr("env.never_started")
+    note = (tr("env.cgroup_v2_is_enabled_limits_apply_to") if cgs.startswith("on")
+            else tr("env.cgroup_v2_is_unavailable_memory", cgs))
     return {**_summary(cfg), "stats": _stats(name) if IS_LINUX else None, "path": str(env_dir(name)),
             "snapshots_detail": cfg.get("snapshots", []), "actions_detail": [{"name": k, "command": v} for k, v in (cfg.get("actions") or {}).items()],
             "cgroup": cgs, "limits_note": note}
@@ -218,13 +219,13 @@ def env_start(ctx: Context, name: str) -> dict:
         from ..envs import providers
         providers.execute(cfg["start_steps"])
         _log(name, f"started by {ctx.agent}")
-        return {"message": f"已启动 {name}（{cfg.get('provider')}）", "env": _summary(cfg)}
+        return {"message": tr("env.started", name, cfg.get('provider')), "env": _summary(cfg)}
     if BACKEND == "wsl2":
         from ..envs import wsl
         return wsl.start(cfg)
     _need_linux()
     if _pid(name):
-        return {"message": f"{name} 已在运行", "env": _summary(cfg)}
+        return {"message": tr("env.is_already_running", name), "env": _summary(cfg)}
     d = env_dir(name)
     (d / "run").mkdir(exist_ok=True)
     for f in ("status", "init.pid"):
@@ -244,11 +245,11 @@ def env_start(ctx: Context, name: str) -> dict:
         st = (d / "run" / "status").read_text() if (d / "run" / "status").exists() else ""
         if st.startswith("running"):
             _log(name, f"started by {ctx.agent}: {st}")
-            return {"message": f"已启动 {name}（{st}）", "env": _summary(cfg), "status": st}
+            return {"message": tr("env.started", name, st), "env": _summary(cfg), "status": st}
         if st.startswith("error") or st.startswith("stopped"):
-            raise FoxError("ERROR", f"启动失败：{st}", hint=f"查看 {d / 'logs' / 'init.log'}")
+            raise FoxError("ERROR", tr("env.failed_to_start", st), hint=tr("common.see", d / 'logs' / 'init.log'))
         time.sleep(0.05)
-    raise FoxError("ERROR", "启动超时", hint=f"查看 {d / 'logs' / 'init.log'}")
+    raise FoxError("ERROR", tr("env.start_timed_out"), hint=tr("common.see", d / 'logs' / 'init.log'))
 
 
 def env_stop(ctx: Context, name: str, timeout: float = 5.0) -> dict:
@@ -258,7 +259,7 @@ def env_stop(ctx: Context, name: str, timeout: float = 5.0) -> dict:
         return wsl.stop(cfg)
     pid = _pid(name)
     if not pid:
-        return {"message": f"{name} 没有运行"}
+        return {"message": tr("env.is_not_running", name)}
     os.kill(pid, signal.SIGTERM)
     t0 = time.time()
     while time.time() - t0 < timeout and _pid(name):
@@ -267,7 +268,7 @@ def env_stop(ctx: Context, name: str, timeout: float = 5.0) -> dict:
         os.kill(pid, signal.SIGKILL)
         time.sleep(0.1)
     _log(name, f"stopped by {ctx.agent}")
-    return {"message": f"已停止 {name}"}
+    return {"message": tr("common.stopped", name)}
 
 
 def env_restart(ctx: Context, name: str) -> dict:
@@ -281,7 +282,7 @@ def _exec(name: str, argv: list[str], cwd: str = "/workspace", capture: bool = T
         from ..envs import wsl
         return wsl.exec_(cfg, argv, cwd, capture=capture, timeout=timeout)
     if not _pid(name):
-        raise FoxError("LOCKED" if False else "DEPENDENCY_MISSING", f"环境 {name} 没有运行", hint=f"foxos env start {name}")
+        raise FoxError("LOCKED" if False else "DEPENDENCY_MISSING", tr("env.environment_is_not_running", name), hint=f"foxos env start {name}")
     cmd = [sys.executable, "-m", "foxos.envs.linux", "exec", str(env_dir(name)), "--cwd", cwd]
     for k, v in (envs or {}).items():
         cmd += ["--env", f"{k}={v}"]
@@ -294,7 +295,7 @@ def _exec(name: str, argv: list[str], cwd: str = "/workspace", capture: bool = T
 
 def env_exec(ctx: Context, name: str, command: list, cwd: str = "/workspace", timeout: float = 600) -> dict:
     if not command:
-        raise FoxError("USAGE", "缺少要执行的命令")
+        raise FoxError("USAGE", tr("common.missing_the_command_to_run"))
     argv = [str(c) for c in command]
     if len(argv) == 1 and " " in argv[0]:
         argv = ["/bin/sh", "-c", argv[0]]
@@ -309,9 +310,9 @@ def env_exec(ctx: Context, name: str, command: list, cwd: str = "/workspace", ti
 def env_shell(ctx: Context, name: str) -> dict:
     cfg = _cfg(name)
     if not sys.stdin.isatty():
-        raise FoxError("USAGE", "shell 需要交互式终端；非交互请用 foxos env exec")
+        raise FoxError("USAGE", tr("env.shell_needs_an_interactive_terminal"))
     code = _exec(name, [cfg.get("shell") or "/bin/sh", "-l"], capture=False)
-    return {"message": f"已退出 {name} 的 shell（退出码 {code}）", "exit_code": code}
+    return {"message": tr("env.exited_the_shell_of_exit_code", name, code), "exit_code": code}
 
 
 def _rmtree(p: Path) -> None:
@@ -339,15 +340,15 @@ def env_clone(ctx: Context, name: str, new_name: str) -> dict:
     cfg = _cfg(name)
     _valid(new_name)
     if (env_dir(new_name) / "env.json").exists():
-        raise FoxError("CONFLICT", f"环境 {new_name} 已存在")
+        raise FoxError("CONFLICT", tr("env.environment_already_exists", new_name))
     if _pid(name):
-        raise FoxError("LOCKED", f"{name} 正在运行，先停止再克隆（保证文件一致）", hint=f"foxos env stop {name}")
+        raise FoxError("LOCKED", tr("env.is_running_stop_it_before_cloning_to", name), hint=f"foxos env stop {name}")
     for sub in ("upper", "work", "logs", "snapshots"):
         (env_dir(new_name) / sub).mkdir(parents=True, exist_ok=True)
     _copy_tree(env_dir(name) / "upper", env_dir(new_name) / "upper")
     new = {**cfg, "name": new_name, "hostname": new_name, "snapshots": [], "created": datetime.now(timezone.utc).isoformat(timespec="seconds"), "cloned_from": name}
     _save(new)
-    return {"message": f"已从 {name} 克隆出 {new_name}", "env": _summary(new)}
+    return {"message": tr("env.cloned_from", name, new_name), "env": _summary(new)}
 
 
 def _tar_upper(name: str, dest: Path) -> int:
@@ -363,29 +364,29 @@ def _tar_upper(name: str, dest: Path) -> int:
 def env_snapshot(ctx: Context, name: str, label: str | None = None) -> dict:
     cfg = _cfg(name)
     if _pid(name):
-        raise FoxError("LOCKED", f"{name} 正在运行，先停止再做快照（保证一致性）", hint=f"foxos env stop {name}")
+        raise FoxError("LOCKED", tr("env.is_running_stop_it_before_taking_a", name), hint=f"foxos env stop {name}")
     sid = datetime.now().strftime("%Y%m%dT%H%M%S")
     size = _tar_upper(name, env_dir(name) / "snapshots" / f"{sid}.tar.zst")
     snap = {"id": sid, "label": label, "size": size, "created": datetime.now(timezone.utc).isoformat(timespec="seconds"), "by": ctx.agent}
     cfg.setdefault("snapshots", []).append(snap)
     _save(cfg)
-    return {"message": f"已为 {name} 创建快照 {sid}", "snapshot": snap}
+    return {"message": tr("env.created_snapshot_of", name, sid), "snapshot": snap}
 
 
 def env_restore(ctx: Context, name: str, snapshot: str) -> dict:
     cfg = _cfg(name)
     if _pid(name):
-        raise FoxError("LOCKED", f"{name} 正在运行，先停止再恢复", hint=f"foxos env stop {name}")
+        raise FoxError("LOCKED", tr("env.is_running_stop_it_before_restoring", name), hint=f"foxos env stop {name}")
     snap = next((s for s in cfg.get("snapshots", []) if s["id"] == snapshot), None)
     if not snap:
-        raise FoxError("NOT_FOUND", f"{name} 没有快照 {snapshot}")
+        raise FoxError("NOT_FOUND", tr("env.has_no_snapshot", name, snapshot))
     up = env_dir(name) / "upper"
     _rmtree(up)
     _rmtree(env_dir(name) / "work")
     up.mkdir()
     (env_dir(name) / "work").mkdir()
     images.extract_rootfs(env_dir(name) / "snapshots" / f"{snapshot}.tar.zst", up)
-    return {"message": f"已把 {name} 恢复到快照 {snapshot}"}
+    return {"message": tr("env.restored_to_snapshot", name, snapshot)}
 
 
 def env_export(ctx: Context, name: str, out: Path) -> dict:
@@ -393,12 +394,12 @@ def env_export(ctx: Context, name: str, out: Path) -> dict:
     if cfg.get("backend") == "wsl2":
         from ..envs import wsl
         wsl.export(cfg, str(out))
-        return {"message": f"已导出 {name} → {ctx.rel(out)}（WSL tar 格式，可用 wsl --import 或 foxos env install custom-rootfs 导入）", "path": ctx.rel(out)}
+        return {"message": tr("env.exported_wsl_tar_format_import_it", name, ctx.rel(out)), "path": ctx.rel(out)}
     if _pid(name):
-        raise FoxError("LOCKED", f"{name} 正在运行，先停止再导出", hint=f"foxos env stop {name}")
+        raise FoxError("LOCKED", tr("env.is_running_stop_it_before_exporting", name), hint=f"foxos env stop {name}")
     # 下层（镜像）在前、可写层在后：tar 解包时后者覆盖前者；overlay 的删除标记（字符设备 0/0）在无特权导出时会被跳过
-    m = images.write_foxenv([Path(cfg["lower"]), env_dir(name) / "upper"], out, {"id": f"{name}-export", "name": f"{name}（从 {cfg['image']} 导出）", "source": f"env:{name}"})
-    return {"message": f"已导出 {name} → {ctx.rel(out)}（{m['size'] / 1048576:.1f} MB，sha256 {m['sha256'][:12]}…）", "path": ctx.rel(out), "manifest": m}
+    m = images.write_foxenv([Path(cfg["lower"]), env_dir(name) / "upper"], out, {"id": f"{name}-export", "name": tr("env.exported_from", name, cfg['image']), "source": f"env:{name}"})
+    return {"message": tr("env.exported_mb_sha256", name, ctx.rel(out), m['size'] / 1048576, m['sha256'][:12]), "path": ctx.rel(out), "manifest": m}
 
 
 def env_import(ctx: Context, file: Path, name: str) -> dict:
@@ -412,28 +413,28 @@ def env_delete(ctx: Context, name: str) -> dict:
         from ..envs import wsl
         wsl.unregister(cfg)
         _rmtree(env_dir(name))
-        return {"message": f"已删除环境 {name}（已注销 WSL 发行版 {wsl.dname(cfg)}）"}
+        return {"message": tr("env.deleted_environment_unregistered_wsl", name, wsl.dname(cfg))}
     if cfg.get("backend") in ("windows-sandbox", "hyperv"):
         _rmtree(env_dir(name))
-        return {"message": f"已从列表移除 {name}" + ("（Hyper-V 虚拟机本身请在 Hyper-V 管理器中删除，或运行 Remove-VM）" if cfg.get("backend") == "hyperv" else "")}
+        return {"message": tr("env.removed_from_the_list", name) + (tr("env.delete_the_hyper_v_virtual_machine") if cfg.get("backend") == "hyperv" else "")}
     if _pid(name):
         env_stop(ctx, name)
     _rmtree(env_dir(name))
-    return {"message": f"已删除环境 {name}（镜像保留）"}
+    return {"message": tr("env.deleted_environment_image_kept", name)}
 
 
 def env_mount(ctx: Context, name: str, source: str, target: str, readonly: bool = False, remove: bool = False) -> dict:
     cfg = _cfg(name)
     src = str(Path(source).expanduser().resolve())
     if not remove and not Path(src).exists():
-        raise FoxError("NOT_FOUND", f"宿主路径不存在：{src}")
+        raise FoxError("NOT_FOUND", tr("env.host_path_does_not_exist", src))
     if not target.startswith("/") or ".." in target.split("/"):
-        raise FoxError("USAGE", "目标必须是环境内的绝对路径")
+        raise FoxError("USAGE", tr("env.the_target_must_be_an_absolute_path"))
     cfg["mounts"] = [m for m in cfg.get("mounts", []) if m["target"] != target]
     if not remove:
         cfg["mounts"].append({"source": src, "target": target, "readonly": readonly})
     _save(cfg)
-    return {"message": f"{'已移除' if remove else '已添加'}挂载 {target}（下次启动生效）", "mounts": cfg["mounts"], "restart_required": bool(_pid(name))}
+    return {"message": tr("env.mount_applies_on_next_start", tr("env.removed") if remove else tr("env.added"), target), "mounts": cfg["mounts"], "restart_required": bool(_pid(name))}
 
 
 def env_limits(ctx: Context, name: str, memory_mb: int | None = None, cpus: float | None = None, pids: int | None = None, network: str | None = None, workspace_mode: str | None = None) -> dict:
@@ -451,8 +452,8 @@ def env_limits(ctx: Context, name: str, memory_mb: int | None = None, cpus: floa
     if workspace_mode:
         cfg["workspace"]["mode"] = workspace_mode
     _save(cfg)
-    note = "内存（RLIMIT_AS，每进程）与进程数（RLIMIT_NPROC）以 rlimit 生效；cgroup v2 可写时按整个环境计。cpus 仅在 cgroup v2 可委派时生效。"
-    return {"message": f"已更新 {name} 的设置（下次启动生效）", "limits": lim, "network": cfg["network"], "workspace": cfg["workspace"], "note": note}
+    note = tr("env.memory_rlimit_as_per_process_and")
+    return {"message": tr("env.updated_the_settings_of_applies_on", name), "limits": lim, "network": cfg["network"], "workspace": cfg["workspace"], "note": note}
 
 
 def env_stats(ctx: Context, name: str | None = None) -> dict:
@@ -478,14 +479,14 @@ def env_action_add(ctx: Context, name: str, action: str, command: str) -> dict:
     cfg = _cfg(name)
     cfg.setdefault("actions", {})[action] = command
     _save(cfg)
-    return {"message": f"已为 {name} 添加自定义操作 {action}", "actions": cfg["actions"]}
+    return {"message": tr("env.added_custom_action_to", name, action), "actions": cfg["actions"]}
 
 
 def env_action_run(ctx: Context, name: str, action: str) -> dict:
     cfg = _cfg(name)
     cmd = (cfg.get("actions") or {}).get(action)
     if not cmd:
-        raise FoxError("NOT_FOUND", f"{name} 没有自定义操作 {action}")
+        raise FoxError("NOT_FOUND", tr("env.has_no_custom_action", name, action))
     return env_exec(ctx, name, ["/bin/sh", "-c", _subst(cmd, cfg, ctx)])
 
 
@@ -517,12 +518,12 @@ def env_fix(ctx: Context, provider: str, action: str) -> dict:
     d = providers.get(provider).doctor()
     act = next((a for a in d.get("actions", []) if a["id"] == action), None)
     if not act:
-        raise FoxError("NOT_FOUND", f"{provider} 当前没有修复操作 {action}", hint=f"foxos env doctor --provider {provider}")
+        raise FoxError("NOT_FOUND", tr("env.currently_has_no_fix", provider, action), hint=f"foxos env doctor --provider {provider}")
     if act.get("manual"):
         return {"message": act["label"], "manual": True, "reboot_required": False, "results": []}
     res = providers.execute([act])
     reboot = any(r.get("reboot_required") for r in res) or action.startswith("enable-")
-    return {"message": f"已执行：{act['label']}" + ("。需要重启电脑后生效" if reboot else ""), "reboot_required": reboot, "results": res}
+    return {"message": tr("env.done", act['label']) + (tr("env.restart_the_computer_for_it_to_take") if reboot else ""), "reboot_required": reboot, "results": res}
 
 
 def env_catalog(ctx: Context, guest: str | None = None, provider: str | None = None, available: bool = False) -> dict:
@@ -539,7 +540,7 @@ def env_catalog(ctx: Context, guest: str | None = None, provider: str | None = N
         usable = [p for p in e["providers"] if p in provs and host in provs[p].platforms]
         it = {**e, "host_providers": usable, "installable": bool(usable) and not e.get("disabled")}
         if not it["installable"] and not e.get("disabled"):
-            it["reason"] = f"当前宿主（{host}）没有可用的提供者：需要 {'/'.join(e['providers'])}"
+            it["reason"] = tr("env.no_provider_is_available_on_this", host, '/'.join(e['providers']))
         if available and not it["installable"]:
             continue
         items.append(it)
@@ -561,26 +562,26 @@ def env_install(ctx: Context, entry: str, name: str, provider: str | None = None
     _valid(name)
     e = providers.entry(entry)
     if e.get("disabled"):
-        raise FoxError("DEPENDENCY_MISSING", f"{e['name']} 不可用：{e.get('reason')}")
+        raise FoxError("DEPENDENCY_MISSING", tr("env.is_unavailable", e['name'], e.get('reason')))
     host = providers.host_os()
     provs = providers.providers()
     cands = [provider] if provider else [p for p in e["providers"] if p in provs and host in provs[p].platforms] or e["providers"][:1]
     p = providers.get(cands[0])
     opts = {"url": url, "sha256": sha256, "iso": iso, "location": location, "memory_mb": memory_mb, "cpus": cpus, "disk_gb": disk_gb, "workspace": str(ctx.workspace.root)}
     if not dry_run and (env_dir(name) / "env.json").exists():
-        raise FoxError("CONFLICT", f"环境 {name} 已存在")
+        raise FoxError("CONFLICT", tr("env.environment_already_exists", name))
     src = providers.resolve_source(e, opts) if e["source"]["kind"] in ("rootfs", "alpine", "lxc", "custom") else dict(e["source"])
     opts["_resolved"] = src
     steps = p.plan_install(e, name, opts)
     plan = {"entry": e["id"], "name": name, "provider": p.id, "source": src, "steps": steps}
     if dry_run:
-        return {"message": f"安装计划：{e['name']} → {name}（{p.id}，{len(steps)} 步）", "plan": plan, "dry_run": True}
+        return {"message": tr("env.install_plan_steps", e['name'], name, p.id, len(steps)), "plan": plan, "dry_run": True}
     if host not in p.platforms:
-        raise FoxError("DEPENDENCY_MISSING", f"{p.name} 需要 {'/'.join(p.platforms)} 宿主（当前 {host}）", hint="加 --dry-run 查看安装计划")
+        raise FoxError("DEPENDENCY_MISSING", tr("env.needs_a_host_current", p.name, '/'.join(p.platforms), host), hint=tr("env.add_dry_run_to_see_the_install_plan"))
     doc = p.doctor()
     if not doc.get("available"):
-        acts = "；".join(f"foxos env fix --provider {p.id} --action {a['id']}（{a['label']}）" for a in doc.get("actions", []))
-        raise FoxError("DEPENDENCY_MISSING", f"{p.name} 不可用：{doc.get('reason')}", hint=acts or None)
+        acts = tr("common.text").join(tr("env.foxos_env_fix_provider_action", p.id, a['id'], a['label']) for a in doc.get("actions", []))
+        raise FoxError("DEPENDENCY_MISSING", tr("env.is_unavailable", p.name, doc.get('reason')), hint=acts or None)
     _install_status(name, state="running", entry=e["id"], provider=p.id, steps=len(steps), step=0)
     try:
         res = providers.execute(steps, report=lambda **k: _install_status(name, **k))
@@ -602,80 +603,80 @@ def env_install(ctx: Context, entry: str, name: str, provider: str | None = None
         _save(cfg)
     _install_status(name, state="done")
     _log(name, f"installed {e['id']} via {p.id} by {ctx.agent}")
-    return {"message": f"已安装 {e['name']} 为环境 {name}（{p.id}）", "plan": plan, "results": res}
+    return {"message": tr("env.installed_as_environment", e['name'], name, p.id), "plan": plan, "results": res}
 
 
 def env_install_status(ctx: Context, name: str) -> dict:
     f = env_dir(_valid(name)) / "install.json"
     if not f.exists():
-        raise FoxError("NOT_FOUND", f"{name} 没有安装记录")
+        raise FoxError("NOT_FOUND", tr("env.has_no_install_record", name))
     return json.loads(f.read_text(encoding="utf-8"))
 
 
-register_app("env", "狐狸OS 环境", "自研隔离环境：每个环境有自己的根文件系统、进程、主机名和资源限制；工作空间按规则挂载到 /workspace。",
-             limits=["Linux 后端无特权运行（用户命名空间）；cgroup 不可委派时用 rlimit 限制", "Windows 使用系统自带 WSL2；macOS 使用 Virtualization.framework"])
-NAME = Param("name", "string", "环境名", required=True, positional=True, metavar="NAME")
-register(Command("env", "images", "列出可用镜像（官方发行版 rootfs）与本地镜像", env_images, examples=["foxos env images --json"]))
-register(Command("env", "pull", "下载镜像并校验 sha256（目录 ID、https 地址或 .foxenv 文件）", env_pull,
-                 params=[Param("image", "string", "镜像", required=True, positional=True, metavar="IMAGE"), Param("sha256", "string", "期望的 sha256（自定义地址时建议提供）")],
+register_app("env", tr("env.foxos_environments"), tr("env.foxos_s_own_isolated_environments"),
+             limits=[tr("env.the_linux_backend_runs_unprivileged"), tr("env.windows_uses_the_built_in_wsl2_macos")])
+NAME = Param("name", "string", tr("env.environment_name"), required=True, positional=True, metavar="NAME")
+register(Command("env", "images", tr("env.list_available_images_official"), env_images, examples=["foxos env images --json"]))
+register(Command("env", "pull", tr("env.download_an_image_and_verify_its"), env_pull,
+                 params=[Param("image", "string", tr("env.image"), required=True, positional=True, metavar="IMAGE"), Param("sha256", "string", tr("env.expected_sha256_recommended_for"))],
                  examples=["foxos env pull alpine-3.20", "foxos env pull ubuntu-24.04"], permission="run"))
-register(Command("env", "create", "创建环境", env_create,
-                 params=[NAME, Param("image", "string", "镜像 ID", default="alpine-3.20"), Param("network", "string", "网络：host（共享宿主网络）或 none（只有回环）", enum=["host", "none"], default="host"),
-                         Param("workspace_mode", "string", "工作空间挂载方式", enum=["rw", "ro", "none"], default="rw", cli_flag="--workspace-mode"),
-                         Param("memory_mb", "integer", "内存上限（MB）"), Param("cpus", "number", "CPU 上限（核，需 cgroup）"), Param("pids", "integer", "进程数上限")],
+register(Command("env", "create", tr("common.create_an_environment"), env_create,
+                 params=[NAME, Param("image", "string", tr("env.image_id"), default="alpine-3.20"), Param("network", "string", tr("env.network_host_shares_the_host_network"), enum=["host", "none"], default="host"),
+                         Param("workspace_mode", "string", tr("env.how_the_workspace_is_mounted"), enum=["rw", "ro", "none"], default="rw", cli_flag="--workspace-mode"),
+                         Param("memory_mb", "integer", tr("env.memory_limit_mb")), Param("cpus", "number", tr("env.cpu_limit_cores_needs_cgroup")), Param("pids", "integer", tr("env.process_limit"))],
                  examples=["foxos env create dev", "foxos env create sandbox --image ubuntu-24.04 --network none --workspace-mode ro --memory-mb 1024"], permission="create"))
-register(Command("env", "list", "列出环境及状态", env_list, examples=["foxos env list --json"]))
-register(Command("env", "info", "环境详情（配置、快照、资源使用）", env_info, params=[NAME], examples=["foxos env info dev --json"]))
-register(Command("env", "start", "启动环境", env_start, params=[NAME], examples=["foxos env start dev"], permission="run"))
-register(Command("env", "stop", "停止环境", env_stop, params=[NAME, Param("timeout", "number", "等待秒数，超时强制结束", default=5.0)], examples=["foxos env stop dev"], permission="run"))
-register(Command("env", "restart", "重启环境", env_restart, params=[NAME], examples=["foxos env restart dev"], permission="run"))
-register(Command("env", "exec", "在环境中执行命令（默认工作目录 /workspace）", env_exec,
-                 params=[NAME, Param("command", "array", "命令及参数（放在 -- 之后）", positional=True, items={"type": "string"}, metavar="CMD"),
-                         Param("cwd", "string", "环境内工作目录", default="/workspace"), Param("timeout", "number", "超时秒数", default=600)],
+register(Command("env", "list", tr("env.list_environments_and_their_state"), env_list, examples=["foxos env list --json"]))
+register(Command("env", "info", tr("env.environment_details_configuration"), env_info, params=[NAME], examples=["foxos env info dev --json"]))
+register(Command("env", "start", tr("env.start_an_environment"), env_start, params=[NAME], examples=["foxos env start dev"], permission="run"))
+register(Command("env", "stop", tr("env.stop_an_environment"), env_stop, params=[NAME, Param("timeout", "number", tr("env.seconds_to_wait_before_forcing_it_to"), default=5.0)], examples=["foxos env stop dev"], permission="run"))
+register(Command("env", "restart", tr("env.restart_an_environment"), env_restart, params=[NAME], examples=["foxos env restart dev"], permission="run"))
+register(Command("env", "exec", tr("env.run_a_command_in_an_environment"), env_exec,
+                 params=[NAME, Param("command", "array", tr("common.command_and_arguments_after"), positional=True, items={"type": "string"}, metavar="CMD"),
+                         Param("cwd", "string", tr("env.working_directory_inside_the"), default="/workspace"), Param("timeout", "number", tr("common.timeout_in_seconds"), default=600)],
                  examples=["foxos env exec dev -- uname -a", "foxos env exec dev -- sh -c 'apk add python3 && python3 -V' --json"], permission="run"))
-register(Command("env", "shell", "进入环境的交互式 shell", env_shell, params=[NAME], examples=["foxos env shell dev"], permission="run"))
-register(Command("env", "clone", "克隆环境（复制可写层与设置）", env_clone, params=[NAME, Param("new_name", "string", "新环境名", required=True, positional=True, metavar="NEW_NAME")],
+register(Command("env", "shell", tr("env.open_an_interactive_shell_in_an"), env_shell, params=[NAME], examples=["foxos env shell dev"], permission="run"))
+register(Command("env", "clone", tr("env.clone_an_environment_copies_the"), env_clone, params=[NAME, Param("new_name", "string", tr("env.new_environment_name"), required=True, positional=True, metavar="NEW_NAME")],
                  examples=["foxos env clone dev dev-copy"], permission="create"))
-register(Command("env", "snapshot", "为停止的环境创建快照", env_snapshot, params=[NAME, Param("label", "string", "说明")], examples=["foxos env snapshot dev --label 装好依赖"], permission="create"))
-register(Command("env", "restore", "恢复到快照", env_restore, params=[NAME, Param("snapshot", "string", "快照 ID", required=True, positional=True, metavar="SNAPSHOT")],
+register(Command("env", "snapshot", tr("env.take_a_snapshot_of_a_stopped"), env_snapshot, params=[NAME, Param("label", "string", tr("env.note"))], examples=[tr("env.foxos_env_snapshot_dev_label_deps")], permission="create"))
+register(Command("env", "restore", tr("env.restore_a_snapshot"), env_restore, params=[NAME, Param("snapshot", "string", tr("env.snapshot_id"), required=True, positional=True, metavar="SNAPSHOT")],
                  examples=["foxos env restore dev 20261110T213000"], permission="modify"))
-register(Command("env", "export", "导出为 .foxenv 镜像（tar + zstd + manifest + sha256）", env_export,
-                 params=[NAME, Param("out", "string", "输出文件（工作空间内）", required=True, path="write")], examples=["foxos env export dev --out backups/dev.foxenv"], permission="create"))
-register(Command("env", "import", "从 .foxenv 镜像导入为新环境", env_import,
-                 params=[Param("file", "string", ".foxenv 文件（工作空间内）", required=True, positional=True, path="read", metavar="FILE"), Param("name", "string", "新环境名", required=True)],
+register(Command("env", "export", tr("env.export_as_a_foxenv_image_tar_zstd"), env_export,
+                 params=[NAME, Param("out", "string", tr("env.output_file_in_the_workspace"), required=True, path="write")], examples=["foxos env export dev --out backups/dev.foxenv"], permission="create"))
+register(Command("env", "import", tr("env.import_a_foxenv_image_as_a_new"), env_import,
+                 params=[Param("file", "string", tr("env.foxenv_file_in_the_workspace"), required=True, positional=True, path="read", metavar="FILE"), Param("name", "string", tr("env.new_environment_name"), required=True)],
                  examples=["foxos env import backups/dev.foxenv --name dev2"], permission="create"))
-register(Command("env", "delete", "删除环境（不删除镜像与工作空间）", env_delete, params=[NAME], examples=["foxos env delete dev-copy"], permission="delete"))
-register(Command("env", "mount", "添加 / 移除宿主目录挂载", env_mount,
-                 params=[NAME, Param("source", "string", "宿主路径", required=True), Param("target", "string", "环境内路径", required=True),
-                         Param("readonly", "boolean", "只读"), Param("remove", "boolean", "移除该挂载")],
+register(Command("env", "delete", tr("env.delete_an_environment_images_and_the"), env_delete, params=[NAME], examples=["foxos env delete dev-copy"], permission="delete"))
+register(Command("env", "mount", tr("env.add_remove_a_host_directory_mount"), env_mount,
+                 params=[NAME, Param("source", "string", tr("env.host_path"), required=True), Param("target", "string", tr("env.path_inside_the_environment"), required=True),
+                         Param("readonly", "boolean", tr("env.read_only")), Param("remove", "boolean", tr("env.remove_this_mount"))],
                  examples=["foxos env mount dev --source ~/datasets --target /data --readonly"], permission="modify"))
-register(Command("env", "limits", "设置资源限制、网络与工作空间权限", env_limits,
-                 params=[NAME, Param("memory_mb", "integer", "内存上限 MB（0 取消）"), Param("cpus", "number", "CPU 上限（0 取消）"), Param("pids", "integer", "进程数上限（0 取消）"),
-                         Param("network", "string", "网络", enum=["host", "none"]), Param("workspace_mode", "string", "工作空间挂载", enum=["rw", "ro", "none"], cli_flag="--workspace-mode")],
+register(Command("env", "limits", tr("env.set_resource_limits_network_and"), env_limits,
+                 params=[NAME, Param("memory_mb", "integer", tr("env.memory_limit_mb_0_to_clear")), Param("cpus", "number", tr("env.cpu_limit_0_to_clear")), Param("pids", "integer", tr("env.process_limit_0_to_clear")),
+                         Param("network", "string", tr("env.network"), enum=["host", "none"]), Param("workspace_mode", "string", tr("env.workspace_mount"), enum=["rw", "ro", "none"], cli_flag="--workspace-mode")],
                  examples=["foxos env limits dev --memory-mb 2048 --pids 512", "foxos env limits dev --network none"], permission="modify"))
-register(Command("env", "stats", "资源使用（进程数、CPU 时间、内存、磁盘）", env_stats, params=[Param("name", "string", "环境名（缺省为全部）", positional=True, metavar="NAME")],
+register(Command("env", "stats", tr("env.resource_usage_processes_cpu_time"), env_stats, params=[Param("name", "string", tr("env.environment_name_all_by_default"), positional=True, metavar="NAME")],
                  examples=["foxos env stats --json"], audited=False))
-register(Command("env", "logs", "环境日志", env_logs, params=[NAME, Param("lines", "integer", "行数", default=100, cli_short="-n")], examples=["foxos env logs dev -n 50"]))
-register(Command("env", "action add", "添加自定义操作（支持 ${env} ${image} ${workspace} ${host_workspace} ${hostname} 变量）", env_action_add,
-                 params=[NAME, Param("action", "string", "操作名", required=True, positional=True, metavar="ACTION"), Param("command", "string", "环境内执行的 shell 命令", required=True)],
+register(Command("env", "logs", tr("env.environment_logs"), env_logs, params=[NAME, Param("lines", "integer", tr("env.lines"), default=100, cli_short="-n")], examples=["foxos env logs dev -n 50"]))
+register(Command("env", "action add", tr("env.add_a_custom_action_supports_the"), env_action_add,
+                 params=[NAME, Param("action", "string", tr("env.action_name"), required=True, positional=True, metavar="ACTION"), Param("command", "string", tr("env.shell_command_run_inside_the"), required=True)],
                  examples=["foxos env action add dev test --command 'cd ${workspace} && make test'"], permission="modify"))
-register(Command("env", "action run", "运行自定义操作", env_action_run, params=[NAME, Param("action", "string", "操作名", required=True, positional=True, metavar="ACTION")],
+register(Command("env", "action run", tr("env.run_a_custom_action"), env_action_run, params=[NAME, Param("action", "string", tr("env.action_name"), required=True, positional=True, metavar="ACTION")],
                  examples=["foxos env action run dev test --json"], permission="run"))
-register(Command("env", "providers", "列出环境提供者（内置与第三方）及其能力、可用性", env_providers, examples=["foxos env providers --json"], audited=False))
-register(Command("env", "doctor", "检查本机虚拟化能力（WSL、Windows Sandbox、Hyper-V、用户命名空间…）并给出修复操作", env_doctor,
-                 params=[Param("provider", "string", "只检查某个提供者")], examples=["foxos env doctor --json", "foxos env doctor --provider wsl2"], audited=False))
-register(Command("env", "fix", "执行 doctor 给出的修复操作（启用 WSL 等，需要管理员确认，可能需要重启）", env_fix,
-                 params=[Param("provider", "string", "提供者", required=True), Param("action", "string", "修复操作 ID（见 doctor 输出）", required=True)],
+register(Command("env", "providers", tr("env.list_environment_providers_built_in"), env_providers, examples=["foxos env providers --json"], audited=False))
+register(Command("env", "doctor", tr("env.check_this_machine_s_virtualization"), env_doctor,
+                 params=[Param("provider", "string", tr("env.check_only_one_provider"))], examples=["foxos env doctor --json", "foxos env doctor --provider wsl2"], audited=False))
+register(Command("env", "fix", tr("env.apply_a_fix_suggested_by_doctor"), env_fix,
+                 params=[Param("provider", "string", tr("env.provider"), required=True), Param("action", "string", tr("env.fix_id_see_the_doctor_output"), required=True)],
                  examples=["foxos env fix --provider wsl2 --action enable-wsl"], permission="run"))
-register(Command("env", "catalog", "可一键安装的系统目录（WSL 发行版、LXC/官方根文件系统、Windows Sandbox、Hyper-V、macOS）", env_catalog,
-                 params=[Param("guest", "string", "来宾系统", enum=["linux", "windows", "macos", "any"]), Param("provider", "string", "只看某个提供者"),
-                         Param("available", "boolean", "只显示本机可安装的")], examples=["foxos env catalog --json", "foxos env catalog --guest windows"], audited=False))
-register(Command("env", "install", "从目录一键安装一个系统为新环境（下载、校验 sha256、导入）", env_install,
-                 params=[Param("entry", "string", "目录条目 ID（foxos env catalog）", required=True, positional=True, metavar="ENTRY"), NAME,
-                         Param("provider", "string", "指定提供者"), Param("url", "string", "自定义根文件系统地址（custom-rootfs）"), Param("sha256", "string", "自定义来源的 sha256"),
-                         Param("iso", "string", "安装介质 ISO 路径（Hyper-V）"), Param("location", "string", "安装位置（Windows 目录）"),
-                         Param("memory_mb", "integer", "内存 MB（Hyper-V / Sandbox）"), Param("cpus", "integer", "CPU 数（Hyper-V）"), Param("disk_gb", "integer", "磁盘 GB（Hyper-V）"),
-                         Param("dry_run", "boolean", "只输出安装计划，不执行")],
+register(Command("env", "catalog", tr("env.catalog_of_systems_you_can_install"), env_catalog,
+                 params=[Param("guest", "string", tr("env.guest_system"), enum=["linux", "windows", "macos", "any"]), Param("provider", "string", tr("env.show_only_one_provider")),
+                         Param("available", "boolean", tr("env.show_only_what_this_machine_can"))], examples=["foxos env catalog --json", "foxos env catalog --guest windows"], audited=False))
+register(Command("env", "install", tr("env.install_a_system_from_the_catalog_as"), env_install,
+                 params=[Param("entry", "string", tr("env.catalog_entry_id_foxos_env_catalog"), required=True, positional=True, metavar="ENTRY"), NAME,
+                         Param("provider", "string", tr("env.use_a_specific_provider")), Param("url", "string", tr("env.custom_root_file_system_url_custom")), Param("sha256", "string", tr("env.sha256_of_the_custom_source")),
+                         Param("iso", "string", tr("env.installation_media_iso_path_hyper_v")), Param("location", "string", tr("env.install_location_windows_folder")),
+                         Param("memory_mb", "integer", tr("env.memory_mb_hyper_v_sandbox")), Param("cpus", "integer", tr("env.cpu_count_hyper_v")), Param("disk_gb", "integer", tr("env.disk_gb_hyper_v")),
+                         Param("dry_run", "boolean", tr("env.only_print_the_install_plan_do_not"))],
                  examples=["foxos env install wsl-ubuntu-24.04 ubuntu", "foxos env install alpine tiny --dry-run --json", "foxos env install hyperv-windows-11-eval win11 --iso D:\\iso\\win11.iso"],
                  permission="create"))
-register(Command("env", "progress", "查看安装进度", env_install_status, params=[NAME], examples=["foxos env progress ubuntu --json"], audited=False))
+register(Command("env", "progress", tr("env.show_install_progress"), env_install_status, params=[NAME], examples=["foxos env progress ubuntu --json"], audited=False))

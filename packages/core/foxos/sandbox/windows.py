@@ -16,6 +16,7 @@ appcontainer：
 
 from __future__ import annotations
 
+from foxos.i18n import tr
 import os
 import subprocess
 import sys
@@ -53,7 +54,7 @@ def icacls_plan(policy, mode: str, sid: str | None = None) -> list[list[str]]:
 
 def capabilities() -> dict:
     if not IS_WIN:
-        return {"platform": "windows", "available": False, "reason": "不是 Windows"}
+        return {"platform": "windows", "available": False, "reason": tr("sandbox.windows.not_windows")}
     import ctypes
     k32 = ctypes.WinDLL("kernel32")
     has_ac = bool(getattr(ctypes.WinDLL("userenv"), "CreateAppContainerProfile", None))
@@ -165,7 +166,7 @@ if IS_WIN:
         if hr == HRESULT_ALREADY_EXISTS:
             hr = uenv.DeriveAppContainerSidFromAppContainerName(W.LPCWSTR(name), ctypes.byref(sid))
         if hr < 0:
-            raise OSError(hr & 0xFFFFFFFF, f"CreateAppContainerProfile 失败 0x{hr & 0xFFFFFFFF:08X}")
+            raise OSError(hr & 0xFFFFFFFF, tr("sandbox.windows.createappcontainerprofile_failed_0x", hr & 0xFFFFFFFF))
         return sid
 
     def job_object(policy):
@@ -278,4 +279,4 @@ if IS_WIN:
         return subprocess.CompletedProcess(argv, code.value, bufs[0] if capture else None, bufs[1] if capture else None)
 else:
     def run(policy, argv, cwd=None, timeout=None, capture=True, profile="default"):
-        raise OSError(95, "Windows 轻量隔离只能在 Windows 上运行")
+        raise OSError(95, tr("sandbox.windows.the_windows_light_sandbox_only_runs"))

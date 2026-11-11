@@ -9,6 +9,7 @@
 
 from __future__ import annotations
 
+from foxos.i18n import tr
 import hashlib
 import json
 import os
@@ -85,11 +86,11 @@ def acquire(ws: Workspace, rel_path: str, owner: str, wait: float = 0.0) -> Path
                     pass
                 continue
             if time.monotonic() >= deadline:
-                who = (holder or {}).get("owner", "未知")
+                who = (holder or {}).get("owner", tr("common.unknown"))
                 raise FoxError(
                     "LOCKED",
-                    f"{rel_path} 正被 {who} 写入，同一文件同一时刻只允许一个写入者",
-                    hint="稍后重试，或使用 --lock-wait <秒> 等待锁释放",
+                    tr("locks.is_being_written_by_only_one_writer", rel_path, who),
+                    hint=tr("locks.retry_later_or_use_lock_wait_seconds"),
                     details={"path": rel_path, "holder": holder},
                 )
             time.sleep(0.05)

@@ -6,6 +6,7 @@
 
 from __future__ import annotations
 
+from foxos.i18n import tr
 import csv
 import datetime as _dt
 import shutil
@@ -33,14 +34,13 @@ MAX_CELLS = 20000
 
 register_app(
     APP,
-    "表格：读写标准 .xlsx 工作簿、公式、图表与导出",
-    "基于 openpyxl 读写 Excel 2007+ (.xlsx) 文件；公式按 Excel 语法写入（以 = 开头），"
-    "用 LibreOffice 无头模式求值与导出 PDF/ODS。",
+    tr("sheets.spreadsheets_read_and_write_standard"),
+    tr("sheets.reads_and_writes_excel_2007_xlsx"),
     limits=[
-        "只读写 .xlsx；.xls / .xlsm / .ods / .csv 输入暂不支持",
-        "公式以文本写入，求值依赖 LibreOffice（read --computed、export）",
-        "图表仅支持 bar / line / pie，数据按列组成系列",
-        "单次 read 最多返回 20000 个单元格",
+        tr("sheets.only_xlsx_is_read_and_written_xls"),
+        tr("sheets.formulas_are_written_as_text"),
+        tr("sheets.charts_support_only_bar_line_pie"),
+        tr("sheets.a_single_read_returns_at_most_20000"),
     ],
 )
 
@@ -49,17 +49,17 @@ register_app(
 # helpers
 def _check_ext(path: Path) -> None:
     if path.suffix.lower() not in XLSX_EXT:
-        raise FoxError("USAGE", f"只支持 .xlsx 文件：{path.name}", hint="文件名以 .xlsx 结尾")
+        raise FoxError("USAGE", tr("sheets.only_xlsx_files_are_supported", path.name), hint=tr("sheets.file_names_end_in_xlsx"))
 
 
 def _load(ctx: Context, path: Path, data_only: bool = False):
     _check_ext(path)
     if not path.exists():
-        raise FoxError("NOT_FOUND", f"文件不存在：{ctx.rel(path)}", hint="先用 foxos sheets create 创建")
+        raise FoxError("NOT_FOUND", tr("common.file_not_found", ctx.rel(path)), hint=tr("sheets.create_it_first_with_foxos_sheets"))
     try:
         return openpyxl.load_workbook(path, data_only=data_only)
     except (InvalidFileException, KeyError, OSError, ValueError) as e:
-        raise FoxError("USAGE", f"无法作为 xlsx 打开：{ctx.rel(path)}（{e}）") from e
+        raise FoxError("USAGE", tr("sheets.cannot_open_as_xlsx", ctx.rel(path), e)) from e
 
 
 def _sheet(wb, name: str | None, create: bool = False):
@@ -69,16 +69,16 @@ def _sheet(wb, name: str | None, create: bool = False):
         return wb[name]
     if create:
         return wb.create_sheet(name)
-    raise FoxError("NOT_FOUND", f"工作表不存在：{name}", details={"sheets": wb.sheetnames})
+    raise FoxError("NOT_FOUND", tr("sheets.sheet_not_found", name), details={"sheets": wb.sheetnames})
 
 
 def _bounds(ref: str):
     try:
         min_col, min_row, max_col, max_row = range_boundaries(ref.upper().replace("$", ""))
     except (ValueError, TypeError, CellCoordinatesException) as e:
-        raise FoxError("USAGE", f"无效的单元格区域：{ref}", hint="使用 A1 记法，如 A1:C10") from e
+        raise FoxError("USAGE", tr("sheets.invalid_cell_range", ref), hint=tr("sheets.use_a1_notation_such_as_a1_c10")) from e
     if None in (min_col, min_row, max_col, max_row):
-        raise FoxError("USAGE", f"区域需要明确的起止单元格：{ref}", hint="如 A1:C10")
+        raise FoxError("USAGE", tr("sheets.the_range_needs_explicit_start_and", ref), hint=tr("sheets.e_g_a1_c10"))
     return min_col, min_row, max_col, max_row
 
 
@@ -90,7 +90,7 @@ def _check_cell(ref: str) -> str:
     except (ValueError, CellCoordinatesException):
         ok = False
     if not ok:
-        raise FoxError("USAGE", f"无效的单元格地址：{ref}", hint="使用 A1 记法，如 B2（列 A–XFD，行 1–1048576）")
+        raise FoxError("USAGE", tr("sheets.invalid_cell_address", ref), hint=tr("sheets.use_a1_notation_such_as_b2_columns_a"))
     return f"{col}{row}"
 
 
@@ -158,7 +158,7 @@ def _has_formulas(wb) -> bool:
 def create(ctx: Context, file: Path, sheet: str = "Sheet1", headers: list | None = None, force: bool = False) -> dict:
     _check_ext(file)
     if file.exists() and not force:
-        raise FoxError("CONFLICT", f"文件已存在：{ctx.rel(file)}", hint="使用 --force 覆盖（会保留上一版本）")
+        raise FoxError("CONFLICT", tr("common.file_already_exists", ctx.rel(file)), hint=tr("common.use_force_to_overwrite_the_previous"))
     wb = openpyxl.Workbook()
     ws = wb.active
     ws.title = sheet
@@ -166,7 +166,7 @@ def create(ctx: Context, file: Path, sheet: str = "Sheet1", headers: list | None
         ws.append([str(h) for h in headers])
     saved = ctx.save_atomic(file, lambda p: wb.save(p))
     return {
-        "message": f"已创建 {ctx.rel(file)}",
+        "message": tr("common.created", ctx.rel(file)),
         "file": ctx.rel(file),
         "sheets": wb.sheetnames,
         "headers": headers or [],
@@ -184,7 +184,7 @@ def read(ctx: Context, file: Path, sheet: str | None = None, range: str | None =
     min_col, min_row, max_col, max_row = b
     n = (max_col - min_col + 1) * (max_row - min_row + 1)
     if n > MAX_CELLS:
-        raise FoxError("USAGE", f"区域包含 {n} 个单元格，超过单次上限 {MAX_CELLS}", hint="用 --range 分批读取")
+        raise FoxError("USAGE", tr("sheets.the_range_has_cells_more_than_the", n, MAX_CELLS), hint=tr("sheets.read_in_batches_with_range"))
     ref = f"{get_column_letter(min_col)}{min_row}:{get_column_letter(max_col)}{max_row}"
     rows = _grid(ws, *b)
     out = {
@@ -204,13 +204,13 @@ def read(ctx: Context, file: Path, sheet: str | None = None, range: str | None =
             out["values"] = _grid(wbv[ws.title], *b)
         out["computed_by"] = "libreoffice"
     elif has_f:
-        out["note"] = "rows 中以 = 开头的是公式；加 --computed 用 LibreOffice 求值"
+        out["note"] = tr("sheets.values_in_rows_that_start_with_are")
     return out
 
 
 def write(ctx: Context, file: Path, cells: dict, sheet: str | None = None, create_sheet: bool = False) -> dict:
     if not cells:
-        raise FoxError("USAGE", "没有要写入的单元格", hint="例如：foxos sheets write data.xlsx A1=Month B1=Sales B5==SUM(B2:B4)")
+        raise FoxError("USAGE", tr("sheets.no_cells_to_write"), hint=tr("sheets.for_example_foxos_sheets_write_data"))
     wb = _load(ctx, file)
     ws = _sheet(wb, sheet, create=create_sheet)
     written, formulas = [], 0
@@ -218,7 +218,7 @@ def write(ctx: Context, file: Path, cells: dict, sheet: str | None = None, creat
     for ref, value in cells.items():
         r = _check_cell(str(ref))
         if value is not None and not isinstance(value, (str, int, float, bool)):
-            raise FoxError("USAGE", f"{r} 的值类型不支持：{type(value).__name__}")
+            raise FoxError("USAGE", tr("sheets.unsupported_value_type_for", r, type(value).__name__))
         normalized[r] = value
     for r, value in normalized.items():
         ws[r] = value
@@ -227,7 +227,7 @@ def write(ctx: Context, file: Path, cells: dict, sheet: str | None = None, creat
             formulas += 1
     saved = ctx.save_atomic(file, lambda p: wb.save(p))
     return {
-        "message": f"已写入 {len(written)} 个单元格到 {ctx.rel(file)}!{ws.title}",
+        "message": tr("sheets.wrote_cell_s_to", len(written), ctx.rel(file), ws.title),
         "file": ctx.rel(file),
         "sheet": ws.title,
         "cells": written,
@@ -253,7 +253,7 @@ def chart_create(
     ws = _sheet(wb, sheet)
     dmin_col, dmin_row, dmax_col, dmax_row = _bounds(data)
     if dmax_row - dmin_row < (0 if no_header else 1):
-        raise FoxError("USAGE", f"数据区域 {data} 太小", hint="首行为系列名称时至少需要两行；否则加 --no-header")
+        raise FoxError("USAGE", tr("sheets.data_range_is_too_small", data), hint=tr("sheets.with_series_names_in_the_first_row"))
     cls = {"bar": BarChart, "line": LineChart, "pie": PieChart}[type]
     chart = cls()
     if title:
@@ -264,7 +264,7 @@ def chart_create(
         if y_title:
             chart.y_axis.title = y_title
     elif dmax_col > dmin_col:
-        raise FoxError("USAGE", "饼图只能有一个数据系列（一列）")
+        raise FoxError("USAGE", tr("sheets.a_pie_chart_can_have_only_one_data"))
     ref = Reference(ws, min_col=dmin_col, min_row=dmin_row, max_col=dmax_col, max_row=dmax_row)
     chart.add_data(ref, titles_from_data=not no_header)
     if categories:
@@ -278,7 +278,7 @@ def chart_create(
     index = len(ws._charts) - 1
     saved = ctx.save_atomic(file, lambda p: wb.save(p))
     return {
-        "message": f"已在 {ctx.rel(file)}!{ws.title} 的 {anchor} 创建{type}图表",
+        "message": tr("sheets.created_a_chart_at_on", ctx.rel(file), ws.title, anchor, type),
         "file": ctx.rel(file),
         "sheet": ws.title,
         "chart": {"index": index, "type": type, "title": title, "anchor": anchor, "data": data, "categories": categories},
@@ -300,9 +300,9 @@ def export(ctx: Context, file: Path, output: Path, sheet: str | None = None, for
     wb = _load(ctx, file)
     fmt = output.suffix.lower().lstrip(".")
     if fmt not in ("csv", "pdf", "ods", "xlsx"):
-        raise FoxError("USAGE", f"不支持导出为 .{fmt}", hint="支持 .csv / .pdf / .ods / .xlsx")
+        raise FoxError("USAGE", tr("common.cannot_export_to", fmt), hint=tr("sheets.supported_csv_pdf_ods_xlsx"))
     if output.exists() and not force:
-        raise FoxError("CONFLICT", f"输出文件已存在：{ctx.rel(output)}", hint="使用 --force 覆盖")
+        raise FoxError("CONFLICT", tr("common.output_file_already_exists", ctx.rel(output)), hint=tr("common.use_force_to_overwrite"))
     warnings = []
     with tempfile.TemporaryDirectory(prefix="foxos-") as td:
         tdp = Path(td)
@@ -314,7 +314,7 @@ def export(ctx: Context, file: Path, output: Path, sheet: str | None = None, for
                     calc = office.recalculated_copy(file, tdp)
                     source_ws = openpyxl.load_workbook(calc, data_only=True)[ws.title]
                 else:
-                    warnings.append("未找到 LibreOffice，公式以文本形式导出")
+                    warnings.append(tr("sheets.libreoffice_not_found_formulas"))
 
             def writer(p: Path):
                 with open(p, "w", newline="", encoding="utf-8") as f:
@@ -327,14 +327,14 @@ def export(ctx: Context, file: Path, output: Path, sheet: str | None = None, for
             saved = ctx.save_atomic(output, lambda p: shutil.copy2(file, p))
         else:
             if sheet:
-                warnings.append("PDF/ODS 导出包含所有工作表，--sheet 被忽略")
+                warnings.append(tr("sheets.pdf_ods_export_includes_all_sheets"))
             staged = tdp / "in" / (output.stem + file.suffix)
             staged.parent.mkdir()
             shutil.copy2(file, staged)
             converted = office.convert(staged, fmt, tdp / "out")
             saved = ctx.save_atomic(output, lambda p: shutil.copy2(converted, p))
     return {
-        "message": f"已导出 {ctx.rel(file)} → {ctx.rel(output)}",
+        "message": tr("common.exported", ctx.rel(file), ctx.rel(output)),
         "file": ctx.rel(file),
         "output": ctx.rel(output),
         "format": fmt,
@@ -345,94 +345,93 @@ def export(ctx: Context, file: Path, output: Path, sheet: str | None = None, for
 
 
 # ----------------------------------------------------------------------
-FILE = Param("file", "string", "工作簿路径（工作空间内，.xlsx）", required=True, positional=True, metavar="FILE")
-SHEET = Param("sheet", "string", "工作表名称，默认当前活动工作表", cli_short="-s")
+FILE = Param("file", "string", tr("sheets.workbook_path_in_the_workspace_xlsx"), required=True, positional=True, metavar="FILE")
+SHEET = Param("sheet", "string", tr("sheets.sheet_name_the_active_sheet_by"), cli_short="-s")
 
 register(Command(
-    APP, "create", "新建一个 .xlsx 工作簿",
+    APP, "create", tr("sheets.create_a_new_xlsx_workbook"),
     create,
     params=[
-        Param("file", "string", "要创建的工作簿路径（.xlsx）", required=True, positional=True, path="write", metavar="FILE"),
-        Param("sheet", "string", "第一个工作表的名称", default="Sheet1", cli_short="-s"),
-        Param("headers", "array", "第一行表头，逗号分隔（CLI）或字符串数组（工具接口）", items={"type": "string"}),
-        Param("force", "boolean", "文件已存在时覆盖（上一版本会保存到 .foxos/versions）", default=False, cli_short="-f"),
+        Param("file", "string", tr("sheets.path_of_the_workbook_to_create_xlsx"), required=True, positional=True, path="write", metavar="FILE"),
+        Param("sheet", "string", tr("sheets.name_of_the_first_sheet"), default="Sheet1", cli_short="-s"),
+        Param("headers", "array", tr("sheets.header_row_comma_separated_cli_or_an"), items={"type": "string"}),
+        Param("force", "boolean", tr("sheets.overwrite_if_the_file_exists_the"), default=False, cli_short="-f"),
     ],
     examples=[
         "foxos sheets create sales.xlsx --sheet Sales --headers Month,Sales",
         "foxos sheets create report/q1.xlsx --force --json",
     ],
-    limits=["只创建 .xlsx；父目录不存在时自动创建"],
+    limits=[tr("sheets.only_creates_xlsx_missing_parent")],
     permission="create",
 ))
 
 register(Command(
-    APP, "read", "读取工作表单元格（公式、图表；可选用 LibreOffice 求值）",
+    APP, "read", tr("sheets.read_sheet_cells_formulas_charts"),
     read,
     params=[
-        Param("file", "string", "工作簿路径", required=True, positional=True, path="read", metavar="FILE"),
+        Param("file", "string", tr("sheets.workbook_path"), required=True, positional=True, path="read", metavar="FILE"),
         SHEET,
-        Param("range", "string", "A1 记法区域，如 A1:C10；默认整个已用区域", cli_short="-r"),
-        Param("computed", "boolean", "用 LibreOffice 重算公式，额外返回 values（不修改原文件）", default=False),
+        Param("range", "string", tr("sheets.range_in_a1_notation_such_as_a1_c10"), cli_short="-r"),
+        Param("computed", "boolean", tr("sheets.recalculate_formulas_with"), default=False),
     ],
     examples=[
         "foxos sheets read sales.xlsx",
         "foxos sheets read sales.xlsx --range A1:B13 --computed --json",
     ],
-    limits=[f"单次最多 {MAX_CELLS} 个单元格", "--computed 需要 LibreOffice"],
+    limits=[tr("sheets.at_most_cells_per_call", MAX_CELLS), tr("sheets.computed_needs_libreoffice")],
     permission="read",
 ))
 
 register(Command(
-    APP, "write", "写入单元格值或公式（CELL=VALUE，以 = 开头为公式）",
+    APP, "write", tr("sheets.write_cell_values_or_formulas_cell"),
     write,
     params=[
-        Param("file", "string", "工作簿路径", required=True, positional=True, path="write", metavar="FILE"),
+        Param("file", "string", tr("sheets.workbook_path"), required=True, positional=True, path="write", metavar="FILE"),
         Param(
             "cells", "object",
-            "要写入的单元格：{\"A1\": \"Month\", \"B2\": 120, \"B14\": \"=SUM(B2:B13)\"}；"
-            "CLI 中写成 A1=Month B2=120 B14==SUM(B2:B13)，数字自动识别，TRUE/FALSE 为布尔，空值清空单元格",
+            tr("sheets.cells_to_write_on_the_cli_write_a1"),
             required=True, positional=True, cli_kv=True, metavar="CELL=VALUE",
         ),
         SHEET,
-        Param("create_sheet", "boolean", "工作表不存在时新建", default=False),
+        Param("create_sheet", "boolean", tr("sheets.create_the_sheet_if_it_does_not"), default=False),
     ],
     examples=[
         "foxos sheets write sales.xlsx A2=Jan B2=120 A3=Feb B3=135",
         "foxos sheets write sales.xlsx 'B14==SUM(B2:B13)' --sheet Sales",
         "foxos sheets write sales.xlsx --cells-json '{\"C2\": \"=B2*1.1\"}' --json",
     ],
-    limits=["公式按 Excel 英文函数名写入，不在写入时校验或求值", "不支持写入样式、合并单元格（阶段 0）"],
+    limits=[tr("sheets.formulas_are_written_with_english"), tr("sheets.writing_styles_and_merged_cells_is")],
     permission="modify",
 ))
 
 register(Command(
-    APP, "chart create", "基于单元格区域创建原生 Excel 图表",
+    APP, "chart create", tr("sheets.create_a_native_excel_chart_from_a"),
     chart_create,
     params=[
-        Param("file", "string", "工作簿路径", required=True, positional=True, path="write", metavar="FILE"),
-        Param("type", "string", "图表类型", required=True, enum=CHART_TYPES, cli_short="-t"),
-        Param("data", "string", "数据区域（按列为系列，首行默认为系列名），如 B1:B13", required=True, cli_short="-d"),
-        Param("categories", "string", "分类（X 轴）区域，如 A2:A13", cli_short="-c"),
-        Param("title", "string", "图表标题"),
+        Param("file", "string", tr("sheets.workbook_path"), required=True, positional=True, path="write", metavar="FILE"),
+        Param("type", "string", tr("common.chart_type"), required=True, enum=CHART_TYPES, cli_short="-t"),
+        Param("data", "string", tr("sheets.data_range_each_column_is_a_series"), required=True, cli_short="-d"),
+        Param("categories", "string", tr("sheets.category_x_axis_range_such_as_a2_a13"), cli_short="-c"),
+        Param("title", "string", tr("sheets.chart_title")),
         SHEET,
-        Param("anchor", "string", "图表左上角所在单元格，默认放在数据右侧", cli_short="-a"),
-        Param("x_title", "string", "X 轴标题（bar/line）"),
-        Param("y_title", "string", "Y 轴标题（bar/line）"),
-        Param("no_header", "boolean", "数据区域首行不是系列名", default=False),
+        Param("anchor", "string", tr("sheets.cell_for_the_chart_s_top_left_corner"), cli_short="-a"),
+        Param("x_title", "string", tr("sheets.x_axis_title_bar_line")),
+        Param("y_title", "string", tr("sheets.y_axis_title_bar_line")),
+        Param("no_header", "boolean", tr("sheets.the_first_row_of_the_data_range_is"), default=False),
     ],
     examples=[
-        "foxos sheets chart create sales.xlsx --type bar --data B1:B13 --categories A2:A13 --title '月度销售额'",
+        tr("sheets.foxos_sheets_chart_create_sales_xlsx"),
         "foxos sheets chart create sales.xlsx -t line -d B1:C13 -c A2:A13 --anchor E20 --json",
     ],
-    limits=["仅 bar / line / pie", "饼图只能一个系列", "图表样式、颜色暂不可配置"],
+    limits=[tr("sheets.bar_line_pie_only"), tr("sheets.a_pie_chart_has_only_one_series"), tr("sheets.chart_styles_and_colors_are_not")],
     permission="modify",
 ))
 
 register(Command(
-    APP, "chart list", "列出工作簿中的图表",
+    APP, "chart list", tr("sheets.list_the_charts_in_a_workbook"),
     chart_list,
     params=[
-        Param("file", "string", "工作簿路径", required=True, positional=True, path="read", metavar="FILE"),
+        Param("file", "string", tr("sheets.workbook_path"), required=True, positional=True, path="read", metavar="FILE"),
         SHEET,
     ],
     examples=["foxos sheets chart list sales.xlsx --json"],
@@ -440,18 +439,18 @@ register(Command(
 ))
 
 register(Command(
-    APP, "export", "导出为 csv / pdf / ods / xlsx（格式由输出文件扩展名决定）",
+    APP, "export", tr("sheets.export_to_csv_pdf_ods_xlsx_format"),
     export,
     params=[
-        Param("file", "string", "源工作簿路径", required=True, positional=True, path="read", metavar="FILE"),
-        Param("output", "string", "输出路径：.csv / .pdf / .ods / .xlsx", required=True, positional=True, path="write", metavar="OUTPUT"),
+        Param("file", "string", tr("sheets.source_workbook_path"), required=True, positional=True, path="read", metavar="FILE"),
+        Param("output", "string", tr("sheets.output_path_csv_pdf_ods_xlsx"), required=True, positional=True, path="write", metavar="OUTPUT"),
         SHEET,
-        Param("force", "boolean", "输出文件已存在时覆盖", default=False, cli_short="-f"),
+        Param("force", "boolean", tr("sheets.overwrite_the_output_file_if_it"), default=False, cli_short="-f"),
     ],
     examples=[
         "foxos sheets export sales.xlsx sales.csv",
         "foxos sheets export sales.xlsx out/sales.pdf --force --json",
     ],
-    limits=["csv 只导出一个工作表，公式导出为求值结果（需 LibreOffice，否则导出公式文本）", "pdf / ods 需要 LibreOffice"],
+    limits=[tr("sheets.csv_exports_only_one_sheet_formulas"), tr("sheets.pdf_ods_need_libreoffice")],
     permission="create",
 ))
