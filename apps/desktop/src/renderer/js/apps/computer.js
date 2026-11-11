@@ -166,8 +166,19 @@
         catch (e) { FX.toast(e.message, 'error'); }
       }
 
-      refresh().then((s) => { if (!s.configured) renderSetup(); else connectView(); });
-      return { dispose: disconnectView, status: () => st, connected: () => view.dataset.connected === '1' };
+      // 虚拟机开机、网络抖动时状态会变：没在线就每 10 秒重新探测一次，上线后自动连上画面
+      let disposed = false; let setupShown = false;
+      const poll = async () => {
+        if (disposed) return;
+        const ok = st && st.reach && st.reach.ok;
+        if (st && st.configured && !ok && !view.querySelector('[data-guest-setup]')) {
+          await refresh();
+          if (st.reach && st.reach.ok && view.dataset.connected !== '1') connectView();
+        }
+        setTimeout(poll, 10000);
+      };
+      refresh().then((s) => { if (!s.configured) { setupShown = true; renderSetup(); } else connectView(); setTimeout(poll, 10000); });
+      return { dispose: () => { disposed = true; disconnectView(); }, setupShown: () => setupShown, status: () => st, connected: () => view.dataset.connected === '1' };
     },
   });
 })();
