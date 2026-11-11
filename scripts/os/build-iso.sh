@@ -17,7 +17,7 @@ SUITE=noble
 ARCH=${FOXOS_OS_ARCH:-amd64}
 case "$ARCH" in amd64|arm64) ;; *) echo "FOXOS_OS_ARCH 只支持 amd64 / arm64" >&2; exit 2 ;; esac
 ISO_NAME="FoxOS-${VERSION}-${ARCH}.iso"
-VOLID="FOXOS_032"
+VOLID="FOXOS_$(echo "$VERSION" | tr -d .)"   # 卷标随版本：FOXOS_033
 WORK=${FOXOS_OS_WORK:-/var/tmp/foxos-os}
 OUT=${FOXOS_OS_OUT:-"$ROOT/build/os"}
 if [ "$ARCH" = arm64 ]; then DEFAULT_MIRROR=http://ports.ubuntu.com/ubuntu-ports; else DEFAULT_MIRROR=http://archive.ubuntu.com/ubuntu; fi
