@@ -295,12 +295,13 @@ def case_acp() -> str:
 def case_desktop() -> str:
     shot = WORK / f"e2e-desktop-{int(time.time())}.png"
     st = j(ssh("foxos desktop status --json", check=True))["result"]
-    ssh("foxos desktop launch -- xfce4-terminal -T foxos-e2e-term", check=True)
+    title = f"foxos-e2e-term-{int(time.time())}"
+    ssh(f"foxos desktop launch -- xfce4-terminal -T {title}", check=True)
     ok = False
     for _ in range(40):
         w = j(ssh("foxos desktop windows --json", check=True))["result"]
         wins = w.get("windows", w if isinstance(w, list) else [])
-        hit = [x for x in wins if "foxos-e2e-term" in (x.get("title") or "")]
+        hit = [x for x in wins if title in (x.get("title") or "")]
         if hit:
             ok = True
             break
@@ -314,9 +315,12 @@ def case_desktop() -> str:
     ssh(f"foxos desktop screenshot --path shots/{shot.name}", check=True)
     screendump(shot)
     ssh(f"foxos desktop close {shlex.quote(wid)}", check=True)
-    time.sleep(5)
-    left = j(ssh("foxos desktop windows --json", check=True))["result"]
-    assert "foxos-e2e-term" not in json.dumps(left, ensure_ascii=False)
+    for _ in range(24):
+        time.sleep(5)
+        left = j(ssh("foxos desktop windows --json", check=True))["result"]
+        if title not in json.dumps(left, ensure_ascii=False):
+            break
+    assert title not in json.dumps(left, ensure_ascii=False), "关闭后窗口还在"
     return f"desktop status：{json.dumps(st, ensure_ascii=False)[:160]}；launch → windows 里出现 → focus → type → key → screenshot → close 全部成功", [str(shot)]
 
 
