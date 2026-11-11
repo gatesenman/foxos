@@ -46,14 +46,21 @@ async function main() {
   // 整个 X 屏幕（LibreOffice 原生窗口在 Electron 之外）
   const grab = (f) => { execFileSync('ffmpeg', ['-loglevel', 'error', '-y', '-f', 'x11grab', '-video_size', `${W}x${H}`, '-i', `${process.env.DISPLAY || ':99'}+0,0`, '-frames:v', '1', f]); return f; };
 
-  await shot('desktop', '桌面：开始菜单按 9 个分组列出已安装的 Everything 应用，右侧是智能体会话面板', async () => {
-    await page.click('#start'); await sleep(800);
+  // 等所有程序图标（<img>）加载完成
+  const iconsReady = () => page.waitForFunction(() => [...document.querySelectorAll('img.app-img')].every((i) => i.complete), null, { timeout: 30000 }).then(() => sleep(300));
+  await shot('desktop', '桌面：桌面快捷方式、窗口标题栏与任务栏显示各程序自带的图标（LibreOffice、系统终端、Code - OSS、Electron、Everything 上游图标），右侧是智能体会话面板', async () => {
+    await open('everything', { app: 'chess' }, { x: 190, y: 20, w: 720, h: 620 });
+    await open('everything', { app: 'documents' }, { x: 560, y: 150, w: 640, h: 600 });
+    await sleep(4000); await iconsReady();
   });
-  await shot('app-center', '应用中心：内置应用、LibreOffice、开发工具、ACP 智能体与 51 个 Everything 应用（9 个分组）', async () => {
+  await shot('start-menu', '开始菜单：内置程序与按 9 个分组列出的已安装 Everything 应用，每个程序显示其开源项目自带的图标', async () => {
+    await page.click('#start'); await sleep(800); await iconsReady();
+  });
+  await shot('app-center', '应用中心：51 个 Everything 应用（9 个分组）显示各自上游自带的图标；另有内置应用、LibreOffice、开发工具与 ACP 智能体', async () => {
     await open('appcenter', {}, { ...big, w: 1160 });
     await page.waitForSelector('.ev-group[data-group=games]', { timeout: 60000 });
     await page.evaluate(() => document.querySelector('.ev-section').scrollIntoView());
-    await sleep(600);
+    await sleep(600); await iconsReady();
   });
   await shot('setup-wizard', '首次运行安装向导：检测并在线安装 LibreOffice、Python 办公库、Node.js、git、环境与 Everything 分组', async () => {
     await open('setup', {}, { x: 180, y: 30, w: 900, h: 820 });

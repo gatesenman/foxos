@@ -1,14 +1,14 @@
 {
- "generated": "2026-11-11T00:44:14+08:00",
- "commit": "b38474c",
+ "generated": "2026-11-11T14:39:27+08:00",
+ "commit": "f40a775",
  "cases": {
-  "pass": 133,
+  "pass": 134,
   "fail": 1,
   "skip": 4,
   "known": 1
  },
  "stories": {
-  "pass": 28,
+  "pass": 29,
   "fail": 1,
   "skip": 1,
   "known": 1,
@@ -293,12 +293,21 @@
    "fail": 0,
    "skip": 1,
    "known": 0
+  },
+  {
+   "id": "US-53",
+   "title": "程序图标：每个程序显示其开源项目自带的图标（Everything 上游 / LibreOffice / 系统终端 / Code - OSS / Electron / ACP 注册表），缺失时退回并报告",
+   "status": "pass",
+   "pass": 1,
+   "fail": 0,
+   "skip": 0,
+   "known": 0
   }
  ],
  "everything": {
   "catalog": 51,
   "boot_ok": 50,
-  "parity_equal": 48,
+  "parity_equal": 49,
   "test_pass": 49,
   "test_fail": 1,
   "test_skip": 1,

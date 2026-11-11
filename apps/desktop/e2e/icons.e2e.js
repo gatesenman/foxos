@@ -8,7 +8,7 @@ const path = require('node:path');
 const { ROOT, launch, shot, tmpWorkspace } = require('./helpers');
 
 const FOXOS_HOME = process.env.FOXOS_TEST_HOME || process.env.FOXOS_HOME || fs.mkdtempSync('/tmp/foxos-e2e-home-');
-const OUT = path.join(ROOT, 'build', 'test-results', 'icons.json');
+const OUT = path.join(ROOT, 'docs', 'test-results', 'icons.json');
 
 // 等页面里所有 <img> 加载完成或失败（失败的会被替换成字体图标）
 const settle = (page, sel) => page.waitForFunction((s) => [...document.querySelectorAll(`${s} img.app-img`)].every((i) => i.complete), sel, { timeout: 30000 });
@@ -84,7 +84,7 @@ test('US-53 每个程序使用其开源项目自带的图标', async () => {
 
     const result = {
       everything: { total: 51, rendered: ev.filter((t) => t.ok).length, missing: evMissing, sources: report.everything.reduce((m, r) => { m[r.source || 'none'] = (m[r.source || 'none'] || 0) + 1; return m; }, {}) },
-      builtins: report.builtins.map((b) => ({ id: b.id, source: b.source, file: b.file, rendered: !!(desk.find((t) => t.key === b.id) || {}).ok })),
+      builtins: report.builtins.map((b) => ({ id: b.id, source: b.source, file: b.file && path.relative(ROOT, b.file).startsWith('..') ? b.file : b.file && path.relative(ROOT, b.file), rendered: !!(desk.find((t) => t.key === b.id) || {}).ok })),
       agents: { total: agentRows.length, withRegistryIcon: agents.filter((a) => a.icon).length, rendered: agentRows.filter((t) => t.ok).length, missing: agentRows.filter((t) => !t.ok).map((t) => t.key) },
       foxosOwn: own,
     };

@@ -15,6 +15,7 @@ FoxOS is a desktop program for Windows and Linux (macOS planned) that gives agen
 - **Real apps**: terminal (real PTY), file manager, Monaco editor, browser, native LibreOffice windows, and the 51 open-source Everything apps.
 - **One operation, three entry points**: GUI, `foxos <app> <resource> <verb> --json`, and MCP tools (stdio and Streamable HTTP) all call the same kernel command.
 - **Traceable and interruptible**: every call goes to a JSONL audit log; single-writer file locks; one-click human takeover pauses all agent writes.
+- **Programs keep their own icons**: Everything apps show their upstream `icon-128.png` (MIT icons bundled, AGPL icons read from the installed upstream component), LibreOffice icons come from the local LibreOffice install, the terminal uses the system terminal icon, the editor VS Code / Code - OSS, the browser Electron, ACP agents the registry `icon`. FoxOS's own apps keep the FoxOS style; font icons are only for controls. See [NOTICE](apps/desktop/src/third-party-icons/NOTICE.md).
 - **Own isolation layer**: no Docker or VM software. Linux namespaces on Linux; one-click WSL2 distros, Windows Sandbox and Hyper-V on Windows.
 
 ## Screenshots
@@ -23,9 +24,10 @@ Captured from the running desktop (xvfb, 1600×1000) with real files created in 
 
 | | |
 | --- | --- |
-| ![App center](docs/screenshots/app-center.png)<br>App center: built-ins, LibreOffice, tools, ACP agents, 51 Everything apps in 9 groups | ![Setup wizard](docs/screenshots/setup-wizard.png)<br>First-run wizard with component picker |
-| ![Terminal](docs/screenshots/terminal.png)<br>Terminal running `foxos` commands | ![Files](docs/screenshots/files.png)<br>File manager, live-synced workspace |
-| ![Editor](docs/screenshots/editor.png)<br>Monaco editor | ![Browser](docs/screenshots/browser.png)<br>Browser |
+| ![Start menu](docs/screenshots/start-menu.png)<br>Start menu: built-ins and installed Everything apps in 9 groups, each with its project's own icon | ![App center](docs/screenshots/app-center.png)<br>App center: 51 Everything apps with their upstream icons, plus built-ins, LibreOffice, tools, ACP agents |
+| ![Setup wizard](docs/screenshots/setup-wizard.png)<br>First-run wizard with component picker | ![Terminal](docs/screenshots/terminal.png)<br>Terminal running `foxos` commands |
+| ![Files](docs/screenshots/files.png)<br>File manager, live-synced workspace | ![Editor](docs/screenshots/editor.png)<br>Monaco editor |
+| ![Browser](docs/screenshots/browser.png)<br>Browser | |
 | ![Writer](docs/screenshots/libreoffice-writer.png)<br>LibreOffice Writer with a generated .docx | ![Calc](docs/screenshots/libreoffice-calc.png)<br>LibreOffice Calc: formulas and a native chart |
 | ![Spreadsheet](docs/screenshots/everything-spreadsheet.png)<br>Everything Spreadsheet opening a workspace .xlsx | ![Documents](docs/screenshots/everything-documents.png)<br>Everything Documents opening a workspace .docx |
 | ![Whiteboard](docs/screenshots/everything-whiteboard.png)<br>Everything Whiteboard | ![CRM](docs/screenshots/everything-crm.png)<br>Everything CRM |
@@ -91,7 +93,7 @@ Desktop (Electron: window manager, built-in apps, Everything runtime, ACP client
 
 `npm run test:all` at the repo root runs pytest, the Playwright + Electron end-to-end tests under xvfb and the official-MCP-SDK tests, and writes [docs/test-report.md](docs/test-report.md) (pass/fail/skip per user story, per-app coverage). No mocks.
 
-Latest full run (Linux): 139 cases — 133 passed, 1 failed, 4 skipped, 1 known upstream defect; 28/31 user stories passed; Everything apps 50/51 boot locally, 48/51 GUI/CLI parity, 51/51 MCP calls succeed. See the [test report](docs/test-report.md).
+Latest report (Linux): 140 cases — 134 passed, 1 failed, 4 skipped, 1 known upstream defect; 29/32 user stories passed; Everything apps 50/51 boot locally, 49/51 GUI/CLI parity, 51/51 MCP calls succeed; program icons: Everything 51/51, built-ins 6/6, ACP agents 45/45. See the [test report](docs/test-report.md).
 
 ## Roadmap
 

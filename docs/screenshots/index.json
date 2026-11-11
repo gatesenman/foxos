@@ -10,16 +10,6 @@
   "file": "docs/screenshots/libreoffice-calc.png"
  },
  {
-  "name": "desktop",
-  "caption": "桌面：开始菜单按 9 个分组列出已安装的 Everything 应用，右侧是智能体会话面板",
-  "file": "docs/screenshots/desktop.png"
- },
- {
-  "name": "app-center",
-  "caption": "应用中心：内置应用、LibreOffice、开发工具、ACP 智能体与 51 个 Everything 应用（9 个分组）",
-  "file": "docs/screenshots/app-center.png"
- },
- {
   "name": "setup-wizard",
   "caption": "首次运行安装向导：检测并在线安装 LibreOffice、Python 办公库、Node.js、git、环境与 Everything 分组",
   "file": "docs/screenshots/setup-wizard.png"
@@ -88,5 +78,20 @@
   "name": "acp-agent-install",
   "caption": "ACP 智能体一键安装：从 ACP Registry 安装，过程在真实终端中可见",
   "file": "docs/screenshots/acp-agent-install.png"
+ },
+ {
+  "name": "start-menu",
+  "caption": "开始菜单：内置程序与按 9 个分组列出的已安装 Everything 应用，每个程序显示其开源项目自带的图标",
+  "file": "docs/screenshots/start-menu.png"
+ },
+ {
+  "name": "app-center",
+  "caption": "应用中心：51 个 Everything 应用（9 个分组）显示各自上游自带的图标；另有内置应用、LibreOffice、开发工具与 ACP 智能体",
+  "file": "docs/screenshots/app-center.png"
+ },
+ {
+  "name": "desktop",
+  "caption": "桌面：桌面快捷方式、窗口标题栏与任务栏显示各程序自带的图标（LibreOffice、系统终端、Code - OSS、Electron、Everything 上游图标），右侧是智能体会话面板",
+  "file": "docs/screenshots/desktop.png"
  }
 ]

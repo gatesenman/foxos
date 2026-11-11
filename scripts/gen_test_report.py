@@ -174,6 +174,15 @@ def main() -> int:
                  f"{('`' + x['cli'] + '`') if x['cli'] else '—'} | {x['ops']} | {x['bound']} | {x['executed']} | {'通过' if x['mcp'] else '—'} | "
                  f"{(x['note'] or '').replace('|', '/')[:160]} |")
     L.append("")
+    icons = load(TR / "icons.json", {})
+    if icons:
+        e, b, g = icons["everything"], icons["builtins"], icons["agents"]
+        SRC = {"installed": "已安装的上游组件", "bundled-mit": "随附（MIT）", "libreoffice": "本机 LibreOffice", "system-terminal": "系统终端", "vscode": "本机 VS Code", "code-oss": "Code - OSS（随附，MIT）", "electron": "Electron（随附）", None: "缺失，退回字体图标"}
+        L.append("## 程序图标覆盖（US-53）\n")
+        L.append(f"- Everything 应用：**{e['rendered']}/{e['total']}** 显示上游自带图标（来源：" + "，".join(f"{SRC.get(k if k != 'none' else None, k)} {v}" for k, v in e["sources"].items()) + f"）；缺失：{', '.join(e['missing']) or '无'}（AGPL 应用未安装时没有图标，安装后从上游组件读取）。")
+        L.append(f"- 内置程序：**{sum(1 for x in b if x['rendered'])}/{len(b)}** —— " + "，".join(f"{x['id']}：{SRC.get(x['source'], x['source'])}" for x in b) + "。")
+        L.append(f"- ACP 智能体：**{g['rendered']}/{g['total']}** 显示注册表 `icon`（{g['withRegistryIcon']} 个在注册表里有 icon）" + (f"；未加载：{', '.join(g['missing'])}" if g["missing"] else "") + "。")
+        L.append(f"- 狐狸OS 自己的程序保留狐狸OS 风格图标：{', '.join(icons.get('foxosOwn', []))}。\n")
     L.append("## 复现\n")
     L.append("```bash\npython3 -m venv .venv && .venv/bin/pip install -e 'packages/core[test]'\n(cd apps/desktop && npm ci)\n"
              "FOXOS_HOME=~/.local/share/FoxOS npm run test:all          # 全部\npython3 scripts/test_all.py --only e2e --e2e mcp,sandbox  # 只跑部分\n```\n")
