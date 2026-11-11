@@ -528,7 +528,9 @@ def case_win_client() -> str:
     assert rep and "result" in rep and rep["result"].get("protocolVersion") == 1, ("".join(seen_lines)[-500:], scrub(err))
     # x11vnc：按需起在来宾回环，ssh -W 转发后能读到 RFB 握手
     ssh("pkill -x x11vnc; (x11vnc -display :0 -localhost -shared -rfbport 5917 -nopw -once -quiet >/tmp/x11vnc-e2e.log 2>&1 &); sleep 20", timeout=300)
-    w = subprocess.run(ssh_base(extra=["-W", "127.0.0.1:5917"]), input="", capture_output=True, timeout=120)
+    # ssh -W 的标准输入要开着（像 VNC 客户端那样），否则连上就断、读不到服务器握手
+    w = subprocess.run(["bash", "-c", "(sleep 20) | " + shlex.join(ssh_base(extra=["-W", "127.0.0.1:5917"])) + " | head -c 12"],
+                       capture_output=True, timeout=180)
     banner = w.stdout[:12].decode("latin1", "replace")
     assert banner.startswith("RFB "), (banner, w.stderr[-300:])
     ver = ssh("x11vnc -version 2>/dev/null | head -1").stdout.strip()
