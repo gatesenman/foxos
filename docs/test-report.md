@@ -90,6 +90,10 @@
 
 没有用真实模型账号跑过回答。Gemini CLI、codex-acp、Qwen Code、Cursor CLI 的握手结果是「需要登录」；opencode 和 claude-agent-acp 能建立会话。详见 [agent-runtime.md](agent-runtime.md)。截图在 `docs/screenshots/bots-*.png`，是 overlay 里真实 XFCE 会话中的「智能体」窗口（Firefox 后备浏览器）。
 
+## 最终回归（2026-11-12 05:58，Asia/Shanghai，合并主线 `bb40a85`）
+
+`packages/core` 全部 pytest：**153 通过、0 失败、19 跳过**（15 分 20 秒）。与上一次相比多跳过 1 个：`test_os_session.py` 的真实 XFCE 用例报告 xfwm4 没能在测试显示上启动；单独重跑该文件 4 个全部通过（104 秒）。中间一次运行（`0136016`，负载很高）里 US-116 opencode 的 ACP 会话没有建立起来而失败，这一次通过。
+
 ## 合并主线后的完整回归（2026-11-12 05:13，Asia/Shanghai）
 
 合并主线（`41f6920`）后在构建盒上跑 `packages/core` 全部 pytest：**152 通过、0 失败、18 跳过**（12 分 27 秒）。之前 US-32 / US-33 的失败是因为构建盒的系统 Python 缺 `zstandard`（`pyproject.toml`、ISO 的 venv、打包脚本都已声明这个依赖，仓库不缺）；装上 Debian 的 `python3-zstandard` 后通过。跳过的 18 个：电脑操控真实端到端 7 个（需要 `FOXOS_CU_E2E=1`，另跑，见下）、预设真实下载 1、Windows 实机 2、镜像 overlay 2、安装包产物 4、缺 `yaml` 模块 1、wine 1。
