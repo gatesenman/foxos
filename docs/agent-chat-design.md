@@ -50,7 +50,7 @@ OpenBot 是「AI 同事」工作区：React（Vite）前端 + Hono API 服务器
 | Bot 资料：名字、头衔、角色、头像 | `foxos bot profile create/update/duplicate/reset/delete`；头像 = Tabler 图标 + 颜色，或工作空间里的图片 | 已实现（US-100） |
 | 主 Bot | 每个工作空间固定一个主智能体「狐狸」（`main: true`，不能删除） | 已实现（US-100） |
 | 其他 Bot 的名册：置顶、隐藏、搜索、正在运行的徽标 | 左栏名册；`--pinned/--hidden`；运行中显示动画徽标 | 已实现（US-100、US-108） |
-| Bot 后端（内置 / AG-UI / Mastra） | 任一 ACP 智能体（本地智能体、Gemini CLI、Codex、Qwen Code、opencode、Claude Code、Cursor CLI…），或 OpenAI 兼容端点（只聊天，不带工具） | 已实现（US-102、US-116） |
+| Bot 后端（内置 / AG-UI / Mastra） | 任一 ACP 智能体（本地智能体、Gemini CLI、Codex、Qwen Code、opencode、Claude Code、Cursor CLI…），或 OpenAI 兼容端点（服务商预设 DeepSeek / OpenAI / 通义千问 DashScope / Ollama / 自定义；带函数调用：委托、列出和读取技能、在允许的机器上列目录和读文件） | 已实现（US-102、US-116、US-119–US-123） |
 | 流式回答、按回合排版 | ACP `agent_message_chunk` → SSE；重开窗口时从进行中回合的起点回放 | 已实现（US-107） |
 | 工具卡片：命令 + 输出、diff、计划 | ACP `tool_call`/`tool_call_update`/`plan` → 卡片 | 已实现（US-102） |
 | 审批卡片：允许一次 / 本对话 / 总是 / 拒绝 | ACP `session/request_permission`；每个智能体的审批模式与规则；审批页列出所有待批项 | 已实现（US-102、US-108） |
@@ -80,8 +80,8 @@ OpenBot 是「AI 同事」工作区：React（Vite）前端 + Hono API 服务器
 | Role description（standing role） | `role`（`--role`），每回合放进前言 | 已实现 |
 | 额外指令 | `instructions`（`--instructions-stdin`） | 已实现 |
 | Avatar（avatarSeed） | `avatar.icon/color/image`（`--icon --color --image`） | 已实现（用图标，不用生成的脸） |
-| Backend / harness | `backend.kind=acp, agent`（`--agent`），或 `kind=model, base_url, model`（`--base-url --model`） | 已实现 |
-| Model | `model`（`--model`），通过 ACP `session/set_model` 下发；没有就用该 ACP 智能体的默认（`foxos acp agent config --model`） | 已实现 |
+| Backend / harness | `backend.kind=acp, agent`（`--acp-agent`），或 `kind=model, provider, base_url, model`（`--provider deepseek` 自动填 `https://api.deepseek.com` 与 `deepseek-flash`；`--base-url --model` 可覆盖） | 已实现（US-119） |
+| Model | `model`（`--model`），通过 ACP `session/set_config_option`（新版 ACP 的 configOptions，opencode 用这个）或 `session/set_model` 下发；没有就用该 ACP 智能体的默认（`foxos acp agent config --model`） | 已实现 |
 | API key | `--api-key-stdin`，存在本机密钥库，任何输出里都是 `***` | 已实现（US-101） |
 | Isolated / 工作文件夹 | `isolated`、`scope`（`bots/<id>`）；越界 PERMISSION_DENIED | 已实现 |
 | Visibility | `visibility`（private/public） | 保留字段（单机） |
@@ -191,7 +191,7 @@ A workspace for "AI coworkers": a React/Vite app, a Hono API server and PostgreS
 
 The Chinese section above has the full tables. In short:
 
-- **Done** (with tests): bot profiles and the main bot (US-100); per-bot settings, all OpenBot fields plus model, API key, scope, skills, connectors, approvals, delegation and machines (US-101); real ACP turns with tool cards, diffs, terminals and approval cards (US-102); `@` mentions and typed handoff envelopes with depth and per-turn limits (US-103); pstack skills (US-104); memory and routines (US-105); pausing one bot or all bots (US-106); the chat service with SSE replay (US-107) and the browser UI in both languages (US-108); connectors with a catalog, stdio/HTTP MCP, bearer tokens, OAuth 2.1 with discovery, PKCE, dynamic registration and refresh, per-bot enablement and write approval (US-109 to US-112); multiple machines (US-113 to US-115); third-party ACP agents (US-116 to US-118).
+- **Done** (with tests): bot profiles and the main bot (US-100); per-bot settings, all OpenBot fields plus model, API key, scope, skills, connectors, approvals, delegation and machines (US-101); real ACP turns with tool cards, diffs, terminals and approval cards (US-102); `@` mentions and typed handoff envelopes with depth and per-turn limits (US-103); pstack skills (US-104); memory and routines (US-105); pausing one bot or all bots (US-106), which also denies a code agent's pending and rule-allowed edits and marks the card as takeover (US-133); the chat service with SSE replay (US-107) and the browser UI in both languages (US-108); connectors with a catalog, stdio/HTTP MCP, bearer tokens, OAuth 2.1 with discovery, PKCE, dynamic registration and refresh, per-bot enablement and write approval (US-109 to US-112); multiple machines (US-113 to US-115); third-party ACP agents (US-116 to US-118); real model turns through DeepSeek: the main bot's own answer, tool-call delegation to an opencode code bot, approve and deny with diffs, a pstack skill, a read on a second machine, and Qwen Code against DeepSeek (US-119 to US-124); the real bots window driven end to end, including docking with a reserved screen edge (US-125 to US-133).
 - **Partial**: hosted OAuth for Notion, Google Drive and GitHub was never run against a real account; channels are only Telegram and webhook; sub-agents work through delegation only.
 - **Gaps**: dictation and voice.
 - **Not planned**: teams, SSO, auto-learning.
@@ -207,3 +207,25 @@ The Chinese section above has the full tables. In short:
 ## 5. Where it lives
 
 See the table in section 8 of the Chinese part.
+
+## Model backends and delegation
+
+A bot's own model turn (`backend.kind=model`) uses an OpenAI-compatible chat API with function calling. The model gets six tools: `bot_task_delegate`, `bot_skill_list`, `bot_skill_show`, `files_list`, `files_read` and `files_info`. The files tools take an optional `machine`, limited to the bot's allowed machines. The main bot hands work to another bot by calling `bot_task_delegate`. `@name` in the model's own answer text is not forwarded. A person's `@name` in their message is forwarded to that bot as before. When the delegated bot's turn ends in an error, the delegation card is marked failed.
+
+Provider presets (`foxos bot config set <bot> --provider <id> --api-key-stdin`):
+
+| Provider | Base URL | Default model |
+|---|---|---|
+| `deepseek` | `https://api.deepseek.com` | `deepseek-flash` (also `deepseek-v4-pro`) |
+| `openai` | `https://api.openai.com/v1` | |
+| `dashscope` | `https://dashscope.aliyuncs.com/compatible-mode/v1` | |
+| `ollama` | `http://127.0.0.1:11434/v1` | |
+| `custom` | your own | your own |
+
+The key is kept in the local secret store and shows as `***` everywhere.
+
+Code agents with DeepSeek:
+
+- **opencode:** run `foxos acp key set opencode DEEPSEEK_API_KEY --value-stdin` and set the bot's model to `deepseek/deepseek-flash`. Without any key, opencode's default free model (`opencode/…-free`) also completes real turns. opencode caps free usage, and once the cap is used up turns fail with "Free usage limit reached". FoxOS starts opencode with `permission: {edit, bash, webfetch: ask}`, so every edit and command waits for an approval card.
+- **Qwen Code:** run `foxos acp key set qwen-code OPENAI_API_KEY --value-stdin`, then `foxos acp agent config qwen-code --env OPENAI_BASE_URL=https://api.deepseek.com --env OPENAI_MODEL=deepseek-flash`. Qwen Code writes through the ACP file system, so its writes go through the FoxOS kernel (audit, locks, pause). In the default mode it does not ask before writing a new file.
+
