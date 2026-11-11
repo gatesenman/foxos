@@ -63,6 +63,15 @@ def save_prefs(p: dict) -> dict:
     return cur
 
 
+def _geometry(win: str) -> tuple[int, int, int, int] | None:
+    r = subprocess.run(["wmctrl", "-lG"], capture_output=True, text=True)
+    for ln in r.stdout.splitlines():
+        f = ln.split()
+        if f and f[0] == win:
+            return int(f[2]), int(f[3]), int(f[4]), int(f[5])
+    return None
+
+
 def apply_window_mode(prefs: dict) -> dict:
     """在 XFCE / X11 上把聊天窗口停靠到屏幕一侧（全高、置顶、所有工作区可见），或恢复成普通窗口。"""
     if not os.environ.get("DISPLAY") or not shutil.which("wmctrl"):
@@ -84,6 +93,13 @@ def apply_window_mode(prefs: dict) -> dict:
             subprocess.run(["wmctrl", "-i", "-r", w, "-b", "remove,maximized_vert,maximized_horz"])
             subprocess.run(["wmctrl", "-i", "-r", w, "-e", f"0,{x},0,{prefs['width']},{sh - panel}"])
             subprocess.run(["wmctrl", "-i", "-r", w, "-b", "add,above,sticky,skip_taskbar"])
+            if prefs["side"] == "right":
+                # 浏览器有最小宽度、窗框有边：按实际几何把右边缘贴回屏幕边
+                time.sleep(0.3)
+                g = _geometry(w)
+                if g and (g[0] + g[2] != sw or g[1] + g[3] > sh - panel):
+                    h = g[3] - max(0, g[1] + g[3] - (sh - panel))
+                    subprocess.run(["wmctrl", "-i", "-r", w, "-e", f"0,{max(0, x - (g[0] + g[2] - sw))},0,-1,{h}"])
         else:
             subprocess.run(["wmctrl", "-i", "-r", w, "-b", "remove,above,sticky,skip_taskbar"])
             ww, wh = min(1200, sw - 120), min(820, sh - panel - 80)
