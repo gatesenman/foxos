@@ -189,7 +189,7 @@ def test_US63_real_linux_preset_download_verify_boot(fox):
     res = out["result"]
     assert res["download"]["assembled"]["verified"]
     assert "FOXOS-PRESET-READY" in res["ready"] and "node=v" in res["ready"] and "bun=1" in res["ready"] and "foxos=foxos" in res["ready"] and "mcp=active" in res["ready"]
-    r = fox.run("env", "exec", name, "--", "sh", "-c", "foxos --version; locale | head -1; node --version; bun --version; gemini --version", timeout=600, json_out=False)
+    r = fox.run("env", "exec", name, "--", "sh", "-c", "foxos --version; locale | head -1; node --version; bun --version; gemini --version", timeout=1800, json_out=False)
     try:
         assert r[0] == 0, r
         text = r[2].stdout

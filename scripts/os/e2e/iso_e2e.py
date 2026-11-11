@@ -157,7 +157,7 @@ def screendump(path: Path) -> Path:
 
 def ssh_base(user: str = "foxos", key: bool = True, extra: list[str] | None = None) -> list[str]:
     cmd = ["ssh", "-p", str(state()["port"]), "-o", "StrictHostKeyChecking=no", "-o", "UserKnownHostsFile=/dev/null",
-           "-o", "LogLevel=ERROR", "-o", "ConnectTimeout=20", "-o", "ServerAliveInterval=30"]
+           "-o", "LogLevel=ERROR", "-o", "ConnectTimeout=180", "-o", "ServerAliveInterval=60", "-o", "ServerAliveCountMax=10"]
     if key:
         cmd += ["-i", str(KEY), "-o", "IdentitiesOnly=yes", "-o", "BatchMode=yes", "-o", "PreferredAuthentications=publickey"]
     return cmd + (extra or []) + [f"{user}@127.0.0.1"]
@@ -166,7 +166,11 @@ def ssh_base(user: str = "foxos", key: bool = True, extra: list[str] | None = No
 def ssh(command: str, *, user: str = "foxos", input: str | None = None, timeout: float = 600, check: bool = False) -> subprocess.CompletedProcess:
     # 远端用登录 shell，PATH 与图形会话变量和用户自己登录时一样
     wrapped = "export DISPLAY=:0 XAUTHORITY=$HOME/.Xauthority XDG_RUNTIME_DIR=/run/user/$(id -u); " + command
-    p = subprocess.run(ssh_base(user) + ["bash", "-lc", shlex.quote(wrapped)], input=input, capture_output=True, text=True, timeout=timeout)
+    for attempt in range(3):  # TCG 下来宾很忙时偶尔连不上（255），重试
+        p = subprocess.run(ssh_base(user) + ["bash", "-lc", shlex.quote(wrapped)], input=input, capture_output=True, text=True, timeout=timeout)
+        if p.returncode != 255 or p.stdout:
+            break
+        time.sleep(15)
     if check and p.returncode != 0:
         raise AssertionError(f"`{command}` 退出码 {p.returncode}: {scrub(p.stderr[-800:])}")
     return p
@@ -232,7 +236,7 @@ def case_ssh() -> str:
     assert bad2.returncode != 0 and "LOGGED-IN" not in bad2.stdout
     root = subprocess.run(ssh_base("root") + ["true"], capture_output=True, text=True, timeout=60)
     assert root.returncode != 0, "root 用密钥登录成功了"
-    fw = ssh("sudo -n ufw status", check=True).stdout
+    fw = ssh("LC_ALL=C sudo -n ufw status", check=True).stdout
     assert "Status: active" in fw and "22/tcp" in fw, fw
     live = "passwordauthentication yes" in eff
     msg = f"开机后 {took:.0f}s 密钥登录成功；sshd -T：{' '.join(eff.split())}；默认 / 错误密码被拒；root 被拒；ufw active 放行 22/tcp"
@@ -253,7 +257,7 @@ def case_ssh() -> str:
 def case_foxos_over_ssh() -> str:
     v = ssh("foxos --version", check=True).stdout.strip()
     st = j(ssh("foxos ssh status --json", check=True))["result"]
-    assert st["active"] and st["root_login"] is False, st
+    assert st["active"] and st["root_login"] in ("no", False), st
     # MCP over SSH（stdio）：initialize → tools/list → tools/call ssh_status
     msgs = [{"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": {"protocolVersion": "2025-06-18", "capabilities": {}, "clientInfo": {"name": "e2e", "version": "1"}}},
             {"jsonrpc": "2.0", "method": "notifications/initialized"},

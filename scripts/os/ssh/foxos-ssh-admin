@@ -2,6 +2,7 @@
 # 狐狸OS SSH 管理助手（root 执行；foxos ssh 经 sudo -n 调用，sudoers 只放行本脚本）。
 # 用法：foxos-ssh-admin enable|disable|password-on|password-off|set-password USER（新密码从标准输入读）|status
 set -eu
+export LC_ALL=C   # ufw / systemctl 的输出要稳定（status 的 JSON 字段不随语言变）
 CONF=/etc/ssh/sshd_config.d/10-foxos.conf
 write_conf() {  # $1 = yes|no（密码登录）
   install -d /etc/ssh/sshd_config.d
