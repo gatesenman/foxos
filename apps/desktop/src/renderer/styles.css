@@ -289,3 +289,6 @@ body.paused .desktop { box-shadow: inset 0 0 0 2px var(--warn); }
 /* 语言选择 */
 .lang-picker { display: flex; gap: 8px; flex-wrap: wrap; }
 .lang-picker .btn { min-width: 110px; justify-content: center; }
+
+/* hidden 属性优先于 .btn 等的 display */
+[hidden] { display: none !important; }

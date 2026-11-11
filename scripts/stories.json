@@ -735,6 +735,17 @@
           "^test_US65"
         ]
       ]
+    },
+    {
+      "id": "US-86",
+      "title": "Windows 伴侣程序不依赖 PATH 上的 foxos：终端 PATH 只保留一个键（Windows 的 Path），应用中心 / 环境终端用 foxos 的绝对路径；安装程序把 foxos.cmd 加到用户 PATH（保留 REG_EXPAND_SZ）",
+      "match": [
+        [
+          "pytest",
+          "test_desktop_cli.py",
+          "^test_US86"
+        ]
+      ]
     }
   ]
 }

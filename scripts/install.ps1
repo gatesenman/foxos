@@ -4,12 +4,12 @@
   (ASCII-only on purpose so it works with "irm ... | iex" on Windows PowerShell 5.1.)
 
 .EXAMPLE
-  irm https://github.com/gatesenman/foxos/releases/download/v0.3.2-os-preview/install.ps1 | iex
+  irm https://github.com/gatesenman/foxos/releases/download/v0.3.3-windows-preview/install.ps1 | iex
 
 .EXAMPLE
   powershell -ExecutionPolicy Bypass -File install.ps1 -Portable
 
-.PARAMETER Tag          Release tag. Default v0.3.2-os-preview; "latest" = newest non-prerelease.
+.PARAMETER Tag          Release tag. Default v0.3.3-windows-preview; "latest" = newest non-prerelease.
 .PARAMETER Token        Optional GitHub token (defaults to $env:GITHUB_TOKEN / $env:GH_TOKEN). Only needed to avoid API rate limits.
 .PARAMETER Portable     Install the portable zip into %LOCALAPPDATA%\FoxOS-Portable instead of running the setup program.
 .PARAMETER Msi          Install the per-machine MSI package (msiexec; needs admin) instead of the NSIS setup.
@@ -22,7 +22,7 @@
 #>
 [CmdletBinding()]
 param(
-  [string]$Tag = 'v0.3.2-os-preview',
+  [string]$Tag = 'v0.3.3-windows-preview',
   [string]$Token = $(if ($env:GITHUB_TOKEN) { $env:GITHUB_TOKEN } else { $env:GH_TOKEN }),
   [switch]$Portable,
   [switch]$Msi,
@@ -52,6 +52,7 @@ $FoxMsg = @{
   'extracted' = @('Extracted to {0}; Start menu shortcut: {1}', '\u5df2\u89e3\u538b\u5230 {0}\uff1b\u5f00\u59cb\u83dc\u5355\u5feb\u6377\u65b9\u5f0f\uff1a{1}')
   'running' = @('Running setup...', '\u6b63\u5728\u8fd0\u884c\u5b89\u88c5\u7a0b\u5e8f\u2026')
   'setupexit' = @('Setup exited with code {0}', '\u5b89\u88c5\u7a0b\u5e8f\u9000\u51fa\u7801 {0}')
+  'onpath' = @('foxos CLI added to the user PATH: {0} (run foxos --version in a new terminal)', '\u547d\u4ee4\u884c foxos \u5df2\u52a0\u5165\u7528\u6237 PATH\uff1a{0}\uff08\u65b0\u5f00\u7684\u7ec8\u7aef\u91cc\u76f4\u63a5\u8fd0\u884c foxos --version\uff09')
   'done' = @('Done. Open FoxOS from the Start menu; the first-run wizard installs optional components (LibreOffice, WSL, ACP agents).', '\u5b8c\u6210\u3002\u4ece\u5f00\u59cb\u83dc\u5355\u6253\u5f00\u72d0\u72f8OS\uff1b\u9996\u6b21\u8fd0\u884c\u5411\u5bfc\u4f1a\u5b89\u88c5\u53ef\u9009\u7ec4\u4ef6\uff08LibreOffice\u3001WSL\u3001ACP \u667a\u80fd\u4f53\uff09\u3002')
 }
 function M([string]$key) {
@@ -77,6 +78,22 @@ if ($Arch -notin @('x64', 'arm64')) { throw (M 'x64only') }
 if ($IsWindows -or $env:OS -eq 'Windows_NT') {
   $build = [Environment]::OSVersion.Version.Build
   if ($build -lt 17763) { Write-Warning (M 'oldwin' $build) }
+}
+
+# Put resources\bin (foxos.cmd) first on the user PATH and drop missing old FoxOS entries; also update this session.
+# Read and write the raw registry value (REG_EXPAND_SZ) so entries like %USERPROFILE%\... stay unexpanded,
+# then set FOXOS_BIN through .NET, which broadcasts WM_SETTINGCHANGE so new terminals see the change.
+function Add-FoxosPath([string]$bin) {
+  if (-not (Test-Path (Join-Path $bin 'foxos.cmd'))) { return }
+  $bin = $bin.TrimEnd('\')
+  $key = [Microsoft.Win32.Registry]::CurrentUser.OpenSubKey('Environment', $true)
+  $cur = [string]$key.GetValue('Path', '', [Microsoft.Win32.RegistryValueOptions]::DoNotExpandEnvironmentNames)
+  $rest = @($cur -split ';' | Where-Object { $_ -and ($_.TrimEnd('\') -ne $bin) -and -not (($_ -like '*\resources\bin') -and -not (Test-Path ([Environment]::ExpandEnvironmentVariables($_)))) })
+  $key.SetValue('Path', ((@($bin) + $rest) -join ';'), [Microsoft.Win32.RegistryValueKind]::ExpandString)
+  $key.Close()
+  [Environment]::SetEnvironmentVariable('FOXOS_BIN', $bin, 'User')
+  if (($env:Path -split ';') -notcontains $bin) { $env:Path = "$bin;$env:Path" }
+  Write-Host (M 'onpath' $bin)
 }
 
 $headers = @{ 'User-Agent' = 'foxos-install'; 'Accept' = 'application/vnd.github+json'; 'X-GitHub-Api-Version' = '2022-11-28' }
@@ -136,6 +153,7 @@ try {
     $ws = New-Object -ComObject WScript.Shell
     $s = $ws.CreateShortcut($lnk); $s.TargetPath = $exe.FullName; $s.WorkingDirectory = $exe.DirectoryName; $s.Save()
     Write-Host (M 'extracted' $target $lnk)
+    Add-FoxosPath (Join-Path $exe.DirectoryName 'resources\bin')
     Start-Process $exe.FullName
   } elseif ($Msi) {
     $msiArgs = @('/i', "`"$file`"", $(if ($Silent) { '/qn' } else { '/passive' }), '/norestart')
@@ -143,6 +161,8 @@ try {
     Write-Host (M 'running')
     $p = Start-Process -FilePath 'msiexec.exe' -ArgumentList $msiArgs -Wait -PassThru
     if ($p.ExitCode -ne 0 -and $p.ExitCode -ne 3010) { throw (M 'setupexit' $p.ExitCode) }
+    $root = if ($Dir) { $Dir } else { Join-Path $env:ProgramFiles 'FoxOS' }
+    Add-FoxosPath (Join-Path $root 'resources\bin')
     Write-Host (M 'done')
   } else {
     $instArgs = @()
@@ -151,6 +171,9 @@ try {
     Write-Host (M 'running')
     $p = if ($instArgs.Count) { Start-Process -FilePath $file -ArgumentList $instArgs -Wait -PassThru } else { Start-Process -FilePath $file -Wait -PassThru }
     if ($p.ExitCode -ne 0) { throw (M 'setupexit' $p.ExitCode) }
+    # The NSIS setup already adds resources\bin to the user PATH; this also updates the current session
+    $root = if ($Dir) { $Dir } else { Join-Path $env:LOCALAPPDATA 'Programs\FoxOS' }
+    Add-FoxosPath (Join-Path $root 'resources\bin')
     Write-Host (M 'done')
   }
 } finally {

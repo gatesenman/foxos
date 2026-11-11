@@ -4,6 +4,7 @@ const pty = require('@lydell/node-pty');
 const path = require('node:path');
 const { IS_WIN, which } = require('./paths');
 const kernel = require('./kernel');
+const { withPath } = require('./cmdline');
 
 const sessions = new Map();
 let nextId = 1;
@@ -16,14 +17,14 @@ function defaultShell() {
 function spawnPty(webContents, { cols = 100, rows = 30, command = null, args = [], title = null } = {}) {
   const id = nextId++;
   const shim = kernel.ensureShim();
-  const env = {
+  // Windows 上 PATH 的键名是 "Path"：withPath 只保留一个键，否则 PowerShell 读不到前置的 shim 目录
+  const env = withPath({
     ...process.env,
     FOXOS_WORKSPACE: kernel.getWorkspace(),
     FOXOS_AGENT: 'human:terminal',
     TERM: 'xterm-256color',
     COLORTERM: 'truecolor',
-    PATH: [shim, process.env.PATH].join(path.delimiter),
-  };
+  }, [shim]);
   const file = command || defaultShell();
   const p = pty.spawn(file, command ? args : [], { name: 'xterm-256color', cols, rows, cwd: kernel.getWorkspace(), env });
   sessions.set(id, p);

@@ -7,6 +7,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { REPO_ROOT, IS_WIN, corePath, which } = require('./paths');
 const settings = require('./settings');
+const { foxosCommandLine } = require('./cmdline');
 
 let workspace = null;
 
@@ -24,18 +25,21 @@ function bundledPython() {
   return fs.existsSync(p) ? p : null;
 }
 
-function pythonPath() {
-  if (process.env.FOXOS_PYTHON) return process.env.FOXOS_PYTHON;
+// 解释器与来源（设置页显示）：env（FOXOS_PYTHON）· settings（设置页填写且存在）· bundled（安装包自带）· venv（开发）· system（PATH 上）· missing
+function pythonInfo() {
+  if (process.env.FOXOS_PYTHON) return { path: process.env.FOXOS_PYTHON, source: 'env', exists: fs.existsSync(process.env.FOXOS_PYTHON) };
   const s = settings.load();
-  if (s.python && fs.existsSync(s.python)) return s.python;
+  if (s.python && fs.existsSync(s.python)) return { path: s.python, source: 'settings', exists: true };
   const b = bundledPython();
-  if (b) return b;
+  if (b) return { path: b, source: 'bundled', exists: true, ignoredSetting: s.python || null };
   if (!app.isPackaged) {
     const venv = IS_WIN ? path.join(REPO_ROOT, '.venv', 'Scripts', 'python.exe') : path.join(REPO_ROOT, '.venv', 'bin', 'python');
-    if (fs.existsSync(venv)) return venv;
+    if (fs.existsSync(venv)) return { path: venv, source: 'venv', exists: true };
   }
-  return which(IS_WIN ? 'python' : 'python3') || (IS_WIN ? 'python' : 'python3');
+  const sys = which(IS_WIN ? 'python' : 'python3');
+  return sys ? { path: sys, source: 'system', exists: true, ignoredSetting: s.python || null } : { path: IS_WIN ? 'python' : 'python3', source: 'missing', exists: false, ignoredSetting: s.python || null };
 }
+function pythonPath() { return pythonInfo().path; }
 
 function coreEnv(extra = {}) {
   return {
@@ -61,6 +65,11 @@ function ensureShim() {
   }
   return dir;
 }
+
+// foxos 命令行的绝对路径（userData/bin 下的 shim，按当前解释器生成）：桌面从不依赖 PATH 上有没有 foxos
+function cliPath() { return path.join(ensureShim(), IS_WIN ? 'foxos.cmd' : 'foxos'); }
+// 在桌面终端里运行 foxos 的命令行（Windows 是 PowerShell，其余是 sh）
+function cliCommandLine(args) { return foxosCommandLine(cliPath(), args, IS_WIN ? 'powershell' : 'posix'); }
 
 function run(args, { json = true, stdin = null, agent = 'human:desktop', timeoutMs = 180000 } = {}) {
   if (!Array.isArray(args) || args.some((a) => typeof a !== 'string')) {
@@ -89,4 +98,4 @@ function run(args, { json = true, stdin = null, agent = 'human:desktop', timeout
   });
 }
 
-module.exports = { run, setWorkspace, getWorkspace, pythonPath, bundledPython, coreEnv, ensureShim };
+module.exports = { run, setWorkspace, getWorkspace, pythonPath, pythonInfo, bundledPython, coreEnv, ensureShim, cliPath, cliCommandLine };

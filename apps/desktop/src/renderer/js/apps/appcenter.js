@@ -98,7 +98,7 @@
       // Everything 应用（HeyPuter/everything，按上游的 9 个分组），在本机从上游源码构建
       const evBox = el('section', { class: 'ev-section' });
       async function evInstall(ids, label) {
-        const code = await FX.runInTerminal(FX.t('common.install_2', label), `foxos everything install ${ids.join(' ')}`);
+        const code = await FX.runFoxosInTerminal(FX.t('common.install_2', label), ['everything', 'install', ...ids]);
         FX.toast(code === 0 ? FX.t('common.installed_2', label) : FX.t('appcenter.install_command_exited_with_code', code), code === 0 ? 'ok' : 'error');
         await FX.loadEverything(true); renderEverything(); FX.emit('everything-changed');
       }
