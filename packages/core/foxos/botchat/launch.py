@@ -12,6 +12,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import shlex
 import shutil
 import socket
 import subprocess
@@ -107,7 +108,8 @@ def browser_argv(url: str) -> list[str]:
         if exe and "firefox" not in b:
             data = Path(os.environ.get("XDG_DATA_HOME") or Path.home() / ".local" / "share") / "foxos" / "bots-browser"
             return [exe, f"--app={url}", f"--class={server.WINDOW_CLASS}", f"--user-data-dir={data}", "--no-first-run",
-                    "--no-default-browser-check", "--window-size=1100,760"]
+                    "--no-default-browser-check", "--window-size=1100,760",
+                    *shlex.split(os.environ.get("FOXOS_BOTS_BROWSER_ARGS", ""))]
     ff = shutil.which("firefox")
     if ff:
         return [ff, "--new-instance", "--profile", str(_firefox_profile()), "--class", server.WINDOW_CLASS, "--name", server.WINDOW_CLASS, url]

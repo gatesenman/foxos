@@ -396,7 +396,7 @@ function renderCard(c, m) {
     apHtml = `<div class="approval"><div class="q"><i class="ti ti-shield-question"></i> ${esc(t("approvals.question"))}</div>
       ${(ap.options || []).map(o => `<button class="btn sm ${String(o.kind).startsWith("allow") ? "primary" : ""}" data-approve="${esc(ap.request)}" data-option="${esc(o.optionId)}">${esc(optName(o))}</button>`).join("")}</div>`;
   } else if (ap.decision) {
-    apHtml = `<div class="approval"><span class="chip ${ap.decision === "allow" ? "ok" : "bad"}"><i class="ti ti-${ap.decision === "allow" ? "check" : "x"}"></i>${esc(t("approvals." + ap.decision))}</span><small>${esc(ap.by ? t("approvals.by", ap.by === "rule" ? t("approvals.by_rule") : ap.by === "human" ? t("origin.person") : ap.by) : "")}</small></div>`;
+    apHtml = `<div class="approval"><span class="chip ${ap.decision === "allow" ? "ok" : "bad"}"><i class="ti ti-${ap.decision === "allow" ? "check" : "x"}"></i>${esc(t("approvals." + ap.decision))}</span><small>${esc(ap.by ? t("approvals.by", ["rule", "takeover", "timeout"].includes(ap.by) ? t("approvals.by_" + ap.by) : ap.by === "human" ? t("origin.person") : ap.by) : "")}</small></div>`;
   }
   const collapsed = st === "completed" && !(c.content || []).some(x => x.type === "diff") && ap.decision !== "pending";
   return `<div class="card ${collapsed ? "collapsed" : ""}"><div class="card-head"><span class="ico"><i class="ti ti-${KIND_ICON[c.kind] || "tool"}"></i></span>

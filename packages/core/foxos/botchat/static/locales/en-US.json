@@ -41,6 +41,8 @@
  "approvals.allow_once": "Allow once",
  "approvals.by": "by {0}",
  "approvals.by_rule": "approval rules",
+ "approvals.by_takeover": "human takeover",
+ "approvals.by_timeout": "timeout",
  "approvals.deny": "Deny",
  "approvals.deny_always": "Always deny",
  "approvals.lead": "When a bot wants to do something that needs your consent it stops and waits. Approval rules live in each bot's settings.",
