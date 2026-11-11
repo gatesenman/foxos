@@ -229,6 +229,23 @@ def print_human(cmd_id: str, result: dict) -> None:
         print(f"# {result['title']}  {result['url']}", file=out)
         for e in result["elements"]:
             print(f"[{e['ref']}] {e['role']:<10} {e['name']}" + (f" = {e['value']!r}" if e.get("value") not in (None, "") else "") + (tr("cli.disabled") if e.get("disabled") else ""), file=out)
+    if cmd_id in ("desktop.windows", "session.windows"):
+        wins = result.get("windows") or []
+        if not wins:
+            print(tr("cli.no_windows"), file=out)
+        for w in wins:
+            mark = "*" if w.get("focused") else " "
+            geo = f"{w.get('width', 0)}x{w.get('height', 0)}+{w.get('x', 0)}+{w.get('y', 0)}"
+            app = w.get("app_id") or w.get("host") or ""
+            print(f"{mark} {w['id']:<12} {geo:<20} {app:<20} {w.get('title', '')}", file=out)
+    if cmd_id in ("desktop.status", "session.status"):
+        for k in ("backend", "compositor", "display", "wayland_display", "windows", "paused", "takeover"):
+            if result.get(k) not in (None, ""):
+                v = result[k]
+                print(f"  {k}: {json.dumps(v, ensure_ascii=False) if isinstance(v, (dict, list)) else v}", file=out)
+        tools = result.get("tools") or {}
+        if tools:
+            print("  tools: " + ", ".join(f"{k}={'yes' if v else 'no'}" for k, v in tools.items()), file=out)
     if cmd_id == "files.list":
         for f in result["entries"]:
             print(f"{'<DIR>' if f['type'] == 'dir' else f['bytes']:>10}  {f['path']}{'/' if f['type'] == 'dir' else ''}", file=out)

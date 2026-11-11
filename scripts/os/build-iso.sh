@@ -11,11 +11,11 @@ set -euo pipefail
 
 SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
 ROOT=$(cd "$SCRIPT_DIR/../.." && pwd)
-VERSION=0.3.0
+VERSION=0.3.1
 SUITE=noble
 ARCH=amd64
 ISO_NAME="FoxOS-${VERSION}-amd64.iso"
-VOLID="FOXOS_030"
+VOLID="FOXOS_031"
 WORK=${FOXOS_OS_WORK:-/var/tmp/foxos-os}
 OUT=${FOXOS_OS_OUT:-"$ROOT/build/os"}
 MIRROR=${FOXOS_OS_MIRROR:-http://archive.ubuntu.com/ubuntu}
@@ -109,7 +109,7 @@ log "安装软件包"
 chroot_run apt-get update
 # shellcheck disable=SC2046
 PACKAGES=$(grep -vE '^\s*(#|$)' "$SCRIPT_DIR/config/packages.list" | tr '\n' ' ')
-chroot_run apt-get install -y --no-install-recommends $PACKAGES
+chroot_run apt-get install -y --no-install-recommends -o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confold $PACKAGES
 
 # ------------------------------------------------------------------ 第三方（许可允许）：Firefox .deb/tarball 与 cloud-hypervisor
 log "安装 Firefox（Mozilla 官方 tarball，不用 Snap）"

@@ -69,6 +69,18 @@ def test_US60_desktop_and_session_commands_fake_backend(fox, tmp_path):
     assert "hello" in data["typed"] and "again" in data["typed"] and data["clicks"][0]["x"] == 10
 
 
+def test_US60_desktop_human_output_lists_windows(fox, tmp_path):
+    """不加 --json 时，人看到的也是窗口列表和会话状态，而不是空输出。"""
+    env = {**_fake_env(tmp_path / "session.json"), "FOXOS_LANG": "zh-CN"}
+    code, _, p = fox.run("desktop", "windows", json_out=False, extra_env=env)
+    assert code == 0 and "没有窗口" in p.stdout
+    fox.run("desktop", "launch", "terminal", extra_env=env, check=0)
+    code, _, p = fox.run("desktop", "windows", json_out=False, extra_env=env)
+    assert code == 0 and "terminal" in p.stdout and p.stdout.lstrip().startswith("*")
+    code, _, p = fox.run("session", "status", json_out=False, extra_env=env)
+    assert code == 0 and "backend: fake" in p.stdout and "paused:" in p.stdout
+
+
 def test_US60_mcp_exposes_desktop_tools(fox):
     cat = fox.run("help", check=0)[1]
     apps = {a["name"]: a for a in cat["apps"]}

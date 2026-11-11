@@ -6,11 +6,15 @@ status=$(foxos control status --json 2>/dev/null || true)
 printf '%s' "$status" | grep -q '"paused": true' && paused=1
 printf '%s' "$status" | grep -qi '"paused":true' && paused=1
 if [ "$paused" = 1 ]; then
-  printf '<txt><span fgcolor="#F5B84A" weight="bold">接管中</span></txt>\n'
+  printf '<icon>media-playback-start-symbolic</icon>\n'
+  printf '<iconclick>/usr/lib/foxos/panel/foxos-takeover resume</iconclick>\n'
+  printf '<txt> <span fgcolor="#F5B84A" weight="bold">接管中</span></txt>\n'
   printf '<txtclick>/usr/lib/foxos/panel/foxos-takeover resume</txtclick>\n'
   printf '<tool>人工接管中：智能体写操作已暂停。点击恢复。</tool>\n'
 else
-  printf '<txt><span fgcolor="#F4EBDF">人工接管</span></txt>\n'
+  printf '<icon>media-playback-pause-symbolic</icon>\n'
+  printf '<iconclick>/usr/lib/foxos/panel/foxos-takeover pause</iconclick>\n'
+  printf '<txt> 人工接管</txt>\n'
   printf '<txtclick>/usr/lib/foxos/panel/foxos-takeover pause</txtclick>\n'
   printf '<tool>暂停智能体的写操作，由你接管桌面。</tool>\n'
 fi

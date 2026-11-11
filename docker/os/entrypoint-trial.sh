@@ -3,9 +3,9 @@
 # 这是 Docker Hub 分发/试用通道，不是狐狸OS 的运行时；容器里不画一个假桌面。
 set -eu
 
-ISO_URL=${FOXOS_ISO_URL:-https://github.com/gatesenman/foxos/releases/download/v0.3.0-os-preview/FoxOS-0.3.0-amd64.iso}
+ISO_URL=${FOXOS_ISO_URL:-https://github.com/gatesenman/foxos/releases/download/v0.3.1-os-preview/FoxOS-0.3.1-amd64.iso}
 ISO_SHA256=${FOXOS_ISO_SHA256:-}
-ISO_PATH=${FOXOS_ISO_PATH:-/var/lib/foxos/FoxOS-0.3.0-amd64.iso}
+ISO_PATH=${FOXOS_ISO_PATH:-/var/lib/foxos/FoxOS-0.3.1-amd64.iso}
 MEM=${FOXOS_MEM:-4G}
 CPUS=${FOXOS_CPUS:-2}
 VNC_PORT=${FOXOS_VNC_PORT:-5900}

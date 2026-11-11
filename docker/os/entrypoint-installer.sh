@@ -2,10 +2,10 @@
 # 只从 GitHub Release 下载狐狸OS ISO 并校验 sha256（在线安装助手）。不启动虚拟机。
 # 若 Release 上没有单个完整 ISO（目前按两个分卷发布），则下载分卷、拼接后再校验。
 set -eu
-REL=${FOXOS_RELEASE_URL:-https://github.com/gatesenman/foxos/releases/download/v0.3.0-os-preview}
+REL=${FOXOS_RELEASE_URL:-https://github.com/gatesenman/foxos/releases/download/v0.3.1-os-preview}
 SUMS_URL=${FOXOS_SUMS_URL:-$REL/SHA256SUMS}
 OUT=${FOXOS_OUT:-/out}
-NAME=FoxOS-0.3.0-amd64.iso
+NAME=FoxOS-0.3.1-amd64.iso
 mkdir -p "$OUT"
 
 verify() {

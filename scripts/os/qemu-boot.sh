@@ -4,7 +4,7 @@
 #                                [--install-disk /path/to.img] [--serial-log PATH]
 set -euo pipefail
 ROOT=$(cd "$(dirname "$0")/../.." && pwd)
-ISO=${1:-"$ROOT/build/os/FoxOS-0.3.0-amd64.iso"}
+ISO=${1:-"$ROOT/build/os/FoxOS-0.3.1-amd64.iso"}
 if [ "${1:-}" != "" ] && [ "${1:0:2}" != "--" ]; then
   shift || true
 fi
@@ -57,18 +57,27 @@ while [ $# -gt 0 ]; do
 done
 
 KVM=()
+# TCG 只在明确要求时使用：--tcg 或 FOXOS_ALLOW_TEST_VMM=qemu-tcg。KVM 不可用时直接报错，不悄悄降级。
+if [ "${FOXOS_ALLOW_TEST_VMM:-}" = qemu-tcg ]; then
+  ACCEL=tcg
+fi
+need_tcg() {
+  echo "错误：$1" >&2
+  echo "如确实要用软件模拟测试引导，请加 --tcg 或设置 FOXOS_ALLOW_TEST_VMM=qemu-tcg。" >&2
+  exit 3
+}
 if [ "$ACCEL" = tcg ]; then
-  echo "使用 TCG（软件模拟）。在本机 KVM 不可用时仍可测引导，但不代表真实性能。"
+  echo "使用 TCG（软件模拟），仅用于测试引导，不代表真实性能。"
 elif [ -e /dev/kvm ]; then
   if dmesg 2>/dev/null | grep -q 'kvm_arch_vcpu_create'; then
-    echo "警告：此宿主的 KVM 曾触发内核 BUG（kvm_arch_vcpu_create），改用 TCG。" >&2
+    need_tcg "此宿主的 KVM 曾触发内核 BUG（kvm_arch_vcpu_create）。"
   elif [ ! -r /dev/kvm ] || [ ! -w /dev/kvm ]; then
-    echo "警告：/dev/kvm 存在但当前用户不可读写，改用 TCG。也可用 sudo 或加入 kvm 组。" >&2
+    need_tcg "/dev/kvm 存在但当前用户不可读写（可用 sudo 或加入 kvm 组）。"
   else
     KVM=(-enable-kvm -cpu host)
   fi
 else
-  echo "警告：没有 /dev/kvm，改用 TCG（会很慢）。" >&2
+  need_tcg "没有 /dev/kvm。"
 fi
 
 : > "$SERIAL_LOG"

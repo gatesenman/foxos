@@ -9,17 +9,18 @@
       <property name="length" type="uint" value="100"/>
       <property name="length-adjust" type="bool" value="true"/>
       <property name="position-locked" type="bool" value="true"/>
-      <property name="icon-size" type="uint" value="20"/>
-      <property name="size" type="uint" value="40"/>
+      <property name="icon-size" type="uint" value="22"/>
+      <property name="size" type="uint" value="46"/>
       <property name="background-style" type="uint" value="1"/>
       <property name="background-rgba" type="array">
-        <value type="double" value="0.165"/>
-        <value type="double" value="0.133"/>
+        <value type="double" value="0.137"/>
         <value type="double" value="0.110"/>
-        <value type="double" value="0.96"/>
+        <value type="double" value="0.094"/>
+        <value type="double" value="0.94"/>
       </property>
       <property name="plugin-ids" type="array">
         <value type="int" value="1"/>
+        <value type="int" value="11"/>
         <value type="int" value="2"/>
         <value type="int" value="3"/>
         <value type="int" value="4"/>
@@ -29,16 +30,21 @@
         <value type="int" value="8"/>
         <value type="int" value="9"/>
         <value type="int" value="10"/>
+        <value type="int" value="12"/>
       </property>
     </property>
   </property>
   <property name="plugins" type="empty">
     <property name="plugin-1" type="string" value="whiskermenu"/>
+    <property name="plugin-11" type="string" value="separator">
+      <property name="style" type="uint" value="0"/>
+    </property>
     <property name="plugin-2" type="string" value="tasklist">
       <property name="grouping" type="uint" value="1"/>
       <property name="show-handle" type="bool" value="false"/>
       <property name="show-labels" type="bool" value="true"/>
       <property name="flat-buttons" type="bool" value="true"/>
+      <property name="middle-click" type="uint" value="1"/>
     </property>
     <property name="plugin-3" type="string" value="separator">
       <property name="expand" type="bool" value="true"/>
@@ -54,12 +60,11 @@
     <property name="plugin-6" type="string" value="separator">
       <property name="style" type="uint" value="0"/>
     </property>
-    <property name="plugin-7" type="string" value="clock">
-      <property name="mode" type="uint" value="2"/>
-      <property name="digital-format" type="string" value="%Y-%m-%d  %H:%M"/>
-      <property name="digital-layout" type="uint" value="3"/>
-      <property name="digital-time-format" type="string" value="%H:%M"/>
-      <property name="digital-date-format" type="string" value="%Y-%m-%d"/>
+    <property name="plugin-7" type="string" value="genmon">
+      <property name="command" type="string" value="/usr/lib/foxos/panel/foxos-clock-genmon"/>
+      <property name="use-label" type="bool" value="false"/>
+      <property name="update-period" type="int" value="5000"/>
+      <property name="font" type="string" value="Noto Sans CJK SC 10.5"/>
     </property>
     <property name="plugin-8" type="string" value="separator">
       <property name="style" type="uint" value="0"/>
@@ -68,13 +73,16 @@
       <property name="command" type="string" value="/usr/lib/foxos/panel/foxos-takeover-genmon"/>
       <property name="use-label" type="bool" value="false"/>
       <property name="update-period" type="int" value="2000"/>
-      <property name="font" type="string" value="Noto Sans CJK SC 10"/>
+      <property name="font" type="string" value="Noto Sans CJK SC 10.5"/>
     </property>
     <property name="plugin-10" type="string" value="genmon">
       <property name="command" type="string" value="/usr/lib/foxos/panel/foxos-system-genmon"/>
       <property name="use-label" type="bool" value="false"/>
       <property name="update-period" type="int" value="60000"/>
-      <property name="font" type="string" value="Noto Sans CJK SC 10"/>
+      <property name="font" type="string" value="Noto Sans CJK SC 10.5"/>
+    </property>
+    <property name="plugin-12" type="string" value="separator">
+      <property name="style" type="uint" value="0"/>
     </property>
   </property>
 </channel>

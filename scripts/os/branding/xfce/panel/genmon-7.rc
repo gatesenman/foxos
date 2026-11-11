@@ -1,0 +1,6 @@
+Command=/usr/lib/foxos/panel/foxos-clock-genmon
+UseLabel=0
+Text=
+UpdatePeriod=5000
+EnableCloseButton=0
+Font=Noto Sans CJK SC 10.5

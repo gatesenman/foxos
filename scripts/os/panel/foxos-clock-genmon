@@ -1,0 +1,7 @@
+#!/bin/sh
+# xfce4-genmon-plugin：底栏时钟，带图标；悬停显示完整日期。
+LC_TIME=${LC_TIME:-zh_CN.UTF-8}
+export LC_TIME
+printf '<icon>preferences-system-time-symbolic</icon>\n'
+printf '<txt> %s</txt>\n' "$(date '+%H:%M')"
+printf '<tool>%s</tool>\n' "$(date '+%Y年%-m月%-d日 %A %H:%M')"

@@ -8,8 +8,8 @@ if [ -d /cdrom/casper ] || [ -d /run/live ] || [ -d /run/casper ]; then
   # 并写入 AccountsService，避免 lightdm 报 “Can't login unknown user 'foxos'”。
   if ! getent passwd foxos >/dev/null 2>&1; then
     mkdir -p /run /home
-    adduser --disabled-password --gecos "FoxOS" --uid 1000 foxos 2>/dev/null \
-      || useradd -m -u 1000 -c "FoxOS" -s /bin/bash foxos || true
+    adduser --disabled-password --gecos "狐狸OS" --uid 1000 foxos 2>/dev/null \
+      || useradd -m -u 1000 -c "狐狸OS" -s /bin/bash foxos || true
     usermod -aG sudo,adm,cdrom,dip,plugdev,users foxos 2>/dev/null || true
     echo "foxos ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/casper
     chmod 440 /etc/sudoers.d/casper

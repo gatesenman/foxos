@@ -1,22 +1,26 @@
-/* 狐狸OS：在 Adwaita 之上做面板与强调色，不另做整套换肤。 */
+/* 狐狸OS：在 Adwaita 之上做面板、开始菜单与强调色，不另做整套换肤。 */
 @import url("resource:///org/gtk/libgtk/theme/Adwaita/gtk-contained.css");
 
 @define-color foxos_accent #D96B2B;
-@define-color foxos_accent_fg #1A0F05;
-@define-color foxos_panel_bg #2A221C;
+@define-color foxos_accent_hover #E88A4F;
+@define-color foxos_panel_bg #231C18;
 @define-color foxos_panel_fg #F4EBDF;
 @define-color theme_selected_bg_color #D96B2B;
 @define-color theme_selected_fg_color #FFF8F0;
+@define-color accent_bg_color #D96B2B;
+@define-color accent_color #B5551F;
 
+/* ---------- 底栏 ---------- */
 .xfce4-panel,
 .xfce4-panel.background,
 panel-window,
 #XfcePanelWindow {
-  background-color: #2A221C;
+  background-color: #231C18;
   background-image: none;
   color: #F4EBDF;
   border: none;
-  font: 11pt "Noto Sans CJK SC", sans-serif;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  font: 10.5pt "Noto Sans CJK SC", sans-serif;
   text-shadow: none;
 }
 
@@ -25,39 +29,123 @@ panel-window,
 .xfce4-panel label,
 .xfce4-panel image {
   color: #F4EBDF;
+  -gtk-icon-shadow: none;
 }
 
 .xfce4-panel button {
   background: transparent;
   border: none;
-  border-radius: 6px;
-  padding: 2px 8px;
+  border-radius: 8px;
+  margin: 5px 2px;
+  padding: 0 12px;
+  min-height: 30px;
   box-shadow: none;
   text-shadow: none;
+  transition: background-color 120ms ease;
 }
 
-.xfce4-panel button:hover,
+.xfce4-panel button:hover {
+  background-color: rgba(255, 255, 255, 0.09);
+}
 .xfce4-panel button:active,
 .xfce4-panel button:checked {
-  background-color: rgba(255, 255, 255, 0.10);
+  background-color: rgba(232, 138, 79, 0.22);
+  box-shadow: inset 0 -2px 0 #E88A4F;
 }
 
-/* Whisker「开始」按钮稍作强调，但不刺眼 */
+/* 任务栏按钮：图标与标题之间留白 */
+.xfce4-panel .tasklist button {
+  padding: 0 12px;
+}
+.xfce4-panel .tasklist button label {
+  margin-left: 6px;
+}
+
+/* genmon（时钟、人工接管、系统）：圆角胶囊，留足左右空白 */
+.xfce4-panel .genmon_plugin,
+.xfce4-panel #genmon-plugin {
+  padding: 0 4px;
+}
+.xfce4-panel .genmon_plugin box,
+.xfce4-panel #genmon-plugin box {
+  margin: 0 2px;
+}
+.xfce4-panel .genmon_imagebutton,
+.xfce4-panel .genmon_valuebutton,
+.xfce4-panel #genmon-value,
+.xfce4-panel #genmon-plugin button {
+  padding: 0 10px;
+  border-radius: 8px;
+}
+
+/* Whisker「开始」按钮：狐狸橙，圆角 */
 #whiskermenu-button,
 .xfce4-panel button#whiskermenu-button {
   background-color: #D96B2B;
   color: #1A0F05;
   font-weight: 600;
-  padding: 2px 12px;
+  margin: 6px 4px 6px 8px;
+  padding: 0 14px 0 10px;
+  border-radius: 9px;
 }
 #whiskermenu-button:hover,
 .xfce4-panel button#whiskermenu-button:hover {
   background-color: #E88A4F;
-  color: #1A0F05;
+}
+#whiskermenu-button:checked,
+.xfce4-panel button#whiskermenu-button:checked {
+  background-color: #B5551F;
+  box-shadow: none;
 }
 #whiskermenu-button label {
   color: #1A0F05;
   font-weight: 600;
+  margin-left: 4px;
+}
+
+/* ---------- 开始菜单窗口 ---------- */
+#whiskermenu-window {
+  background-color: #FBF7F2;
+  border-radius: 0;
+}
+#whiskermenu-window entry {
+  border-radius: 8px;
+  min-height: 32px;
+  padding: 0 10px;
+}
+#whiskermenu-window entry:focus {
+  border-color: #D96B2B;
+  box-shadow: inset 0 0 0 1px #D96B2B;
+}
+#whiskermenu-window treeview,
+#whiskermenu-window iconview,
+#whiskermenu-window scrolledwindow,
+#whiskermenu-window viewport {
+  background-color: #FBF7F2;
+}
+#whiskermenu-window treeview:selected,
+#whiskermenu-window iconview:selected,
+#whiskermenu-window treeview:hover {
+  background-color: rgba(217, 107, 43, 0.16);
+  color: #2C241C;
+  border-radius: 6px;
+}
+#whiskermenu-window button {
+  border-radius: 8px;
+  padding: 6px 10px;
+}
+#whiskermenu-window button.radio:checked,
+#whiskermenu-window button:checked {
+  background-color: rgba(217, 107, 43, 0.18);
+  background-image: none;
+  border-color: transparent;
+  box-shadow: none;
+  color: #2C241C;
+}
+#whiskermenu-window button.flat:hover,
+#whiskermenu-window button:hover {
+  background-color: rgba(217, 107, 43, 0.10);
+  background-image: none;
 }
 
 /* 狐狸OS 自有 GTK 界面使用细滚动条；不改 Firefox / LibreOffice 内部控件 */
@@ -65,13 +153,18 @@ scrollbar,
 scrollbar slider,
 scrollbar.vertical slider,
 scrollbar.horizontal slider {
-  min-width: 8px;
-  min-height: 8px;
-  border-radius: 8px;
+  min-width: 6px;
+  min-height: 6px;
+  border-radius: 6px;
+}
+scrollbar {
+  background-color: transparent;
+  border: none;
 }
 scrollbar slider {
-  background-color: alpha(#2C241C, 0.35);
+  background-color: alpha(#2C241C, 0.30);
+  border: none;
 }
 scrollbar slider:hover {
-  background-color: alpha(#2C241C, 0.55);
+  background-color: alpha(#2C241C, 0.50);
 }

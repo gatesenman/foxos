@@ -20,7 +20,8 @@ if [ -f "$SRC/icons/icon-256.png" ]; then
 fi
 # 默认用户目录里的壁纸指向
 install -d /etc/skel/.config
-echo "foxos" > /etc/debian_chroot || true
+# 不写 /etc/debian_chroot：否则 bash 提示符会多出「(foxos)」前缀
+rm -f /etc/debian_chroot
 # 机器 id 在 Live / 安装时重新生成
 truncate -s 0 /etc/machine-id || true
 rm -f /var/lib/dbus/machine-id || true

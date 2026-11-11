@@ -793,5 +793,6 @@
   "desktop.xdotool_failed": "xdotool failed: {0}",
   "desktop.screenshot_tool_is_not_installed": "Neither scrot nor maim is installed, so a screenshot cannot be taken",
   "desktop.screenshot_failed": "Screenshot failed: {0}",
-  "desktop.install_x11_tools_they_are_in_the_foxos_iso": "The FoxOS ISO already includes wmctrl, xdotool, and scrot; install these tools on a development machine"
+  "desktop.install_x11_tools_they_are_in_the_foxos_iso": "The FoxOS ISO already includes wmctrl, xdotool, and scrot; install these tools on a development machine",
+  "cli.no_windows": "(no windows in this session)"
 }

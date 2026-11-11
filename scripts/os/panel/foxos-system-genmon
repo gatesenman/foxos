@@ -1,5 +1,7 @@
 #!/bin/sh
 # xfce4-genmon-plugin：显示「系统」，点击打开注销/关机对话框。
-printf '<txt><span fgcolor="#F4EBDF">系统</span></txt>\n'
+printf '<icon>system-shutdown-symbolic</icon>\n'
+printf '<iconclick>xfce4-session-logout</iconclick>\n'
+printf '<txt> 系统</txt>\n'
 printf '<txtclick>xfce4-session-logout</txtclick>\n'
 printf '<tool>退出会话、锁定、关机或重新启动</tool>\n'

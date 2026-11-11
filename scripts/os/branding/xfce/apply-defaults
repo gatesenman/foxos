@@ -3,9 +3,9 @@
 set -eu
 WALL=${FOXOS_WALLPAPER:-/usr/share/backgrounds/foxos/default.png}
 ICON=Adwaita
-if [ -d /usr/share/icons/Yaru ]; then
-  ICON=Yaru
-fi
+for t in Papirus Yaru; do
+  if [ -f "/usr/share/icons/$t/index.theme" ]; then ICON=$t; break; fi
+done
 command -v xfconf-query >/dev/null 2>&1 || exit 0
 
 xfconf-query -c xsettings -p /Net/ThemeName -n -t string -s FoxOS 2>/dev/null || \

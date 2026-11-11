@@ -793,5 +793,6 @@
   "desktop.xdotool_failed": "xdotool 失败：{0}",
   "desktop.screenshot_tool_is_not_installed": "未安装 scrot 或 maim，无法截图",
   "desktop.screenshot_failed": "截图失败：{0}",
-  "desktop.install_x11_tools_they_are_in_the_foxos_iso": "狐狸OS ISO 已预装 wmctrl、xdotool、scrot；在开发机上请安装这些工具"
+  "desktop.install_x11_tools_they_are_in_the_foxos_iso": "狐狸OS ISO 已预装 wmctrl、xdotool、scrot；在开发机上请安装这些工具",
+  "cli.no_windows": "（当前会话没有窗口）"
 }
