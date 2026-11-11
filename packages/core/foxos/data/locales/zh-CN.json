@@ -1246,5 +1246,8 @@
   "acp.p_mode": "默认模式 ID（session/set_mode；空字符串清除）",
   "acp.p_model": "默认模型 ID（会话开始时用 session/set_model 切换；空字符串清除）",
   "acp.registry_offline": "连不上官方 ACP 注册表，无法确认最新版本",
-  "acp.update_what": "请指定智能体，或用 --all"
+  "acp.update_what": "请指定智能体，或用 --all",
+  "connectors.oauth_discovery_failed": "在 {0} 找不到 OAuth 授权服务器元数据（RFC 9728 / RFC 8414）",
+  "connectors.oauth_needs_url": "OAuth 连接器需要 MCP 地址（--url）",
+  "connectors.oauth_no_pkce": "授权服务器 {0} 不支持 PKCE S256，拒绝连接"
 }

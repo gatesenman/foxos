@@ -1246,5 +1246,8 @@
   "acp.p_mode": "Default mode ID (session/set_mode; empty string clears)",
   "acp.p_model": "Default model ID (switched with session/set_model when a session starts; empty string clears)",
   "acp.registry_offline": "Cannot reach the official ACP registry to confirm the latest version",
-  "acp.update_what": "Name an agent or pass --all"
+  "acp.update_what": "Name an agent or pass --all",
+  "connectors.oauth_discovery_failed": "No OAuth authorization server metadata found for {0} (RFC 9728 / RFC 8414)",
+  "connectors.oauth_needs_url": "An OAuth connector needs an MCP URL (--url)",
+  "connectors.oauth_no_pkce": "Authorization server {0} does not support PKCE S256; refusing"
 }

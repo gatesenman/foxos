@@ -118,8 +118,13 @@ def add(key: str | None, cid: str | None = None, title: str | None = None, url: 
             raise FoxError("USAGE", tr("connectors.custom_needs"))
         if url and not url.startswith(("https://", "http://127.0.0.1", "http://localhost")):
             raise FoxError("PERMISSION_DENIED", tr("connectors.https_only"))
+        au = {"kind": auth or "none", **({"header": header} if header else {})}
+        if au["kind"] == "oauth":
+            if not url:
+                raise FoxError("USAGE", tr("connectors.oauth_needs_url"))
+            au.update(discover_oauth(url))
         rec = {"key": "custom", "title": title or cid, "vendor": "", "transport": "http" if url else "stdio", "url": url,
-               "command": command, "auth": {"kind": auth or "none", **({"header": header} if header else {})}, "write_tools": [], "icon": "plug"}
+               "command": command, "auth": au, "write_tools": [], "icon": "plug"}
     if not cid or not all(ch.isalnum() or ch in "-_" for ch in cid):
         raise FoxError("USAGE", tr("connectors.bad_id"))
     if cid in d:
@@ -128,6 +133,37 @@ def add(key: str | None, cid: str | None = None, title: str | None = None, url: 
     d[cid] = rec
     _save(d)
     return {"id": cid, **rec}
+
+
+def _get_json(url: str) -> dict | None:
+    try:
+        with urllib.request.urlopen(urllib.request.Request(url, headers={"Accept": "application/json", "User-Agent": "foxos-connector"}), timeout=15) as r:
+            return json.loads(r.read().decode("utf-8"))
+    except (OSError, ValueError):
+        return None
+
+
+def discover_oauth(mcp_url: str) -> dict:
+    """MCP 授权发现：先读受保护资源元数据（RFC 9728）找授权服务器，再读授权服务器元数据（RFC 8414）。"""
+    u = urllib.parse.urlparse(mcp_url)
+    origin = f"{u.scheme}://{u.netloc}"
+    issuers = [origin]
+    for path in (f"/.well-known/oauth-protected-resource{u.path.rstrip('/')}", "/.well-known/oauth-protected-resource"):
+        prm = _get_json(origin + path)
+        if prm and prm.get("authorization_servers"):
+            issuers = [str(x).rstrip("/") for x in prm["authorization_servers"]] + issuers
+            break
+    for iss in issuers:
+        iu = urllib.parse.urlparse(iss)
+        for path in (f"/.well-known/oauth-authorization-server{iu.path.rstrip('/')}", f"/.well-known/openid-configuration{iu.path.rstrip('/')}"):
+            meta = _get_json(f"{iu.scheme}://{iu.netloc}{path}")
+            if meta and meta.get("authorization_endpoint") and meta.get("token_endpoint"):
+                if "S256" not in (meta.get("code_challenge_methods_supported") or ["S256"]):
+                    raise FoxError("PERMISSION_DENIED", tr("connectors.oauth_no_pkce", iss))
+                return {"authorization_url": meta["authorization_endpoint"], "token_url": meta["token_endpoint"],
+                        **({"registration_url": meta["registration_endpoint"]} if meta.get("registration_endpoint") else {}),
+                        "scopes": [], "issuer": meta.get("issuer", iss)}
+    raise FoxError("DEPENDENCY_MISSING", tr("connectors.oauth_discovery_failed", mcp_url))
 
 
 def remove(cid: str) -> dict:
@@ -267,7 +303,7 @@ class McpClient:
         self.proc = None
         cid = c["id"]
         _refresh_if_needed(cid, c)
-        self.headers = {"Content-Type": "application/json", "Accept": "application/json, text/event-stream"}
+        self.headers = {"Content-Type": "application/json", "Accept": "application/json, text/event-stream", "User-Agent": "foxos-connector/0.3"}
         a = c.get("auth") or {}
         if a.get("kind") in ("bearer", "oauth"):
             tok = secrets.get(f"connector:{cid}:token")
@@ -357,7 +393,8 @@ def refresh_tools(cid: str) -> dict:
         cl.close()
     d = _load()
     d[cid]["tools"] = [{"name": t["name"], "description": (t.get("description") or "")[:300], "write": t["name"] in (c.get("write_tools") or [])
-                        or bool((t.get("annotations") or {}).get("destructiveHint"))} for t in tools]
+                        or bool((t.get("annotations") or {}).get("destructiveHint")) or (t.get("annotations") or {}).get("readOnlyHint") is False}
+                       for t in tools]
     d[cid]["server"] = (init or {}).get("serverInfo")
     d[cid]["tools_refreshed"] = audit.now_iso()
     _save(d)
@@ -379,6 +416,11 @@ def call_tool(ws, caller: str, cid: str, tool: str, arguments: dict) -> dict:
             dec = bots._auto_decision(b, "edit")
             if dec == "deny":
                 raise FoxError("PERMISSION_DENIED", tr("connectors.write_denied", tool))
+            once = os.environ.get("FOXOS_BOT_APPROVE")  # 这一轮的一次性审批方式（bot message send --approve）
+            if dec == "ask" and once in ("allow", "deny"):
+                dec = once
+                if dec == "deny":
+                    raise FoxError("PERMISSION_DENIED", tr("connectors.write_not_approved", tool))
             if dec == "ask":
                 opts = [{"optionId": "allow", "name": tr("bots.allow_once"), "kind": "allow_once"},
                         {"optionId": "reject", "name": tr("bots.deny"), "kind": "reject_once"}]
