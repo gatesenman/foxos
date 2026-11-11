@@ -258,7 +258,7 @@
 
 ### `bot_profile_create`
 
-新建智能体。CLI：foxos bot profile create NAME [--title TITLE] [--role ROLE] [--instructions INSTRUCTIONS] [--icon ICON] [--color COLOR] [--image IMAGE] [--acp-agent AGENT] [--base-url BASE_URL] [--model MODEL] [--api-key API_KEY] [--scope SCOPE] [--isolated] [--visibility {private,public}] [--pinned] [--hidden] [--active] [--notifications] [--skills-mode {all,selected}] [--skills SKILLS] [--skills-off SKILLS_OFF] [--connectors CONNECTORS] [--machines MACHINES] [--default-machine DEFAULT_MACHINE] [--approval-mode {ask,allow_reads,allow_all}] [--rule RULES] [--delegate-to DELEGATE_TO] [--max-depth MAX_DEPTH] [--max-per-turn MAX_PER_TURN] [--id ID]。限制：这个操作只有人可以做。示例：foxos bot profile create Coder --title Coding --acp-agent codex-acp --icon code --color '#3B82F6' --isolated
+新建智能体。CLI：foxos bot profile create NAME [--title TITLE] [--role ROLE] [--instructions INSTRUCTIONS] [--icon ICON] [--color COLOR] [--image IMAGE] [--acp-agent AGENT] [--provider {deepseek,openai,dashscope,ollama,custom}] [--base-url BASE_URL] [--model MODEL] [--api-key API_KEY] [--scope SCOPE] [--isolated] [--visibility {private,public}] [--pinned] [--hidden] [--active] [--notifications] [--skills-mode {all,selected}] [--skills SKILLS] [--skills-off SKILLS_OFF] [--connectors CONNECTORS] [--machines MACHINES] [--default-machine DEFAULT_MACHINE] [--approval-mode {ask,allow_reads,allow_all}] [--rule RULES] [--delegate-to DELEGATE_TO] [--max-depth MAX_DEPTH] [--max-per-turn MAX_PER_TURN] [--id ID]。限制：这个操作只有人可以做。示例：foxos bot profile create Coder --title Coding --acp-agent codex-acp --icon code --color '#3B82F6' --isolated
 
 只读：否 · 破坏性：否 · CLI：`foxos bot profile create`
 
@@ -272,6 +272,7 @@
 | `color` | string |  | 头像颜色 #RRGGBB |
 | `image` | string |  | 头像图片（工作空间内的 png/jpg/svg/webp） |
 | `agent` | string |  | 后端 ACP 智能体 ID（如 codex-acp、gemini、claude-acp、foxos-local） |
+| `provider` | string |  | 模型服务商预设：deepseek、openai、dashscope、ollama 或 custom（填好地址与默认模型；密钥用 --api-key-stdin 存进本机密钥库） 可选：deepseek / openai / dashscope / ollama / custom |
 | `base_url` | string |  | OpenAI 兼容端点（https://…/v1）；设置后后端改为模型 |
 | `model` | string |  | 模型名（模型后端）或给 ACP 智能体的模型偏好 |
 | `api_key` | string |  | 模型端点的 API 密钥（存本地密钥库；用 --api-key-stdin） |
@@ -304,7 +305,7 @@
 
 ### `bot_profile_update`
 
-修改智能体资料（同 bot config set）。CLI：foxos bot profile update BOT [--name NAME] [--title TITLE] [--role ROLE] [--instructions INSTRUCTIONS] [--icon ICON] [--color COLOR] [--image IMAGE] [--acp-agent AGENT] [--base-url BASE_URL] [--model MODEL] [--api-key API_KEY] [--scope SCOPE] [--isolated] [--visibility {private,public}] [--pinned] [--hidden] [--active] [--notifications] [--skills-mode {all,selected}] [--skills SKILLS] [--skills-off SKILLS_OFF] [--connectors CONNECTORS] [--machines MACHINES] [--default-machine DEFAULT_MACHINE] [--approval-mode {ask,allow_reads,allow_all}] [--rule RULES] [--delegate-to DELEGATE_TO] [--max-depth MAX_DEPTH] [--max-per-turn MAX_PER_TURN]。限制：这个操作只有人可以做。示例：foxos bot profile update coder --title Backend
+修改智能体资料（同 bot config set）。CLI：foxos bot profile update BOT [--name NAME] [--title TITLE] [--role ROLE] [--instructions INSTRUCTIONS] [--icon ICON] [--color COLOR] [--image IMAGE] [--acp-agent AGENT] [--provider {deepseek,openai,dashscope,ollama,custom}] [--base-url BASE_URL] [--model MODEL] [--api-key API_KEY] [--scope SCOPE] [--isolated] [--visibility {private,public}] [--pinned] [--hidden] [--active] [--notifications] [--skills-mode {all,selected}] [--skills SKILLS] [--skills-off SKILLS_OFF] [--connectors CONNECTORS] [--machines MACHINES] [--default-machine DEFAULT_MACHINE] [--approval-mode {ask,allow_reads,allow_all}] [--rule RULES] [--delegate-to DELEGATE_TO] [--max-depth MAX_DEPTH] [--max-per-turn MAX_PER_TURN]。限制：这个操作只有人可以做。示例：foxos bot profile update coder --title Backend
 
 只读：否 · 破坏性：否 · CLI：`foxos bot profile update`
 
@@ -319,6 +320,7 @@
 | `color` | string |  | 头像颜色 #RRGGBB |
 | `image` | string |  | 头像图片（工作空间内的 png/jpg/svg/webp） |
 | `agent` | string |  | 后端 ACP 智能体 ID（如 codex-acp、gemini、claude-acp、foxos-local） |
+| `provider` | string |  | 模型服务商预设：deepseek、openai、dashscope、ollama 或 custom（填好地址与默认模型；密钥用 --api-key-stdin 存进本机密钥库） 可选：deepseek / openai / dashscope / ollama / custom |
 | `base_url` | string |  | OpenAI 兼容端点（https://…/v1）；设置后后端改为模型 |
 | `model` | string |  | 模型名（模型后端）或给 ACP 智能体的模型偏好 |
 | `api_key` | string |  | 模型端点的 API 密钥（存本地密钥库；用 --api-key-stdin） |
@@ -420,7 +422,7 @@
 
 ### `bot_config_set`
 
-修改智能体设置（与 OpenBot 的 Bot 设置逐项对应）。CLI：foxos bot config set BOT [--name NAME] [--title TITLE] [--role ROLE] [--instructions INSTRUCTIONS] [--icon ICON] [--color COLOR] [--image IMAGE] [--acp-agent AGENT] [--base-url BASE_URL] [--model MODEL] [--api-key API_KEY] [--scope SCOPE] [--isolated] [--visibility {private,public}] [--pinned] [--hidden] [--active] [--notifications] [--skills-mode {all,selected}] [--skills SKILLS] [--skills-off SKILLS_OFF] [--connectors CONNECTORS] [--machines MACHINES] [--default-machine DEFAULT_MACHINE] [--approval-mode {ask,allow_reads,allow_all}] [--rule RULES] [--delegate-to DELEGATE_TO] [--max-depth MAX_DEPTH] [--max-per-turn MAX_PER_TURN]。限制：这个操作只有人可以做。示例：foxos bot config set coder --acp-agent claude-acp --skills tdd,architect --approval-mode allow_reads --rule execute=ask
+修改智能体设置（与 OpenBot 的 Bot 设置逐项对应）。CLI：foxos bot config set BOT [--name NAME] [--title TITLE] [--role ROLE] [--instructions INSTRUCTIONS] [--icon ICON] [--color COLOR] [--image IMAGE] [--acp-agent AGENT] [--provider {deepseek,openai,dashscope,ollama,custom}] [--base-url BASE_URL] [--model MODEL] [--api-key API_KEY] [--scope SCOPE] [--isolated] [--visibility {private,public}] [--pinned] [--hidden] [--active] [--notifications] [--skills-mode {all,selected}] [--skills SKILLS] [--skills-off SKILLS_OFF] [--connectors CONNECTORS] [--machines MACHINES] [--default-machine DEFAULT_MACHINE] [--approval-mode {ask,allow_reads,allow_all}] [--rule RULES] [--delegate-to DELEGATE_TO] [--max-depth MAX_DEPTH] [--max-per-turn MAX_PER_TURN]。限制：这个操作只有人可以做。示例：foxos bot config set coder --acp-agent claude-acp --skills tdd,architect --approval-mode allow_reads --rule execute=ask
 
 只读：否 · 破坏性：否 · CLI：`foxos bot config set`
 
@@ -435,6 +437,7 @@
 | `color` | string |  | 头像颜色 #RRGGBB |
 | `image` | string |  | 头像图片（工作空间内的 png/jpg/svg/webp） |
 | `agent` | string |  | 后端 ACP 智能体 ID（如 codex-acp、gemini、claude-acp、foxos-local） |
+| `provider` | string |  | 模型服务商预设：deepseek、openai、dashscope、ollama 或 custom（填好地址与默认模型；密钥用 --api-key-stdin 存进本机密钥库） 可选：deepseek / openai / dashscope / ollama / custom |
 | `base_url` | string |  | OpenAI 兼容端点（https://…/v1）；设置后后端改为模型 |
 | `model` | string |  | 模型名（模型后端）或给 ACP 智能体的模型偏好 |
 | `api_key` | string |  | 模型端点的 API 密钥（存本地密钥库；用 --api-key-stdin） |
