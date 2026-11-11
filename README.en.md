@@ -44,6 +44,19 @@ Every image below comes from FoxOS itself (the four Chrome shots are 0.3.2, the 
 
 Screenshots of the Windows companion app are in their own section below: [Windows companion app](#windows-伴侣程序在现有-windows-桌面上运行v020--windows-companion-app).
 
+## Features
+
+| Area | What you get |
+| --- | --- |
+| Desktop | Window management (drag, resize, maximize, taskbar), start menu, global search (apps + workspace files), session restore |
+| Built-in apps | Terminal (node-pty / ConPTY), file manager, Monaco editor, browser, app center, settings, setup wizard, environments |
+| Office | `foxos sheets` / `docs` / `slides` read and write standard .xlsx / .docx / .pptx (formulas, native charts, tables, notes); open, evaluate and export in native LibreOffice windows |
+| Everything apps | 51 open-source apps in 9 groups, built and run locally, each with semantic commands (`foxos <app> <resource> <verb>`) — see [docs/everything-apps.md](docs/everything-apps.md) |
+| Agents | ACP client (session panel, run on host or inside an environment), one-click install from the official ACP registry, MCP server (stdio / Streamable HTTP, token, compact / full tool sets) |
+| Safety & collaboration | Workspace confinement (rejects `../`, symlink escapes, reserved dirs), JSONL audit log, file locks, atomic save with versions, human takeover (`PAUSED`, exit code 8) |
+| Environments | Linux namespace runtime (overlayfs, pivot_root, seccomp, cgroup v2 / rlimit), `.foxenv` images, snapshots, clones, export; Windows: WSL2, Windows Sandbox, Hyper-V; provider protocol |
+| Languages | Simplified Chinese (default) and English for the UI, the `foxos` CLI, MCP tool descriptions and kernel messages (`--lang` / `FOXOS_LANG`) |
+
 ## Download
 
 Everything is on [v0.3.2-os-preview](https://github.com/gatesenman/foxos/releases/tag/v0.3.2-os-preview) (pre-release); `SHA256SUMS` in the same release covers every file. Two different things:
@@ -93,27 +106,36 @@ USB and Hyper-V steps: [ISO test guide](docs/os-test-guide.md). Older releases (
 
 ## Windows 伴侣程序（在现有 Windows 桌面上运行，v0.2.0） / Windows companion app
 
-These are screenshots of the **Windows companion app** (`v0.2.0-windows-preview`, Electron). It runs on your existing Windows (or Linux) desktop and provides a terminal, editor, Everything apps, environments and agent sessions. **It is not the FoxOS operating system desktop**; see the [screenshots](#screenshots-the-real-foxos-031-system) above for that. Captured with xvfb at 1600×1000 by [`apps/desktop/scripts/screenshots.js`](apps/desktop/scripts/screenshots.js).
+These are screenshots of the **Windows companion app** (`v0.2.0-windows-preview`, Electron). It runs on your existing Windows (or Linux) desktop and provides a terminal, editor, Everything apps, environments and agent sessions. **It is not the FoxOS operating system desktop**; see the [screenshots](#screenshots-the-real-foxos-032--031-system) above for that. Captured with xvfb at 1600×1000 by [`apps/desktop/scripts/screenshots.js`](apps/desktop/scripts/screenshots.js) with the UI set to English (`FOXOS_SHOT_LANG=en-US`); the Chinese README shows the same screens in Chinese. All of them were re-captured from the current code with 48 Everything apps built and installed locally and a running Alpine environment. The ACP install shot is the Chinese one (the English run had Gemini CLI already installed). The Live ISO screenshots above come from booting the ISO in QEMU and were not re-captured here.
 
 | | |
 | --- | --- |
-| ![Start menu](docs/screenshots/start-menu.png)<br>Start menu: built-ins and installed Everything apps in 9 groups, each with its project's own icon | ![App center](docs/screenshots/app-center.png)<br>App center: 51 Everything apps with their upstream icons, plus built-ins, LibreOffice, tools, ACP agents |
-| ![Setup wizard](docs/screenshots/setup-wizard.png)<br>First-run wizard with component picker | ![Terminal](docs/screenshots/terminal.png)<br>Terminal running `foxos` commands |
-| ![Files](docs/screenshots/files.png)<br>File manager, live-synced workspace | ![Editor](docs/screenshots/editor.png)<br>Monaco editor |
-| ![Browser](docs/screenshots/browser.png)<br>Browser | ![Settings → Language](docs/screenshots/settings-language-en.png)<br>Settings → Language: 简体中文 (default) / English, applies immediately |
-| ![App center (English)](docs/screenshots/app-center-en.png)<br>App center in English: group names and app descriptions follow the language | ![Writer](docs/screenshots/libreoffice-writer.png)<br>LibreOffice Writer with a generated .docx |
-| ![Calc](docs/screenshots/libreoffice-calc.png)<br>LibreOffice Calc: formulas and a native chart | ![Spreadsheet](docs/screenshots/everything-spreadsheet.png)<br>Everything Spreadsheet opening a workspace .xlsx (Chinese UI, shipped upstream, follows the FoxOS language) |
-| ![Documents](docs/screenshots/everything-documents.png)<br>Everything Documents opening a workspace .docx | ![Whiteboard](docs/screenshots/everything-whiteboard.png)<br>Everything Whiteboard |
-| ![CRM](docs/screenshots/everything-crm.png)<br>Everything CRM | ![Chess](docs/screenshots/everything-chess.png)<br>Everything Chess |
-| ![ACP install](docs/screenshots/acp-agent-install.png)<br>One-click ACP agent install from the official registry | ![Install a system](docs/screenshots/environments-catalog.png)<br>Environments → Install a system (WSL2 distros, rootfs, Windows Sandbox, Hyper-V) |
-| ![Alpine](docs/screenshots/environments-alpine.png)<br>A running Alpine environment with live stats | ![Audit and takeover](docs/screenshots/audit-takeover.png)<br>Activity log and human takeover (`PAUSED`) |
+| ![Start menu](docs/screenshots/start-menu-en.png)<br>Start menu: built-ins and installed Everything apps in 9 groups, each with its project's own icon | ![App center](docs/screenshots/app-center.png)<br>App center: 51 Everything apps with their upstream icons, plus built-ins, LibreOffice, tools, ACP agents |
+| ![Setup wizard](docs/screenshots/setup-wizard-en.png)<br>First-run wizard with component picker | ![Terminal](docs/screenshots/terminal-en.png)<br>Terminal running `foxos` commands |
+| ![Files](docs/screenshots/files-en.png)<br>File manager, live-synced workspace | ![Editor](docs/screenshots/editor-en.png)<br>Monaco editor |
+| ![Browser](docs/screenshots/browser-en.png)<br>Browser | ![Settings → Language](docs/screenshots/settings-language-en.png)<br>Settings → Language: 简体中文 (default) / English, applies immediately |
+| ![App center (English)](docs/screenshots/app-center-en.png)<br>App center in English: group names and app descriptions follow the language | ![Writer](docs/screenshots/libreoffice-writer-en.png)<br>LibreOffice Writer with a generated .docx |
+| ![Calc](docs/screenshots/libreoffice-calc-en.png)<br>LibreOffice Calc: formulas and a native chart | ![Spreadsheet](docs/screenshots/everything-spreadsheet-en.png)<br>Everything Spreadsheet opening a workspace .xlsx (Chinese UI, shipped upstream, follows the FoxOS language) |
+| ![Documents](docs/screenshots/everything-documents-en.png)<br>Everything Documents opening a workspace .docx | ![Whiteboard](docs/screenshots/everything-whiteboard-en.png)<br>Everything Whiteboard |
+| ![CRM](docs/screenshots/everything-crm-en.png)<br>Everything CRM | ![Chess](docs/screenshots/everything-chess-en.png)<br>Everything Chess |
+| ![ACP install](docs/screenshots/acp-agent-install.png)<br>One-click ACP agent install from the official registry | ![Install a system](docs/screenshots/environments-catalog-en.png)<br>Environments → Install a system (WSL2 distros, rootfs, Windows Sandbox, Hyper-V) |
+| ![Alpine](docs/screenshots/environments-alpine-en.png)<br>A running Alpine environment with live stats | ![Audit and takeover](docs/screenshots/audit-takeover-en.png)<br>Activity log and human takeover (`PAUSED`) |
 
 ## Quick start (from source)
 
 ```bash
 git clone https://github.com/gatesenman/foxos.git && cd foxos
 python3 -m venv .venv && .venv/bin/pip install -e 'packages/core[test]'
-cd apps/desktop && npm ci && npm start
+cd apps/desktop && npm ci && npm start          # desktop; the setup wizard opens on first run
+```
+
+CLI only:
+
+```bash
+export PYTHONPATH=$PWD/packages/core
+python3 -m foxos --workspace ~/FoxOS/workspace sheets create sales.xlsx
+python3 -m foxos --workspace ~/FoxOS/workspace sheets write sales.xlsx A1=Month B1=Amount A2=Jan B2=120 'B3==SUM(B2:B2)'
+python3 -m foxos help --json      # full capability catalog
 ```
 
 ## For agents: CLI and MCP
@@ -153,6 +175,54 @@ Light isolation (`foxos sandbox`): run host tools directly, but only the workspa
 
 Desktop (Electron: window manager, built-in apps, Everything runtime, ACP client, app bridge) → kernel (Python `foxos`: command registry generating argparse / JSON Schema / MCP tools / docs; workspace confinement, locks, audit, takeover; apps; environment providers). See the diagram in [README.md](README.md#架构) and [docs/architecture.md](docs/architecture.md).
 
+## Tech stack
+
+| Layer | Technology |
+| --- | --- |
+| OS (ISO) | Ubuntu 24.04, XFCE (xfwm4 / Whisker menu), Calamares installer; build scripts in `scripts/os/` |
+| Desktop / companion | Electron 45, node-pty (real PTY), xterm, Monaco, electron-builder (NSIS / AppImage) |
+| Kernel & CLI | Python ≥ 3.10, openpyxl, python-docx, python-pptx, zstandard; one argparse command registry generates JSON Schema, MCP tools and docs |
+| Agent interfaces | MCP (stdio and Streamable HTTP), ACP client and official registry |
+| Isolation | Linux user namespaces + overlayfs + pivot_root + seccomp / Landlock, cgroup v2; KVM + cloud-hypervisor; WSL2 / Windows Sandbox / Hyper-V |
+| Testing | pytest, Playwright + Electron (xvfb), official MCP SDK |
+
+## Project structure
+
+```text
+foxos/
+├── apps/desktop/          # Electron desktop (companion app)
+│   ├── src/main/          # main process: kernel calls, ACP, PTY, Everything runtime, settings, setup
+│   ├── src/renderer/      # window manager and built-in app UIs
+│   ├── src/locales/       # UI strings (zh-CN / en-US)
+│   └── e2e/               # Playwright + Electron end-to-end tests
+├── packages/core/         # Python kernel `foxos` (CLI, MCP server, workspace, audit, locks, environments, sandbox)
+│   ├── foxos/
+│   └── tests/
+├── scripts/
+│   ├── os/                # bootable ISO build (branding, Calamares, panel, systemd, QEMU boot test)
+│   ├── test_all.py        # full test entry point, writes docs/test-report.md
+│   └── gen_*.py           # generate CLI reference, app catalog, environment catalog docs
+├── docker/os/             # optional Docker distribution
+├── docs/                  # architecture, CLI / MCP reference, environments, test report, screenshots
+└── AGENTS.md              # onboarding for agents
+```
+
+## Configuration
+
+Environment variables read by the desktop and/or the kernel:
+
+| Variable | Purpose |
+| --- | --- |
+| `FOXOS_HOME` | Data directory (Everything apps, agents, environments). Defaults: Linux `$XDG_DATA_HOME/foxos` (`~/.local/share/foxos`), Windows `%LOCALAPPDATA%\FoxOS`, macOS `~/Library/Application Support/FoxOS` |
+| `FOXOS_LANG` | UI / CLI language: `zh-CN` (default) or `en-US`; same as `--lang` |
+| `FOXOS_MCP_TOKEN` | Access token for `foxos mcp --http` |
+| `FOXOS_PYTHON` | Python interpreter the desktop uses to call the kernel |
+| `FOXOS_SOFFICE` | Path to the LibreOffice `soffice` binary |
+| `FOXOS_SESSION_BACKEND` | Force the graphical session backend (X11 / Wayland) |
+| `FOXOS_CHROME_FLAGS` | Extra command-line flags when launching Chrome |
+
+The workspace is selected with the global `--workspace <dir>` option; UI language and other settings can also be changed in the desktop Settings app.
+
 ## Testing
 
 `npm run test:all` at the repo root runs pytest, the Playwright + Electron end-to-end tests under xvfb and the official-MCP-SDK tests, and writes [docs/test-report.md](docs/test-report.md) (pass/fail/skip per user story, per-app coverage). No mocks.
@@ -165,6 +235,14 @@ Done: kernel, audit, locks, takeover, MCP; desktop and real apps; 51 Everything 
 Light sandbox level: Linux Landlock + seccomp (tested); macOS Seatbelt and Windows restricted token / AppContainer + job objects (code and unit tests, not yet verified on hardware).
 Chinese / English UI (Chinese default) and FoxOS scrollbars: done.
 Next: Windows hardware verification; Linux packages; macOS build; code signing.
+
+## Contributing
+
+Issues and pull requests are welcome. Before submitting:
+
+1. Run `npm run test:all` at the repo root (or at least `cd packages/core && pytest`) and make sure nothing new fails;
+2. After changing UI strings run `cd apps/desktop && npm run lint:i18n`;
+3. When adding commands, regenerate the docs (`scripts/gen_cli_docs.py` etc.).
 
 ## License
 
