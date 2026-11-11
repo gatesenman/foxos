@@ -42,7 +42,7 @@ def rt(tmp_path):
     return run
 
 
-def test_US78_install_opencode_verified_and_real_acp_handshake(rt):
+def test_US116_install_opencode_verified_and_real_acp_handshake(rt):
     rc, d, p = rt("runtime", "install", "opencode")
     assert rc == 0, p.stdout + p.stderr
     res = d["result"]["results"][0]

@@ -427,6 +427,215 @@
           "^test_US62"
         ]
       ]
+    },
+    {
+      "id": "US-100",
+      "title": "智能体：主智能体与多个智能体的创建、复制、改名、删除",
+      "match": [
+        [
+          "pytest",
+          "test_bots.py",
+          "^test_US100"
+        ]
+      ]
+    },
+    {
+      "id": "US-101",
+      "title": "每个智能体的设置（对照 OpenBot 逐项）：名称、头像、说明、模型、ACP 智能体、范围、权限；密钥不外露",
+      "match": [
+        [
+          "pytest",
+          "test_bots.py",
+          "^test_US101"
+        ]
+      ]
+    },
+    {
+      "id": "US-102",
+      "title": "真实 ACP 回合：工具调用卡片、审批（允许/拒绝）、diff、终端输出，审计记下是哪个智能体",
+      "match": [
+        [
+          "pytest",
+          "test_bots.py",
+          "^test_US102"
+        ]
+      ]
+    },
+    {
+      "id": "US-103",
+      "title": "@提及与委托：主智能体把任务交给别的智能体，结果在范围内汇报回来",
+      "match": [
+        [
+          "pytest",
+          "test_bots.py",
+          "^test_US103"
+        ]
+      ]
+    },
+    {
+      "id": "US-104",
+      "title": "pstack 技能：发现、显示、在对话中运行",
+      "match": [
+        [
+          "pytest",
+          "test_bots.py",
+          "^test_US104"
+        ]
+      ]
+    },
+    {
+      "id": "US-105",
+      "title": "智能体记忆与例程（定时任务）",
+      "match": [
+        [
+          "pytest",
+          "test_bots.py",
+          "^test_US105"
+        ]
+      ]
+    },
+    {
+      "id": "US-106",
+      "title": "只暂停一个智能体与人工接管",
+      "match": [
+        [
+          "pytest",
+          "test_bots.py",
+          "^test_US106"
+        ]
+      ]
+    },
+    {
+      "id": "US-107",
+      "title": "聊天服务：令牌鉴权、发送、SSE 流、重开时回放进行中的回合",
+      "match": [
+        [
+          "pytest",
+          "test_bots.py",
+          "^test_US107"
+        ]
+      ]
+    },
+    {
+      "id": "US-108",
+      "title": "聊天界面：真实浏览器里发送、审批、中英文切换",
+      "match": [
+        [
+          "pytest",
+          "test_bots.py",
+          "^test_US108"
+        ]
+      ]
+    },
+    {
+      "id": "US-109",
+      "title": "连接器目录与 stdio MCP 连接器，按智能体授权",
+      "match": [
+        [
+          "pytest",
+          "test_connectors.py",
+          "^test_US109"
+        ]
+      ]
+    },
+    {
+      "id": "US-110",
+      "title": "OAuth 2.1 连接器：发现（RFC 9728/8414）、PKCE、动态注册、刷新，写操作需审批",
+      "match": [
+        [
+          "pytest",
+          "test_connectors.py",
+          "^test_US110"
+        ]
+      ]
+    },
+    {
+      "id": "US-111",
+      "title": "Bearer 令牌连接器：错误令牌不算连上，密钥从不写进日志",
+      "match": [
+        [
+          "pytest",
+          "test_connectors.py",
+          "^test_US111"
+        ]
+      ]
+    },
+    {
+      "id": "US-112",
+      "title": "免密钥的托管连接器真实调用",
+      "match": [
+        [
+          "pytest",
+          "test_connectors.py",
+          "^test_US112"
+        ]
+      ]
+    },
+    {
+      "id": "US-113",
+      "title": "多机配对：一次性配对码、证书指纹、双向 TLS（令牌被偷也连不上）",
+      "match": [
+        [
+          "pytest",
+          "test_machines.py",
+          "^test_US113"
+        ]
+      ]
+    },
+    {
+      "id": "US-114",
+      "title": "一个智能体控制两台狐狸OS：默认拒绝、按机器授权、两边审计写明控制端与智能体",
+      "match": [
+        [
+          "pytest",
+          "test_machines.py",
+          "^test_US114"
+        ]
+      ]
+    },
+    {
+      "id": "US-115",
+      "title": "多个智能体共用一台狐狸OS：范围与应用授权、LOCKED、CONFLICT、只暂停一个、撤销授权",
+      "match": [
+        [
+          "pytest",
+          "test_machines.py",
+          "^test_US115"
+        ]
+      ]
+    },
+    {
+      "id": "US-116",
+      "title": "从官方发布地址安装第三方 ACP 智能体（sha256 校验）并真实握手；智能体设置与更新检查",
+      "match": [
+        [
+          "pytest",
+          "test_acp_real.py",
+          "^test_US116"
+        ]
+      ]
+    },
+    {
+      "id": "US-117",
+      "title": "镜像阶段运行环境：以用户 foxos 检查预装版本、PEP 668、专有智能体不进镜像",
+      "match": [
+        [
+          "pytest",
+          "test_os_runtime.py",
+          "^test_US117"
+        ]
+      ]
+    },
+    {
+      "id": "US-118",
+      "title": "镜像里预装的 ACP 智能体已登记，以用户 foxos 真实握手",
+      "match": [
+        [
+          "pytest",
+          "test_os_runtime.py",
+          "^test_US118"
+        ]
+      ]
     }
   ]
 }

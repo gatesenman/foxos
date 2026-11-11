@@ -49,7 +49,7 @@ def bot(ws, tmp_path):
     return BotCLI(ws, home)
 
 
-def test_US62_main_bot_and_other_bots_crud(bot):
+def test_US100_main_bot_and_other_bots_crud(bot):
     r = bot.ok("bot", "profile", "list")
     main = [b for b in r["bots"] if b["main"]]
     assert len(main) == 1 and main[0]["id"] == "fox"
@@ -72,7 +72,7 @@ def test_US62_main_bot_and_other_bots_crud(bot):
     assert rc != 0
 
 
-def test_US63_per_bot_settings_parity_and_secret_redaction(bot):
+def test_US101_per_bot_settings_parity_and_secret_redaction(bot):
     bot.ok("bot", "profile", "create", "Writer", "--id", "writer")
     bot.ok("bot", "config", "set", "writer", "--title", "Docs", "--role", "Writes docs", "--icon", "pencil", "--color", "#10B981",
            "--visibility", "public", "--pinned", "--no-notifications", "--scope", "docs", "--skills-mode", "selected", "--skills", "tdd,how",
@@ -107,7 +107,7 @@ def test_US63_per_bot_settings_parity_and_secret_redaction(bot):
     assert rc == 2
 
 
-def test_US64_real_acp_turn_with_approval_card_and_diff(bot):
+def test_US102_real_acp_turn_with_approval_card_and_diff(bot):
     # 等待审批：另一个进程回答（与界面「允许一次」相同的命令）
     p = subprocess.Popen([sys.executable, "-m", "foxos", "--workspace", str(bot.ws), "--agent", "human", "bot", "message", "send", "fox",
                           "write notes/hello.txt: hi from fox", "--json"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True,
@@ -143,7 +143,7 @@ def test_US64_real_acp_turn_with_approval_card_and_diff(bot):
     assert term["kind"] == "execute" and "terminal-ok" in json.dumps(term)
 
 
-def test_US65_mention_and_delegation_report_back_within_scope(bot):
+def test_US103_mention_and_delegation_report_back_within_scope(bot):
     bot.ok("bot", "profile", "create", "Coder", "--id", "coder", "--isolated", "--role", "Writes code")
     r = bot.ok("bot", "message", "send", "fox", "@coder write a.txt: hello", "--approve", "allow")["reply"]
     d = [c for c in r["cards"] if c["type"] == "delegation"][0]
@@ -169,7 +169,7 @@ def test_US65_mention_and_delegation_report_back_within_scope(bot):
     assert t is None
 
 
-def test_US66_pstack_skills_discovered_and_shown(bot):
+def test_US104_pstack_skills_discovered_and_shown(bot):
     s = bot.ok("bot", "skill", "list")
     names = {x["name"] for x in s["skills"]}
     assert {"tdd", "architect", "how", "principle-prove-it-works"} <= names
@@ -185,7 +185,7 @@ def test_US66_pstack_skills_discovered_and_shown(bot):
     assert "MIT" in notice and "Lauren Tan" in notice
 
 
-def test_US67_memory_routines(bot):
+def test_US105_memory_routines(bot):
     bot.ok("bot", "memory", "add", "fox", "Sarah prefers short answers")
     r = bot.ok("bot", "message", "send", "fox", "remember: the build server is ci-1")["reply"]
     mem = bot.ok("bot", "memory", "list", "fox")["memory"]
@@ -203,7 +203,7 @@ def test_US67_memory_routines(bot):
     assert any(m.get("origin") == "routine" for m in msgs)
 
 
-def test_US68_pause_one_bot_and_takeover(bot):
+def test_US106_pause_one_bot_and_takeover(bot):
     bot.ok("bot", "profile", "create", "Coder", "--id", "coder")
     bot.ok("bot", "config", "set", "coder", "--no-active")
     rc, d, _ = bot.run("bot", "message", "send", "coder", "hello")
@@ -257,7 +257,7 @@ def server(bot):
     s.stop()
 
 
-def test_US69_chat_service_auth_send_and_sse_stream(bot, server):
+def test_US107_chat_service_auth_send_and_sse_stream(bot, server):
     # 令牌：没有 cookie 拒绝；写操作还要 X-FoxOS 头（防跨站）
     assert server.req("GET", "/api/state", cookie=False)[0] == 401
     st, _, _ = server.req("POST", "/api/bots/fox/send", {"text": "hi"}, headers={"X-FoxOS": "0"})
@@ -313,7 +313,7 @@ def _chrome():
 
 
 @pytest.mark.skipif(not _chrome(), reason="needs a Chrome or Chromium binary for the real browser test")
-def test_US70_chat_ui_real_browser_send_approve_and_both_languages(bot, server, tmp_path):
+def test_US108_chat_ui_real_browser_send_approve_and_both_languages(bot, server, tmp_path):
     import shutil
     node = shutil.which("node")
     if not node:
