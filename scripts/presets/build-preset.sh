@@ -165,6 +165,8 @@ ch /usr/local/bin/bun --version
 install -d "$MNT/usr/lib/systemd/user" "$MNT/etc/systemd/user/default.target.wants"
 install -m 644 "$ROOT/scripts/os/systemd/foxos-mcp.service" "$MNT/usr/lib/systemd/user/foxos-mcp.service"
 ln -sf /usr/lib/systemd/user/foxos-mcp.service "$MNT/etc/systemd/user/default.target.wants/foxos-mcp.service"
+# linger：foxos 的用户服务（MCP）开机就启动，不依赖桌面登录；SSH 会话里也有用户总线
+install -d "$MNT/var/lib/systemd/linger"; touch "$MNT/var/lib/systemd/linger/foxos"
 install -d "$MNT/home/foxos/FoxOS/workspace"; ch chown -R foxos:foxos /home/foxos
 install -m 755 "$HERE/guest/foxos-preset-firstboot" "$HERE/guest/foxos-preset-ready" "$MNT/usr/lib/foxos/"
 install -m 644 "$HERE/guest/foxos-preset-firstboot.service" "$HERE/guest/foxos-preset-ready.service" "$MNT/etc/systemd/system/"
