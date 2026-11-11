@@ -52,12 +52,18 @@ Captured from the running desktop (xvfb, 1600×1000) with real files created in 
 
 | File | What it is |
 | --- | --- |
-| `FoxOS-0.3.0-amd64.iso` | Live + installer image (UEFI + BIOS), amd64, under 2 GB |
-| `SHA256SUMS` | Checksums |
+| `FoxOS-0.3.0-amd64.iso.part1` / `.part2` | Two parts of the complete ISO (1507059712 bytes after concat, ~1.40 GiB) |
+| `FoxOS-0.3.0-amd64.iso` | The assembled Live + installer image (UEFI + BIOS), amd64, under 2 GB |
+| `SHA256SUMS` | Checksums (complete ISO and both parts) |
+
+Uploading the single 1.4 GiB asset from this build environment was cut off mid-transfer, so the Release ships two parts. Concatenate them, then verify.
 
 ```bash
-curl -L -O https://github.com/gatesenman/foxos/releases/download/v0.3.0-os-preview/FoxOS-0.3.0-amd64.iso
-curl -L -O https://github.com/gatesenman/foxos/releases/download/v0.3.0-os-preview/SHA256SUMS
+base=https://github.com/gatesenman/foxos/releases/download/v0.3.0-os-preview
+curl -L -O "$base/FoxOS-0.3.0-amd64.iso.part1"
+curl -L -O "$base/FoxOS-0.3.0-amd64.iso.part2"
+curl -L -O "$base/SHA256SUMS"
+cat FoxOS-0.3.0-amd64.iso.part1 FoxOS-0.3.0-amd64.iso.part2 > FoxOS-0.3.0-amd64.iso
 sha256sum -c SHA256SUMS
 ```
 

@@ -63,9 +63,9 @@ docker run --rm \
   gatesenman/foxos:0.3.0-os-preview-installer
 ```
 
-当前目录会得到 `FoxOS-0.3.0-amd64.iso` 和 `SHA256SUMS`，脚本会按校验和验证。然后把 ISO 写到 U 盘，或在 Hyper-V / 本机虚拟机里启动。安装步骤见 [os-test-guide.md](os-test-guide.md)。
+当前目录会得到 `FoxOS-0.3.0-amd64.iso` 和 `SHA256SUMS`，脚本会按校验和验证。若 Release 上没有单个完整 ISO（目前是两个分卷），入口脚本会下载分卷、拼接后再校验。然后把 ISO 写到 U 盘，或在 Hyper-V / 本机虚拟机里启动。安装步骤见 [os-test-guide.md](os-test-guide.md)。
 
-The current directory receives the ISO and `SHA256SUMS`, verified by checksum. Write it to USB or boot it in Hyper-V / a local VM. See [os-test-guide.md](os-test-guide.md).
+The current directory receives the ISO and `SHA256SUMS`, verified by checksum. If the Release has no single ISO asset (it currently ships two parts), the entrypoint downloads the parts, concatenates them, and then verifies. Write it to USB or boot it in Hyper-V / a local VM. See [os-test-guide.md](os-test-guide.md).
 
 ## 本地构建（尚未登录 Docker Hub 时）/ Build locally (before Docker Hub login)
 

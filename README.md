@@ -73,13 +73,19 @@ Windows 上的 `.exe` 是**伴侣程序**（预览版见 [v0.2.0-windows-preview
 
 | 文件 | 说明 |
 | --- | --- |
-| `FoxOS-0.3.0-amd64.iso` | Live + 安装镜像（UEFI + BIOS），amd64，小于 2 GB |
-| `SHA256SUMS` | 校验和 |
+| `FoxOS-0.3.0-amd64.iso.part1` / `.part2` | 完整 ISO 的两个分卷（拼接后 1507059712 字节，约 1.40 GiB） |
+| `FoxOS-0.3.0-amd64.iso` | 拼接得到的 Live + 安装镜像（UEFI + BIOS），amd64，小于 2 GB |
+| `SHA256SUMS` | 校验和（含完整 ISO 与两个分卷） |
+
+本构建环境向 GitHub 上传单个约 1.4 GiB 附件会在中途断开，所以 Release 上是两个分卷，拼起来后再校验。
 
 ```bash
-# 下载并校验（版本号以 Release 页面为准）
-curl -L -O https://github.com/gatesenman/foxos/releases/download/v0.3.0-os-preview/FoxOS-0.3.0-amd64.iso
-curl -L -O https://github.com/gatesenman/foxos/releases/download/v0.3.0-os-preview/SHA256SUMS
+# 下载两个分卷和校验和，拼回 ISO（版本号以 Release 页面为准）
+base=https://github.com/gatesenman/foxos/releases/download/v0.3.0-os-preview
+curl -L -O "$base/FoxOS-0.3.0-amd64.iso.part1"
+curl -L -O "$base/FoxOS-0.3.0-amd64.iso.part2"
+curl -L -O "$base/SHA256SUMS"
+cat FoxOS-0.3.0-amd64.iso.part1 FoxOS-0.3.0-amd64.iso.part2 > FoxOS-0.3.0-amd64.iso
 sha256sum -c SHA256SUMS
 ```
 

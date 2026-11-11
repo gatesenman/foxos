@@ -6,11 +6,19 @@
 
 | 文件 | 说明 |
 | --- | --- |
-| `FoxOS-0.3.0-amd64.iso` | Live + 安装镜像（UEFI，可选 BIOS），应小于 2 GB |
-| `SHA256SUMS` | 校验和 |
+| `FoxOS-0.3.0-amd64.iso.part1` | 分卷 1（838860800 字节） |
+| `FoxOS-0.3.0-amd64.iso.part2` | 分卷 2（668198912 字节） |
+| `FoxOS-0.3.0-amd64.iso` | 拼接后的 Live + 安装镜像（UEFI，可选 BIOS），1507059712 字节，小于 2 GB |
+| `SHA256SUMS` | 校验和（含完整 ISO 与两个分卷） |
+
+完整 ISO 的 SHA-256 为 `4c0986f71e8650123adc996e2a0b512d00a874dab8f1f3468464976d308e9ea6`。Release 上是两个分卷（本构建环境上传单个 1.4 GiB 附件会在中途断开）。
 
 ```bash
-# 校验
+base=https://github.com/gatesenman/foxos/releases/download/v0.3.0-os-preview
+curl -L -O "$base/FoxOS-0.3.0-amd64.iso.part1"
+curl -L -O "$base/FoxOS-0.3.0-amd64.iso.part2"
+curl -L -O "$base/SHA256SUMS"
+cat FoxOS-0.3.0-amd64.iso.part1 FoxOS-0.3.0-amd64.iso.part2 > FoxOS-0.3.0-amd64.iso
 sha256sum -c SHA256SUMS
 ```
 
