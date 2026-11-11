@@ -284,7 +284,8 @@ def status(t: dict) -> dict:
     if not exe:
         return {"ok": False, "found": None}
     try:
-        p = subprocess.run([exe, *chk[1:]], capture_output=True, text=True, timeout=60, env=_env())
+        # 第一次运行（新的数据目录要初始化）在忙的机器上可能很慢，版本检查给足时间
+        p = subprocess.run([exe, *chk[1:]], capture_output=True, text=True, timeout=float(os.environ.get("FOXOS_RUNTIME_CHECK_TIMEOUT", "240")), env=_env())
         out = (p.stdout or p.stderr or "").strip().splitlines()
         found = out[0].strip() if out else ""
     except (OSError, subprocess.TimeoutExpired) as e:
