@@ -41,62 +41,112 @@ OpenBot 是「AI 同事」工作区：React（Vite）前端 + Hono API 服务器
 - **模型配置**：`/setup-pstack` 写一份「每个角色用哪个模型」的设置文件（Cursor：`~/.cursor/rules/pstack-models.mdc`；Claude Code：`~/.claude/rules/pstack-models.md`；其它：`~/.agents/pstack-models.md`）。`arena`、`architect`、`interrogate` 按列表里的模型各派一个子智能体。
 - **跨 harness**：技能用 Cursor 的工具名写成（`Task`、`AskQuestion`），`docs/harness/claude-code.md` 给出到 Claude Code 的映射。镜像版去掉了 Cursor 专有部分，可以用 `npx skills add backnotprop/pstack` 装进 Claude Code、Codex、OpenCode 等。
 
-## 2. 映射到狐狸OS
+## 2. 对照 OpenBot 的功能清单
+
+状态：**已实现** = 有代码、有测试（括号里是用户故事编号，见 [user-stories.md](user-stories.md)）；**部分** = 有实现但没有在真实服务上跑通；**缺口** = 还没做；**不做** = 单机系统不需要。
 
 | OpenBot 功能 | 狐狸OS 实现 | 状态 |
 |---|---|---|
-| Bot 资料：名字、头衔、角色、头像 | `foxos bot profile create/update`：名字、头衔、角色说明、头像（Tabler 字体图标名 + 颜色，或工作空间里的图片；不用 emoji） | 已实现 |
-| 主 Bot（Personal Assistant） | 每个工作空间固定一个主智能体（`main: true`，不能删除，只能改设置）；第一次使用自动创建「狐狸」 | 已实现 |
-| Bot 后端（内置 / AG-UI 端点） | 后端 = 任一已安装的 ACP 智能体（Claude Code、Codex、Gemini CLI、注册表里其它）或「本地智能体」（仓库自带、确定性的 ACP 进程，不需要模型密钥）或 OpenAI 兼容模型端点 | 已实现（模型端点见缺口） |
-| 每个 Bot 自己的对话 | `.foxos/bots/<id>/messages.jsonl`；`foxos bot message list/send` | 已实现 |
-| 每个 Bot 自己的记忆 | `.foxos/bots/<id>/memory.jsonl`；`foxos bot memory add/list/forget`；每回合作为上下文交给 Bot | 已实现（不做自动学习） |
-| 工作范围（OpenBot 的每 Bot 文件夹 / 隔离） | 每个 Bot 有 `scope`（工作空间里的子目录）；ACP 的 `fs/*` 和终端都限制在范围内，越界返回 PERMISSION_DENIED；仍受工作空间约束、写锁、审计、人工接管 | 已实现 |
-| 流式消息 | ACP `session/update` 的 `agent_message_chunk` → 服务端 SSE → 界面逐段追加 | 已实现 |
-| 工具调用卡片（命令 + 输出、diff、计划） | ACP `tool_call` / `tool_call_update`（`content` 里的 `diff`、`terminal`）、`plan` → 卡片：文件编辑显示增删行，终端显示命令与输出，计划显示勾选清单 | 已实现 |
-| 审批卡片 | ACP `session/request_permission` → 卡片，选项来自智能体（允许一次 / 总是允许 / 拒绝）；人工接管时一律拒绝 | 已实现（没有「本对话允许」的持久规则） |
-| 附件 | 输入框选文件 → 存到工作空间 `attachments/`（经内核写入，有审计），作为 ACP `resource_link` 发给智能体 | 已实现 |
-| `@` 提及其它 Bot | 输入 `@名字`：消息直接交给那个 Bot；主智能体回答里的 `@名字` 也会转交 | 已实现 |
-| Bot 之间交接（handoff 信封） | `foxos bot task delegate --to <bot> --task … [--constraints …] [--expecting …]`；主智能体通过 MCP 工具 `bot_task_delegate` 调用；深度上限 3、每回合上限 5；审计里 `task` 字段记录 `delegated-by:<bot>` | 已实现 |
-| 主 Bot 汇总回报 | 被委托的 Bot 的回答作为工具结果返回给主智能体；聊天里显示「已委托给 X」卡片，X 的回答折叠在卡片里 | 已实现 |
-| 技能（`/` 菜单） | pstack 技能与原则：`foxos bot skill list/show/run`；输入框 `/` 弹出技能；主智能体每回合拿到技能目录，可通过 `fs/read_text_file` 读 SKILL.md 或 MCP `bot_skill_show` 调用；用过的技能显示成消息上方的标签 | 已实现 |
-| 子智能体 | pstack 的子智能体说明（poteto-agent）在委托时可附加；ACP 智能体自身的子智能体（如 Claude Code 的 Task）原样显示为工具卡片 | 部分 |
-| 接管 | 沿用狐狸OS 人工接管：暂停期间 ACP 写文件、终端和委托全部返回 PAUSED，审批卡片自动拒绝 | 已实现 |
-| 审计 | 沿用 `.foxos/audit.jsonl`；身份 `bot:<id>`（经 ACP 智能体时 `bot:<id>/acp:<agent>`）；密钥参数在审计里写成 `***` | 已实现 |
-| Bot 头像 | Tabler 图标字体 + 主题色圆形；ACP 智能体显示注册表官方图标 | 已实现 |
-| 例程 / 目标 | 没做。可以用系统的 systemd 用户定时器调用 `foxos bot message send` | 缺口 |
-| 团队共享、可见性、SSO | 单机系统，不需要 | 不做 |
-| 自动学习、记忆来源导入 | 依赖 CopilotKit Intelligence（非 MIT） | 不做 |
+| Bot 资料：名字、头衔、角色、头像 | `foxos bot profile create/update/duplicate/reset/delete`；头像 = Tabler 图标 + 颜色，或工作空间里的图片 | 已实现（US-100） |
+| 主 Bot | 每个工作空间固定一个主智能体「狐狸」（`main: true`，不能删除） | 已实现（US-100） |
+| 其他 Bot 的名册：置顶、隐藏、搜索、正在运行的徽标 | 左栏名册；`--pinned/--hidden`；运行中显示动画徽标 | 已实现（US-100、US-108） |
+| Bot 后端（内置 / AG-UI / Mastra） | 任一 ACP 智能体（本地智能体、Gemini CLI、Codex、Qwen Code、opencode、Claude Code、Cursor CLI…），或 OpenAI 兼容端点（只聊天，不带工具） | 已实现（US-102、US-116） |
+| 流式回答、按回合排版 | ACP `agent_message_chunk` → SSE；重开窗口时从进行中回合的起点回放 | 已实现（US-107） |
+| 工具卡片：命令 + 输出、diff、计划 | ACP `tool_call`/`tool_call_update`/`plan` → 卡片 | 已实现（US-102） |
+| 审批卡片：允许一次 / 本对话 / 总是 / 拒绝 | ACP `session/request_permission`；每个智能体的审批模式与规则；审批页列出所有待批项 | 已实现（US-102、US-108） |
+| `@` 提及、`/` 技能、附件 | 输入框 `@` 菜单、`/` 技能菜单、附件存到 `attachments/` 并作为 `resource_link` 发送 | 已实现（US-103、US-104） |
+| 交接（handoff 信封 `{task, constraints, expecting}`）、深度与次数上限 | `foxos bot task delegate`、MCP `bot_task_delegate`；深度 3、每回合 5；审计 `delegated-by:<bot>` | 已实现（US-103） |
+| 子智能体 | 其他 Bot 当子智能体（委托）；ACP 智能体自己的子任务原样显示为卡片 | 部分 |
+| 技能（部署 / 个人） | pstack 随系统分发；工作空间 `.foxos/skills/` 与 `~/.agents/skills/` 覆盖同名；每个智能体可「全部 / 只选这些 / 关掉这些」 | 已实现（US-104） |
+| 记忆 | `foxos bot memory add/list/forget`，每回合作为上下文；人确认才写入 | 已实现（US-105；不做自动学习） |
+| 例程（定时） | `foxos bot routine create/update/delete/run`；systemd 用户定时器每 5 分钟检查；最短 15 分钟、最多 20 个启用 | 已实现（US-105） |
+| 接管 | 狐狸OS 人工接管：全部暂停或只暂停一个智能体（`control pause --only bot:<id>`） | 已实现（US-106、US-115） |
+| 审计（谁授权、什么触发） | `.foxos/audit.jsonl`：`bot:<id>/acp:<agent>`、远程是 `bot:<id>@<控制端>`；触发来源 person / routine / channel / handoff | 已实现 |
+| 连接器：目录、OAuth、令牌、按 Bot 启用 | 见第 5 节 | 已实现（US-109–US-112；托管 OAuth 服务部分） |
+| 频道（Slack 等） | Telegram 机器人、Webhook | 部分（只有这两种；Telegram 没有对真实机器人跑过） |
+| Bot 的电脑 | 狐狸OS 本身就是智能体的电脑；多机见第 6 节 | 已实现（US-113–US-115） |
 | 听写、语音 | — | 缺口 |
+| 团队、可见性、SSO | `visibility` 字段保留，单机不生效 | 不做 |
+| 自动学习、记忆来源导入 | 依赖 CopilotKit Intelligence（非 MIT） | 不做 |
 
-已有部件和缺口：
+## 3. 每个智能体的设置
 
-- **已有**：Electron 伴侣里的「智能体会话」面板（单个 ACP 会话、权限卡片、审计时间线）、`apps/desktop/src/main/acp.js`（Node 版 ACP 客户端）、ACP 注册表安装（Electron 里）、`foxos` CLI / MCP、审计、人工接管、工作空间约束、写锁、轻量沙箱。
-- **缺的（本次补上）**：Python 版 ACP 客户端（CLI / MCP / 操作系统里都能用，不依赖 Electron）、在系统里安装 ACP 智能体（`foxos acp agent install`）、本地密钥库、多个 Bot 的资料 / 对话 / 记忆、委托、pstack、操作系统里的聊天窗口。
+设置页的分页：设置、技能、记忆、审批、例程、委托、机器、频道、管理。命令行是 `foxos bot config get/set`。
 
-## 3. pstack 集成设计
+| OpenBot 设置 | 狐狸OS 字段（`foxos bot config set` 参数） | 状态 |
+|---|---|---|
+| Name | `name`（`--name`），同一工作空间唯一 | 已实现 |
+| Title | `title`（`--title`） | 已实现 |
+| Role description（standing role） | `role`（`--role`），每回合放进前言 | 已实现 |
+| 额外指令 | `instructions`（`--instructions-stdin`） | 已实现 |
+| Avatar（avatarSeed） | `avatar.icon/color/image`（`--icon --color --image`） | 已实现（用图标，不用生成的脸） |
+| Backend / harness | `backend.kind=acp, agent`（`--agent`），或 `kind=model, base_url, model`（`--base-url --model`） | 已实现 |
+| Model | `model`（`--model`），通过 ACP `session/set_model` 下发；没有就用该 ACP 智能体的默认（`foxos acp agent config --model`） | 已实现 |
+| API key | `--api-key-stdin`，存在本机密钥库，任何输出里都是 `***` | 已实现（US-101） |
+| Isolated / 工作文件夹 | `isolated`、`scope`（`bots/<id>`）；越界 PERMISSION_DENIED | 已实现 |
+| Visibility | `visibility`（private/public） | 保留字段（单机） |
+| Pinned / hidden / active | `pinned` `hidden` `active` | 已实现 |
+| Notifications | `notifications` | 已实现 |
+| Skills | `skills.mode/enabled/disabled`（`--skills-mode --skills --skills-off`） | 已实现 |
+| Connectors | `connectors`（`--connectors`），只有列出的连接器的工具会给这个智能体 | 已实现（US-109） |
+| Approvals | `approvals.mode`（ask / allow_reads / allow_all）、`rules`（`--rule 工具=allow|ask|deny`） | 已实现 |
+| Handoff 范围 | `delegation.allowed/max_depth/max_per_turn`（`--delegate-to --max-depth --max-per-turn`） | 已实现 |
+| Machines | `machines.allowed/default`（`--machines --default-machine`） | 已实现（US-114） |
+| Channels | `channels`（`foxos bot channel set --kind telegram|webhook`） | 部分 |
+| Routines | `foxos bot routine …`（按智能体） | 已实现 |
 
-1. **随系统分发**：`packages/core/foxos/data/pstack/skills/`（MIT，带 `NOTICE` 与上游提交号）。`foxos bot skill list` 读每个 `SKILL.md` 的头部，分出 `skill` / `principle` / `subagent`，给出路径与是否 `disable-model-invocation`。用户还能把自己的技能放进工作空间 `.foxos/skills/<名字>/SKILL.md` 或 `~/.agents/skills/`，同名时用户的优先。
-2. **主智能体怎么用**：
-   - 每个回合，主智能体收到一段狐狸OS 前言：身份与角色、记忆、可委托的其它 Bot 名单、技能目录（名字 + 一句描述 + SKILL.md 绝对路径），以及规则「需要时先读 SKILL.md 再按步骤做；原则在适用时读」。
-   - 用户输入 `/architect …`、`/tdd …`：把对应 SKILL.md 全文附在这一回合（就像 Cursor / Claude Code 把技能附到消息上）。
-   - 智能体自己读 SKILL.md（`fs/read_text_file` 命中技能路径）或调用 MCP `bot_skill_show`，都算「用了这个技能」。
-   - 聊天里每条主智能体回答上方显示用过的技能标签（例如「architect」「principle-prove-it-works」），也写进消息记录 `skills_used`。
-3. **子智能体与多模型**：pstack 的 `arena` / `swarm` / `architect` 要求按模型列表派多个子智能体。狐狸OS 把「其它 Bot」当作可派的子智能体：主智能体用 `bot_task_delegate` 把一部分交给 Claude Code Bot、另一部分交给 Codex Bot，结果回到主智能体合并。`foxos bot skill models` 写 `~/.agents/pstack-models.md`，把角色映射到 Bot（例如 `arena runners: bot:claude, bot:codex`）。
-4. **Claude Code / Codex 自带技能机制**：`foxos bot skill install --harness claude-code|codex|agents` 把 pstack 拷到 `~/.claude/skills/`、`~/.codex/skills/` 或 `~/.agents/skills/`，这样 ACP 背后的 CLI 自己也能发现（它们支持 Agent Skills 时）。
+## 4. pstack 集成
 
-## 4. 实现位置
+1. **随系统分发**：`packages/core/foxos/data/pstack/`（MIT，带 `NOTICE` 与上游提交号 08547969）。`foxos bot skill list` 读每个 `SKILL.md` 的头部，分出 `skill` / `principle` / `subagent`。用户的同名技能优先。
+2. **主智能体怎么用**：每回合的前言里有技能目录（名字、一句描述、SKILL.md 路径）；用户输入 `/architect …` 时把 SKILL.md 全文附在这一回合；智能体读 SKILL.md 或调用 MCP `bot_skill_show` 都记为「用过」，显示成回答上方的标签，写进 `skills_used`。
+3. **多模型**：`foxos bot skill models` 写 `~/.agents/pstack-models.md`，把 pstack 的角色映射到其他智能体（例如 `arena runners: bot:claude, bot:codex`），主智能体用委托派发。
+4. **给 ACP 背后的 CLI**：`foxos bot skill install --harness claude-code|codex|agents` 把 pstack 拷到它们自己的技能目录。
+
+## 5. 连接器
+
+| 能力 | 实现 |
+|---|---|
+| 目录 | `foxos connector catalog`：Parallel、Exa、Firecrawl（免密钥与 API key 两种）、Notion、Google Drive、GitHub、自定义 |
+| 传输 | MCP Streamable HTTP 与 stdio（`connector add --command …`） |
+| 认证 | 无；Bearer / 自定义头（`--token-stdin`，存密钥库）；OAuth 2.1：RFC 9728 → RFC 8414 发现、必须 S256 PKCE、动态客户端注册（RFC 7591）、刷新令牌、回调只听 127.0.0.1 |
+| 按智能体启用 | 每个智能体的 `connectors` 列表；`connector tools` 列出工具 |
+| 写操作 | 目录里的 `write_tools`、工具的 `destructiveHint` 或 `readOnlyHint:false` 都算写，按该智能体的审批模式处理 |
+| 错误令牌 | 连接时被拒就不算连上，并断开（PERMISSION_DENIED） |
+
+测试：本地的真实 OAuth 2.1 + MCP 测试服务（`tests/peers/oauth_mcp.py`）跑完整授权码流程；Exa 免密钥服务真实调用。Notion、Google Drive、GitHub 的托管 OAuth 流程已实现，但没有用真实账号跑过。
+
+## 6. 多机：一个智能体控制多台狐狸OS、多个智能体共用一台
+
+- **被控端**：`foxos machine serve`（系统里是 `foxos-machine.service`，0.0.0.0:7443）。第一次启动生成自签名证书。
+- **配对**：被控端 `foxos machine host code` 给出一次性配对码（默认 10 分钟）和证书指纹；控制端 `foxos machine pair --name … --url … --code … --fingerprint …`。指纹不对就拒绝（防中间人）。配对时控制端把自己的证书交给被控端登记。
+- **双向 TLS**：之后每次连接，控制端钉住被控端证书指纹，被控端校验控制端出示的证书正是配对时登记的那张，再校验令牌。只偷到令牌连不上（US-113）。
+- **授权，默认拒绝**：`foxos machine host grant --client … --bot … --permissions read,create,modify [--apps …] [--scope …]`；`revoke`、`unpair` 立即生效。`machine`、`control`（配对授权与接管本身）永远不能远程调用。
+- **一个智能体，多台机器**：智能体设置里的 `machines` 决定它能去哪些机器；对话里 MCP 工具带 `machine` 参数，命令行用 `--machine`（US-114）。
+- **多个智能体，一台机器**：每个智能体分别授权；同一文件单写者锁（LOCKED）、`--expect-mtime` 乐观并发（CONFLICT）、桌面输入同一时间只归一个智能体（CONFLICT）；被控端的人可以只暂停一个智能体；`machine ping` 显示此刻谁在操作；远端自称 `human` 会被改写成 `remote-human:<控制端>`，不能绕过接管（US-115）。
+- **审计**：被控端记 `bot:<id>@<控制端>`、`interface: remote`；控制端记 `interface: remote-client` 与目标机器。
+
+## 7. 聊天窗口：独立或停靠
+
+- `foxos-bots`（开始菜单「智能体」）打开独立窗口（Chromium 系 `--app`，没有时用 Firefox 专用配置），窗口类 `foxos-bots`；已经开着就切到前台。
+- **停靠**：标题栏按钮或 `foxos-bots --dock [--side left|right]`，窗口贴到屏幕一侧、全高、置顶、所有工作区可见；`--undock` 恢复。选择按用户保存在 `~/.config/foxos/bots-ui.json`。截图：`docs/screenshots/bots-window-separate.png`、`bots-window-docked.png`。
+- `foxos-bots --page approvals|connectors|agents|machines|skills|routines|runtime|settings/<bot>/<tab>` 直达页面。
+- 限制：停靠用 wmctrl 移动窗口，不预留屏幕边（strut），最大化的其他窗口会被盖住一部分。
+- Electron 伴侣里的「智能体」应用用 webview 打开同一个界面。
+
+## 8. 实现位置
 
 | 部分 | 位置 |
 |---|---|
-| Bot 资料 / 对话 / 记忆 / 委托 / 技能命令 | `packages/core/foxos/apps/bot.py`、`packages/core/foxos/bots.py` |
-| ACP 客户端（Python，stdio JSON-RPC） | `packages/core/foxos/acp_client.py` |
-| ACP 智能体安装、密钥、握手 | `packages/core/foxos/apps/acp.py`、`packages/core/foxos/secrets.py` |
-| 本地确定性 ACP 智能体 | `packages/core/foxos/local_agent.py`（`python3 -m foxos.local_agent`） |
-| 聊天服务与界面 | `packages/core/foxos/botchat/`（`foxos bot serve`，只监听 127.0.0.1，随机令牌） |
-| 操作系统里的窗口 | `scripts/os/bots/foxos-bots`、`foxos-bots.desktop`（开始菜单「智能体」） |
-| 伴侣程序 | Electron 的「智能体」应用打开同一个界面 |
-| pstack | `packages/core/foxos/data/pstack/` |
-| 运行时（Node、Bun、Python、uv、智能体 CLI） | `scripts/os/runtime/manifest.json`、`scripts/os/hooks/35-agent-runtime.sh`、`foxos runtime …`，说明见 [agent-runtime.md](agent-runtime.md) |
+| 智能体资料 / 对话 / 记忆 / 委托 / 技能 / 例程 / 频道 | `packages/core/foxos/bots.py`、`apps/bot.py`、`channels.py`、`skills.py` |
+| ACP 客户端、智能体安装 / 设置 / 更新 / 握手 | `acp_client.py`、`apps/acp.py`、`secrets.py` |
+| 本地确定性 ACP 智能体 | `local_agent.py` |
+| 连接器 | `connectors.py`、`apps/connector.py` |
+| 多机 | `machines.py`、`apps/machine.py` |
+| 运行环境 | `runtime.py`、`apps/runtime.py`、`data/runtime-manifest.json`，见 [agent-runtime.md](agent-runtime.md) |
+| 聊天服务与界面 | `botchat/server.py`、`botchat/launch.py`、`botchat/static/` |
+| 操作系统 | `scripts/os/hooks/30-foxos.sh`、`35-agent-runtime.sh`、`scripts/os/bots/`、`scripts/os/systemd/` |
+| 伴侣程序 | `apps/desktop/src/main/bots.js`、`renderer/js/apps/bots.js` |
+| 测试 | `packages/core/tests/test_bots.py`、`test_connectors.py`、`test_machines.py`、`test_acp_real.py`、`test_os_runtime.py` |
 
 ---
 
@@ -137,23 +187,23 @@ A workspace for "AI coworkers": a React/Vite app, a Hono API server and PostgreS
 - **Model config**: `/setup-pstack` writes a per-role model file (`~/.cursor/rules/pstack-models.mdc`, `~/.claude/rules/pstack-models.md`, or `~/.agents/pstack-models.md`); `arena`, `architect` and `interrogate` fan out one subagent per listed model.
 - **Harnesses**: written with Cursor tool names, mapped for Claude Code in `docs/harness/claude-code.md`; the mirror installs into Claude Code, Codex, OpenCode and others with `npx skills add backnotprop/pstack`.
 
-## 2. Mapping onto FoxOS
+## 2. OpenBot parity
 
-See the table in the Chinese section above; every row has the same meaning. In short:
+The Chinese section above has the full tables. In short:
 
-- **Implemented**: bot profiles (name, title, role, font-icon or image avatar, no emoji), one fixed main bot per workspace, backends (any installed ACP agent, the bundled deterministic local agent, or an OpenAI-compatible endpoint), per-bot conversation and memory, per-bot workspace scope enforced on ACP `fs/*` and terminals on top of workspace bounds, locks, audit and takeover; streaming; tool-call cards with diffs, terminal output and plans; approval cards from ACP `session/request_permission`; attachments saved into the workspace and sent as `resource_link`; `@` mentions; typed delegation envelopes with depth 3 and 5-per-turn caps; pstack skills in the `/` menu with "skills used" chips; registry icons for ACP agents.
-- **Partial**: subagents (pstack's poteto-agent brief can be attached to a delegation; an ACP agent's own subagents show as tool cards).
-- **Gaps**: routines and goals, dictation, "allow for this conversation" persisted rules, automatic learning (depends on non-MIT Intelligence), team sharing (not needed on a single-user OS).
+- **Done** (with tests): bot profiles and the main bot (US-100); per-bot settings, all OpenBot fields plus model, API key, scope, skills, connectors, approvals, delegation and machines (US-101); real ACP turns with tool cards, diffs, terminals and approval cards (US-102); `@` mentions and typed handoff envelopes with depth and per-turn limits (US-103); pstack skills (US-104); memory and routines (US-105); pausing one bot or all bots (US-106); the chat service with SSE replay (US-107) and the browser UI in both languages (US-108); connectors with a catalog, stdio/HTTP MCP, bearer tokens, OAuth 2.1 with discovery, PKCE, dynamic registration and refresh, per-bot enablement and write approval (US-109 to US-112); multiple machines (US-113 to US-115); third-party ACP agents (US-116 to US-118).
+- **Partial**: hosted OAuth for Notion, Google Drive and GitHub was never run against a real account; channels are only Telegram and webhook; sub-agents work through delegation only.
+- **Gaps**: dictation and voice.
+- **Not planned**: teams, SSO, auto-learning.
 
-Existing pieces: the Electron agent session panel (one ACP session, permission cards, audit timeline), `acp.js` (Node ACP client), registry install in Electron, the `foxos` CLI/MCP, audit, takeover, workspace bounds, file locks and the light sandbox. Missing before this change: a Python ACP client usable from CLI/MCP and the OS, ACP install from the OS, a secret store, multiple bots with conversations and memory, delegation, pstack, and an OS chat window.
+## 3. Multiple machines
 
-## 3. pstack integration
+`foxos machine serve` runs on the controlled machine. Pairing uses a one-time code plus the certificate fingerprint, and the controller registers its own certificate. Every later connection is mutual TLS (pinned server fingerprint plus the registered client certificate) and also needs the token. Grants are deny-by-default, per bot, with permission, app and scope limits. The audit log names `bot:<id>@<controller>`. Several bots on one machine are kept apart by file locks (LOCKED), optimistic concurrency (CONFLICT), a single desktop-input owner, and per-bot pause.
 
-1. **Shipped** in `packages/core/foxos/data/pstack/skills/` (MIT, `NOTICE`, upstream commit). `foxos bot skill list` reads each front matter and classifies `skill` / `principle` / `subagent`. User skills in `.foxos/skills/<name>/SKILL.md` or `~/.agents/skills/` override by name.
-2. **How the main bot uses them**: each turn carries a FoxOS preamble (identity and role, memory, the bots it can delegate to, the skill catalog with absolute SKILL.md paths, and the rule "read SKILL.md first when one applies"). `/architect …` or `/tdd …` attaches that SKILL.md in full. A `fs/read_text_file` on a skill path or an MCP `bot_skill_show` call counts as using it. The chat shows "skills used" chips above the answer and stores them as `skills_used`.
-3. **Subagents and multiple models**: other bots act as pstack's subagents. The main bot calls `bot_task_delegate` to hand parts to a Claude Code bot and a Codex bot and merges the results. `foxos bot skill models` writes `~/.agents/pstack-models.md` mapping roles to bots.
-4. **Native skill discovery**: `foxos bot skill install --harness claude-code|codex|agents` copies pstack into `~/.claude/skills/`, `~/.codex/skills/` or `~/.agents/skills/` so the CLI behind an ACP agent finds them itself.
+## 4. Chat window
 
-## 4. Where it lives
+`foxos-bots` opens a separate window (class `foxos-bots`). `--dock`/`--undock` docks it to a screen edge or detaches it, and the choice is saved per user. `--page` opens a given page.
 
-See the table in section 4 above.
+## 5. Where it lives
+
+See the table in section 8 of the Chinese part.

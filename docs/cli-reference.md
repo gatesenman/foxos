@@ -164,6 +164,57 @@ foxos acp agent login gemini --method oauth-personal
 
 - 只有人可以登录智能体账号
 
+### `foxos acp agent config`
+
+查看或修改某个 ACP 智能体的设置：默认模型、模式、额外启动参数、非机密环境变量（机密用 acp key set）
+
+```text
+foxos acp agent config AGENT [--model MODEL] [--mode MODE] [--arg ARG] [--env ENV] [--clear]
+```
+
+工具接口名：`acp_agent_config` · 权限：`modify`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `agent` | `AGENT` | string | 是 | 智能体 ID（如 codex-acp、gemini、claude-acp） |
+| `model` | `--model` | string |  | 默认模型 ID（会话开始时用 session/set_model 切换；空字符串清除） |
+| `mode` | `--mode` | string |  | 默认模式 ID（session/set_mode；空字符串清除） |
+| `arg` | `--arg` | array |  | 额外启动参数（可重复；替换原有的额外参数） |
+| `env` | `--env` | object |  | 非机密环境变量 KEY=VALUE（可重复；VALUE 为空表示删除） |
+| `clear` | `--clear` | boolean |  | 先清空全部设置 |
+
+示例：
+
+```bash
+foxos acp agent config gemini --json
+foxos acp agent config gemini --model gemini-2.5-pro
+foxos acp agent config opencode --env OPENCODE_LOG=info
+```
+
+### `foxos acp agent update`
+
+和官方注册表比较版本并更新 ACP 智能体（装到用户目录，系统预装的也不需要 root）
+
+```text
+foxos acp agent update [AGENT] [--all] [--check] [--accept-license]
+```
+
+工具接口名：`acp_agent_update` · 权限：`run`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `agent` | `AGENT` | string |  | 智能体 ID（如 codex-acp、gemini、claude-acp） |
+| `all` | `--all` | boolean |  | 检查全部已安装的智能体 |
+| `check` | `--check` | boolean |  | 只检查，不安装 |
+| `accept_license` | `--accept-license` | boolean |  | 确认不可再分发的许可证（例如专有智能体） |
+
+示例：
+
+```bash
+foxos acp agent update --all --check --json
+foxos acp agent update gemini
+```
+
 ### `foxos acp key set`
 
 保存智能体的 API 密钥到本地密钥库（从标准输入读取，不写日志）
