@@ -41,6 +41,8 @@
  "approvals.allow_once": "允许一次",
  "approvals.by": "由 {0}",
  "approvals.by_rule": "审批规则",
+ "approvals.by_takeover": "人工接管",
+ "approvals.by_timeout": "超时",
  "approvals.deny": "拒绝",
  "approvals.deny_always": "总是拒绝",
  "approvals.lead": "智能体要做需要你同意的事时会停下来等你。审批规则在每个智能体的设置里。",

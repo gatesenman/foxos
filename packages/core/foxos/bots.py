@@ -881,6 +881,12 @@ def _run_acp(ws, bot, turn: _Turn, text, skill_block, envelope, attachments, ide
         for f in ("title", "kind"):
             if tc.get(f):
                 cd.setdefault(f, tc[f])
+        if paused_for(ws, aid):
+            # 人工接管时代理自己写文件（不走 ACP fs）也要停下：一律拒绝，记为接管
+            opt = _pick(opts, False)
+            cd["approval"] = {"decision": "deny", "by": "takeover", "optionId": opt}
+            turn.emit({"type": "card", "card": cd})
+            return opt
         if dec != "ask":
             opt = _pick(opts, dec == "allow")
             cd["approval"] = {"decision": dec, "by": "rule", "optionId": opt}
@@ -912,9 +918,10 @@ def _run_acp(ws, bot, turn: _Turn, text, skill_block, envelope, attachments, ide
             if paused_for(ws, aid):
                 break
             time.sleep(0.25)
-        a["status"] = "expired"
+        why = "takeover" if paused_for(ws, aid) else "timeout"
+        a["status"] = "cancelled" if why == "takeover" else "expired"
         f.write_text(json.dumps(a, ensure_ascii=False), encoding="utf-8")
-        cd["approval"] = {"request": rid, "decision": "deny", "by": "timeout"}
+        cd["approval"] = {"request": rid, "decision": "deny", "by": why}
         turn.emit({"type": "card", "card": cd})
         return _pick(opts, False)
 
