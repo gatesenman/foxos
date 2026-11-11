@@ -13,7 +13,8 @@ const { corePath } = require('./paths');
 const kernel = require('./kernel');
 
 const SCHEME = 'foxapp';
-protocol.registerSchemesAsPrivileged([{ scheme: SCHEME, privileges: { standard: true, secure: true, supportFetchAPI: true, corsEnabled: true, stream: true, allowServiceWorkers: false, codeCache: true } }]);
+protocol.registerSchemesAsPrivileged([{ scheme: SCHEME, privileges: { standard: true, secure: true, supportFetchAPI: true, corsEnabled: true, stream: true, allowServiceWorkers: false, codeCache: true } },
+  { scheme: 'foxicon', privileges: { standard: true, secure: true, supportFetchAPI: true, corsEnabled: true } }]); // 程序图标，见 icons.js
 
 const SHIM = path.join(corePath(), 'foxos', 'data', 'runtime', 'puter-shim.js');
 const BRIDGE = path.join(corePath(), 'foxos', 'data', 'runtime', 'bridge.js');

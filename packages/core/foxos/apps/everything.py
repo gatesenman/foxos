@@ -114,6 +114,33 @@ def _fetch_source(apps: list[str], dest: Path, source: str | None, log) -> Path:
     return dest
 
 
+ICON_NAMES = ("icon-128.png", "icon.png")
+
+
+def _copy_icon(adir: Path, dest: Path) -> str | None:
+    for n in ICON_NAMES:
+        if (adir / n).exists():
+            shutil.copy2(adir / n, dest / "icon.png")
+            return n
+    return None
+
+
+def ev_icons(ctx: Context, source: str | None = None) -> dict:
+    """给已安装但缺少图标的应用补上上游图标（只取 src/<应用>/icon*.png，不重新构建）。"""
+    need = [a["id"] for a in CATALOG["apps"] if installed(a["id"]) and not (app_dir(a["id"]) / "icon.png").exists()]
+    done, missing = [], []
+    if need:
+        work = Path(tempfile.mkdtemp(prefix="foxos-ev-icons-"))
+        try:
+            _fetch_source(need, work, source, lambda s: None)
+            for a in need:
+                (done if _copy_icon(work / "src" / a, app_dir(a)) else missing).append(a)
+        finally:
+            shutil.rmtree(work, ignore_errors=True)
+    have = [a["id"] for a in CATALOG["apps"] if (app_dir(a["id"]) / "icon.png").exists()]
+    return {"message": f"补齐 {len(done)} 个应用的图标；已安装应用中有图标的共 {len(have)} 个", "added": done, "missing": missing, "with_icon": have}
+
+
 def install_app(app: str, source: str | None = None, log=lambda s: None, keep_build: bool = False) -> dict:
     a = _need(app)
     npm = shutil.which("npm")
@@ -140,6 +167,8 @@ def install_app(app: str, source: str | None = None, log=lambda s: None, keep_bu
         vite = adir / "node_modules" / "vite" / "bin" / "vite.js"
         node = shutil.which("node") or "node"
         _run([node, str(vite), "build", "--config", str(DATA / "runtime" / "vite.foxos.config.mjs"), "--outDir", str(stage / "dist"), "--emptyOutDir"], adir, log, env=env)
+        # 上游自带的程序图标（桌面的应用中心、开始菜单、任务栏、标题栏使用）
+        _copy_icon(adir, stage)
         # 许可证与版权声明随安装保留
         notices = stage / "licenses"
         notices.mkdir()
@@ -236,6 +265,8 @@ register(Command("everything", "run", "执行一个应用的任意命令（与 f
                          Param("args", "object", "命令参数（JSON 对象）")],
                  examples=["foxos everything run tasks \"add-task set\" --args '{\"value\": \"买牛奶\", \"submit\": true}' --json"],
                  audited=False))
+register(Command("everything", "icons", "给已安装的应用补上上游自带的程序图标（不重新构建）", ev_icons,
+                 params=[Param("source", "string", "本地上游仓库路径（缺省从 GitHub 获取固定提交）")], examples=["foxos everything icons --json"], permission="modify"))
 register(Command("everything", "uninstall", "卸载应用（保留工作空间中的数据）", ev_uninstall, params=[APPP], permission="delete",
                  examples=["foxos everything uninstall chess"]))
 

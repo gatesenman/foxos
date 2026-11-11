@@ -212,10 +212,12 @@ ipcMain.on('ui:ready', async () => {
   console.log(`screenshot saved: ${path.resolve(SCREENSHOT)}`);
   app.quit();
 });
+handle('icons:report', () => require('./icons').report());
 ipcMain.on('ui:log', (_e, msg) => console.error(`[界面] ${msg}`));
 
 app.whenReady().then(() => {
   session.defaultSession.setPermissionRequestHandler((_wc, _perm, cb) => cb(false));
+  require('./icons').register(session.defaultSession);
   const launch = { exec: process.execPath, args: [...(app.isPackaged ? [] : [app.getAppPath()]), ...process.argv.filter((a) => a === '--no-sandbox' || a.startsWith('--user-data-dir='))] };
   control.start(controlHandler, { launch });
   try { fs.mkdirSync(everything.foxosHome(), { recursive: true }); fs.writeFileSync(path.join(everything.foxosHome(), 'desktop-launch.json'), JSON.stringify(launch)); } catch { /* 忽略 */ }

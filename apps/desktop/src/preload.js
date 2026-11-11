@@ -28,6 +28,7 @@ contextBridge.exposeInMainWorld('foxos', {
     onData: (cb) => on('pty:data', cb),
     onExit: (cb) => on('pty:exit', cb),
   },
+  icons: { report: () => call('icons:report') },
   agents: {
     list: () => call('agents:list'),
     installed: () => call('agents:installed'),
