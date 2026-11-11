@@ -53,7 +53,7 @@
 | US-50 | 安装系统：目录与一键安装（Linux 宿主上真实安装 Alpine） | 通过 | 1 | 0 | 0 |
 | US-52 | 轻量隔离：Landlock + seccomp 真实限制；智能体在轻量沙箱中运行；Seatbelt / Windows 策略生成 | 通过 | 14 | 0 | 1 |
 | US-53 | 程序图标：每个程序显示其开源项目自带的图标（Everything 上游 / LibreOffice / 系统终端 / Code - OSS / Electron / ACP 注册表），缺失时退回并报告 | 通过 | 1 | 0 | 0 |
-| US-60 | 真实 labwc 会话：列出/聚焦/移动窗口，键入与点击，人工接管（CLI 与 MCP） | 通过 | 3 | 0 | 0 |
+| US-60 | 真实 XFCE 会话：列出/聚焦/移动/缩放窗口，键入与点击，人工接管（CLI 与 MCP） | 通过 | 3 | 0 | 0 |
 | US-61 | linux-kvm 来宾与 foxos env run / desktop-attach（至少一个 Linux 来宾路径） | 通过 | 4 | 0 | 0 |
 
 ### 失败、跳过与已知缺陷的用例
@@ -67,12 +67,12 @@
 | US-46 | `everything.e2e.js` US-46 assets：本地打开，界面操作与 CLI 等价 | 跳过 | 上游提交 0fbb88cd 的 src/assets 只有 index.html/package.json/vite.config.js，缺少 index.html 引用的 /src/main.js（GitHub contents API 对 src/assets/src 返回 404），因此无法构建。 |
 | US-52 | `test_sandbox.py` test_windows_code_path_under_wine | 跳过 | 设置 FOXOS_TEST_WINE / FOXOS_TEST_WINE_PYTHON 后在 wine 中运行 Windows 代码路径 |
 
-## 操作系统会话与环境（2026-11-11 19:30，Asia/Shanghai）
+## 操作系统会话与环境（2026-11-11 20:52，Asia/Shanghai）
 
-本次在同一 Linux 构建盒上补充了 US-60 / US-61，**没有**重跑 Electron 桌面的 Everything 端到端，上表中 US-01–US-53 的 Everything 结果仍是 2026-11-11 14:39 那一次 `test:all`。新增用例如下。
+本次将图形会话从 labwc 换成 XFCE 后，在同一 Linux 构建盒上重跑了 `npm run test:os`（US-60 / US-61），**没有**重跑 Electron 桌面的 Everything 端到端。上表中 US-01–US-53 的 Everything 结果仍是 2026-11-11 14:39 那一次 `test:all`。
 
-- **US-60**（3 通过）：`packages/core/tests/test_os_session.py`。假后端覆盖列出、聚焦、移动、缩放、键入、点击、截图、关闭，以及 `desktop` / `session` 人工接管（智能体写操作返回 `PAUSED`）；MCP 工具目录含 `desktop_windows`、`desktop_move`、`session_takeover`。另在本机用 `WLR_BACKENDS=headless` 启动真实 **labwc 0.8.3**，打开两扇 foot 窗口，经 `zwlr_foreign_toplevel_manager_v1` 列出/聚焦/关闭，用 `wtype` 键入、虚拟指针点击、`grim` 截图。程序化 `move` 在无 `wlrctl` 时按设计返回 `DEPENDENCY_MISSING`（协议没有位置请求）。
-- **US-61**（4 通过）：`packages/core/tests/test_os_kvm.py`。`linux-kvm` 已登记为内置提供者；Linux 目录条目（如 Alpine）含该提供者；`foxos env run --iso --no-start` 与 `foxos env desktop-attach` 命令/MCP 已接通。此构建盒的 `/dev/kvm` 存在，但内核曾出现 `kvm_arch_vcpu_create` BUG，`foxos env doctor --provider linux-kvm` 会如实报告不可用；**不会**在未设置 `FOXOS_ALLOW_TEST_VMM=qemu-tcg` 时改用 QEMU。产品路径仍是 cloud-hypervisor + KVM，来宾桌面走 wayvnc。默认测试套件不引导 1.4 GiB 的狐狸OS ISO（太慢）；在支持 KVM 的机器上可用该 ISO 或目录中的 Linux 系统做来宾桌面。复现：`npm run test:os`。
+- **US-60**（3 通过）：`packages/core/tests/test_os_session.py`。假后端覆盖列出、聚焦、移动、缩放、键入、点击、截图、关闭，以及 `desktop` / `session` 人工接管（智能体写操作返回 `PAUSED`）；MCP 工具目录含 `desktop_windows`、`desktop_move`、`session_takeover`。另在本机用 **Xvfb + xfwm4** 启动真实 XFCE 窗口管理器，打开两扇 xfce4-terminal 窗口，经 `wmctrl` 列出/聚焦/关闭/移动/缩放，用 `xdotool` 键入与点击，用 `scrot` 截图。程序化移动与缩放在 X11 上可用。
+- **US-61**（4 通过）：`packages/core/tests/test_os_kvm.py`。`linux-kvm` 已登记为内置提供者；Linux 目录条目（如 Alpine）含该提供者；`foxos env run --iso --no-start` 与 `foxos env desktop-attach` 命令/MCP 已接通。此构建盒的 `/dev/kvm` 存在，但内核曾出现 `kvm_arch_vcpu_create` BUG，`foxos env doctor --provider linux-kvm` 会如实报告不可用；**不会**在未设置 `FOXOS_ALLOW_TEST_VMM=qemu-tcg` 时改用 QEMU。产品路径仍是 cloud-hypervisor + KVM，来宾桌面走 wayvnc。默认测试套件不引导狐狸OS ISO（太慢）；在支持 KVM 的机器上可用该 ISO 或目录中的 Linux 系统做来宾桌面。复现：`npm run test:os`。
 
 ## Everything 应用覆盖（51 个）
 

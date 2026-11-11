@@ -1,6 +1,13 @@
 # 狐狸OS 0.3.0 预览版测试指南
 
-这是第一张**可引导、可安装**的 狐狸OS ISO（Ubuntu 24.04 基础，labwc 桌面）。下面说明怎么在 U 盘、真实电脑、Hyper-V 和本机构建测试里启动它。Windows 上的 `.exe` 是伴侣程序，不是这张 ISO。
+这是第一张**可引导、可安装**的 狐狸OS ISO（Ubuntu 24.04 基础，XFCE 桌面）。下面说明怎么在 U 盘、真实电脑、Hyper-V 和本机构建测试里启动它。Windows 上的 `.exe` 是伴侣程序，不是这张 ISO。
+
+本仓库当前代码已经把默认图形会话改成 XFCE。在构建机上新做出来的 ISO 是：
+
+- `build/os/FoxOS-0.3.0-amd64.iso`：1534500864 字节（约 1.43 GiB，小于 2 GB）
+- SHA-256：`8d70c6514df41dd85ddaff0b53ce4308e0b27ed13afd441687f23d536b1ef3bb`
+
+下面表格与校验和仍对应 GitHub Release [v0.3.0-os-preview](https://github.com/gatesenman/foxos/releases/tag/v0.3.0-os-preview) 上已发布的分卷（更换 XFCE 之前的预览镜像）。新构建还没有拆分上传到该 Release。若要用 XFCE 这版，请在仓库里按 [os-build.md](os-build.md) 自行制作，或等待下一次发布。
 
 预发布：[v0.3.0-os-preview](https://github.com/gatesenman/foxos/releases/tag/v0.3.0-os-preview)
 
@@ -32,7 +39,7 @@ sudo dd if=FoxOS-0.3.0-amd64.iso of=/dev/sdX bs=4M status=progress conv=fsync
 
 在 Windows 上可用 Rufus 或 `balenaEtcher`，把 ISO 写到 U 盘（DD / 镜像模式）。然后从 U 盘启动（UEFI 优先；部分机器也可走传统 BIOS）。
 
-默认菜单「狐狸OS（试用或安装）」会自动登录用户 `foxos`（空密码），进入 labwc 桌面：底部面板（开始、时钟、系统、人工接管）、壁纸，以及真实的窗口（终端、文件管理器、编辑器、Firefox）。中文界面与 Fcitx5 拼音默认开启；物理键盘布局是 US。
+默认菜单「狐狸OS（试用或安装）」会自动登录用户 `foxos`（空密码），进入 XFCE 桌面：底部面板（开始、时钟、系统、人工接管）、壁纸，以及真实的窗口（终端、文件管理器、编辑器、Firefox）。中文界面与 Fcitx5 拼音默认开启；物理键盘布局是 US。
 
 要安装到硬盘：打开开始菜单里的「安装 狐狸OS」（Calamares）。安装过程会分区并写入引导，请先备份。安装完成后去掉 U 盘再启动。
 

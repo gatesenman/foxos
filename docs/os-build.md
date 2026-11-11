@@ -5,7 +5,7 @@
 ## 产出
 
 - `build/os/FoxOS-0.3.0-amd64.iso`：Live（可试用）+ Calamares 安装器，UEFI 与传统 BIOS 都能引导
-- `build/os/SHA256SUMS`：该 ISO 的 sha256
+- `build/os/SHA256SUMS`：该 ISO 的 sha256。当前代码在构建机上产出 `FoxOS-0.3.0-amd64.iso`（1534500864 字节，SHA-256 `8d70c6514df41dd85ddaff0b53ce4308e0b27ed13afd441687f23d536b1ef3bb`）。该文件已在 `.gitignore` 中，不会提交进 git。
 - 单个 ISO 必须小于 2 GB（GitHub Release 的文件上限）。LibreOffice、Everything 应用、ACP 智能体等较大组件不打进 ISO，安装后在线获取。
 
 `build/` 已在 `.gitignore` 里，不把 ISO 提交进 git。
@@ -51,15 +51,15 @@ sudo scripts/os/build-iso.sh
 ## 脚本实际做的事（按顺序）
 
 1. **debootstrap** `--variant=minbase` 安装 Ubuntu 24.04（noble, amd64）。这是底本，随后用 APT 装包，不用 live-build / mkosi 等封装器。
-2. 写入 `scripts/os/config/sources.list`（main / universe / restricted 与对应的 updates、security），在 chroot 里 `apt-get install` `config/packages.list` 中的包：内核、casper（Live 启动）、labwc、面板依赖、Thunar、GNOME Terminal、Calamares、lightdm、Fcitx5、字体、NetworkManager、Hyper-V 来宾守护进程、GRUB 等。
+2. 写入 `scripts/os/config/sources.list`（main / universe / restricted 与对应的 updates、security），在 chroot 里 `apt-get install` `config/packages.list` 中的包：内核、casper（Live 启动）、XFCE（xfce4-session、xfwm4、xfce4-panel、Whisker 菜单等）、Thunar、XFCE Terminal、Calamares、lightdm、Fcitx5、字体、NetworkManager、Hyper-V 来宾守护进程、GRUB 等。
 3. 下载并安装 **Firefox 官方 Linux x64 tarball**（中文语言包）到 `/opt/firefox`。不用 Ubuntu 默认的 Snap。
 4. 下载 **cloud-hypervisor** 官方静态二进制（Apache-2.0）到 `/usr/lib/foxos/vmm/`，并写入 `NOTICE`（版本、来源、许可）。这是完整环境的 VMM，不是 QEMU。
 5. 把本仓库的狐狸OS Python 包拷到 `/usr/lib/foxos/python`，安装 `/usr/bin/foxos` 与用户级 systemd 服务 `foxos-mcp.service`。
-6. 跑 `scripts/os/hooks/` 里的脚本（按文件名顺序）：locale / 时区、os-release 与壁纸等品牌、labwc 与面板、安装器配置、initramfs 模块（virtio、Hyper-V、NVMe、USB）、清理构建机代理和 APT 缓存。**构建机上的代理配置不会留在 ISO 里。**
+6. 跑 `scripts/os/hooks/` 里的脚本（按文件名顺序）：locale / 时区、os-release 与壁纸等品牌、XFCE 会话与主题、安装器配置、initramfs 模块（virtio、Hyper-V、NVMe、USB）、清理构建机代理和 APT 缓存。**构建机上的代理配置不会留在 ISO 里。**
 7. 从 chroot 取出内核与 initrd，用 **mksquashfs**（xz）做成 `/casper/filesystem.squashfs`。
 8. 用宿主上的 **grub-mkrescue** 做成混合 ISO（UEFI + BIOS），卷标 `FOXOS_030`。启动参数见 `scripts/os/iso/grub.cfg`（`boot=casper`，默认 locale 为 zh_CN）。
 
-Live 用户名为 `foxos`（见 `scripts/os/branding/casper.conf`）。在 Live 介质上 lightdm 会自动登录；安装到硬盘后不会自动登录，由 Calamares 创建的用户从登录器进入「狐狸OS」会话（labwc）。
+Live 用户名为 `foxos`（见 `scripts/os/branding/casper.conf`）。在 Live 介质上 lightdm 会自动登录；安装到硬盘后不会自动登录，由 Calamares 创建的用户从登录器进入「狐狸OS」会话（XFCE / `startxfce4`）。
 
 ## 测试引导
 
@@ -75,7 +75,7 @@ QEMU 只用于在本开发机上自动测试，**不是狐狸OS 的一部分**�
 
 ## 许可证方面的处理
 
-- labwc、Calamares、GRUB、casper 等 GPL / 以 GPL 为主的组件：**只通过 Ubuntu 软件包安装**，不把源码拷进本仓库。
+- XFCE、Calamares、GRUB、casper 等 GPL / 以 GPL 为主的组件：**只通过 Ubuntu 软件包安装**，不把源码拷进本仓库。狐狸OS 窗口装饰与面板样式见 `scripts/os/branding/xfce/ATTRIBUTION.md`。
 - cloud-hypervisor：Apache-2.0，官方二进制 + `NOTICE`。
 - Firefox：Mozilla 官方构建，按 Mozilla 公共许可分发；ISO 里保留其自身的许可文件。
 - 不内置 AGPL 的 Everything 应用源码；不内置 Windows ISO。

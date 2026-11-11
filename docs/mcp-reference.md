@@ -114,7 +114,7 @@
 
 ### `desktop_launch`
 
-启动一个应用或命令。CLI：foxos desktop launch CMD...。示例：foxos desktop launch -- gnome-terminal
+启动一个应用或命令。CLI：foxos desktop launch CMD...。示例：foxos desktop launch -- xfce4-terminal
 
 只读：否 · 破坏性：否 · CLI：`foxos desktop launch`
 
@@ -318,7 +318,7 @@
 
 ### `session_launch`
 
-启动一个应用或命令。CLI：foxos session launch CMD...。示例：foxos session launch -- gnome-terminal
+启动一个应用或命令。CLI：foxos session launch CMD...。示例：foxos session launch -- xfce4-terminal
 
 只读：否 · 破坏性：否 · CLI：`foxos session launch`
 

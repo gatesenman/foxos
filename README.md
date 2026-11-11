@@ -13,13 +13,13 @@
   <a href="README.en.md">English</a>
 </p>
 
-![狐狸OS 真实桌面：labwc、底部面板、开始菜单和 GNOME 终端](docs/screenshots/os-desktop.png)
+![狐狸OS 真实桌面：XFCE、开始菜单、底栏和终端窗口](docs/screenshots/os-desktop.png)
 
-这张截图来自 Live ISO 在 QEMU 里的一次干净引导之后的图形会话（QEMU 只用于测试）。图里是真正的 labwc 窗口：GNOME 终端（`foxos@foxos`）、底部狐狸OS 面板（开始、时钟、系统、人工接管）和开始菜单，不是 Electron 里画的假桌面。
+这张截图来自狐狸OS 的真实 XFCE 图形会话（QEMU / Xvfb 只用于测试）。图里是真正的 xfwm4 窗口：XFCE 终端（`foxos@foxos`）、底部面板（开始、时钟、系统、人工接管）和 Whisker 开始菜单，不是 Electron 里画的假桌面。
 
 ## 狐狸OS 是什么
 
-狐狸OS 首先是一个**可引导、可安装的 Linux 操作系统**（Ubuntu 24.04 基础，默认中文，labwc 合成器 + GTK 面板）。它给智能体（Claude Code、Codex、Gemini CLI 等 ACP / MCP 客户端）和人一个共同的真实桌面：每个窗口都是真实的 OS 进程。
+狐狸OS 首先是一个**可引导、可安装的 Linux 操作系统**（Ubuntu 24.04 基础，默认中文，XFCE 桌面）。它给智能体（Claude Code、Codex、Gemini CLI 等 ACP / MCP 客户端）和人一个共同的真实桌面：每个窗口都是真实的 OS 进程。
 
 Windows 上的 `.exe` 是**伴侣程序**（预览版见 [v0.2.0-windows-preview](https://github.com/gatesenman/foxos/releases/tag/v0.2.0-windows-preview)），用来在 Windows 里继续用 WSL2 / Hyper-V / Windows Sandbox 工作；它不是这张 ISO 本身。我们不会在非 Apple 硬件上提供 macOS 系统镜像。
 
@@ -93,8 +93,8 @@ sha256sum -c SHA256SUMS
 
 | | |
 | --- | --- |
-| ![狐狸OS 桌面](docs/screenshots/os-desktop.png)<br>**桌面**：labwc、底部面板、开始菜单、GNOME 终端 | ![终端](docs/screenshots/os-terminal.png)<br>**GNOME 终端**：真实的 `foxos@foxos` 会话 |
-| ![文本编辑器](docs/screenshots/os-editor.png)<br>**文本编辑器**：GNOME Text Editor 的真实窗口 | |
+| ![狐狸OS 桌面](docs/screenshots/os-desktop.png)<br>**桌面**：XFCE、底部面板、开始菜单、终端 | ![终端](docs/screenshots/os-terminal.png)<br>**XFCE 终端**：真实的 `foxos@foxos` 会话 |
+| ![文本编辑器](docs/screenshots/os-editor.png)<br>**文本编辑器**：系统里的独立编辑器窗口（ISO 预装 Mousepad） | |
 
 **Windows x64 伴侣预览**：[v0.2.0-windows-preview](https://github.com/gatesenman/foxos/releases/tag/v0.2.0-windows-preview)（预发布，尚未在 Windows 实机上验收，见 [Windows 测试清单](docs/windows-test-guide.md)）
 

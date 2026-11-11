@@ -6,13 +6,13 @@
 
 <p align="center"><a href="README.md">中文</a> · <a href="https://github.com/gatesenman/foxos/releases/tag/v0.3.0-os-preview">Bootable ISO</a> · <a href="https://github.com/gatesenman/foxos/releases/tag/v0.2.0-windows-preview">Windows companion preview</a> · <a href="docs/os-test-guide.md">ISO test guide</a> · <a href="AGENTS.md">AGENTS.md</a></p>
 
-![FoxOS real desktop: labwc, bottom panel, start menu, and GNOME Terminal](docs/screenshots/os-desktop.png)
+![FoxOS real desktop: XFCE, start menu, bottom panel, and terminal](docs/screenshots/os-desktop.png)
 
-This screenshot is from a graphical session of the Live ISO (QEMU used for testing only). It shows real labwc windows: GNOME Terminal (`foxos@foxos`), the FoxOS bottom panel (Start, clock, System, Take over), and the start menu — not a painted Electron fake desktop.
+This screenshot is from a real FoxOS XFCE graphical session (QEMU / Xvfb used for testing only). It shows real xfwm4 windows: the XFCE terminal (`foxos@foxos`), the bottom panel (Start, clock, System, Take over), and the Whisker applications menu — not a painted Electron fake desktop.
 
 ## What it is
 
-FoxOS is first a **bootable, installable Linux OS** (Ubuntu 24.04 base, Chinese default, labwc compositor + GTK panel). Agents (ACP/MCP clients such as Claude Code, Codex, Gemini CLI) and humans share a real desktop: every window is a real OS process.
+FoxOS is first a **bootable, installable Linux OS** (Ubuntu 24.04 base, Chinese default, XFCE desktop). Agents (ACP/MCP clients such as Claude Code, Codex, Gemini CLI) and humans share a real desktop: every window is a real OS process.
 
 The Windows `.exe` is a **companion** ([v0.2.0-windows-preview](https://github.com/gatesenman/foxos/releases/tag/v0.2.0-windows-preview)), not the ISO itself. We will not ship a macOS system image for non-Apple hardware.
 
@@ -71,8 +71,8 @@ Real-desktop screenshots:
 
 | | |
 | --- | --- |
-| ![FoxOS desktop](docs/screenshots/os-desktop.png)<br>**Desktop**: labwc, bottom panel, start menu, GNOME Terminal | ![Terminal](docs/screenshots/os-terminal.png)<br>**GNOME Terminal**: a real `foxos@foxos` session |
-| ![Text editor](docs/screenshots/os-editor.png)<br>**Text editor**: a real GNOME Text Editor window | |
+| ![FoxOS desktop](docs/screenshots/os-desktop.png)<br>**Desktop**: XFCE, bottom panel, start menu, terminal | ![Terminal](docs/screenshots/os-terminal.png)<br>**XFCE Terminal**: a real `foxos@foxos` session |
+| ![Text editor](docs/screenshots/os-editor.png)<br>**Text editor**: a standalone editor window (Mousepad is preinstalled on the ISO) | |
 
 **Windows x64 companion preview:** [v0.2.0-windows-preview](https://github.com/gatesenman/foxos/releases/tag/v0.2.0-windows-preview) (pre-release, not yet verified on real Windows hardware — see the [test checklist](docs/windows-test-guide.md)).
 

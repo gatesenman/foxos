@@ -43,7 +43,7 @@ xorriso -osirrox on -indev "$ISO_PATH" -extract /casper/vmlinuz "$WORKDIR/vmlinu
   || die "无法从 ISO 提取内核（xorriso -extract）"
 chmod 644 "$WORKDIR/vmlinuz" "$WORKDIR/initrd"
 
-# 给来宾一张 TAP，把容器的 5900 转到虚拟机（wayvnc 在 foxos.vnc 参数下监听）。
+# 给来宾一张 TAP，把容器的 5900 转到虚拟机（x11vnc 在 foxos.vnc 参数下监听）。
 TAP=${FOXOS_TAP:-foxos0}
 ip link show "$TAP" >/dev/null 2>&1 || ip tuntap add dev "$TAP" mode tap
 ip addr show dev "$TAP" | grep -q '172.30.0.1' || ip addr add 172.30.0.1/24 dev "$TAP" || true
@@ -68,7 +68,7 @@ fi
 
 CMDLINE="boot=casper hostname=foxos username=foxos locale=zh_CN.UTF-8 timezone=Asia/Shanghai keyboard-configuration/layoutcode=us console=ttyS0,115200n8 foxos.vnc ip=172.30.0.2::172.30.0.1:255.255.255.0:foxos:eth0:off ---"
 log "用 cloud-hypervisor 引导真实 ISO（内存 $MEM，CPU $CPUS）"
-log "桌面：来宾 labwc 上的 wayvnc（不是容器里画的假桌面）。请等图形会话起来后访问 VNC 端口 ${VNC_PORT} 或 http://<host>:${WEB_PORT}"
+log "桌面：来宾 XFCE 上的 x11vnc（不是容器里画的假桌面）。请等图形会话起来后访问 VNC 端口 ${VNC_PORT} 或 http://<host>:${WEB_PORT}"
 exec "$CH" \
   --cpus "boot=${CPUS}" \
   --memory "size=${MEM}" \

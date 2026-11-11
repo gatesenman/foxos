@@ -8,7 +8,7 @@
 
 - **主产品**：`FoxOS-<版本>-amd64.iso`（Live 可体验 + Calamares 安装器）。发布到 [GitHub Releases](https://github.com/gatesenman/foxos/releases)，单个 ISO 不超过 2 GB。
 - **引导**：真实硬件（UEFI，兼做传统 BIOS）、Windows 上的 Hyper-V / 狐狸OS「环境」应用、以及本仓库开发机上的 QEMU/KVM。**QEMU 只用于测试，不是产品依赖，也不打进 ISO。** 产品不附带 Docker、Podman、LXC、VirtualBox、QEMU。
-- **安装后**：真实登录、真实 Wayland 会话、真实合成器管理的真实窗口。LibreOffice、终端、文件管理器、浏览器、编辑器、Everything 应用都是操作系统里的普通进程，各有自己的窗口，而不是画在同一个 Electron 窗口里的矩形。
+- **安装后**：真实登录、真实 XFCE（X11）会话、由 xfwm4 管理的真实窗口。LibreOffice、终端、文件管理器、浏览器、编辑器、Everything 应用都是操作系统里的普通进程，各有自己的窗口，而不是画在同一个 Electron 窗口里的矩形。
 - **Windows / macOS 伴侣**：此前的 Windows 安装包（`.exe`）和今后在已有桌面上运行的伴侣程序，用来在那些平台上继续跑智能体，直到各自有自己的系统镜像。macOS 系统镜像只能在 Apple 硬件上制作和运行（Apple 许可），PC / 本 ISO 做不到，目录里会写明原因。
 
 ## 2. 基础系统
@@ -20,37 +20,37 @@
   - Plymouth 启动画面、登录界面（greeter）、壁纸、光标与面板均为狐狸OS 外观
   - `lsb_release`、APT 来源说明等处不展示 Ubuntu 营销文案；软件源本身仍指向 Ubuntu 归档（或镜像），保证安全更新
 - **默认语言**：简体中文（zh-CN），可在安装器和设置里切到 English；`foxos` / MCP 消息跟随 `--lang` / `FOXOS_LANG`（见桌面的多语言实现）。
-- **输入与字体**：Noto CJK 字体；Fcitx5 + 拼音（Wayland 下比 IBus 稳），安装后也可选其他输入法。
+- **输入与字体**：Noto CJK 字体；Fcitx5 + 拼音，安装后也可选其他输入法。
 
-## 3. 桌面（合成器与外壳）
+## 3. 桌面（XFCE）
 
-### 为什么选 labwc
+### 为什么选 XFCE
 
-会话是 **Wayland**（必要时 XWayland 兼容旧应用）。合成器选用 [labwc](https://github.com/labwc/labwc)（GPL-2.0：作为发行版软件包安装，**不把源码拷进本仓库**）。
+会话是 **XFCE**，跑在 **X11** 上（窗口管理器为 xfwm4）。这是给智能体用的 Ubuntu / Debian VPS 上最常见的轻量桌面：窗口、面板、开始菜单都是系统里的真控件，远程桌面和自动化工具（wmctrl、xdotool）也最成熟。软件包以发行版形式安装，**不把源码拷进本仓库**。
 
-选它而不是 kwin_wayland 或 GNOME Shell，是因为：
+选它而不是 GNOME Shell 或 KDE Plasma，是因为：
 
-1. **窗口由合成器管理**，Alt+Tab、平铺/浮动、多工作区、边缘吸附与普通桌面一致，不是自绘的假窗口。
-2. 基于 wlroots，智能体控制窗口走 **标准化协议**（xdg-foreign / wlr-foreign-toplevel-management、wlr-layer-shell、虚拟键盘/指针），不必绑死某一种桌面总线。
-3. 体积小、依赖少，便于把 ISO 压在 2 GB 以内，也便于去掉上游桌面的品牌残留。
-4. 配置是普通 XML（键绑定、菜单、自动启动），行为可审计、可测试。
+1. **窗口由窗口管理器管理**，Alt+Tab、多工作区、边缘吸附与普通 Linux 桌面一致，不是自绘的假窗口。
+2. 体积比 GNOME / KDE 小，便于把 ISO 压在 2 GB 以内，也便于去掉上游桌面的品牌残留。
+3. 智能体控制窗口走成熟的 X11 工具：`wmctrl` 列出 / 聚焦 / 关闭 / 移动 / 缩放，`xdotool` 键入与点击，`scrot` 截图。
+4. 配置是普通的 xfconf XML 与面板插件，行为可审计、可测试。
 
-kwin_wayland 功能更全（无障碍、高分屏、特效），但会带入大量 Plasma 组件和品牌，第一版不采用；若以后需要更强的无障碍，可以再提供可选会话。
+外观用狐狸OS 自己的窗口装饰与面板样式（暖色、克制，不以默认 Greybird 灰皮肤示人），GTK 控件建立在 Adwaita 之上；图标主题优先 Yaru（否则 Adwaita）。来源与许可见 `scripts/os/branding/xfce/ATTRIBUTION.md`。
 
 ### 面板、登录、安装器
 
-- **面板**：狐狸OS 自己的 GTK 面板（开始菜单、任务栏、托盘、时钟、网络/音量、**人工接管按钮**）。不用 Electron 画整张桌面。若仍保留 Electron，它只作为「智能体会话 / 设置」的一个普通窗口跑在这套桌面上。
-- **登录**：greetd + 图形 greeter（Live 可自动登录到 `foxos` 用户，安装后按安装器里创建的用户登录）。
+- **面板**：标准的 xfce4-panel。左侧是 Whisker 开始菜单（按钮标题为「开始」），中间是任务栏，右侧是托盘、时钟、**人工接管** 和 **系统**（注销 / 关机）。不用 Electron 画整张桌面。若仍保留 Electron，它只作为「智能体会话 / 设置」的一个普通窗口跑在这套桌面上。
+- **登录**：LightDM + lightdm-gtk-greeter（Live 可自动登录到 `foxos` 用户，安装后按安装器里创建的用户登录「狐狸OS」会话）。
 - **安装器**：Calamares（发行版软件包，不把源码拷进仓库）。默认中文，含分区、用户、可选磁盘加密、网络，以及组件选择：桌面已预装；Everything 应用、ACP 智能体、额外环境镜像在安装后按需在线下载（避免 ISO 超 2 GB，也不在镜像里内置 AGPL 源码）。
 
 ### 预装应用（都是普通软件包 / 普通进程）
 
 | 用途 | 第一版选用 | 说明 |
 |---|---|---|
-| 终端 | GNOME Terminal 或 kitty | 真实 PTY；可直接运行 `foxos` |
+| 终端 | XFCE Terminal | 真实 PTY；可直接运行 `foxos` |
 | 文件管理器 | Thunar | 比 Nautilus 依赖少，支持工作空间书签 |
 | 浏览器 | Firefox（Mozilla 官方 .deb，不用 Snap） |  |
-| 编辑器 | GNOME Text Editor；Code - OSS 作可选组件 | 原 Electron 里的 Monaco 编辑器若保留，改为独立窗口 |
+| 编辑器 | Mousepad；Code - OSS 作可选组件 | 原 Electron 里的 Monaco 编辑器若保留，改为独立窗口 |
 | 办公 | LibreOffice | **体积大，不默认打进 ISO**；安装器 / `foxos` 在线安装组件可装，装完是普通窗口 |
 | Everything 应用 | 安装后在线构建/安装 | 各应用是独立进程、独立窗口（Web 应用跑在隔离的浏览进程里，仍是操作系统窗口，不是外壳内嵌矩形） |
 
@@ -61,7 +61,7 @@ kwin_wayland 功能更全（无障碍、高分屏、特效），但会带入大�
 这是这套操作系统存在的理由。人能做的，智能体用同一套命令也能做，效果相同。
 
 - **命令与 MCP**：`foxos` CLI 与 MCP 服务器以 systemd（用户与系统服务）开机自启，契约写在 [AGENTS.md](../AGENTS.md) 与 [agent-guide.md](agent-guide.md)。语法仍是 `foxos <应用> <资源> <动词>`，另增面向操作系统本身的 `foxos desktop …` / `foxos session …` / 扩展后的 `foxos env …`。
-- **窗口与输入**（真实 API，不是进程内假界面）：列出 / 聚焦 / 移动 / 缩放 / 关闭窗口，启动应用，点击、键入、快捷键，截图，能拿到的辅助功能树。实现走 labwc / wlroots 协议，以及 `wtype`、`ydotool` 或同等工具（以当时已安装、许可允许的为准）。
+- **窗口与输入**（真实 API，不是进程内假界面）：列出 / 聚焦 / 移动 / 缩放 / 关闭窗口，启动应用，点击、键入、快捷键，截图，能拿到的辅助功能树。实现走 `wmctrl`、`xdotool`、`scrot`（XFCE / X11）。
 - **仍然生效**：工作空间路径约束、写锁、JSONL 审计、人工接管（真实快捷键 + 面板按钮，暂停智能体写操作）、轻量沙箱与完整环境。
 - **ACP 智能体**作为系统组件安装，启动时注入 MCP。
 - 操作系统级操作清单记入 [operations/desktop.md](operations/desktop.md) 与命令目录，并配用户故事与端到端测试（US-6x）。
@@ -81,7 +81,7 @@ kwin_wayland 功能更全（无障碍、高分屏、特效），但会带入大�
 
 **VMM 选型：cloud-hypervisor（Apache-2.0）。** 以官方二进制或本仓库构建脚本编译的二进制随 ISO 提供，NOTICE 保留版权与许可；不把无关源码整树拷进仓库。选它而不是 Firecracker，是因为完整环境必须能挂显示（virtio-gpu / 来宾桌面窗口）；Firecracker 面向无界面的微服务虚拟机，没有这条路。也不用 QEMU（产品依赖禁令）。libkrun（同样 Apache-2.0）可作为「只跑一个带 GPU 的应用」的后续选项。
 
-来宾桌面进入狐狸OS 窗口的第一版路径：来宾内的 Wayland 会话 + 许可允许的显示通道（优先 virtio-gpu 扫描到宿主 GTK 窗口；过渡方案可以是 vsock 上的 wayvnc，ISC 许可，宿主用我们自己的小窗口显示）。输入走同一通道或 virtio-input。目标是人在狐狸OS 里看到并操作来宾桌面，智能体也可以 `foxos env desktop-attach` 后对来宾做与宿主相同的窗口操作。
+来宾桌面进入狐狸OS 窗口的第一版路径：来宾内的图形会话 + 许可允许的显示通道（优先 virtio-gpu 扫描到宿主 GTK 窗口；过渡方案可以是 vsock 上的 wayvnc，ISC 许可，宿主用我们自己的小窗口显示）。输入走同一通道或 virtio-input。目标是人在狐狸OS 里看到并操作来宾桌面，智能体也可以 `foxos env desktop-attach` 后对来宾做与宿主相同的窗口操作。
 
 - **Windows 来宾**：同一套 KVM + cloud-hypervisor，镜像来自用户提供的 ISO 或微软评估版 / 开发版 ISO（下载时校验校验和，记录许可条款，**不把 Windows ISO 放进 GitHub Release**）。安装 virtio 来宾工具以便桌面显示到窗口。若本机没有 VMX/SVM，或已处于无法嵌套的虚拟机中，命令明确报错并提示原因。
 - **macOS 来宾**：仅 Apple 允许在 Apple 硬件上虚拟化 macOS。本 ISO（PC / Linux）目录里看得到该条目，但禁用，并写明原因。伴侣程序在 macOS 上运行时，再接已有的 Virtualization.framework 提供者。
@@ -102,7 +102,7 @@ kwin_wayland 功能更全（无障碍、高分屏、特效），但会带入大�
 
 **第一张可引导 ISO 必须已经做到：**
 
-- 作为 Live 盘能引导到真实的狐狸OS 桌面（labwc + 面板 + 终端 / 文件管理器 / 浏览器）
+- 作为 Live 盘能引导到真实的狐狸OS 桌面（XFCE + 终端 / 文件管理器 / 浏览器）
 - 品牌是狐狸OS（os-release、主机名、壁纸、登录器），默认中文
 - Calamares 安装器（中文默认）
 - `foxos` 命令与 MCP 的 systemd 服务
@@ -111,8 +111,8 @@ kwin_wayland 功能更全（无障碍、高分屏、特效），但会带入大�
 
 **随后迭代（不假装已经做完）：**
 
-- 窗口程序化移动 / 缩放依赖合成器能力（wlr-foreign-toplevel 没有位置请求；有 wlrctl 时可用）
-- 智能体对辅助功能树的完整覆盖；linux-kvm 来宾内 exec（SSH / vsock）与 virtio-gpu 目标显示路径
+- 智能体对辅助功能树的更完整覆盖（窗口的列出、聚焦、移动、缩放、键入、点击已由 `foxos desktop` 提供）
+- linux-kvm 来宾内 exec（SSH / vsock）与 virtio-gpu 目标显示路径
 - 完整目录里的每一个来宾（含 Windows 评估版的自动安装与来宾工具）
 - virtio-gpu 直出（替换过渡显示通道）
 - LibreOffice、Everything、ACP 的在线组件安装器在安装后的打磨
@@ -122,6 +122,6 @@ kwin_wayland 功能更全（无障碍、高分屏、特效），但会带入大�
 
 - 不在仓库根目录擅自加 LICENSE 文件。
 - 不把 AGPL 的 Everything 应用源码放进 ISO；安装器在线获取。
-- 不复制 GPL 代码（Calamares、labwc、GRUB 等以发行版软件包形式安装）。
+- 不复制 GPL 代码（Calamares、XFCE、GRUB 等以发行版软件包形式安装）。
 - 随 ISO 提供的 Apache-2.0 / MIT / BSD 二进制（如 cloud-hypervisor）保留 NOTICE。
 - 不重新分发 Windows ISO。

@@ -24,9 +24,9 @@ Tags follow the GitHub Release version. `v0.3.0-os-preview` maps to `gatesenman/
 
 ## 试用（真 ISO，不是假桌面）/ Trial (real ISO, not a fake desktop)
 
-容器里不画一个 Electron 或网页假装桌面。它用和狐狸OS 相同的 VMM（cloud-hypervisor，Apache-2.0 官方静态二进制）在宿主的 `/dev/kvm` 上引导 Release 里的 ISO。来宾 labwc 会话在内核参数带 `foxos.vnc` 时启动 **wayvnc**；容器把 5900（VNC）和 6080（noVNC 网页）转到那台虚拟机。
+容器里不画一个 Electron 或网页假装桌面。它用和狐狸OS 相同的 VMM（cloud-hypervisor，Apache-2.0 官方静态二进制）在宿主的 `/dev/kvm` 上引导 Release 里的 ISO。来宾 XFCE 会话在内核参数带 `foxos.vnc` 时启动 **x11vnc**；容器把 5900（VNC）和 6080（noVNC 网页）转到那台虚拟机。
 
-The container does not paint a fake desktop. It boots the real release ISO with the same VMM FoxOS ships (cloud-hypervisor) on the host’s `/dev/kvm`. When the guest is started with `foxos.vnc`, labwc launches **wayvnc**; the container forwards port 5900 (VNC) and 6080 (noVNC web).
+The container does not paint a fake desktop. It boots the real release ISO with the same VMM FoxOS ships (cloud-hypervisor) on the host’s `/dev/kvm`. When the guest is started with `foxos.vnc`, the XFCE session launches **x11vnc**; the container forwards port 5900 (VNC) and 6080 (noVNC web).
 
 ```bash
 # 需要 Linux 宿主，并且 CPU 支持虚拟化（VMX/SVM），把 KVM 传进容器

@@ -113,7 +113,7 @@
 目标：人在狐狸OS 桌面上看到一个普通窗口，里面是来宾的完整桌面；`foxos env desktop-attach` 打开这个窗口后，智能体对来宾里的应用使用与宿主相同的操作语法。
 
 1. **目标路径**：virtio-gpu（以及 virtio-input）把来宾帧缓冲呈现在一个 GTK 窗口里，工作空间通过 virtio-fs 挂到来宾的 `/workspace`。
-2. **第一版可用的过渡路径**：来宾里的 Wayland 会话（如 labwc）通过 vsock 上的 [wayvnc](https://github.com/any1/wayvnc)（ISC）提供显示；宿主用狐狸OS 自己的小窗口显示，不引入 QEMU。随后用 virtio-gpu 替换，命令不变。
+2. **第一版可用的过渡路径**：来宾里的图形会话通过 vsock 上的 [wayvnc](https://github.com/any1/wayvnc)（ISC）提供显示；宿主用狐狸OS 自己的小窗口显示，不引入 QEMU。随后用 virtio-gpu 替换，命令不变。
 
 ### Windows 与 macOS 来宾
 

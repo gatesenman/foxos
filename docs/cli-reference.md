@@ -29,7 +29,7 @@
 
 ## desktop — 真实桌面会话
 
-在 labwc 合成器管理的真实窗口上列出、聚焦、移动，以及键入、点击和人工接管。不是 Electron 里画的假窗口。
+在 XFCE 管理的真实窗口上列出、聚焦、移动，以及键入、点击和人工接管。不是 Electron 里画的假窗口。
 
 ### `foxos desktop status`
 
@@ -172,8 +172,8 @@ foxos desktop launch CMD...
 示例：
 
 ```bash
-foxos desktop launch -- gnome-terminal
-foxos desktop launch -- foot -T notes
+foxos desktop launch -- xfce4-terminal
+foxos desktop launch -- xfce4-terminal -T notes
 ```
 
 ### `foxos desktop type`
@@ -309,7 +309,7 @@ foxos desktop resume
 
 ## session — 真实桌面会话
 
-在 labwc 合成器管理的真实窗口上列出、聚焦、移动，以及键入、点击和人工接管。不是 Electron 里画的假窗口。
+在 XFCE 管理的真实窗口上列出、聚焦、移动，以及键入、点击和人工接管。不是 Electron 里画的假窗口。
 
 ### `foxos session status`
 
@@ -452,8 +452,8 @@ foxos session launch CMD...
 示例：
 
 ```bash
-foxos session launch -- gnome-terminal
-foxos session launch -- foot -T notes
+foxos session launch -- xfce4-terminal
+foxos session launch -- xfce4-terminal -T notes
 ```
 
 ### `foxos session type`
