@@ -1,0 +1,11 @@
+[Unit]
+Description=FoxOS machine host (lets paired FoxOS machines control this one; mutual TLS, per-bot grants, default deny)
+After=network-online.target
+
+[Service]
+ExecStart=/usr/bin/foxos machine serve --listen 0.0.0.0:7443
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=default.target

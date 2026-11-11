@@ -97,7 +97,31 @@ def installed_info(id_: str) -> dict | None:
     if not cmd or not os.path.exists(cmd):
         return None
     info["system"] = str(f).startswith(str(SYSTEM_AGENTS))
+    cfg = agent_config(id_)
+    if cfg:
+        info["config"] = cfg
+        info["args"] = [*(info.get("args") or []), *cfg.get("args", [])]
+        info["env"] = {**(info.get("env") or {}), **cfg.get("env", {})}
     return info
+
+
+# ---------------------------------------------------------------------- 每个智能体的设置
+CONFIG_KEYS = ("model", "mode", "args", "env")
+
+
+def _config_file(id_: str) -> Path:
+    return agents_dir() / id_ / "foxos-config.json"
+
+
+def agent_config(id_: str) -> dict:
+    """用户对某个 ACP 智能体的设置（默认模型、模式、额外参数、非机密环境变量）。系统预装的智能体也能设，存在用户目录。"""
+    f = _config_file(id_)
+    if not f.is_file():
+        return {}
+    try:
+        return {k: v for k, v in json.loads(f.read_text(encoding="utf-8")).items() if k in CONFIG_KEYS}
+    except ValueError:
+        return {}
 
 
 def installed() -> list[dict]:
@@ -376,6 +400,75 @@ def cmd_key_remove(ctx: Context, agent: str, name: str) -> dict:
     return {"message": tr("acp.key_removed", name, agent)}
 
 
+def cmd_agent_config(ctx: Context, agent: str, model: str | None = None, mode: str | None = None, arg: list | None = None,
+                     env: dict | None = None, clear: bool = False) -> dict:
+    if agent != LOCAL_ID and not installed_info(agent):
+        raise FoxError("NOT_FOUND", tr("acp.not_installed", agent), hint=f"foxos acp agent install {agent}")
+    cfg = {} if clear else agent_config(agent)
+    changed = clear
+    if model is not None:
+        cfg["model"] = model or None
+        changed = True
+    if mode is not None:
+        cfg["mode"] = mode or None
+        changed = True
+    if arg is not None:
+        cfg["args"] = [str(a) for a in arg]
+        changed = True
+    if env is not None:
+        for k, v in env.items():
+            if not str(k).replace("_", "").isalnum() or str(k).upper() != str(k):
+                raise FoxError("USAGE", tr("acp.bad_env_name"))
+            if any(x in str(k) for x in ("KEY", "TOKEN", "SECRET", "PASSWORD")):
+                raise FoxError("USAGE", tr("acp.env_looks_secret", k), hint=f"printf %s \"$VALUE\" | foxos acp key set {agent} {k} --value-stdin")
+        cfg["env"] = {**cfg.get("env", {}), **{str(k): str(v) for k, v in env.items() if v not in (None, "")}}
+        for k in [k for k, v in env.items() if v in (None, "")]:
+            cfg["env"].pop(str(k), None)
+        changed = True
+    cfg = {k: v for k, v in cfg.items() if v not in (None, [], {})}
+    if changed:
+        f = _config_file(agent)
+        f.parent.mkdir(parents=True, exist_ok=True)
+        f.write_text(json.dumps(cfg, ensure_ascii=False, indent=2), encoding="utf-8")
+    return {"agent": agent, "config": cfg, "changed": changed}
+
+
+def _version_tuple(v: str | None) -> tuple:
+    import re
+    return tuple(int(x) for x in re.findall(r"\d+", v or "")[:4])
+
+
+def cmd_agent_update(ctx: Context, agent: str | None = None, all: bool = False, check: bool = False,  # noqa: A002
+                     accept_license: bool = False) -> dict:
+    """和官方注册表比较版本；有新版就装到用户目录（系统预装的不用 root 也能更新，用户目录的优先）。"""
+    if not agent and not all:
+        raise FoxError("USAGE", tr("acp.update_what"))
+    reg = fetch_registry()
+    if reg["source"] != "online" and not check:
+        raise FoxError("DEPENDENCY_MISSING", tr("acp.registry_offline"))
+    latest = {a["id"]: a for a in reg["data"]["agents"]}
+    targets = [i for i in installed() if i["id"] != LOCAL_ID and (all or i["id"] == agent)]
+    if agent and not targets:
+        raise FoxError("NOT_FOUND", tr("acp.not_installed", agent))
+    out = []
+    for i in targets:
+        e = latest.get(i["id"])
+        row = {"agent": i["id"], "installed": i.get("version"), "latest": (e or {}).get("version"), "system": i.get("system", False)}
+        if not e:
+            row["status"] = "not_in_registry"
+        elif _version_tuple(e.get("version")) <= _version_tuple(i.get("version")):
+            row["status"] = "current"
+        elif check:
+            row["status"] = "available"
+        elif not redistributable(e.get("license")) and not accept_license:
+            row["status"] = "needs_license"
+        else:
+            info = install_agent(i["id"], log=lambda s: None)
+            row.update(status="updated", installed=info.get("version"))
+        out.append(row)
+    return {"source": reg["source"], "count": len(out), "agents": out}
+
+
 AG = Param("agent", "string", tr("acp.p_agent"), required=True, positional=True, metavar="AGENT")
 register_app("acp", tr("acp.app_summary"), tr("acp.app_description"))
 register(Command("acp", "agent list", tr("acp.c_list"), cmd_agent_list,
@@ -393,6 +486,19 @@ register(Command("acp", "agent probe", tr("acp.c_probe"), cmd_agent_probe,
 register(Command("acp", "agent login", tr("acp.c_login"), cmd_agent_login,
                  params=[AG, Param("method", "string", tr("acp.p_method"), required=True)],
                  examples=["foxos acp agent login gemini --method oauth-personal"], permission="run", limits=[tr("acp.login_human_only")]))
+register(Command("acp", "agent config", tr("acp.c_config"), cmd_agent_config,
+                 params=[AG, Param("model", "string", tr("acp.p_model")), Param("mode", "string", tr("acp.p_mode")),
+                         Param("arg", "array", tr("acp.p_arg"), items={"type": "string"}, cli_repeat=True),
+                         Param("env", "object", tr("acp.p_env_kv"), cli_kv=True, cli_flag="--env"),
+                         Param("clear", "boolean", tr("acp.p_clear"), default=False)],
+                 examples=["foxos acp agent config gemini --json", "foxos acp agent config gemini --model gemini-2.5-pro",
+                           "foxos acp agent config opencode --env OPENCODE_LOG=info"], permission="modify"))
+register(Command("acp", "agent update", tr("acp.c_update"), cmd_agent_update,
+                 params=[Param("agent", "string", tr("acp.p_agent"), positional=True, metavar="AGENT"),
+                         Param("all", "boolean", tr("acp.p_all"), default=False),
+                         Param("check", "boolean", tr("acp.p_check"), default=False),
+                         Param("accept_license", "boolean", tr("acp.p_accept_license"), default=False)],
+                 examples=["foxos acp agent update --all --check --json", "foxos acp agent update gemini"], permission="run"))
 register(Command("acp", "key set", tr("acp.c_key_set"), cmd_key_set,
                  params=[AG, Param("name", "string", tr("acp.p_env"), required=True, positional=True, metavar="ENV_NAME"),
                          Param("value", "string", tr("acp.p_value"), required=True, cli_stdin=True, secret=True)],

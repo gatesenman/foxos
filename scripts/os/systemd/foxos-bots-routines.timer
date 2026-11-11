@@ -1,0 +1,9 @@
+[Unit]
+Description=Run due FoxOS bot routines every 5 minutes
+
+[Timer]
+OnBootSec=3min
+OnUnitActiveSec=5min
+
+[Install]
+WantedBy=timers.target

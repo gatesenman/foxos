@@ -1,0 +1,11 @@
+[Unit]
+Description=FoxOS bots service (chat UI, routines, channels, webhooks) on 127.0.0.1
+After=graphical-session.target
+
+[Service]
+ExecStart=/usr/bin/foxos bot serve --listen 127.0.0.1:0
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=default.target

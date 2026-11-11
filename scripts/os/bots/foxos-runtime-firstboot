@@ -1,0 +1,98 @@
+#!/usr/bin/python3
+"""首次登录：安装清单里 phase=firstboot 的智能体命令行（带进度窗口）。
+
+可再分发的直接安装；专有许可（Claude Code、Claude Agent ACP、Cursor CLI）先列出许可证与官方来源，
+用户点「安装」才下载（foxos runtime install … --accept-license）。完成后写标记，不再弹出；
+随时可以在「智能体 → 运行环境」或 `foxos runtime install firstboot` 里重做。
+"""
+import json
+import os
+import shutil
+import subprocess
+import sys
+from pathlib import Path
+
+STATE = Path(os.environ.get("XDG_STATE_HOME") or Path.home() / ".local/state") / "foxos"
+MARK = STATE / "runtime-firstboot.done"
+ZH = (os.environ.get("FOXOS_LANG") or os.environ.get("LANG", "zh")).lower().startswith("zh")
+
+
+def L(zh, en):
+    return zh if ZH else en
+
+
+def foxos(*args, **kw):
+    return subprocess.run(["foxos", *args], capture_output=True, text=True, **kw)
+
+
+def main() -> int:
+    if MARK.exists() and "--again" not in sys.argv:
+        return 0
+    STATE.mkdir(parents=True, exist_ok=True)
+    r = foxos("runtime", "list", "--phase", "firstboot", "--json")
+    try:
+        tools = [t for t in json.loads(r.stdout)["result"]["tools"] if not t.get("ok")]
+    except (ValueError, KeyError):
+        return 1
+    if not tools:
+        MARK.write_text("nothing to install\n")
+        return 0
+    zen = shutil.which("zenity") if os.environ.get("DISPLAY") else None
+    free = [t for t in tools if t.get("redistributable")]
+    prop = [t for t in tools if not t.get("redistributable")]
+    accept = False
+    if prop:
+        text = L("下面这些智能体命令行是专有软件，狐狸OS 不能代为分发。要从官方来源下载并安装吗？\n\n",
+                 "These agent CLIs are proprietary; FoxOS cannot redistribute them. Download and install them from the official source?\n\n")
+        text += "\n".join(f"• {t['title']} {t['version']} — {t['license']}\n  {t['source']}" for t in prop)
+        if zen:
+            accept = subprocess.run([zen, "--question", "--width=560", "--title", L("安装智能体命令行", "Install agent CLIs"), "--text", text,
+                                     "--ok-label", L("安装", "Install"), "--cancel-label", L("以后再说", "Not now")]).returncode == 0
+        else:
+            print(text)
+    names = [t["name"] for t in free] + ([t["name"] for t in prop] if accept else [])
+    if not names:
+        MARK.write_text("declined\n")
+        return 0
+    env = {**os.environ, "FOXOS_PROGRESS": "1"}
+    p = subprocess.Popen(["foxos", "runtime", "install", *names, *(["--accept-license"] if accept else []), "--json"],
+                         stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, env=env)
+    bar = subprocess.Popen([zen, "--progress", "--auto-close", "--width=520", "--title", L("正在安装智能体命令行", "Installing agent CLIs"),
+                            "--text", ", ".join(names)], stdin=subprocess.PIPE, text=True) if zen else None
+    done = 0
+    for line in p.stderr:
+        try:
+            ev = json.loads(line)
+        except ValueError:
+            continue
+        if "tool" not in ev:
+            continue
+        if ev.get("step") in ("done", "check_failed"):
+            done += 1
+        pct = int((done + (ev.get("pct") or 0) / 100 * (ev.get("step") not in ("done", "check_failed"))) / len(names) * 100)
+        msg = f"# {ev['tool']}: {ev.get('step')} {ev.get('pct', '')}"
+        if bar and bar.stdin:
+            try:
+                bar.stdin.write(f"{min(pct, 99)}\n{msg}\n")
+                bar.stdin.flush()
+            except BrokenPipeError:
+                bar = None
+        else:
+            print(msg[2:], flush=True)
+    out = p.stdout.read()
+    rc = p.wait()
+    if bar and bar.stdin:
+        try:
+            bar.stdin.write("100\n")
+            bar.stdin.close()
+        except BrokenPipeError:
+            pass
+    MARK.write_text(out[-4000:])
+    if rc and zen:
+        subprocess.run([zen, "--warning", "--width=480", "--text", L("有些命令行没装好，可以稍后在「智能体 → 运行环境」重试。",
+                                                                     "Some CLIs did not install; retry later in Bots → Runtime.")])
+    return rc
+
+
+if __name__ == "__main__":
+    sys.exit(main())

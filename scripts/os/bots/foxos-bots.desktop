@@ -1,0 +1,25 @@
+[Desktop Entry]
+Type=Application
+Name=Bots
+Name[zh_CN]=智能体
+GenericName=Bot chat
+GenericName[zh_CN]=智能体聊天
+Comment=Main bot and other bots: chat, delegate, coding agents, skills, connectors, machines
+Comment[zh_CN]=主智能体与其它智能体：聊天、委托、代码智能体、技能、连接器、多台机器
+Exec=foxos-bots
+Icon=foxos-bots
+Terminal=false
+Categories=Utility;Development;
+StartupWMClass=foxos-bots
+Keywords=bot;agent;acp;chat;智能体;助手;
+Actions=dock;undock;
+
+[Desktop Action dock]
+Name=Dock to the side
+Name[zh_CN]=停靠到屏幕侧边
+Exec=foxos-bots --dock
+
+[Desktop Action undock]
+Name=Separate window
+Name[zh_CN]=独立窗口
+Exec=foxos-bots --undock

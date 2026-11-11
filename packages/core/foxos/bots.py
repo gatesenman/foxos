@@ -915,6 +915,10 @@ def _run_acp(ws, bot, turn: _Turn, text, skill_block, envelope, attachments, ide
                 raise FoxError("PERMISSION_DENIED", tr("bots.agent_needs_login", agent_id, msg),
                                hint=f"foxos acp key set {agent_id} <ENV_NAME> --value-stdin") from e
             raise FoxError("ERROR", tr("acp.handshake_failed", agent_id, msg, conn.stderr[-400:])) from e
+        cfg = info.get("config") or {}
+        applied = conn.configure_session(sess, model=bot.get("model") or cfg.get("model"), mode=cfg.get("mode"))
+        if applied:
+            turn.emit({"type": "session_config", "applied": applied})
         pooled = {"conn": conn, "session": sess["sessionId"], "agent": agent_id, "init": init}
         if keep:
             with _pool_lock:
