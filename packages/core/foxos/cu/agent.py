@@ -21,13 +21,16 @@ from . import llm
 from .loop import Loop, browser_tools, computer_tools
 from .policy import ACTIONS, Observation, active_policy, observation
 
+READ_TOOLS = ("read_text", "read", "observe_app")
 DESTRUCTIVE_RE = re.compile(r"(delete|remove|erase|discard|send|submit|pay|purchase|buy|order|checkout|transfer|publish|post|install|"
                             r"uninstall|format|empty trash|sign ?out|log ?out|删除|移除|清空|发送|提交|支付|付款|购买|下单|结算|转账|发布|安装|卸载|退出登录)", re.I)
 
 PLAN_SYS = ("You are the planner (System 2) of a computer-use agent on Linux (XFCE desktop or Chrome). Decompose the task into 1-8 short, "
             "concrete subgoals that a fast step policy can execute one UI action at a time. Reply with JSON only: "
             '{"subgoals": [{"goal": "...", "text": "exact text to type or option to select, or null", "check": "what is visible when done"}]}. '
-            "Put any text that must be typed into `text` verbatim (the step policy cannot write text). Do not include a final "
+            "Put any text that must be typed into `text` verbatim (the step policy cannot write text). Typing REPLACES the whole "
+            "content of the target field, so to add to existing text put the complete desired final content in `text` "
+            "(e.g. existing 'milk' plus a new line 'eggs' → text 'milk\\neggs'); do not plan caret movements. Do not include a final "
             "'report the answer' subgoal; answers are extracted at the end.")
 VERIFY_SYS = ("You verify whether a computer-use task is complete, from the current UI observation. Reply with JSON only: "
               '{"complete": true|false, "answer": "final answer or extracted values, exact text with units, or a short summary", '
@@ -56,6 +59,7 @@ class Agent(Loop):
         self.s2_usage = {"prompt_tokens": 0, "completion_tokens": 0}
         self.s1_usage: dict = {}
         self._last_nodes: list = []
+        self._s2_read: str | None = None
         self._title = None
         self._url = None
 
@@ -185,6 +189,9 @@ class Agent(Loop):
         user = (f"Task: {self.task}\nPlan: {json.dumps(self.subgoals, ensure_ascii=False)}\nCurrent subgoal #{self.sg + 1}: "
                 f"{json.dumps(sg, ensure_ascii=False)}\nWhy you are called: {reason}\nRecent actions: "
                 f"{json.dumps(self.history[-6:], ensure_ascii=False)}\n\nObservation:\n{obs.full[:16000]}")
+        if self._s2_read:  # 规划器每次调用是无状态的：把上一次读到的内容带回去，避免反复读
+            user += f"\n\nYour previous read returned:\n{self._s2_read[:6000]}\nUse it: call done with the answer if it answers the task, " \
+                    "or subgoal_done / set_plan if the plan is out of date. Do not read the same thing again."
         content = [{"type": "text", "text": user}]
         if self._png is not None and self.vision and obs.surface != "screen":
             content.append(llm.image_part(self._png))
@@ -208,7 +215,9 @@ class Agent(Loop):
             return {"tool": name, "ok": True}
         if name == "done":
             return {"tool": "done", "ok": True, "answer": args.get("answer"), "success": bool(args.get("success", True))}
-        return {"tool": name, "args": args, **self.execute(name, args)}
+        out = self.execute(name, args)
+        self._s2_read = out.pop("full", None) if name in READ_TOOLS and out.get("ok") else None
+        return {"tool": name, "args": args, **out}
 
     # ------------------------------------------------------------ 执行
     def is_risky(self, name: str, args: dict) -> bool:
@@ -228,7 +237,10 @@ class Agent(Loop):
             return {"ok": False, "error": tr("cu.denied"), "denied": True, "ms": 0}
         try:
             res = self.act(name, args)
-            return {"ok": True, "result": self._short(res)[:400], "ms": round((time.time() - t0) * 1000)}
+            out = {"ok": True, "result": self._short(res)[:400], "ms": round((time.time() - t0) * 1000)}
+            if name in READ_TOOLS:
+                out["full"] = self._short(res)
+            return out
         except FoxError as e:
             if e.code == "PAUSED":
                 self.wait_if_paused()
