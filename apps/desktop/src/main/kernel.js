@@ -48,6 +48,8 @@ function coreEnv(extra = {}) {
     PYTHONPATH: [corePath(), process.env.PYTHONPATH].filter(Boolean).join(path.delimiter),
     PYTHONIOENCODING: 'utf-8',
     PYTHONUTF8: '1',
+    // 核心的宿主保护和桌面的执行模式保持一致：客户端模式 = 宿主（智能体只在狐狸OS 虚拟电脑里动手），native = 狐狸OS
+    ...(process.env.FOXOS_PLACE ? {} : { FOXOS_PLACE: executionMode() === 'client' ? 'host' : 'foxos' }),
     ...extra,
   };
 }

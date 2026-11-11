@@ -25,6 +25,7 @@ const bots = require('./bots');
 const guest = require('./guest');
 const client = require('./client');
 const policy = require('./policy');
+const hostaccess = require('./hostaccess');
 
 const s0 = settings.load();
 // 界面语言：--lang= > 设置 > FOXOS_LANG > zh-CN；同时设置 Chromium 自身的界面语言（右键菜单、日期控件）
@@ -108,7 +109,7 @@ const handle = (ch, fn) => ipcMain.handle(ch, async (_e, ...a) => {
 ipcMain.handle('foxos:openExternal', (_e, url) => (/^https:\/\//.test(String(url)) ? shell.openExternal(String(url)).then(() => true) : false));
 ipcMain.handle('foxos:run', (_e, args, opts = {}) => kernel.run(args, { json: opts.json !== false, stdin: opts.stdin ?? null, ...(opts.timeoutMs ? { timeoutMs: Math.min(+opts.timeoutMs || 0, 4 * 3600 * 1000) } : {}) }));
 
-handle('env', () => ({
+handle('env', async () => ({
   workspace: kernel.getWorkspace(),
   agent: 'human:desktop',
   platform: process.platform,
@@ -119,7 +120,7 @@ handle('env', () => ({
   pythonInfo: kernel.pythonInfo(),
   cli: kernel.cliPath(),
   mode: kernel.executionMode(),
-  hostExecution: settings.load().hostExecution === true,
+  hostExecution: kernel.executionMode() === 'client' ? await hostaccess.enabled() : false,
   guest: guest.config(),
   guestMin: policy.GUEST_MIN_VERSION,
   guestLinks: policy.GUEST_LINKS,
@@ -134,7 +135,7 @@ const CLIENT = () => kernel.executionMode() === 'client';
 // 本机执行闸门：客户端模式下默认关闭；设置里打开“允许在本机执行”后，每次都要在原生对话框里确认
 async function hostGate(action, detail = '') {
   if (!CLIENT()) return true;
-  if (settings.load().hostExecution !== true) throw new Error(t('client.host_execution_off', action));
+  if (!(await hostaccess.enabled())) throw new Error(t('client.host_execution_off', action));
   const r = await dialog.showMessageBox(win, { type: 'warning', buttons: [t('client.allow_once'), t('common.cancel')], defaultId: 1, cancelId: 1, noLink: true,
     title: t('client.host_action_title'), message: t('client.host_action_message', action), detail: String(detail).slice(0, 2000) });
   if (r.response !== 0) throw new Error(t('client.host_action_denied', action));
@@ -274,15 +275,17 @@ ipcMain.on('acp:permissionReply', (_e, reqId, optionId) => {
   if (r) { permWaiters.delete(reqId); r(optionId || null); }
 });
 
-handle('settings:get', () => { const s = settings.load(); return { ...s, secrets: settings.secretNames() }; });
-handle('settings:set', (patch) => {
+handle('settings:get', async () => { const s = settings.load(); delete s.hostExecution; return { ...s, hostExecution: kernel.executionMode() === 'client' ? await hostaccess.enabled() : false, secrets: settings.secretNames() }; });
+handle('settings:set', async (patch) => {
   const s = settings.load();
-  const allowed = ['workspace', 'python', 'setupDone', 'agentDefault', 'hostExecution'];
-  if ('hostExecution' in patch) patch.hostExecution = patch.hostExecution === true;
+  const allowed = ['workspace', 'python', 'setupDone', 'agentDefault'];
   for (const k of allowed) if (k in patch) s[k] = patch[k];
+  delete s.hostExecution;  // 旧版本存在 settings.json 里的开关不再生效：唯一来源是核心 host-access 状态
   settings.save(s);
+  if ('hostExecution' in patch) await hostaccess.set(patch.hostExecution === true);
   return true;
 });
+handle('hostAccess:status', () => hostaccess.status());
 handle('secrets:set', (name, value) => { settings.setSecret(name, value); return settings.secretNames(); });
 handle('session:load', () => settings.loadSession());
 handle('session:save', (state) => { const cur = settings.loadSession(); settings.saveSession({ ...cur, ...state }); return true; });

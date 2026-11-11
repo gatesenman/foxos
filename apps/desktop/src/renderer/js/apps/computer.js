@@ -48,7 +48,11 @@
     mount(body) {
       const statusEl = el('span', { class: 'badge muted', 'data-guest-status': '', text: '…' });
       const labelEl = el('b', { class: 'grow', 'data-guest-label': '' });
-      const hostEl = el('span', { class: 'badge', 'data-host-exec': FX.env.hostExecution ? 'on' : 'off', title: FX.t('client.host_execution_hint'), text: FX.env.hostExecution ? FX.t('client.host_execution_on_badge') : FX.t('client.host_execution_off_badge') });
+      const hostEl = el('span', { class: 'badge', title: FX.t('client.host_execution_hint') });
+      const paintHost = (on) => { hostEl.dataset.hostExec = on ? 'on' : 'off'; hostEl.textContent = on ? FX.t('client.host_execution_on_badge') : FX.t('client.host_execution_off_badge'); };
+      paintHost(FX.env.hostExecution);
+      // 开关的唯一来源是核心 host-access 状态（命令行也能改），打开窗口时重新读一次
+      window.foxos.hostAccess.status().then((st) => { FX.env.hostExecution = !!st.enabled; paintHost(st.enabled); }).catch(() => {});
       const btn = (act, ic, label, fn) => el('button', { class: 'btn ghost sm', 'data-act': act, onclick: fn }, icon(ic), label);
       const bar = el('div', { class: 'row pad computer-bar' }, icon('device-desktop'), labelEl, statusEl, hostEl,
         btn('guest-start', 'player-play', FX.t('client.start'), () => lifecycle('start')),

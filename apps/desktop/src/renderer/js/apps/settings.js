@@ -28,7 +28,7 @@
               el('input', { type: 'checkbox', checked: !!s.hostExecution, onchange: async (e) => {
                 const on = e.target.checked;
                 if (on && !(await FX.confirm(FX.t('client.host_execution_enable_title'), FX.t('client.host_execution_enable_body'), { danger: true }))) { e.target.checked = false; return; }
-                await window.foxos.settings.set({ hostExecution: on }); FX.env.hostExecution = on; FX.toast(on ? FX.t('client.host_execution_on_badge') : FX.t('client.host_execution_off_badge'), on ? 'error' : 'ok');
+                try { await window.foxos.settings.set({ hostExecution: on }); } catch (err) { e.target.checked = !on; FX.toast(String(err.message || err), 'error'); return; } FX.env.hostExecution = on; FX.toast(on ? FX.t('client.host_execution_on_badge') : FX.t('client.host_execution_off_badge'), on ? 'error' : 'ok');
               } }),
               el('span', { text: FX.t('client.host_execution_label') })) : null,
             env.mode === 'client' ? el('div', { class: 'muted small', text: FX.t('client.host_execution_hint') }) : null),

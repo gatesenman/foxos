@@ -55,12 +55,19 @@ def set_policy(enabled: bool, by: str) -> dict:
     p = _path()
     p.parent.mkdir(parents=True, exist_ok=True)
     d = {"enabled": bool(enabled), "by": by, "at": audit.now_iso()}
-    p.write_text(json.dumps(d, indent=2), encoding="utf-8")
+    tmp = p.with_name(p.name + ".tmp")
+    tmp.write_text(json.dumps(d, indent=2), encoding="utf-8")
     try:
-        os.chmod(p, 0o600)
+        os.chmod(tmp, 0o600)
     except OSError:
         pass
+    os.replace(tmp, p)  # 原子替换：桌面客户端直接读这个文件，不能读到写了一半的内容
     return d
+
+
+def state_path() -> str:
+    """唯一的开关状态文件。桌面客户端的「允许在本机执行」也读写它（通过 foxos bot host-access）。"""
+    return str(_path())
 
 
 def is_bot(agent: str | None) -> bool:

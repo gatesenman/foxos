@@ -32,6 +32,8 @@
 
 默认**关闭**。设置 → 「在哪台电脑上执行」里可以打开「允许在本机执行（每次确认）」；打开后，少数明确要在本机运行的动作（本机终端、在本机文件管理器里显示）每一次都会弹出原生确认框，默认按钮是「取消」。智能体、应用中心、打开 Word 即使打开这个开关也仍然只在狐狸OS 电脑里执行。
 
+这个开关和命令行的 `foxos bot host-access` 是**同一个**（存在 `FOXOS_HOME/host-access.json`）：在设置里打开，`foxos bot host-access` 显示已打开；在命令行里 `foxos bot host-access disable`，设置里也随即是关的，不用重启。只有人能改它，每次改动都记进审计。打开以后，直接在这台电脑上用 `foxos` 跑的智能体也只能读；其它每个操作都要人在审批卡片上逐个确认。旧版本存在 `settings.json` 里的 `hostExecution` 不再生效。
+
 本机就是狐狸OS（`/etc/os-release` 里 `ID=foxos`，即 ISO / 虚拟机里的桌面）时，桌面程序照常在本机执行。开发时 `npm start` 也沿用本机执行；`FOXOS_CLIENT_MODE=1` 强制客户端模式，`FOXOS_HOST_EXECUTION=1` 强制本机模式。
 
 ### 画面
@@ -109,6 +111,8 @@ The FoxOS computer can be:
 ### Running on this PC
 
 This is **off** by default. You can turn on "Allow running on this PC (confirm every time)" under Settings → "Where actions run". Even then, the few actions that explicitly target this PC (a local terminal, "show in this PC's file manager") each show a native confirmation dialog whose default button is Cancel. Agents, the app center and Open Word always run on the FoxOS computer, whatever this setting says.
+
+This setting and `foxos bot host-access` are **one switch**, stored in `FOXOS_HOME/host-access.json`. Turn it on in Settings and `foxos bot host-access` reports it on. Run `foxos bot host-access disable` and Settings shows it off right away, with no restart. Only a person can change it, and every change is audited. While it is on, bots run with `foxos` directly on this PC can read, and every other action needs its own approval card. The old `hostExecution` value in `settings.json` is ignored.
 
 The app keeps running actions locally when it is itself running on FoxOS (`ID=foxos` in `/etc/os-release`, i.e. the desktop inside the ISO or a VM), and in development (`npm start`). Set `FOXOS_CLIENT_MODE=1` to force client mode, or `FOXOS_HOST_EXECUTION=1` to force local mode.
 

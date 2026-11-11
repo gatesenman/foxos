@@ -109,3 +109,28 @@ def test_US155_opt_in_host_execution_asks_per_action(tmp_path):
     assert not host.ok("bot", "host-access", "disable")["enabled"]
     rc, d, _ = host.run("files", "read", "notes/ok.txt", agent="bot:fox")
     assert rc != 0 and d["error"]["code"] == "PERMISSION_DENIED"
+
+
+def test_US156_host_access_state_file_is_the_one_switch(tmp_path, monkeypatch):
+    """桌面客户端直接读 `path` 指向的文件：命令行打开 / 关闭后文件内容立刻跟着变，写入是原子的（不留临时文件）。"""
+    home = tmp_path / "home"
+    ws = tmp_path / "ws"
+    ws.mkdir()
+    env = _env({"FOXOS_HOME": str(home), "FOXOS_PLACE": "host"})
+
+    def run(*a, agent="human:cli"):
+        p = subprocess.run([sys.executable, "-m", "foxos", "--workspace", str(ws), "--agent", agent, "--json", "bot", "host-access", *a],
+                           capture_output=True, text=True, env=env, timeout=120)
+        return p.returncode, json.loads(p.stdout)
+
+    rc, d = run()
+    assert rc == 0 and d["result"]["enabled"] is False and d["result"]["on_host"] is True
+    f = d["result"]["path"]
+    assert f == str(home / "host-access.json")
+    rc, d = run("enable")
+    assert rc == 0 and json.loads(open(f, encoding="utf-8").read())["enabled"] is True
+    assert sorted(p.name for p in home.iterdir() if p.name.startswith("host-access")) == ["host-access.json"]
+    rc, d = run("disable", agent="bot:fox")
+    assert rc != 0 and json.loads(open(f, encoding="utf-8").read())["enabled"] is True
+    rc, d = run("disable")
+    assert rc == 0 and json.loads(open(f, encoding="utf-8").read())["enabled"] is False

@@ -54,6 +54,7 @@ contextBridge.exposeInMainWorld('foxos', {
     onPermission: (cb) => on('acp:permission', cb),
     replyPermission: (reqId, optionId) => ipcRenderer.send('acp:permissionReply', reqId, optionId),
   },
+  hostAccess: { status: () => call('hostAccess:status') },
   settings: {
     get: () => call('settings:get'),
     set: (p) => call('settings:set', p),

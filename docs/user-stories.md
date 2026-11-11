@@ -41,13 +41,15 @@
 | US-153 | 智能体窗口：配对第二台狐狸OS 并在聊天里切换机器 | `apps/desktop/e2e/bots.e2e.mjs`：`US-153` |
 | US-154 | 智能体窗口：人工接管让智能体的编辑停下（卡片记为接管），交还后恢复 | `apps/desktop/e2e/bots.e2e.mjs`：`US-154` |
 | US-155 | 宿主应用里的智能体只在狐狸OS 虚拟电脑里动手；宿主执行要人明确打开（`foxos bot host-access enable`）并逐个确认 | `packages/core/tests/test_hostguard.py`：`test_US155_…` |
+| US-156 | 桌面客户端的「允许在本机执行」和 `foxos bot host-access` 是同一个开关：默认关，在设置里打开后命令行看得到，命令行关掉后设置里也是关 | `apps/desktop/e2e/hostaccess.e2e.js`：`US-156`；`packages/core/tests/test_hostguard.py`：`test_US156_…` |
+| US-157 | Qwen Code 在狐狸OS 里默认用 `--approval-mode default`：写文件前弹审批卡片，拒绝则不写，批准才写 | `packages/core/tests/test_bots_deepseek.py`：`test_US157_…` |
 
 说明：
 
 - US-102–US-108 用仓库自带的本地 ACP 智能体（`python3 -m foxos.local_agent`，一个真实的 ACP stdio 进程，按规则回答，不需要模型账号）。这样每一步（工具卡片、审批、diff、委托、技能）都能在测试里确定地重现。
 - US-112 会真实调用 Exa 的免密钥 MCP 服务；US-116 会从 GitHub 下载 opencode。没有网络时这两个跳过。
 - US-117、US-118 要先运行 `sudo scripts/os/tools/agent-overlay.sh up`，在镜像 chroot 的 overlay 里检查；没挂载时跳过。
-- US-140–US-145 用真实模型（DeepSeek 的 OpenAI 兼容接口）跑回答。密钥从 `~/.secrets/deepseek_api_key`（或 `FOXOS_TEST_DEEPSEEK_KEY_FILE`）读取，只经标准输入存进测试自己的密钥库；没有密钥文件时这些用例**跳过**（不算失败），所以没有密钥的 CI 仍然是绿的。
+- US-140–US-145、US-157 用真实模型（DeepSeek 的 OpenAI 兼容接口）跑回答。密钥从 `~/.secrets/deepseek_api_key`（或 `FOXOS_TEST_DEEPSEEK_KEY_FILE`）读取，只经标准输入存进测试自己的密钥库；没有密钥文件时这些用例**跳过**（不算失败），所以没有密钥的 CI 仍然是绿的。
 - US-146–US-154 在自己的 Xvfb + xfwm4 桌面里打开真实的智能体窗口（Chrome 应用模式），用 Playwright 经 CDP 点界面。代码智能体是 opencode：有 DeepSeek 密钥时用 `deepseek/deepseek-flash`，没有时用 opencode 的默认免费模型（不需要密钥，但 opencode 对免费用量有上限，用完会报 “Free usage limit reached”）。
 - 真实的 Gemini、Codex、Claude、Cursor 测到的是 ACP 握手和会话建立，见 [agent-runtime.md](agent-runtime.md)。
 
@@ -67,4 +69,6 @@ Every story has an automated test, and `scripts/stories.json` maps each story to
 - The bots block continues at US-140, because main uses US-120–US-127 for computer use.
 - US-140–US-145: real model turns through DeepSeek's OpenAI-compatible API: the main bot answers, delegates to an opencode code bot that edits a file after a person approves (the card carries the diff), a denied edit leaves the file alone, a pstack skill, a read on a second FoxOS machine, and Qwen Code pointed at DeepSeek. The key is read from `~/.secrets/deepseek_api_key` (or `FOXOS_TEST_DEEPSEEK_KEY_FILE`) and only goes into the test's own secret store over stdin. Without the key file these tests are skipped, not failed.
 - US-155: on a host app (the Windows companion and other non-FoxOS systems), bots act only inside the FoxOS virtual computer. Host execution needs a person to turn it on, and then a confirmation for every action that isn't read-only.
+- US-156: the Windows client's "Allow running on this PC" setting and `foxos bot host-access` are one switch. It is off by default; turning it on in Settings shows up in the CLI, and turning it off in the CLI shows up in Settings.
+- US-157: inside FoxOS, Qwen Code starts with `--approval-mode default`, so it asks (an approval card) before it writes. A denied write leaves no file; an approved one writes it. Needs the DeepSeek key, like US-140–US-145.
 - US-146–US-154: the real bots window (Chrome app mode) on its own Xvfb + xfwm4 desktop, driven with Playwright over CDP: create and configure bots, approve and deny real opencode edits, @ delegation, `/` skills, a real local MCP connector, docking with a reserved screen edge, pairing a second machine, and takeover. The code bots use `deepseek/deepseek-flash` when the key file exists and opencode's default free model otherwise (no key, but opencode caps free usage).

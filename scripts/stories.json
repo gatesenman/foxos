@@ -1026,6 +1026,33 @@
           "^test_US155"
         ]
       ]
+    },
+    {
+      "id": "US-156",
+      "title": "桌面客户端的「允许在本机执行」和 foxos bot host-access 是同一个开关（默认关，两边互相看得到）",
+      "match": [
+        [
+          "e2e",
+          "hostaccess.e2e.js",
+          "^US-156 "
+        ],
+        [
+          "pytest",
+          "test_hostguard.py",
+          "^test_US156"
+        ]
+      ]
+    },
+    {
+      "id": "US-157",
+      "title": "Qwen Code 在狐狸OS 里默认要审批：写文件前弹审批卡片，拒绝则不写",
+      "match": [
+        [
+          "pytest",
+          "test_bots_deepseek.py",
+          "^test_US157"
+        ]
+      ]
     }
   ]
 }

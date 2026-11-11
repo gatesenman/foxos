@@ -279,7 +279,7 @@ def host_access(ctx: Context, action: str = "status") -> dict:
         hostguard.set_policy(action == "enable", ctx.agent)
     pol = hostguard.policy()
     return {"place": hostguard.place(), "on_host": hostguard.on_host(), "enabled": pol["enabled"], "by": pol["by"], "at": pol["at"],
-            "message": tr("host.status_vm") if not hostguard.on_host() else tr("host.status_on") if pol["enabled"] else tr("host.status_off")}
+            "path": hostguard.state_path(), "message": tr("host.status_vm") if not hostguard.on_host() else tr("host.status_on") if pol["enabled"] else tr("host.status_off")}
 
 
 def approval_list(ctx: Context) -> dict:
