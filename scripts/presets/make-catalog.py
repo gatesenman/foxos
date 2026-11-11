@@ -3,7 +3,7 @@
 
 Linux 预设的大小与 sha256 来自 build/presets/<id>/foxos-<id>.json（build-preset.sh 的产物），
 狐狸OS ISO 来自 build/os/release-<ver>/SHA256SUMS；Windows / macOS 只是「配方」，介质在安装时从官方下载。
-用法：python3 scripts/presets/make-catalog.py [--release presets-2026.11] [--os-version 0.3.2]
+用法：python3 scripts/presets/make-catalog.py [--release presets-2026.11] [--os-version 0.3.3]
 """
 import argparse
 import json
@@ -14,7 +14,7 @@ ROOT = Path(__file__).resolve().parents[2]
 OUT = ROOT / "packages/core/foxos/data/env-presets.json"
 ap = argparse.ArgumentParser()
 ap.add_argument("--release", default="presets-2026.11")
-ap.add_argument("--os-version", default="0.3.2")
+ap.add_argument("--os-version", default="0.3.3")
 a = ap.parse_args()
 
 FEATURES = ["desktop-xfce", "zh-CN", "node", "bun", "python", "acp-gemini-cli", "foxos-cli", "foxos-mcp", "foxos-bridge-ssh"]

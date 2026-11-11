@@ -40,6 +40,27 @@
 - 远程狐狸OS 和其他虚拟化：经 SSH 在那台电脑里按需启动 `x11vnc -localhost`（只听那台电脑自己的 127.0.0.1，`-shared`），再用 `ssh -W` 转发。没有经过网络明文传输。
 - 渲染用 [noVNC](https://github.com/novnc/noVNC) 1.7.0（MPL-2.0，打包在 `apps/desktop/src/renderer/vendor/novnc/`，许可证文件一起分发；重新生成：`node apps/desktop/scripts/vendor-novnc.mjs <装了 @novnc/novnc 与 esbuild 的目录>`）。
 
+### 需要什么样的狐狸OS 电脑
+
+来宾需要**狐狸OS 0.3.3 或更新**：从 0.3.3 起才有 OpenSSH（只认密钥）、`foxos acp stdio`（智能体）和 `foxos bot serve`（聊天）。0.3.2 及更早的 ISO 没有 sshd，客户端连不上。程序首次运行时「狐狸OS 电脑」窗口会列出下面几种办法；连上旧版本时状态显示为黄色并提示升级。
+
+1. **最新的狐狸OS 系统预览 ISO**（[发布页](https://github.com/gatesenman/foxos/releases?q=os-preview&expanded=true)，0.3.3 或更新）：在 Hyper-V、VirtualBox 或 QEMU 里新建虚拟机安装（[安装指南](os-test-guide.md)），然后在狐狸OS 终端里：
+   ```sh
+   foxos ssh enable
+   foxos ssh keys add --key "ssh-ed25519 AAAA… 你的电脑"   # 或 --github 你的用户名
+   ```
+   Windows 上生成密钥：PowerShell 运行 `ssh-keygen -t ed25519`，公钥在 `%USERPROFILE%\.ssh\id_ed25519.pub`。再在客户端「远程狐狸OS（SSH）」里填虚拟机地址、用户 `foxos`、私钥 `%USERPROFILE%\.ssh\id_ed25519`。
+2. **在程序里新建**：「本机上的狐狸OS 虚拟机」选一个预设和本机可用的虚拟化，程序下载、创建并启动。低于 0.3.3 的狐狸OS ISO 预设会标成「版本太旧」，不默认选中。
+3. **远程狐狸OS**：另一台电脑或服务器上的狐狸OS，用 SSH 连接，或在那边运行 `foxos machine serve` 后在客户端里配对。
+4. **0.3.3 ISO 发布之前的替代办法**：任何 Linux 桌面（建议 Xubuntu 24.04，或 Ubuntu 登录时选「Ubuntu on Xorg」；画面靠 x11vnc，需要 X11 会话）都可以当来宾：
+   ```sh
+   sudo apt install -y openssh-server x11vnc pipx libreoffice-writer
+   pipx install "git+https://github.com/gatesenman/foxos#subdirectory=packages/core"
+   pipx ensurepath && foxos --version        # 应为 0.3.3 或更新
+   mkdir -p ~/.ssh && echo "ssh-ed25519 AAAA… 你的电脑" >> ~/.ssh/authorized_keys && chmod 600 ~/.ssh/authorized_keys
+   ```
+   这种来宾里没有狐狸OS 的 `foxos ssh` 管理助手，SSH 用发行版自己的方式配置。
+
 ### 「foxos 不是内部或外部命令」（0.2.0）
 
 0.2.0 在应用中心点「安装」时，在本机 PowerShell 里运行 `foxos everything install …`；根因是终端环境里同时有 `Path` 和 `PATH` 两个键，PowerShell 读到的是没改过的 `Path`，于是找不到 foxos（0.3.3 已修，见 US-86）。更根本的是这个安装本来就不该在本机执行：0.3.3 起它在狐狸OS 电脑里运行（US-87），本机 PowerShell 不参与。
@@ -96,6 +117,32 @@ The app keeps running actions locally when it is itself running on FoxOS (`ID=fo
 - **Local QEMU VMs:** the window shows the VM console directly (QEMU `-vnc 127.0.0.1:N`, loopback only), so you can watch the VM boot.
 - **Remote FoxOS and other backends:** the app starts `x11vnc -localhost` on demand over SSH. It listens only on that computer's own 127.0.0.1 and is `-shared`, and the stream is forwarded with `ssh -W`, so nothing crosses the network unencrypted.
 - **Rendering:** [noVNC](https://github.com/novnc/noVNC) 1.7.0 (MPL-2.0) is vendored in `apps/desktop/src/renderer/vendor/novnc/` together with its license files. To regenerate it, run `node apps/desktop/scripts/vendor-novnc.mjs <dir with @novnc/novnc and esbuild installed>`.
+
+### Which FoxOS computer you need
+
+The guest must run **FoxOS 0.3.3 or newer**. OpenSSH (key-only), `foxos acp stdio` (agents) and `foxos bot serve` (chat) all arrived in 0.3.3. ISOs 0.3.2 and older have no sshd, so the client can't connect to them.
+
+On first run, the "FoxOS computer" window lists the options below. If you connect to an older version, the status turns yellow and asks you to upgrade.
+
+1. **Install the latest FoxOS OS preview ISO** (0.3.3 or newer, from the [releases page](https://github.com/gatesenman/foxos/releases?q=os-preview&expanded=true)).
+   - Install it in a Hyper-V, VirtualBox or QEMU VM, following the [install guide](os-test-guide.md).
+   - In a FoxOS terminal, run:
+     ```sh
+     foxos ssh enable
+     foxos ssh keys add --key "ssh-ed25519 AAAA… my-pc"   # or --github <user>
+     ```
+   - On Windows, create a key by running `ssh-keygen -t ed25519` in PowerShell. The public key is `%USERPROFILE%\.ssh\id_ed25519.pub`.
+   - In the client, under "Remote FoxOS (SSH)", enter the VM's address, user `foxos` and the private key `%USERPROFILE%\.ssh\id_ed25519`.
+2. **Create one in the app.** Under "FoxOS VM on this PC", pick a preset and the virtualization this PC has. The app downloads, creates and starts the VM. FoxOS ISO presets older than 0.3.3 are marked "too old" and are not selected by default.
+3. **Use a remote FoxOS** on another computer or server. Connect over SSH, or run `foxos machine serve` there and pair it in the client.
+4. **Until a 0.3.3 ISO is published, use any Linux desktop as the guest.** It needs an X11 session, because the screen uses x11vnc. Xubuntu 24.04 works, as does Ubuntu with "Ubuntu on Xorg" chosen at login. Set it up with:
+   ```sh
+   sudo apt install -y openssh-server x11vnc pipx libreoffice-writer
+   pipx install "git+https://github.com/gatesenman/foxos#subdirectory=packages/core"
+   pipx ensurepath && foxos --version        # expect 0.3.3 or newer
+   mkdir -p ~/.ssh && echo "ssh-ed25519 AAAA… my-pc" >> ~/.ssh/authorized_keys && chmod 600 ~/.ssh/authorized_keys
+   ```
+   These guests don't have FoxOS's `foxos ssh` admin helper, so set up SSH the distribution's usual way.
 
 ### "foxos is not recognized" (0.2.0)
 

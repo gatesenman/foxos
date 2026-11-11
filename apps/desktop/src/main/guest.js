@@ -13,6 +13,7 @@ const path = require('node:path');
 const { IS_WIN, which, corePath } = require('./paths');
 const settings = require('./settings');
 const cmd = require('./cmdline');
+const policy = require('./policy');
 const { shQuote } = cmd;
 
 const GUEST_VNC_PORT = 5907;
@@ -132,7 +133,7 @@ async function status() {
       // 轻量探测：来宾里 foxos --version（不要用 help --json，它有几 MB）
       const v = r.ssh ? await exec(r, ['foxos', '--version'], { timeoutMs: 60000 }).then((p) => ({ ok: p.code === 0, version: p.stdout.trim().split(/\s+/).pop(), stderr: p.stderr, code: p.code }))
         : await kernelRun(['machine', 'ping', r.machine], { timeoutMs: 60000 }).then((k) => ({ ok: k.ok, version: k.data?.result?.version || null, stderr: k.data?.error?.message || k.stderr }));
-      reach = v.ok ? { ok: true, version: v.version || null } : { ok: false, error: (v.stderr || '').trim() || `exit ${v.code}` };
+      reach = v.ok ? { ok: true, version: v.version || null, compat: policy.guestCompat(v.version), min: policy.GUEST_MIN_VERSION } : { ok: false, error: (v.stderr || '').trim() || `exit ${v.code}` };
     }
     return { configured: true, config: g, label: r.label, kind: r.kind, state: r.state, provider: r.provider, ssh: r.ssh ? { host: r.ssh.host, port: r.ssh.port, user: r.ssh.user } : null, console: r.console, reach };
   } catch (e) {

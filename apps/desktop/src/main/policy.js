@@ -28,4 +28,27 @@ function routeKernel(args) {
   return LIFECYCLE_APPS.has(String((args || [])[0] || '')) ? 'local' : 'guest';
 }
 
-module.exports = { mode, routeKernel, isFoxosOs, LIFECYCLE_APPS };
+// 狐狸OS 电脑（来宾）需要的最低版本：0.3.3 起来宾里才有 OpenSSH（只认密钥）、foxos acp stdio（智能体）、foxos bot serve（聊天）。
+// 0.3.2 及更早的 ISO 没有 sshd，客户端连不上（QEMU 下只能看到画面）。
+const GUEST_MIN_VERSION = '0.3.3';
+// 没有狐狸OS 电脑时去哪儿拿：最新的系统预览 ISO（Hyper-V / VirtualBox / QEMU 里安装）、安装指南、客户端说明
+const GUEST_LINKS = {
+  releases: 'https://github.com/gatesenman/foxos/releases?q=os-preview&expanded=true',
+  isoGuide: 'https://github.com/gatesenman/foxos/blob/main/docs/os-test-guide.md',
+  clientGuide: 'https://github.com/gatesenman/foxos/blob/main/docs/windows-client.md',
+};
+
+function parseVersion(v) {
+  const m = /(\d+)\.(\d+)\.(\d+)/.exec(String(v || ''));
+  return m ? [Number(m[1]), Number(m[2]), Number(m[3])] : null;
+}
+
+// 'ok' | 'old' | 'unknown'（版本读不出来，例如配对的机器没报版本）
+function guestCompat(version, min = GUEST_MIN_VERSION) {
+  const a = parseVersion(version); const b = parseVersion(min);
+  if (!a) return 'unknown';
+  for (let i = 0; i < 3; i++) { if (a[i] !== b[i]) return a[i] > b[i] ? 'ok' : 'old'; }
+  return 'ok';
+}
+
+module.exports = { mode, routeKernel, isFoxosOs, LIFECYCLE_APPS, GUEST_MIN_VERSION, GUEST_LINKS, guestCompat, parseVersion };

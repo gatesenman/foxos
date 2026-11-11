@@ -120,3 +120,29 @@ test('US-87 客户端模式：所有动作都在狐狸OS 电脑里执行，本�
     await app.close();
   }
 });
+
+// 首次运行、还没有狐狸OS 电脑：不能卡住——说明需要的来宾版本、去哪儿下载 ISO、怎么开 SSH、在本机新建或连接远程
+test('US-87 首次运行：没有狐狸OS 电脑时说明需要的版本和获取方式', { timeout: 20 * 60 * 1000 }, async () => {
+  const ws = tmpWorkspace('client-first-run');
+  const { app, page } = await launchClient(ws, undefined);
+  try {
+    const need = await page.waitForSelector('.window[data-app=computer] [data-setup=need]', { timeout: 300000 });
+    const min = await page.evaluate(() => FX.env.guestMin);
+    assert.equal(await need.getAttribute('data-guest-min'), min);
+    const text = await need.textContent();
+    assert.ok(text.includes(min), text);
+    assert.ok(/foxos ssh enable/.test(text) && /foxos ssh keys add/.test(text), text);
+    for (const k of ['releases', 'iso_guide', 'client_guide']) assert.ok(await page.$(`[data-setup=need] [data-link=${k}]:not([disabled])`), k);
+    assert.ok(await page.$('[data-setup=ssh] [data-act=connect-ssh]'));
+    await page.waitForSelector('[data-setup=machine] [data-act=pair]', { timeout: 300000 });
+    // 本机新建：低于最低版本的狐狸OS ISO 预设被标出来，且不默认选中
+    await page.waitForSelector('[data-setup=env] select[data-f=preset]', { timeout: 300000 });
+    const opts = await page.$$eval('[data-setup=env] select[data-f=preset] option', (os) => os.map((o) => ({ v: o.value, old: o.dataset.tooOld, t: o.textContent, sel: o.selected })));
+    const old = opts.filter((o) => o.old === '1');
+    if (old.length < opts.length) assert.equal(opts.find((o) => o.sel).old, '0', JSON.stringify(opts));
+    for (const o of old) assert.ok(o.t.includes(min), o.t);
+    await shot(page, 'US-87-first-run-no-guest');
+  } finally {
+    await app.close().catch(() => {});
+  }
+});
