@@ -55,9 +55,12 @@ async function openFromStart(page, app) {
 // 界面状态签名：可见控件（角色、名称、值、勾选），去掉含数字的名称（时钟、日期等随时间变化）；加上应用数据（去掉 id / 时间字段）
 async function signature(page, app, ws) {
   const snap = await inView(page, app, 'window.__foxosBridge.snapshot({ limit: 800 })');
-  // 生成的 ID（如下拉框的值 mwaudfhd-cbltjm）每次重置都不同，归一化后再比较
+  // 生成的 ID（如下拉框的值 mwaudfhd-cbltjm：Date.now().toString(36) + '-' + 6 位随机 base36）每次重置都不同，归一化后再比较。
+  // 必须先归一化、再按“含数字”过滤：这种 ID 有时含数字有时不含（随机），先过滤的话同一个控件在一次结果里被丢掉、
+  // 在另一次里留下成 <id>，这就是 US-44 tasks 偶发“只在 CLI 结果中出现：combobox|List|<id>|”的原因。
   const norm = (v) => (typeof v === 'string' && /^[0-9a-f-]{16,}$|^[a-z0-9]{6,}-[a-z0-9]{4,}$/i.test(v) ? '<id>' : v);
-  const ui = [...new Set(snap.elements.filter((e) => !/\d/.test(`${e.name}${e.value || ''}`)).map((e) => `${e.role}|${e.name}|${norm(e.value) ?? ''}|${e.checked ?? ''}`))].sort();
+  const ui = [...new Set(snap.elements.map((e) => ({ ...e, value: norm(e.value) })).filter((e) => !/\d/.test(`${e.name}${e.value || ''}`))
+    .map((e) => `${e.role}|${e.name}|${e.value ?? ''}|${e.checked ?? ''}`))].sort();
   const kvf = path.join(ws, 'AppData', app, 'kv.json');
   const rnd = RANDOM[app];
   const strip = (v) => (Array.isArray(v) ? v.map(strip) : v && typeof v === 'object'
