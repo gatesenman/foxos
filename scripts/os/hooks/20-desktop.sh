@@ -36,3 +36,17 @@ systemctl enable NetworkManager.service || true
 install -d /etc/xdg/fcitx5
 printf '%s
 ' '[Groups/0]' 'Name=Default' 'Default Layout=us' 'DefaultIM=pinyin'   '[Groups/0/Items/0]' 'Name=pinyin' 'Layout='   '[GroupOrder]' '0=Default' > /etc/xdg/fcitx5/profile
+
+# 物理键盘 US；中文输入用法是 fcitx5。casper 也会按 cmdline layoutcode 改写。
+cat > /etc/default/keyboard <<'U'
+XKBMODEL="pc105"
+XKBLAYOUT="us"
+XKBVARIANT=""
+XKBOPTIONS=""
+BACKSPACE="guess"
+U
+# NetworkManager + netplan：默认接管所有网卡并走 DHCP
+install -d /etc/netplan
+install -m 600 "$SRC/branding/netplan/01-foxos.yaml" /etc/netplan/01-foxos.yaml
+# Live 下 casper-md5check 没有我们的 md5sum.txt，会报失败；关掉以免吓到用户
+systemctl mask casper-md5check.service 2>/dev/null || true

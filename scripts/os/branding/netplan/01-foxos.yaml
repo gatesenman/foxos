@@ -1,0 +1,4 @@
+# 让 NetworkManager 管理有线 / 无线；没有这文件时网卡会停在 unmanaged，dhcp 不会跑。
+network:
+  version: 2
+  renderer: NetworkManager

@@ -39,6 +39,7 @@ labwc
 swaybg
 xwayland
 grim
+wayvnc
 slurp
 wl-clipboard
 wtype
@@ -77,6 +78,12 @@ wireplumber
 # 登录与安装
 lightdm
 lightdm-gtk-greeter
+accountsservice
+# Xorg：lightdm-gtk-greeter 在自动登录失败时回退到 X11 登录器需要它；modesetting 驱动在 core 里
+xserver-xorg-core
+xserver-xorg-input-libinput
+xserver-xorg-video-fbdev
+xserver-xorg-video-vesa
 calamares
 # 工具
 nano

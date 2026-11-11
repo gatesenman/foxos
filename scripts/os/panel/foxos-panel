@@ -12,7 +12,7 @@ button.primary { background: #ff8a3d; color: #1a0f05; font-weight: 600; }
 button.primary:hover { background: #ffb27a; }
 button.warn { background: #3a2e12; color: #f5b84a; }
 button.warn.on { background: #f5b84a; color: #1a0f05; }
-#clock { padding: 0 12px; color: #a9afbe; font-variant-numeric: tabular-nums; }
+#clock { padding: 0 12px; color: #a9afbe; }
 #brand { font-weight: 600; padding-left: 4px; }
 popover { background: #11141b; border: 1px solid #262c3a; }
 .pop-item { padding: 6px 14px; }
@@ -218,8 +218,15 @@ class Panel(Gtk.Window):
 
 def css():
     p = Gtk.CssProvider()
-    p.load_from_data(CSS.encode())
-    Gtk.StyleContext.add_provider_for_screen(Gdk.Screen.get_default(), p, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
+    try:
+        p.load_from_data(CSS.encode())
+    except Exception as e:
+        print("foxos-panel css:", e, file=sys.stderr)
+        return
+    screen = Gdk.Screen.get_default()
+    if screen is None:
+        return
+    Gtk.StyleContext.add_provider_for_screen(screen, p, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
 
 def main():
     if TOGGLE:
