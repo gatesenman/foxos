@@ -94,7 +94,8 @@ def sizes(e: dict, artifact: str | None) -> dict:
     elif e["kind"] == "foxos-image":
         need = dl + int(e.get("disk_gb") or 8) * 1024 ** 3
     elif e["kind"] == "foxos-iso":
-        need = dl * 2
+        # 分卷 + 拼好的 ISO，再加上安装到虚拟磁盘时可能用到的 disk_gb
+        need = dl * 2 + int(e.get("disk_gb") or 32) * 1024 ** 3
     elif e["kind"] == "windows-media":
         dl = int((e.get("media") or {}).get("size") or 0)
         need = dl + int(e.get("disk_gb") or 64) * 1024 ** 3
