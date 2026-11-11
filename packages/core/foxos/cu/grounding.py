@@ -4,6 +4,9 @@
 - vlm        通用视觉模型（默认 DeepSeek deepseek-flash；也可 Qwen3-VL、GPT、Gemini），回 0–1000 归一化坐标
 - ui-tars    UI-TARS-1.5-7B / UI-Venus-1.5 等 GUI 专用定位模型，用 vLLM / Ollama 以 OpenAI 兼容接口在本机或局域网提供
              （ScreenSpot-Pro：UI-TARS-1.5-7B 61.6%，UI-Venus-1.5-8B 68.4%；7–8B 需要约 16–20 GB 显存，量化后 8 GB 左右）
+- typesafe   TypeSafe Jev 1.14 的 Box 问题（托管 API，需要提前体验资格的密钥）：回元素的框（0–1 比例）和置信度
+- 本机一键模型（`foxos model install gui-owl-1.5-2b && foxos model use gui-owl-1.5-2b --as grounding`）：Qwen3-VL 系（GUI-Owl、
+             UI-Venus、MAI-UI、Holo2、Qwen3.5）用 vlm（0–1000 坐标），UI-TARS-1.5 / Jedi 用 ui-tars（缩放后像素）
 - omniparser Microsoft OmniParser v2 服务（omnitool 的 omniparserserver，HTTP /parse/）：把截图解析成带编号的元素列表，
              这样纯文字模型（DeepSeek v4 pro）也能按编号挑元素
 权重都不打进系统镜像；需要时按 docs/computer-use-research.md 的说明单独下载。
@@ -13,6 +16,7 @@ from __future__ import annotations
 
 import base64
 import json
+import uuid
 import math
 import re
 import struct
@@ -63,8 +67,10 @@ def ground_vlm(png: bytes, description: str, cfg: dict) -> dict:
     w, h = png_size(png)
     g = cfg.get("grounding") or {}
     prompt = tr("cu.ground_prompt", w, h, description)
+    local = llm.is_local_url(g.get("base_url"))
     r = llm.chat([{"role": "user", "content": [{"type": "text", "text": prompt}, llm.image_part(png)]}], vision=True, cfg=cfg,
-                 model=g.get("model") or None, base_url=g.get("base_url") or None, timeout=120)
+                 model=g.get("model") or None, base_url=g.get("base_url") or None, timeout=600 if local else 120,
+                 temperature=0 if local else None, extra={"chat_template_kwargs": {"enable_thinking": False}} if local else None)
     text = r["message"].get("content") or ""
     if "not_found" in text.lower() or "not found" in text.lower():
         raise FoxError("NOT_FOUND", tr("cu.ground_not_found", description))
@@ -82,9 +88,9 @@ def ground_uitars(png: bytes, description: str, cfg: dict) -> dict:
         raise FoxError("DEPENDENCY_MISSING", tr("cu.uitars_not_configured"),
                        hint="foxos computer model set --grounding ui-tars --grounding-url http://127.0.0.1:8000/v1 --grounding-model ByteDance-Seed/UI-TARS-1.5-7B")
     prompt = ("Output only the coordinate of one point in your response. What element matches the following task: " + description)
-    local = {**cfg, "provider": "local"} if "127.0.0.1" in g["base_url"] or "localhost" in g["base_url"] else cfg
-    r = llm.chat([{"role": "user", "content": [{"type": "text", "text": prompt}, llm.image_part(png)]}], cfg=local,
-                 model=g["model"], base_url=g["base_url"], vision=True, timeout=120)
+    local = llm.is_local_url(g["base_url"])
+    r = llm.chat([{"role": "user", "content": [{"type": "text", "text": prompt}, llm.image_part(png)]}], cfg=cfg,
+                 model=g["model"], base_url=g["base_url"], vision=True, timeout=600 if local else 120, temperature=0 if local else None)
     text = r["message"].get("content") or ""
     p = _json_point(text.replace("<|box_start|>", "").replace("<|box_end|>", ""))
     if not p:
@@ -127,9 +133,40 @@ def ground_omniparser(png: bytes, description: str, cfg: dict) -> dict:
     return {"x": e["x"], "y": e["y"], "kind": "omniparser", "element": e, "model": r["model"], "screen": list(png_size(png))}
 
 
+def ground_typesafe(png: bytes, description: str, cfg: dict) -> dict:
+    from . import typesafe
+    w, h = png_size(png)
+    g = cfg.get("grounding") or {}
+    c = typesafe.Client(model=g.get("model") or "jev-latest")
+    ph = "img-" + uuid.uuid4().hex  # 占位符：state 里出现的地方会被图片替换，所以要用不会撞上普通文字的 uuid
+    r = c.ask(ph, {"target": typesafe.box("Locate this UI element in the image: " + description)},
+              assets={ph: typesafe.image_asset(png)})
+    a = r["answers"]["target"]
+    b = a["box"]
+    x, y = round((b["left"] + b["right"]) / 2 * w), round((b["top"] + b["bottom"]) / 2 * h)
+    return {"x": x, "y": y, "kind": "typesafe", "model": r["model"], "box": b, "confidence": a.get("confidence"),
+            "screen": [w, h], "seconds": r["seconds"]}
+
+
 def ground(png: bytes, description: str, cfg: dict | None = None, kind: str | None = None) -> dict:
     cfg = cfg or llm.load()
-    k = kind or (cfg.get("grounding") or {}).get("kind") or "vlm"
+    k = kind or (cfg.get("grounding") or {}).get("kind") or "auto"
+    if k == "auto":  # 默认：有 TypeSafe 密钥 → Jev Box；本地 UI-TARS 在跑 → UI-TARS；否则视觉模型
+        from . import typesafe
+        if typesafe.api_key():
+            k = "typesafe"
+        else:
+            try:
+                from . import models
+                ep = models.endpoint("ui-tars-1.5-7b")
+            except Exception:  # noqa: BLE001
+                ep = None
+            if ep:
+                cfg = {**cfg, "grounding": {**(cfg.get("grounding") or {}), "kind": "ui-tars", "base_url": ep.get("base_url"),
+                                            "model": ep.get("model")}}
+                k = "ui-tars"
+            else:
+                k = "vlm"
     if k == "none":
         raise FoxError("DEPENDENCY_MISSING", tr("cu.grounding_off"))
     if k == "vlm":
@@ -140,4 +177,6 @@ def ground(png: bytes, description: str, cfg: dict | None = None, kind: str | No
         return ground_uitars(png, description, cfg)
     if k == "omniparser":
         return ground_omniparser(png, description, cfg)
+    if k == "typesafe":
+        return ground_typesafe(png, description, cfg)
     raise FoxError("USAGE", tr("cu.bad_grounding", ", ".join(llm.GROUNDING_KINDS)))

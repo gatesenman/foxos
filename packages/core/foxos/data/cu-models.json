@@ -1,0 +1,63 @@
+{
+ "generated": "2026-11-12",
+ "policy": "one optional local vision model; default stack is agent-desktop + Jev (DeepSeek fallback)",
+ "jev": "TypeSafe Jev is a hosted System One API (no open weights): `foxos model provider add typesafe --key-stdin`",
+ "llama_cpp": {
+  "tag": "b12284",
+  "license": "MIT",
+  "assets": {
+   "cpu-x64": [
+    "llama-b12284-bin-ubuntu-x64.tar.gz",
+    "50b5f85d45f8ddc7179d1b9b65de6534fbb18dc075942413238cb3471570123f"
+   ],
+   "vulkan-x64": [
+    "llama-b12284-bin-ubuntu-vulkan-x64.tar.gz",
+    "94bfdf9ad9ab4e5544acc71d8699942fe8013b6c3b39f24570262782619de707"
+   ],
+   "cuda-x64": [
+    "llama-b12284-bin-ubuntu-cuda-13.5-x64.tar.gz",
+    "d6ede56000c0da12e040334ea7532680d8a11a82cce2ee137c704d066cdbe80c"
+   ],
+   "cpu-arm64": [
+    "llama-b12284-bin-ubuntu-arm64.tar.gz",
+    "88cd4ac318056bcbcc05d92613481c303eecb03b6ded77367cbd5711aaba4435"
+   ]
+  }
+ },
+ "models": [
+  {
+   "id": "ui-tars-1.5-7b",
+   "kind": "grounding",
+   "rank": 1,
+   "title": "UI-TARS-1.5-7B (ByteDance Seed)",
+   "source_repo": "ByteDance-Seed/UI-TARS-1.5-7B",
+   "license": "Apache-2.0",
+   "gguf_repo": "Mungert/UI-TARS-1.5-7B-GGUF",
+   "modelscope": "Mungert/UI-TARS-1.5-7B-GGUF",
+   "files": [
+    {
+     "role": "model",
+     "name": "UI-TARS-1.5-7B-q4_k_m.gguf",
+     "size": 4777648512,
+     "sha256": "b65488bf94d3f0525cf609c8bc5d03fa4800589546189bdfdc2f6cea0356e7f8"
+    },
+    {
+     "role": "mmproj",
+     "name": "UI-TARS-1.5-7B-q8_0.mmproj",
+     "size": 853119680,
+     "sha256": "27dde5528b1476e9aa44a7213408b389dd4c4ce4222aba8d1db9f105fb67e4de"
+    }
+   ],
+   "coords": "ui-tars",
+   "benchmarks": {
+    "screenspot_pro": 49.6,
+    "osworld": 27.4
+   },
+   "params_b": 7,
+   "quant": "Q4_K_M",
+   "note": "optional local vision grounding for apps without accessibility; ByteDance card (Holo2 card measures ScreenSpot-Pro 39.0)",
+   "ram_gb": 8.3,
+   "vram_gb_vllm_bf16": 18.8
+  }
+ ]
+}

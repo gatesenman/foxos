@@ -1,7 +1,8 @@
 """智能体循环：观察 → 模型 → 动作 → 再观察，直到模型调用 done。
 
 - browser：观察 = 当前网页的无障碍快照（文字），纯文字模型（DeepSeek v4 pro）即可；配置了视觉模型时附截图
-- computer：观察 = 窗口列表 + 当前程序的 AT-SPI 无障碍树；配置了视觉模型时附截图，并可用视觉定位点击
+- computer：观察 = 窗口列表 + agent-desktop 的无障碍快照（AT-SPI）；配置了视觉模型时附截图，并可用视觉定位点击；
+  没有无障碍信息的程序退回 xdotool 键盘输入（type_keys）与视觉定位点击（click_visual）
 每个动作都经 foxos 内核执行（与 CLI / MCP 同一条路径）：写审计、受工作空间约束、人工接管时停下等待；
 需要审批的动作（approve=ask 时所有改动，risky 时只有高风险动作）走智能体审批卡片（foxos bot approval answer）。
 过程写在 .foxos/tasks/<任务id>.jsonl。
@@ -57,14 +58,16 @@ def computer_tools(vision: bool) -> list:
     t = [
         _fn("launch", "Start a desktop program, e.g. ['mousepad', 'notes.txt'] or ['xfce4-terminal']. Paths are inside the workspace.",
             {"command": {"type": "array", "items": s}}, ["command"]),
-        _fn("observe_app", "Show the accessibility tree of a specific application by name (default: the active window's app).", {"app": s}),
-        _fn("click", "Click an element by ref from the latest accessibility tree (menus, buttons, menu items, tabs, check boxes).",
+        _fn("observe_app", "Show the accessibility snapshot of a specific application by name (default: all/focused app).", {"app": s}),
+        _fn("click", "Click an element by ref from the latest snapshot (menus, buttons, menu items, tabs, check boxes).",
             {"ref": s}, ["ref"]),
-        _fn("set_text", "Replace (or append to) the text of an editable element (text, entry) by ref.",
+        _fn("set_text", "Replace the text of an editable element (textfield, entry) by ref; append=true inserts at the caret instead.",
             {"ref": s, "text": s, "append": {"type": "boolean"}}, ["ref", "text"]),
-        _fn("read", "Read the full text/value/state of an element by ref.", {"ref": s}, ["ref"]),
-        _fn("type_keys", "Type literal text into the focused window via the keyboard.", {"text": s}, ["text"]),
-        _fn("key", "Send a key combination to the focused window, e.g. ctrl+s, Return, Escape, alt+F4.", {"keys": s}, ["keys"]),
+        _fn("select", "Choose an option in a combo box / list by ref and visible text.", {"ref": s, "value": s}, ["ref", "value"]),
+        _fn("scroll", "Scroll a scrollable element by ref.", {"ref": s, "direction": {"type": "string", "enum": ["up", "down"]}}, ["ref"]),
+        _fn("read", "Read the full text of an element by ref.", {"ref": s}, ["ref"]),
+        _fn("key", "Send a key combination to the focused app, e.g. ctrl+s, return, escape.", {"keys": s}, ["keys"]),
+        _fn("type_keys", "Fallback for apps without accessibility: type literal text into the focused window via the keyboard.", {"text": s}, ["text"]),
         _fn("focus_window", "Focus a window by id from the window list.", {"window": s}, ["window"]),
         _fn("wait", "Wait a few seconds for the UI to update.", {"seconds": {"type": "number"}}, ["seconds"]),
         DONE,
@@ -143,8 +146,15 @@ class Loop:
             return text, png
         wins = self.run_cmd("desktop.windows", {})
         wl = "\n".join(f"- window {w.get('id')} \"{w.get('title')}\"" + (" [active]" if w.get("active") else "") for w in wins.get("windows", []))
-        tr_ = self.run_cmd("desktop.tree", {"app": self.app, "max_nodes": 350} if self.app else {"max_nodes": 350})
-        text = "Windows:\n" + (wl or "(none)") + "\n\nAccessibility tree:\n" + (tr_.get("snapshot") or "(no accessible app)")
+        try:
+            tr_ = self.run_cmd("desktop.tree", {"app": self.app, "full": True} if self.app else {"full": True})
+        except FoxError as e:
+            if e.code == "PAUSED":
+                raise
+            tr_ = {"snapshot": f"(accessibility snapshot failed: {e.message}; use type_keys / key / click_visual)", "nodes": []}
+        self._last_nodes = tr_.get("nodes") or []
+        self._title = next((w.get("title") for w in wins.get("windows", []) if w.get("active")), None)
+        text = "Windows:\n" + (wl or "(none)") + "\n\nAccessibility snapshot (agent-desktop):\n" + (tr_.get("snapshot") or "(no accessible app)")
         png = None
         if self.vision:
             import tempfile
@@ -186,15 +196,10 @@ class Loop:
 
     def _label(self, ref) -> str:
         try:
-            if self.kind == "browser":
-                for line in (self._last_obs or "").splitlines():
-                    if f"[ref={ref}]" in line:
-                        return line.strip()
-            else:
-                from . import a11y
-                r = a11y.lookup(self.ctx.workspace, ref)
-                return f"{r.get('role')} {r.get('name')}"
-        except FoxError:
+            for line in (self._last_obs or "").splitlines():
+                if f"[ref={ref}]" in line:
+                    return line.strip()
+        except (FoxError, AttributeError):
             pass
         return ""
 
@@ -238,12 +243,14 @@ class Loop:
                  "read_text": ("browser.text", {"ref": a.get("ref"), "tab": t, "max_chars": 12000})}
         else:
             m = {"launch": ("desktop.launch", {"command": workspace_argv(self.ctx, a.get("command") or [])}),
-                 "observe_app": ("desktop.tree", {"app": a.get("app"), "max_nodes": 350}),
+                 "observe_app": ("desktop.tree", {"app": a.get("app")}),
                  "click": ("desktop.element.click", {"ref": a.get("ref")}),
                  "set_text": ("desktop.element.set-text", {"ref": a.get("ref"), "text": a.get("text", ""), "append": bool(a.get("append"))}),
-                 "read": ("desktop.element.read", {"ref": a.get("ref"), "limit": 8000}),
+                 "select": ("desktop.element.select", {"ref": a.get("ref"), "value": a.get("value", "")}),
+                 "scroll": ("desktop.element.scroll", {"ref": a.get("ref"), "direction": a.get("direction", "down")}),
+                 "read": ("desktop.element.read", {"ref": a.get("ref")}),
                  "type_keys": ("desktop.type", {"text": a.get("text", "")}),
-                 "key": ("desktop.key", {"keys": a.get("keys", "")}),
+                 "key": ("desktop.press", {"keys": a.get("keys", "")}),
                  "focus_window": ("desktop.focus", {"window": str(a.get("window", ""))}),
                  "click_visual": ("desktop.ground", {"description": a.get("description", ""), "click": True})}
             if name == "wait":

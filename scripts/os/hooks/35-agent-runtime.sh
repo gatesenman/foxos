@@ -10,6 +10,13 @@ export npm_config_cache=/var/tmp/foxos-npm-cache UV_CACHE_DIR=/var/tmp/foxos-uv-
 "$PY" -m foxos.runtime install --phase iso --system
 echo "35-agent-runtime: installed"
 "$PY" -m foxos.runtime check || { echo "35-agent-runtime: an ISO-phase tool failed its --version check" >&2; exit 1; }
+# 电脑操控后端（Apache-2.0，版本固定）：agent-desktop（默认：无障碍树观察 / 操作）、agent-browser（兜底：网页，经 CDP 连自带 Chrome）
+for pkg in agent-desktop@1.2.0 agent-browser@0.42.0; do
+  name=${pkg%@*}
+  install -d "/usr/lib/foxos/tools/$name"
+  npm install --prefix "/usr/lib/foxos/tools/$name" --no-audit --no-fund "$pkg"
+  "/usr/lib/foxos/tools/$name/node_modules/.bin/$name" --version
+done
 rm -rf /var/tmp/foxos-npm-cache /var/tmp/foxos-uv-cache /root/.foxos-build /root/.npm /root/.cache/node-gyp
 # 用户 PATH：~/.local/bin（首次登录与 foxos runtime install 装在这里），/usr/local/bin 已在默认 PATH
 cat > /etc/profile.d/foxos-runtime.sh <<'P'

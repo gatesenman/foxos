@@ -32,11 +32,33 @@ PROVIDERS = {
                   "env": ["DASHSCOPE_API_KEY"]},
     "zhipu": {"base_url": "https://open.bigmodel.cn/api/paas/v4", "model": "glm-5.1", "vision_model": "glm-5v-turbo", "env": ["ZHIPU_API_KEY"]},
     "moonshot": {"base_url": "https://api.moonshot.cn/v1", "model": "kimi-k3", "vision_model": "kimi-k3", "env": ["MOONSHOT_API_KEY"]},
+    # 托管的电脑操控模型（都走 OpenAI 兼容的 /chat/completions；原生 computer-use 工具协议未接，见 docs/computer-use-research.md）
+    "anthropic": {"base_url": "https://api.anthropic.com/v1", "model": "claude-opus-4-8", "vision_model": "claude-opus-4-8",
+                  "env": ["ANTHROPIC_API_KEY"], "note": "Claude computer use; OpenAI-SDK-compatible endpoint"},
+    "gemini": {"base_url": "https://generativelanguage.googleapis.com/v1beta/openai", "model": "gemini-3-pro-preview",
+               "vision_model": "gemini-3-pro-preview", "env": ["GEMINI_API_KEY"], "note": "Gemini computer use; OpenAI-compatible endpoint"},
+    "volcengine": {"base_url": "https://ark.cn-beijing.volces.com/api/v3", "model": "doubao-1-5-ui-tars-250428",
+                   "vision_model": "doubao-1-5-ui-tars-250428", "env": ["ARK_API_KEY"], "note": "Doubao / UI-TARS on Volcengine Ark"},
     "local": {"base_url": "http://127.0.0.1:8000/v1", "model": "", "vision_model": "", "env": []},
 }
-GROUNDING_KINDS = ("vlm", "ui-tars", "omniparser", "none")
+
+
+def custom_providers() -> dict:
+    try:
+        return json.loads((secrets.home() / "model-providers.json").read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return {}
+
+
+def all_providers() -> dict:
+    return {**PROVIDERS, **custom_providers()}
+
+
+def is_local_url(url: str | None) -> bool:
+    return bool(url) and any(h in url for h in ("127.0.0.1", "localhost", "[::1]"))
+GROUNDING_KINDS = ("auto", "vlm", "ui-tars", "omniparser", "typesafe", "none")
 DEFAULT = {"provider": "deepseek", "base_url": None, "model": None, "vision_model": None, "vision": "auto",
-           "grounding": {"kind": "vlm", "base_url": None, "model": None}, "max_steps": 30}
+           "grounding": {"kind": "auto", "base_url": None, "model": None}, "max_steps": 30}
 
 
 def _path() -> Path:
@@ -50,7 +72,7 @@ def load() -> dict:
         d = {}
     cfg = {**DEFAULT, **{k: v for k, v in d.items() if v is not None}}
     cfg["grounding"] = {**DEFAULT["grounding"], **(d.get("grounding") or {})}
-    prov = PROVIDERS.get(cfg["provider"], PROVIDERS["local"])
+    prov = all_providers().get(cfg["provider"], PROVIDERS["local"])
     cfg["base_url"] = (cfg.get("base_url") or prov["base_url"]).rstrip("/")
     cfg["model"] = cfg.get("model") or prov["model"]
     cfg["vision_model"] = cfg.get("vision_model") if cfg.get("vision_model") is not None else prov["vision_model"]
@@ -65,6 +87,8 @@ def save(patch: dict) -> dict:
     for k, v in patch.items():
         if k == "grounding":
             d["grounding"] = {**(d.get("grounding") or {}), **{kk: vv for kk, vv in v.items() if vv is not None}}
+        elif isinstance(v, dict) and isinstance(d.get(k), dict):
+            d[k] = {**d[k], **{kk: vv for kk, vv in v.items() if vv is not None}}
         elif v is not None:
             d[k] = v
     _path().parent.mkdir(parents=True, exist_ok=True)
@@ -90,7 +114,7 @@ def api_key(cfg: dict) -> str | None:
     k = secrets.get(key_name(cfg["provider"])) if hasattr(secrets, "get") else None
     if k:
         return k
-    for e in PROVIDERS.get(cfg["provider"], {}).get("env", []) + ["FOXOS_MODEL_API_KEY"]:
+    for e in all_providers().get(cfg["provider"], {}).get("env", []) + ["FOXOS_MODEL_API_KEY"]:
         if os.environ.get(e):
             return os.environ[e]
     return None
@@ -118,20 +142,23 @@ def image_part(png: bytes, mime: str = "image/png") -> dict:
 
 def chat(messages: list[dict], tools: list[dict] | None = None, *, vision: bool = False, cfg: dict | None = None,
          model: str | None = None, base_url: str | None = None, timeout: float = 180.0, temperature: float | None = None,
-         retries: int = 2) -> dict:
+         retries: int = 2, extra: dict | None = None) -> dict:
     """返回 {"message": 助手消息（原样，含 reasoning_content / tool_calls）, "usage", "model", "seconds"}。"""
     cfg = cfg or load()
     m = model or (cfg["vision_model"] if vision else cfg["model"])
     if not m:
         raise FoxError("DEPENDENCY_MISSING", tr("cu.no_model"), hint="foxos computer model set --provider deepseek")
-    key = api_key(cfg)
-    if not key and cfg["provider"] != "local":
+    local = cfg["provider"] == "local" or is_local_url(base_url) or all_providers().get(cfg["provider"], {}).get("keyless")
+    key = None if (is_local_url(base_url) and base_url != cfg.get("base_url")) else api_key(cfg)
+    if not key and not local:
         raise FoxError("DEPENDENCY_MISSING", tr("cu.no_key", cfg["provider"]), hint=f"foxos computer model key --value-stdin  # {cfg['provider']}")
     body: dict = {"model": m, "messages": messages}
     if tools:
         body["tools"] = tools
     if temperature is not None:
         body["temperature"] = temperature
+    if extra:
+        body.update(extra)
     hdr = {"Content-Type": "application/json"}
     if key:
         hdr["Authorization"] = f"Bearer {key}"
@@ -144,7 +171,8 @@ def chat(messages: list[dict], tools: list[dict] | None = None, *, vision: bool 
             with urllib.request.urlopen(req, timeout=timeout) as r:  # noqa: S310 — 用户配置的模型服务
                 data = json.loads(r.read().decode("utf-8"))
             msg = data["choices"][0]["message"]
-            return {"message": msg, "usage": data.get("usage") or {}, "model": m, "seconds": round(time.time() - t0, 2)}
+            return {"message": msg, "usage": data.get("usage") or {}, "model": m, "seconds": round(time.time() - t0, 2),
+                    "logprobs": data["choices"][0].get("logprobs")}
         except urllib.error.HTTPError as e:
             detail = e.read().decode("utf-8", "replace")[:400]
             last = FoxError("ERROR", tr("cu.model_http", m, e.code, detail))

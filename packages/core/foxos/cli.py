@@ -249,6 +249,8 @@ def print_human(cmd_id: str, result: dict) -> None:
         for a in result["apps"]:
             print(tr("cli.ops", tr("cli.installed") if a['installed'] else tr("cli.not_installed"), a['group_name'], a['id'], a['name'], a['license'], a['ops']), file=out)
         print(tr("cli.in_total_installed_upstream", result['count'], result['installed'], result['commit'][:8]), file=out)
+    if isinstance(result.get("snapshot"), str) and cmd_id.endswith((".tree", "browser.snapshot")):
+        print(result["snapshot"], file=out)
     if cmd_id.endswith(".ui.snapshot"):
         print(f"# {result['title']}  {result['url']}", file=out)
         for e in result["elements"]:
