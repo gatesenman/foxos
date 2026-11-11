@@ -31,5 +31,5 @@ command-menueditor=menulibre
 show-command-menueditor=false
 show-application-edit-item=false
 hover-switch-category=false
-favorites=xfce4-terminal.desktop,thunar.desktop,firefox.desktop,org.xfce.mousepad.desktop,calamares-foxos.desktop
+favorites=xfce4-terminal.desktop,thunar.desktop,foxos-chrome.desktop,org.xfce.mousepad.desktop,calamares-foxos.desktop
 recent-items-max=8

@@ -16,7 +16,134 @@
 
 错误码：USAGE(2) NOT_FOUND(3) PERMISSION_DENIED(4) LOCKED(5) DEPENDENCY_MISSING(6) CONFLICT(7) PAUSED(8) ERROR(1)。
 
-共 4349 个工具。
+共 4357 个工具。
+
+## browser（8 个工具）
+
+### `browser_status`
+
+Chrome 是否安装、版本、CDP 开关与端口。CLI：foxos browser status。示例：foxos browser status --json
+
+只读：是 · 破坏性：否 · CLI：`foxos browser status`
+
+调用示例：
+
+```json
+{"name": "browser_status", "arguments": {}}
+```
+
+### `browser_cdp`
+
+开启 / 关闭 Chrome 远程调试（CDP，只听 127.0.0.1）。CLI：foxos browser cdp on|off [--port PORT]。限制：只有人可以开启；智能体只能关闭；只绑定 127.0.0.1；开启后使用单独的智能体配置文件 ~/.config/foxos/chrome-agent。示例：foxos browser cdp on
+
+只读：否 · 破坏性：否 · CLI：`foxos browser cdp`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `state` | string | 是 | on 或 off |
+| `port` | integer |  | 调试端口（默认 9222） |
+
+调用示例：
+
+```json
+{"name": "browser_cdp", "arguments": {"state": "…"}}
+```
+
+### `browser_open`
+
+在 Chrome 打开网址（CDP 运行时新开标签页，否则启动 Chrome）。CLI：foxos browser open URL [--wait WAIT]。示例：foxos browser open https://github.com/gatesenman/foxos
+
+只读：否 · 破坏性：否 · CLI：`foxos browser open`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `url` | string | 是 | 网址 |
+| `wait` | number |  | 启动后等待 CDP 就绪的秒数 |
+
+调用示例：
+
+```json
+{"name": "browser_open", "arguments": {"url": "…"}}
+```
+
+### `browser_tabs`
+
+列出标签页（需要 CDP）。CLI：foxos browser tabs。示例：foxos browser tabs --json
+
+只读：是 · 破坏性：否 · CLI：`foxos browser tabs`
+
+调用示例：
+
+```json
+{"name": "browser_tabs", "arguments": {}}
+```
+
+### `browser_navigate`
+
+让标签页跳转并等待加载完成（需要 CDP）。CLI：foxos browser navigate URL [--tab TAB]。示例：foxos browser navigate https://example.com --tab 3F2A
+
+只读：否 · 破坏性：否 · CLI：`foxos browser navigate`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `url` | string | 是 | 网址 |
+| `tab` | string |  | 标签页 id（foxos browser tabs 里的 id，可写前缀；默认第一个） |
+
+调用示例：
+
+```json
+{"name": "browser_navigate", "arguments": {"url": "…"}}
+```
+
+### `browser_eval`
+
+在标签页里执行 JavaScript 并返回值（需要 CDP）。CLI：foxos browser eval JS [--tab TAB]。示例：foxos browser eval 'document.title'
+
+只读：否 · 破坏性：否 · CLI：`foxos browser eval`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `expression` | string | 是 | JavaScript 表达式 |
+| `tab` | string |  | 标签页 id（foxos browser tabs 里的 id，可写前缀；默认第一个） |
+
+调用示例：
+
+```json
+{"name": "browser_eval", "arguments": {"expression": "…"}}
+```
+
+### `browser_screenshot`
+
+截取标签页内容为 PNG（需要 CDP）。CLI：foxos browser screenshot [--path PATH] [--tab TAB]。示例：foxos browser screenshot --path shots/page.png
+
+只读：是 · 破坏性：否 · CLI：`foxos browser screenshot`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `path` | string |  | 工作空间内的 PNG 路径（缺省写到 .foxos/screenshots/） |
+| `tab` | string |  | 标签页 id（foxos browser tabs 里的 id，可写前缀；默认第一个） |
+
+调用示例：
+
+```json
+{"name": "browser_screenshot", "arguments": {}}
+```
+
+### `browser_close`
+
+关闭标签页（需要 CDP）。CLI：foxos browser close TAB。示例：foxos browser close 3F2A
+
+只读：否 · 破坏性：否 · CLI：`foxos browser close`
+
+| 参数 | 类型 | 必填 | 说明 |
+|---|---|---|---|
+| `tab` | string | 是 | 标签页 id（foxos browser tabs 里的 id，可写前缀；默认第一个） |
+
+调用示例：
+
+```json
+{"name": "browser_close", "arguments": {"tab": "…"}}
+```
 
 ## desktop（13 个工具）
 
@@ -114,7 +241,7 @@
 
 ### `desktop_launch`
 
-启动一个应用或命令。CLI：foxos desktop launch CMD...。示例：foxos desktop launch -- xfce4-terminal
+启动一个应用或命令。CLI：foxos desktop launch CMD...。示例：foxos desktop launch chrome
 
 只读：否 · 破坏性：否 · CLI：`foxos desktop launch`
 
@@ -318,7 +445,7 @@
 
 ### `session_launch`
 
-启动一个应用或命令。CLI：foxos session launch CMD...。示例：foxos session launch -- xfce4-terminal
+启动一个应用或命令。CLI：foxos session launch CMD...。示例：foxos session launch chrome
 
 只读：否 · 破坏性：否 · CLI：`foxos session launch`
 

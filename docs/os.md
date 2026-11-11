@@ -57,12 +57,29 @@
 |---|---|---|
 | 终端 | XFCE Terminal | 真实 PTY；可直接运行 `foxos` |
 | 文件管理器 | Thunar | 比 Nautilus 依赖少，支持工作空间书签 |
-| 浏览器 | Firefox（Mozilla 官方 .deb，不用 Snap） |  |
+| 浏览器 | **Google Chrome**（默认浏览器，首次使用时从 Google 官方源安装，见下）；Firefox 作为离线备用（Mozilla 官方 tarball，不用 Snap） | 开始菜单收藏、默认网页处理程序、XFCE 首选浏览器都指向「Google Chrome」 |
 | 编辑器 | Mousepad；Code - OSS 作可选组件 | 原 Electron 里的 Monaco 编辑器若保留，改为独立窗口 |
 | 办公 | LibreOffice | **体积大，不默认打进 ISO**；安装器 / `foxos` 在线安装组件可装，装完是普通窗口 |
 | Everything 应用 | 安装后在线构建/安装 | 各应用是独立进程、独立窗口（Web 应用跑在隔离的浏览进程里，仍是操作系统窗口，不是外壳内嵌矩形） |
 
-狐狸OS 自己的界面（面板、设置、开始菜单、环境窗口）使用自定义细滚动条；不修改 LibreOffice、Firefox 等工具包内部的默认滚动条。
+### 浏览器：为什么 Chrome 不在 ISO 里、怎么装
+
+**决定**：ISO 里**不预装** Google Chrome 二进制，而是预装「Google Chrome」入口，第一次使用时从 Google 官方软件源安装。
+
+- **原因**：[Google Chrome 附加服务条款](https://www.google.com/chrome/terms/)只授予个人使用许可，不允许未经 Google 另行书面许可复制、再分发 Chrome（企业条款也只允许在本单位的机器上分发）。把 `google-chrome-stable` 打进我们公开下载的 ISO 就是再分发，所以不做。Mozilla 允许原样再分发 Firefox，所以 Firefox 仍在 ISO 里，作为没网或不同意 Chrome 条款时的备用浏览器（因此没有删掉 Firefox，它也只占约 250 MB）。
+- **首次登录**：XFCE 自启动 `foxos-chrome-setup --firstrun`，弹出中文对话框说明条款并给出链接；点「同意并安装」后 `pkexec` 安装。同一用户只问一次。
+- **任何时候**：开始菜单收藏里的「Google Chrome」（`foxos-chrome.desktop`，Papirus 的 Chrome 图标）以及所有网页链接都走 `/usr/bin/foxos-chrome`：已装就直接启动 Chrome；没装就先询问，拒绝则用 Firefox 打开同一个链接。
+- **安装过程**（`/usr/lib/foxos/foxos-chrome-setup --install`）：从 `dl.google.com` 下载 Google Linux 软件包签名密钥，**核对指纹** `EB4C1BFD4F042F6DDDCCEC917721F63BD38B4796`，写入 `/usr/share/keyrings/google-chrome.gpg`，添加 `https://dl.google.com/linux/chrome/deb/ stable main`，`apt-get install google-chrome-stable`（apt 用 Google 的签名校验包）。之后 Chrome 由 apt 正常升级。
+- **默认浏览器与中文**：`x-www-browser` alternatives、`/etc/xdg/mimeapps.list`、`/etc/xdg/xfce4/helpers.rc` 都指向 Chrome；托管策略 `/etc/opt/chrome/policies/managed/foxos.json` 固定 `ApplicationLocaleValue=zh-CN`（界面中文），并关掉 Chrome 自己的「设为默认浏览器」提示。
+- **Calamares**：如果在 Live 会话里已同意条款并装了 Chrome，安装器的 `shellprocess@chrome` 步骤会把 Chrome 从 Google 源装进新系统（需要联网；失败不影响安装，新系统首次登录会再问）。没同意过就不装，新系统首次登录再问。
+
+### 智能体控制 Chrome（CDP，默认关闭）
+
+- `foxos desktop launch chrome [URL]`、`foxos browser open URL`：用狐狸OS 的参数启动 Chrome。
+- 远程调试（Chrome DevTools Protocol）**默认关闭**，只能由人打开：`foxos browser cdp on`（智能体身份会得到 `PERMISSION_DENIED`；智能体可以关闭）。打开后狐狸OS 启动的 Chrome 加 `--remote-debugging-address=127.0.0.1 --remote-debugging-port=9222`，**只监听本机**，并使用单独的智能体配置文件 `~/.config/foxos/chrome-agent`，不会把你日常配置里的登录态、密码交给智能体。
+- 之后可用 `foxos browser tabs / navigate / eval / screenshot / close`，MCP 里是同名的 `browser_*` 工具；人工接管时写操作返回 `PAUSED`。操作清单：[operations/browser.md](operations/browser.md)。
+
+狐狸OS 自己的界面（面板、设置、开始菜单、环境窗口）使用自定义细滚动条；不修改 LibreOffice、Chrome、Firefox 等工具包内部的默认滚动条。
 
 ## 4. 智能体控制整台机器
 

@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=狐狸OS：安装 Google Chrome
+Exec=/usr/lib/foxos/foxos-chrome-setup --firstrun
+NoDisplay=true
+X-XFCE-Autostart-Override=true
+OnlyShowIn=XFCE;

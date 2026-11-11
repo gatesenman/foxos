@@ -72,7 +72,7 @@ done
 sleep 8  # 等 apply-defaults、壁纸、genmon 刷新
 
 
-P=os-031   # 新文件名：GitHub 按 URL 缓存图片，换名才能让 README 立即显示新图
+P=${FOXOS_SHOT_PREFIX:-os-032}   # 新文件名：GitHub 按 URL 缓存图片，换名才能让 README 立即显示新图
 shot() { x "scrot -o /tmp/$P-$1.png"; cp "$R/tmp/$P-$1.png" "$OUT/$P-$1.png"; }
 typeln() { x "xdotool type --delay 12 -- '$1'"; x "xdotool key Return"; sleep "${2:-2}"; }
 win() { x "xdotool search --sync --onlyvisible --class $1" | tail -1; }
@@ -82,6 +82,44 @@ as_root() {
   chroot "$R" /usr/bin/env -i HOME=/root PATH=/usr/sbin:/usr/bin:/sbin:/bin DISPLAY="$DISP" \
     LANG=zh_CN.UTF-8 LANGUAGE=zh_CN:zh LC_ALL=zh_CN.UTF-8 /bin/sh -c "$*"
 }
+
+# FOXOS_SHOT_ONLY=chrome：只拍 Google Chrome 首次安装对话框、Chrome 窗口和 CDP 控制
+if [ "${FOXOS_SHOT_ONLY:-}" = chrome ]; then
+  # a) 首次使用对话框（与开始菜单「Google Chrome」、首次登录自启动是同一个）
+  x "/usr/lib/foxos/foxos-chrome-setup --gui" >"$WORK/shot-chrome-gui.log" 2>&1 &
+  sleep 6
+  shot chrome-setup
+  x "xdotool key Escape"; sleep 2
+  # b) 用户点「同意并安装」后 pkexec 运行的就是这一步（这里没有 polkit 代理，直接以 root 运行同一脚本）
+  rm -f "$R/etc/resolv.conf"; cp -L /etc/resolv.conf "$R/etc/resolv.conf"
+  as_root "/usr/lib/foxos/foxos-chrome-setup --install" >"$WORK/shot-chrome-install.log" 2>&1
+  tail -3 "$WORK/shot-chrome-install.log"
+  # c) 人打开 CDP，智能体用 foxos 启动 Chrome、列标签页、读标题
+  x "xfce4-terminal --geometry=96x22+60+600" >/dev/null 2>&1 &
+  sleep 4
+  WID=$(win xfce4-terminal)
+  x "xdotool windowactivate --sync $WID"; sleep 2
+  typeln 'clear; foxos browser cdp on' 3
+  typeln 'foxos --agent demo-agent desktop launch chrome https://github.com/gatesenman/foxos' 20
+  CW=$(win Google-chrome)
+  x "xdotool windowsize $CW 1280 860 windowmove $CW 600 40" || true
+  x "pkill -x zenity" >/dev/null 2>&1 || true   # 首次登录自启动的同一对话框，已经截过
+  sleep 4
+  x "xdotool windowactivate --sync $CW"; sleep 1
+  x "xdotool key Escape"; sleep 1               # 关掉「翻译此页」气泡（界面是中文，页面是英文）
+  x "xdotool mousemove 300 300"; sleep 2
+  shot chrome
+  x "xdotool windowactivate --sync $WID"; sleep 1
+  typeln 'clear; foxos browser status' 4
+  typeln 'foxos --agent demo-agent browser tabs' 4
+  typeln "foxos --agent demo-agent browser eval 'document.title' --json | grep value" 4
+  typeln 'foxos --agent demo-agent browser screenshot --path shots/chrome-page.png' 5
+  shot chrome-cdp
+  x "sh -c 'foxos browser status --json; xdg-settings get default-web-browser; readlink -f /etc/alternatives/x-www-browser'" > "$OUT/chrome.txt" 2>&1 || true
+  cp "$R/home/foxos/FoxOS/workspace/shots/chrome-page.png" "$OUT/chrome-page.png" 2>/dev/null || true
+  chown -R "${SUDO_UID:-0}:${SUDO_GID:-0}" "$OUT"
+  echo "截图已写入 $OUT"; exit 0
+fi
 
 # 1. 终端：foxos 命令操作真实桌面与工作空间里的表格、文档
 x "xfce4-terminal --geometry=110x30+120+70" >/dev/null 2>&1 &

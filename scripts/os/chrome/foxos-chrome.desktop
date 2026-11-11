@@ -1,0 +1,13 @@
+[Desktop Entry]
+Type=Application
+Name=Google Chrome
+Name[zh_CN]=Google Chrome 浏览器
+GenericName=Web Browser
+GenericName[zh_CN]=网页浏览器
+Comment=浏览网页（首次使用时从 Google 官方源安装）
+Exec=/usr/bin/foxos-chrome %U
+Icon=google-chrome
+Categories=Network;WebBrowser;
+MimeType=text/html;application/xhtml+xml;x-scheme-handler/http;x-scheme-handler/https;
+StartupNotify=true
+StartupWMClass=Google-chrome

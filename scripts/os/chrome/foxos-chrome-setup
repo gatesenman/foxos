@@ -1,0 +1,116 @@
+#!/bin/bash
+# 狐狸OS：安装 Google Chrome（官方 stable，来自 Google 自己的 apt 源）。
+#
+# 为什么不在 ISO 里预装：Google Chrome 附加服务条款不允许未经 Google 另行书面许可
+# 复制和再分发 Chrome 二进制（见 https://www.google.com/chrome/terms/）。所以 ISO 只带
+# 这个脚本、Google 软件源的配置和签名密钥指纹；Chrome 本身由用户自己的电脑在用户
+# 同意 Google 条款后直接从 dl.google.com 下载，apt 用 Google 的签名校验。
+#
+# 用法：
+#   foxos-chrome-setup --gui          图形确认（同意条款 → pkexec 安装），首次登录和开始菜单用
+#   foxos-chrome-setup --firstrun     首次登录自启动：已安装或已经回答过就什么都不做
+#   foxos-chrome-setup --install      （root）添加源、校验密钥、安装、设为默认浏览器
+#   foxos-chrome-setup --if-accepted ROOT  （root，Calamares 用）Live 里同意过才装进 ROOT
+#   foxos-chrome-setup --status       打印 installed / not-installed
+set -euo pipefail
+
+KEY_URL=https://dl.google.com/linux/linux_signing_key.pub
+KEY_FPR=EB4C1BFD4F042F6DDDCCEC917721F63BD38B4796
+KEYRING=/usr/share/keyrings/google-chrome.gpg
+LIST=/etc/apt/sources.list.d/google-chrome.list
+ACCEPTED=/var/lib/foxos/chrome-terms-accepted
+TERMS_URL=https://www.google.com/chrome/terms/
+STATE_DIR=${XDG_CONFIG_HOME:-$HOME/.config}/foxos
+ANSWERED=$STATE_DIR/chrome-firstrun-answered
+
+installed() { command -v google-chrome-stable >/dev/null 2>&1; }
+
+set_default() {
+  # 系统级默认浏览器：alternatives、XFCE 首选应用、mimeapps（新用户与当前用户都生效）
+  update-alternatives --install /usr/bin/x-www-browser x-www-browser /usr/bin/google-chrome-stable 250 >/dev/null 2>&1 || true
+  update-alternatives --set x-www-browser /usr/bin/google-chrome-stable >/dev/null 2>&1 || true
+  install -d /etc/xdg/xfce4
+  if grep -q '^WebBrowser=' /etc/xdg/xfce4/helpers.rc 2>/dev/null; then
+    sed -i 's/^WebBrowser=.*/WebBrowser=foxos-chrome/' /etc/xdg/xfce4/helpers.rc
+  else
+    echo 'WebBrowser=foxos-chrome' >> /etc/xdg/xfce4/helpers.rc
+  fi
+  cat > /etc/xdg/mimeapps.list <<'M'
+[Default Applications]
+text/html=foxos-chrome.desktop
+application/xhtml+xml=foxos-chrome.desktop
+x-scheme-handler/http=foxos-chrome.desktop
+x-scheme-handler/https=foxos-chrome.desktop
+x-scheme-handler/about=foxos-chrome.desktop
+M
+  # 中文界面：Chrome 在 Linux 上跟随 LANGUAGE / LANG；狐狸OS 默认 zh_CN.UTF-8，额外固定一次
+  install -d /etc/opt/chrome/policies/managed
+  cat > /etc/opt/chrome/policies/managed/foxos.json <<'P'
+{ "ApplicationLocaleValue": "zh-CN", "DefaultBrowserSettingEnabled": false }
+P
+}
+
+do_install() {
+  [ "$(id -u)" = 0 ] || { echo "需要 root：pkexec foxos-chrome-setup --install" >&2; exit 4; }
+  export DEBIAN_FRONTEND=noninteractive
+  tmp=$(mktemp -d); trap 'rm -rf "$tmp"' EXIT
+  echo "下载 Google 软件包签名密钥 …"
+  curl -fsSL --retry 3 "$KEY_URL" -o "$tmp/key.pub"
+  gpg --batch --quiet --dearmor -o "$tmp/key.gpg" "$tmp/key.pub"
+  got=$(gpg --batch --show-keys --with-colons "$tmp/key.gpg" 2>/dev/null | awk -F: '/^fpr:/{print $10; exit}')
+  if [ "$got" != "$KEY_FPR" ]; then
+    echo "签名密钥指纹不对：得到 $got，应为 $KEY_FPR。已停止。" >&2; exit 1
+  fi
+  install -m 644 "$tmp/key.gpg" "$KEYRING"
+  echo "deb [arch=amd64 signed-by=$KEYRING] https://dl.google.com/linux/chrome/deb/ stable main" > "$LIST"
+  echo "从 dl.google.com 安装 google-chrome-stable …"
+  # 全量 update：Chrome 依赖 fonts-liberation 等系统包，ISO 里的 apt 列表在构建时已清空
+  apt-get update
+  apt-get install -y google-chrome-stable
+  # 之后由 Chrome 包自己的 cron 维护 google-chrome.list（同名文件），apt 照常升级 Chrome
+  install -d /var/lib/foxos; date -Is > "$ACCEPTED"
+  set_default
+  echo "已安装：$(google-chrome-stable --version)"
+}
+
+gui() {
+  if installed; then exit 0; fi
+  msg="狐狸OS 推荐使用 Google Chrome 作为浏览器（智能体也可以在你允许后通过本机 CDP 控制它）。
+
+为了遵守 Google 的许可，狐狸OS 不预装 Chrome：点「同意并安装」表示你接受
+Google Chrome 服务条款（$TERMS_URL），
+Chrome 会从 Google 官方软件源（dl.google.com）下载，约 120 MB，需要联网。
+
+不安装也可以：系统自带 Firefox，可随时从开始菜单「Google Chrome」再装。"
+  if command -v zenity >/dev/null 2>&1; then
+    zenity --question --title="安装 Google Chrome" --width=520 --icon-name=google-chrome \
+      --ok-label="同意并安装" --cancel-label="以后再说" --text="$msg" || return 1
+    pkexec /usr/lib/foxos/foxos-chrome-setup --install 2>&1 | \
+      zenity --progress --pulsate --auto-close --no-cancel --title="安装 Google Chrome" --text="正在从 Google 下载并安装 Chrome …" || true
+  else
+    xfce4-terminal -T "安装 Google Chrome" -x sh -c "printf '%s\n\n' \"$msg\"; read -p '输入 y 同意并安装：' a; [ \"\$a\" = y ] && pkexec /usr/lib/foxos/foxos-chrome-setup --install; read -p '按回车关闭' _"
+  fi
+  installed
+}
+
+case "${1:-}" in
+  --install) do_install ;;
+  --status) installed && echo installed || echo not-installed ;;
+  --if-accepted)
+    root=${2:?ROOT}
+    [ -f "$ACCEPTED" ] || { echo "Live 会话里没有同意 Chrome 条款，安装后首次登录再询问"; exit 0; }
+    cp /usr/lib/foxos/foxos-chrome-setup "$root/usr/lib/foxos/foxos-chrome-setup" 2>/dev/null || true
+    # 目标系统里 /etc/resolv.conf 指向 systemd-resolved，chroot 里没有它：临时换成 Live 的真实 DNS
+    mv "$root/etc/resolv.conf" "$root/etc/resolv.conf.foxos-bak" 2>/dev/null || true
+    cp -L /run/systemd/resolve/resolv.conf "$root/etc/resolv.conf" 2>/dev/null || cp -L /etc/resolv.conf "$root/etc/resolv.conf" || true
+    chroot "$root" /usr/lib/foxos/foxos-chrome-setup --install || echo "Chrome 安装失败（可能没有网络），首次登录会再询问"
+    rm -f "$root/etc/resolv.conf"; mv "$root/etc/resolv.conf.foxos-bak" "$root/etc/resolv.conf" 2>/dev/null || true
+    exit 0 ;;
+  --firstrun)
+    installed && exit 0
+    [ -f "$ANSWERED" ] && exit 0
+    mkdir -p "$STATE_DIR"; date -Is > "$ANSWERED"
+    sleep 6; gui || true ;;
+  --gui|"") gui ;;
+  *) echo "用法：foxos-chrome-setup [--gui|--firstrun|--install|--if-accepted ROOT|--status]" >&2; exit 2 ;;
+esac

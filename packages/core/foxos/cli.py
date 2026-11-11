@@ -246,6 +246,13 @@ def print_human(cmd_id: str, result: dict) -> None:
         tools = result.get("tools") or {}
         if tools:
             print("  tools: " + ", ".join(f"{k}={'yes' if v else 'no'}" for k, v in tools.items()), file=out)
+    if cmd_id == "browser.status":
+        cdp = result.get("cdp") or {}
+        print(f"  chrome: {result.get('version') or (result.get('binary') or tr('browser.chrome_not_installed'))}", file=out)
+        print(f"  cdp: {'on' if cdp.get('enabled') else 'off'}  {cdp.get('address')}:{cdp.get('port')}  running={'yes' if cdp.get('running') else 'no'}", file=out)
+    if cmd_id == "browser.tabs":
+        for tb in result.get("tabs") or []:
+            print(f"  {tb['id']}  {tb.get('title') or ''}  {tb.get('url') or ''}", file=out)
     if cmd_id == "files.list":
         for f in result["entries"]:
             print(f"{'<DIR>' if f['type'] == 'dir' else f['bytes']:>10}  {f['path']}{'/' if f['type'] == 'dir' else ''}", file=out)

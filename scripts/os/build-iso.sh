@@ -11,11 +11,11 @@ set -euo pipefail
 
 SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
 ROOT=$(cd "$SCRIPT_DIR/../.." && pwd)
-VERSION=0.3.1
+VERSION=0.3.2
 SUITE=noble
 ARCH=amd64
 ISO_NAME="FoxOS-${VERSION}-amd64.iso"
-VOLID="FOXOS_031"
+VOLID="FOXOS_032"
 WORK=${FOXOS_OS_WORK:-/var/tmp/foxos-os}
 OUT=${FOXOS_OS_OUT:-"$ROOT/build/os"}
 MIRROR=${FOXOS_OS_MIRROR:-http://archive.ubuntu.com/ubuntu}
@@ -69,7 +69,7 @@ log "工作目录 $WORK"
 mkdir -p "$WORK" "$OUT" "$ISO/casper" "$ISO/boot/grub" "$ISO/.disk" "$STAGING"
 # 把脚本、品牌、面板、仓库里的 foxos 包、图标放到 staging，供 chroot hook 使用
 rsync -a --delete \
-  "$SCRIPT_DIR/branding" "$SCRIPT_DIR/panel" "$SCRIPT_DIR/calamares" "$SCRIPT_DIR/systemd" "$SCRIPT_DIR/hooks" \
+  "$SCRIPT_DIR/branding" "$SCRIPT_DIR/panel" "$SCRIPT_DIR/calamares" "$SCRIPT_DIR/systemd" "$SCRIPT_DIR/hooks" "$SCRIPT_DIR/chrome" \
   "$STAGING/"
 mkdir -p "$STAGING/icons" "$STAGING/foxos-pkg"
 cp -a "$ROOT/assets/icons/." "$STAGING/icons/"

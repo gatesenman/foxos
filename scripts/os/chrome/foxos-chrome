@@ -1,0 +1,6 @@
+#!/bin/sh
+# 开始菜单 / 默认浏览器入口「Google Chrome」：已安装就直接启动；
+# 没装就先问要不要装（Google 条款），不装则用自带的 Firefox 打开同一个链接。
+if command -v google-chrome-stable >/dev/null 2>&1; then exec google-chrome-stable "$@"; fi
+/usr/lib/foxos/foxos-chrome-setup --gui && exec google-chrome-stable "$@"
+exec firefox "$@"

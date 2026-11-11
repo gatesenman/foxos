@@ -5,7 +5,7 @@
   pytest        packages/core/tests
   smoke         apps/desktop/scripts/smoke.sh（桌面冒烟）
   e2e           apps/desktop/e2e/*.e2e.js / *.e2e.mjs（Playwright 驱动真实 Electron 桌面、官方 MCP SDK）
-  os            packages/core/tests/test_os_session.py 与 test_os_kvm.py（真实 XFCE / X11 会话、linux-kvm 动词）
+  os            packages/core/tests/test_os_session.py、test_os_kvm.py 与 test_os_chrome.py（真实 XFCE / X11 会话、linux-kvm 动词）
 结果（JUnit XML）写到 build/test-results/，汇总写到 docs/test-results/summary.json，报告写到 docs/test-report.md。
 
 用法：python3 scripts/test_all.py [--only pytest,smoke,e2e] [--e2e mcp,sandbox,...] [--report-only]
@@ -78,7 +78,7 @@ def main() -> int:
                 codes["pytest"] = run([PY, "-m", "pytest", "-q", "packages/core/tests", f"--junitxml={OUT / 'pytest.xml'}"], env, ROOT, OUT / "pytest.log")
             if "os" in only:
                 codes["os"] = run([PY, "-m", "pytest", "-q",
-                                   "packages/core/tests/test_os_session.py", "packages/core/tests/test_os_kvm.py",
+                                   "packages/core/tests/test_os_session.py", "packages/core/tests/test_os_kvm.py", "packages/core/tests/test_os_chrome.py",
                                    f"--junitxml={OUT / 'os.xml'}"], env, ROOT, OUT / "os.log")
             if "smoke" in only or "e2e" in only:
                 xvfb = ensure_display(env)

@@ -59,10 +59,19 @@ def desktop_resize(ctx: Context, window: str, width: int, height: int) -> dict:
 
 def desktop_launch(ctx: Context, command: list) -> dict:
     argv = [str(c) for c in (command or [])]
-    if len(argv) == 1 and " " in argv[0]:
+    if argv and argv[0].lower() in _browser_aliases():
+        # `foxos desktop launch chrome [URL…]`：用狐狸OS 的 Chrome 启动参数（CDP 开启时只听 127.0.0.1）
+        from .browser import chrome_argv
+        argv = chrome_argv(ctx, argv[1:])
+    elif len(argv) == 1 and " " in argv[0]:
         argv = ["/bin/sh", "-c", argv[0]]
     r = _backend(ctx).launch(argv)
     return {"message": tr("desktop.launched", " ".join(argv)), **r}
+
+
+def _browser_aliases() -> set[str]:
+    from .browser import ALIASES
+    return ALIASES
 
 
 def desktop_type(ctx: Context, text: str) -> dict:
@@ -126,7 +135,7 @@ def _register_for(app: str) -> None:
                      examples=[f"foxos {app} close 4278190080"], permission="modify"))
     register(Command(app, "launch", tr("desktop.launch_an_application_or_command"), desktop_launch,
                      params=[Param("command", "array", tr("desktop.command_and_arguments"), required=True, positional=True, items={"type": "string"}, metavar="CMD")],
-                     examples=[f"foxos {app} launch -- xfce4-terminal", f"foxos {app} launch -- xfce4-terminal -T notes"], permission="run"))
+                     examples=[f"foxos {app} launch chrome", f"foxos {app} launch -- xfce4-terminal", f"foxos {app} launch -- xfce4-terminal -T notes"], permission="run"))
     register(Command(app, "type", tr("desktop.type_text_into_the_focused_window"), desktop_type,
                      params=[Param("text", "string", tr("desktop.text_to_type"), required=True, positional=True, metavar="TEXT")],
                      examples=[f"foxos {app} type 'hello'"], permission="modify"))

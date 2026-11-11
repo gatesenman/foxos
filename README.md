@@ -5,7 +5,7 @@
 <p align="center">给智能体使用的桌面操作系统：真实的桌面与应用、统一的 <code>foxos</code> 命令与 MCP 工具、审计与人工接管、自研隔离环境。</p>
 
 <p align="center">
-  <a href="https://github.com/gatesenman/foxos/releases/tag/v0.3.1-os-preview">下载可引导 ISO</a> ·
+  <a href="https://github.com/gatesenman/foxos/releases/tag/v0.3.2-os-preview">下载可引导 ISO</a> ·
   <a href="https://github.com/gatesenman/foxos/releases/tag/v0.2.0-windows-preview">Windows 伴侣预览</a> ·
   <a href="#快速开始">快速开始</a> ·
   <a href="AGENTS.md">智能体接入</a> ·
@@ -33,14 +33,16 @@ Windows 上的 `.exe` 是**伴侣程序**（预览版见 [v0.2.0-windows-preview
 - **自研隔离环境**：不依赖 Docker / 虚拟机软件；Linux 上用命名空间运行官方发行版根文件系统，Windows 上一键安装 WSL2 发行版、Windows Sandbox、Hyper-V 虚拟机。
 - **内置智能体熟悉的东西**：标准 `.xlsx` / `.docx` / `.pptx`、Excel 公式、经典 CLI 约定（子命令、`--help`、`--json`、稳定退出码）、git、Python、Node。
 
-## 截图（狐狸OS 0.3.1 真实系统）
+## 截图（狐狸OS 0.3.2 / 0.3.1 真实系统）
 
-下面每一张都来自狐狸OS 0.3.1 本身：ISO 里的根文件系统以用户 `foxos`、`zh_CN` 语言运行真实的 XFCE 会话（Xvfb，1920×1080），窗口是真实的 xfwm4 窗口和真实应用进程；安装程序和引导两张来自 QEMU 里引导的 ISO。没有任何拼接或模拟界面。截图脚本：[`scripts/os/tools/shoot-desktop.sh`](scripts/os/tools/shoot-desktop.sh)。
+下面每一张都来自狐狸OS 本身（Chrome 相关四张为 0.3.2，其余为 0.3.1）：ISO 里的根文件系统以用户 `foxos`、`zh_CN` 语言运行真实的 XFCE 会话（Xvfb，1920×1080），窗口是真实的 xfwm4 窗口和真实应用进程；安装程序和引导两张来自 QEMU 里引导的 ISO。没有任何拼接或模拟界面。截图脚本：[`scripts/os/tools/shoot-desktop.sh`](scripts/os/tools/shoot-desktop.sh)。
 
 | | |
 | --- | --- |
 | ![桌面与开始菜单](docs/screenshots/os-031-desktop.png)<br>**桌面与开始菜单**：XFCE 桌面，Whisker「开始」菜单（中文、Papirus 图标、收藏里有「安装 狐狸OS」），底栏是时钟 / 人工接管 / 系统 | ![终端里的 foxos 命令](docs/screenshots/os-031-terminal.png)<br>**终端里的 foxos 命令**：XFCE 终端，真实的 `foxos@foxos` 会话：`foxos sheets` 写入公式、`foxos docs` 生成周报、`foxos files` 列出工作空间 |
-| ![Thunar 文件管理器](docs/screenshots/os-031-files.png)<br>**Thunar 文件管理器**：打开工作空间，里面是上一步命令生成的 `.xlsx` / `.docx` | ![Firefox](docs/screenshots/os-031-firefox.png)<br>**Firefox**：系统自带浏览器（0.3.1；下一版改为 Google Chrome）打开项目 GitHub 页面 |
+| ![Google Chrome](docs/screenshots/os-032-chrome.png)<br>**Google Chrome（0.3.2 默认浏览器）**：`foxos desktop launch chrome` 打开的真实 Chrome 157，中文界面，开始菜单收藏和 xdg 默认浏览器都指向它 | ![智能体通过 CDP 控制 Chrome](docs/screenshots/os-032-chrome-cdp.png)<br>**智能体控制 Chrome（CDP）**：人工执行 `foxos browser cdp on`（只监听 127.0.0.1，默认关闭）后，智能体用 `foxos browser tabs / eval / screenshot` 读标签页、执行脚本、截图 |
+| ![首次登录：安装 Google Chrome](docs/screenshots/os-032-live-boot.png)<br>**首次登录：安装 Google Chrome**：0.3.2 ISO 在 QEMU 里引导后自动弹出的对话框。按 Google 的许可 ISO 不带 Chrome，点「同意并安装」从 Google 官方源安装 | ![Chrome 安装对话框](docs/screenshots/os-032-chrome-setup.png)<br>**安装对话框（完整分辨率）**：同一个对话框在 1920×1080 会话里；不装也可以，Firefox 作为离线后备保留 |
+| ![Thunar 文件管理器](docs/screenshots/os-031-files.png)<br>**Thunar 文件管理器**：打开工作空间，里面是上一步命令生成的 `.xlsx` / `.docx` | ![Firefox](docs/screenshots/os-031-firefox.png)<br>**Firefox**：系统自带浏览器（0.3.1 的默认浏览器；0.3.2 起默认是 Google Chrome，Firefox 保留为离线后备）打开项目 GitHub 页面 |
 | ![Mousepad 文本编辑器](docs/screenshots/os-031-editor.png)<br>**Mousepad 文本编辑器**：中文菜单，编辑工作空间里的 Markdown | ![设置管理器](docs/screenshots/os-031-settings.png)<br>**设置管理器**：XFCE 设置（外观、显示、键盘、输入法等），中文界面 |
 | ![系统菜单](docs/screenshots/os-031-system.png)<br>**系统菜单**：底栏「系统」打开的注销 / 重启 / 关机对话框 | ![人工接管](docs/screenshots/os-031-takeover.png)<br>**人工接管**：执行 `foxos control pause` 后，智能体的写操作被拒绝（`PAUSED`，退出码 8）；终端里是真实输出。截图时底栏指示器尚未刷新成「接管中」，0.3.2 修复 |
 | ![安装 狐狸OS](docs/screenshots/os-031-installer.png)<br>**安装 狐狸OS**：从 0.3.1 ISO 在 QEMU 里引导后启动的 Calamares 安装程序（虚拟机分辨率，挂了一块空白磁盘） | ![从 ISO 引导](docs/screenshots/os-live-boot.png)<br>**从 ISO 引导**：0.3.1 Live 会话在虚拟机里自动登录 `foxos` 进入 XFCE |
@@ -67,34 +69,34 @@ Windows 伴侣程序的截图在下方单独一节：[Windows 伴侣程序](#win
 
 所有版本都在 [Releases](https://github.com/gatesenman/foxos/releases)。两种东西不要混淆：
 
-- **狐狸OS 操作系统** = `v0.3.1-os-preview` 里的可引导 ISO（两个分卷 `part1` + `part2`，拼接后校验 SHA-256 `7acb74c92d159034966821900d43ddeec1815d0d7456d57232811371c31b4500`）。上面的截图就是它。
+- **狐狸OS 操作系统** = `v0.3.2-os-preview` 里的可引导 ISO（两个分卷 `part1` + `part2`，拼接后校验 SHA-256 `8e6a9e65f5e39f22170a23c9dde583056663e26c298e936bdbda4524f1110e39`）。上面的截图就是它。0.3.2 起默认浏览器是 Google Chrome（首次登录时从 Google 官方源安装，见 [docs/os.md](docs/os.md#浏览器为什么-chrome-不在-iso-里怎么装)）。旧版本 `v0.3.1-os-preview`、`v0.3.0-os-preview` 仍在 Releases 页面。
 - **Windows 伴侣程序** = `v0.2.0-windows-preview` 里的 `FoxOS-Setup-0.2.0-x64.exe` / `FoxOS-0.2.0-win-x64.zip` / `install.ps1`。它是在现有 Windows 桌面上运行的应用程序，不是操作系统。
 
-**可引导 ISO（推荐）**：[v0.3.1-os-preview](https://github.com/gatesenman/foxos/releases/tag/v0.3.1-os-preview)（预发布）。写到 U 盘或在 Hyper-V 里启动，步骤见 [ISO 测试指南](docs/os-test-guide.md)。
+**可引导 ISO（推荐）**：[v0.3.2-os-preview](https://github.com/gatesenman/foxos/releases/tag/v0.3.2-os-preview)（预发布）。写到 U 盘或在 Hyper-V 里启动，步骤见 [ISO 测试指南](docs/os-test-guide.md)。
 
 | 文件 | 说明 |
 | --- | --- |
-| `FoxOS-0.3.1-amd64.iso.part1` / `.part2` | 完整 ISO 的两个分卷（838860800 + 723613696 字节，拼接后 1562474496 字节，约 1.46 GiB） |
-| `FoxOS-0.3.1-amd64.iso` | 拼接得到的 Live + 安装镜像（UEFI + BIOS），amd64，小于 2 GB，SHA-256 `7acb74c92d159034966821900d43ddeec1815d0d7456d57232811371c31b4500` |
+| `FoxOS-0.3.2-amd64.iso.part1` / `.part2` | 完整 ISO 的两个分卷（838860800 + 724301824 字节，拼接后 1563162624 字节，约 1.46 GiB） |
+| `FoxOS-0.3.2-amd64.iso` | 拼接得到的 Live + 安装镜像（UEFI + BIOS），amd64，小于 2 GB，SHA-256 `8e6a9e65f5e39f22170a23c9dde583056663e26c298e936bdbda4524f1110e39` |
 | `SHA256SUMS` | 校验和（含完整 ISO 与两个分卷） |
 
 Release 上只有两个分卷：本构建环境单个上传约 1.46 GiB 的完整 ISO 时连接在中途断开，所以请把分卷拼起来再校验。
 
 ```bash
 # 下载两个分卷和校验和，拼回 ISO（版本号以 Release 页面为准）
-base=https://github.com/gatesenman/foxos/releases/download/v0.3.1-os-preview
-curl -L -O "$base/FoxOS-0.3.1-amd64.iso.part1"
-curl -L -O "$base/FoxOS-0.3.1-amd64.iso.part2"
+base=https://github.com/gatesenman/foxos/releases/download/v0.3.2-os-preview
+curl -L -O "$base/FoxOS-0.3.2-amd64.iso.part1"
+curl -L -O "$base/FoxOS-0.3.2-amd64.iso.part2"
 curl -L -O "$base/SHA256SUMS"
-cat FoxOS-0.3.1-amd64.iso.part1 FoxOS-0.3.1-amd64.iso.part2 > FoxOS-0.3.1-amd64.iso
+cat FoxOS-0.3.2-amd64.iso.part1 FoxOS-0.3.2-amd64.iso.part2 > FoxOS-0.3.2-amd64.iso
 sha256sum -c SHA256SUMS --ignore-missing
 ```
 
 Windows（PowerShell）：
 
 ```powershell
-cmd /c copy /b FoxOS-0.3.1-amd64.iso.part1+FoxOS-0.3.1-amd64.iso.part2 FoxOS-0.3.1-amd64.iso
-Get-FileHash -Algorithm SHA256 .\FoxOS-0.3.1-amd64.iso
+cmd /c copy /b FoxOS-0.3.2-amd64.iso.part1+FoxOS-0.3.2-amd64.iso.part2 FoxOS-0.3.2-amd64.iso
+Get-FileHash -Algorithm SHA256 .\FoxOS-0.3.2-amd64.iso
 ```
 
 **Windows x64 伴侣程序（不是操作系统）**：[v0.2.0-windows-preview](https://github.com/gatesenman/foxos/releases/tag/v0.2.0-windows-preview)（预发布，尚未在 Windows 实机上验收，见 [Windows 测试清单](docs/windows-test-guide.md)）

@@ -131,3 +131,4 @@ grub-efi-amd64-signed
 grub-pc-bin
 shim-signed
 grub-efi-amd64-bin
+zenity

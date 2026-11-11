@@ -27,6 +27,181 @@
 - **audit**：每次调用（含失败与拒绝）都追加到 <workspace>/.foxos/audit.jsonl；只读自省命令 audit tail、control status 成功时不记录
 - **tool_names**：工具接口名 = 命令 ID 把 . 换成 _，如 sheets.chart.create → sheets_chart_create
 
+## browser — 浏览器（Google Chrome）
+
+启动 Chrome、打开网页；人开启本机 CDP 后可列标签页、跳转、执行脚本、截图
+
+### `foxos browser status`
+
+Chrome 是否安装、版本、CDP 开关与端口
+
+```text
+foxos browser status
+```
+
+工具接口名：`browser_status` · 权限：`read`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| — | | | | 无参数 |
+
+示例：
+
+```bash
+foxos browser status --json
+```
+
+### `foxos browser cdp`
+
+开启 / 关闭 Chrome 远程调试（CDP，只听 127.0.0.1）
+
+```text
+foxos browser cdp on|off [--port PORT]
+```
+
+工具接口名：`browser_cdp` · 权限：`modify`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `state` | `on|off` | string | 是 | on 或 off |
+| `port` | `--port` | integer |  | 调试端口（默认 9222） |
+
+示例：
+
+```bash
+foxos browser cdp on
+foxos browser cdp off
+```
+
+限制：
+
+- 只有人可以开启；智能体只能关闭
+- 只绑定 127.0.0.1；开启后使用单独的智能体配置文件 ~/.config/foxos/chrome-agent
+
+### `foxos browser open`
+
+在 Chrome 打开网址（CDP 运行时新开标签页，否则启动 Chrome）
+
+```text
+foxos browser open URL [--wait WAIT]
+```
+
+工具接口名：`browser_open` · 权限：`run`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `url` | `URL` | string | 是 | 网址 |
+| `wait` | `--wait` | number |  | 启动后等待 CDP 就绪的秒数；默认 15.0 |
+
+示例：
+
+```bash
+foxos browser open https://github.com/gatesenman/foxos
+```
+
+### `foxos browser tabs`
+
+列出标签页（需要 CDP）
+
+```text
+foxos browser tabs
+```
+
+工具接口名：`browser_tabs` · 权限：`read`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| — | | | | 无参数 |
+
+示例：
+
+```bash
+foxos browser tabs --json
+```
+
+### `foxos browser navigate`
+
+让标签页跳转并等待加载完成（需要 CDP）
+
+```text
+foxos browser navigate URL [--tab TAB]
+```
+
+工具接口名：`browser_navigate` · 权限：`modify`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `url` | `URL` | string | 是 | 网址 |
+| `tab` | `--tab` | string |  | 标签页 id（foxos browser tabs 里的 id，可写前缀；默认第一个） |
+
+示例：
+
+```bash
+foxos browser navigate https://example.com --tab 3F2A
+```
+
+### `foxos browser eval`
+
+在标签页里执行 JavaScript 并返回值（需要 CDP）
+
+```text
+foxos browser eval JS [--tab TAB]
+```
+
+工具接口名：`browser_eval` · 权限：`modify`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `expression` | `JS` | string | 是 | JavaScript 表达式 |
+| `tab` | `--tab` | string |  | 标签页 id（foxos browser tabs 里的 id，可写前缀；默认第一个） |
+
+示例：
+
+```bash
+foxos browser eval 'document.title'
+```
+
+### `foxos browser screenshot`
+
+截取标签页内容为 PNG（需要 CDP）
+
+```text
+foxos browser screenshot [--path PATH] [--tab TAB]
+```
+
+工具接口名：`browser_screenshot` · 权限：`read`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `path` | `--path` | string |  | 工作空间内的 PNG 路径（缺省写到 .foxos/screenshots/）；工作空间路径（write） |
+| `tab` | `--tab` | string |  | 标签页 id（foxos browser tabs 里的 id，可写前缀；默认第一个） |
+
+示例：
+
+```bash
+foxos browser screenshot --path shots/page.png
+```
+
+### `foxos browser close`
+
+关闭标签页（需要 CDP）
+
+```text
+foxos browser close TAB
+```
+
+工具接口名：`browser_close` · 权限：`modify`
+
+| 参数 | CLI | 类型 | 必填 | 说明 |
+|---|---|---|---|---|
+| `tab` | `TAB` | string | 是 | 标签页 id（foxos browser tabs 里的 id，可写前缀；默认第一个） |
+
+示例：
+
+```bash
+foxos browser close 3F2A
+```
+
 ## desktop — 真实桌面会话
 
 在 XFCE 管理的真实窗口上列出、聚焦、移动，以及键入、点击和人工接管。不是 Electron 里画的假窗口。
@@ -172,6 +347,7 @@ foxos desktop launch CMD...
 示例：
 
 ```bash
+foxos desktop launch chrome
 foxos desktop launch -- xfce4-terminal
 foxos desktop launch -- xfce4-terminal -T notes
 ```
@@ -452,6 +628,7 @@ foxos session launch CMD...
 示例：
 
 ```bash
+foxos session launch chrome
 foxos session launch -- xfce4-terminal
 foxos session launch -- xfce4-terminal -T notes
 ```
@@ -794,7 +971,7 @@ foxos env run NAME [--image IMAGE] [--iso ISO] [--provider PROVIDER] [--network 
 
 ```bash
 foxos env run dev --image alpine-3.20
-foxos env run live --provider linux-kvm --iso FoxOS-0.3.1-amd64.iso --desktop-attach
+foxos env run live --provider linux-kvm --iso FoxOS-0.3.0-amd64.iso --desktop-attach
 ```
 
 ### `foxos env desktop-attach`

@@ -1,10 +1,11 @@
 #!/bin/sh
 # xfce4-genmon-plugin：显示「人工接管」或「接管中」，点击切换。
 set -eu
+# 直接看接管标记文件（foxos control pause 写的就是它），不起 Python：
+# genmon 在面板线程里同步执行命令，慢命令会让指示器一直停在旧状态。
 paused=0
-status=$(foxos control status --json 2>/dev/null || true)
-printf '%s' "$status" | grep -q '"paused": true' && paused=1
-printf '%s' "$status" | grep -qi '"paused":true' && paused=1
+ws=${FOXOS_WORKSPACE:-$HOME/FoxOS/workspace}
+[ -e "$ws/.foxos/paused" ] && paused=1
 if [ "$paused" = 1 ]; then
   printf '<icon>media-playback-start-symbolic</icon>\n'
   printf '<iconclick>/usr/lib/foxos/panel/foxos-takeover resume</iconclick>\n'

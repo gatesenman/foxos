@@ -33,3 +33,39 @@ if [ -d "$SRC/vmm" ]; then
     ln -sf /usr/lib/foxos/vmm/cloud-hypervisor /usr/bin/cloud-hypervisor
   fi
 fi
+# Google Chrome：不预装（Google 条款不允许再分发），只装首次使用时从 Google 官方源安装的入口。
+# 见 docs/os.md「浏览器：为什么 Chrome 不在 ISO 里」。
+if [ -d "$SRC/chrome" ]; then
+  command -v zenity >/dev/null 2>&1 || DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends zenity || true
+  install -m 755 "$SRC/chrome/foxos-chrome-setup" /usr/lib/foxos/foxos-chrome-setup
+  ln -sf /usr/lib/foxos/foxos-chrome-setup /usr/bin/foxos-chrome-setup
+  install -m 755 "$SRC/chrome/foxos-chrome" /usr/bin/foxos-chrome
+  install -m 644 "$SRC/chrome/foxos-chrome.desktop" /usr/share/applications/foxos-chrome.desktop
+  install -d /etc/xdg/autostart
+  install -m 644 "$SRC/chrome/foxos-chrome-firstrun.desktop" /etc/xdg/autostart/foxos-chrome-firstrun.desktop
+  # 默认浏览器：入口是 foxos-chrome（装好后就是 Chrome；没装时先询问，拒绝则用 Firefox）
+  cat > /etc/xdg/mimeapps.list <<'M'
+[Default Applications]
+text/html=foxos-chrome.desktop
+application/xhtml+xml=foxos-chrome.desktop
+x-scheme-handler/http=foxos-chrome.desktop
+x-scheme-handler/https=foxos-chrome.desktop
+M
+  install -d /etc/xdg/xfce4
+  sed -i '/^WebBrowser=/d' /etc/xdg/xfce4/helpers.rc 2>/dev/null || true
+  echo 'WebBrowser=foxos-chrome' >> /etc/xdg/xfce4/helpers.rc
+  install -d /usr/share/xfce4/helpers
+  cat > /usr/share/xfce4/helpers/foxos-chrome.desktop <<'H'
+[Desktop Entry]
+NoDisplay=true
+Version=1.0
+Encoding=UTF-8
+Type=X-XFCE-Helper
+X-XFCE-Category=WebBrowser
+X-XFCE-CommandsWithParameter=/usr/bin/foxos-chrome "%s"
+Icon=google-chrome
+Name=Google Chrome
+X-XFCE-Commands=/usr/bin/foxos-chrome
+H
+  update-alternatives --install /usr/bin/x-www-browser x-www-browser /usr/bin/foxos-chrome 220 || true
+fi

@@ -136,3 +136,5 @@ MCP 工具 `env_*`。完整虚拟机用 `linux-kvm`（内核 KVM + cloud-hypervi
 在狐狸OS 的 XFCE 会话里，智能体对**真实窗口**使用 `foxos desktop …` 或 `foxos session …`（同一组动词，MCP 为 `desktop_*` / `session_*`）：
 列出 / 聚焦 / 移动 / 关闭窗口，启动应用，键入、点击、截图，以及人工接管（`takeover` / `resume`，与 `foxos control pause` 同一状态）。
 这些不是 Electron 里画的矩形。操作清单见 docs/operations/desktop.md。人能做的，智能体用同一套命令也能做，效果相同。
+
+浏览器是 Google Chrome：`foxos desktop launch chrome` 或 `foxos browser open URL`。人用 `foxos browser cdp on` 打开本机远程调试（只听 127.0.0.1，单独的智能体配置文件）后，可用 `foxos browser tabs / navigate / eval / screenshot`；没打开时这些命令返回 PERMISSION_DENIED，不要尝试自己打开（智能体身份无权开启）。清单见 docs/operations/browser.md。

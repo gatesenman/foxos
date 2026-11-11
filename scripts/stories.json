@@ -416,6 +416,17 @@
           "^test_US61"
         ]
       ]
+    },
+    {
+      "id": "US-62",
+      "title": "Google Chrome：默认浏览器、foxos desktop launch chrome、本机 CDP（127.0.0.1，人开启）打开网页、读标题、截图",
+      "match": [
+        [
+          "pytest",
+          "test_os_chrome.py",
+          "^test_US62"
+        ]
+      ]
     }
   ]
 }
