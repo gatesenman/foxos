@@ -236,7 +236,7 @@ def case_ssh() -> str:
     assert bad2.returncode != 0 and "LOGGED-IN" not in bad2.stdout
     root = subprocess.run(ssh_base("root") + ["true"], capture_output=True, text=True, timeout=60)
     assert root.returncode != 0, "root 用密钥登录成功了"
-    fw = ssh("LC_ALL=C sudo -n ufw status", check=True).stdout
+    fw = ssh("sudo -n env LANGUAGE=C LC_ALL=C ufw status", check=True).stdout
     assert "Status: active" in fw and "22/tcp" in fw, fw
     live = "passwordauthentication yes" in eff
     msg = f"开机后 {took:.0f}s 密钥登录成功；sshd -T：{' '.join(eff.split())}；默认 / 错误密码被拒；root 被拒；ufw active 放行 22/tcp"
@@ -269,7 +269,7 @@ def case_foxos_over_ssh() -> str:
     tools = {t["name"] for t in replies[2]["result"]["tools"]}
     assert {"ssh_status", "env_catalog", "bot_message_send"} <= tools, sorted(tools)[:20]
     assert not replies[3]["result"].get("isError"), replies[3]
-    return f"{v}；foxos ssh status：active、root_login=false、password_login={st['password_login']}；MCP over SSH：{len(tools)} 个工具，tools/call ssh_status 成功"
+    return f"{v}；foxos ssh status：active、root_login={st['root_login']}、password_login={st['password_login']}；MCP over SSH：{len(tools)} 个工具，tools/call ssh_status 成功"
 
 
 def case_runtime() -> str:
@@ -311,7 +311,7 @@ def case_desktop() -> str:
     ssh("foxos desktop type 'echo FOXOS-E2E-TYPED'", check=True)
     ssh("foxos desktop key Return", check=True)
     time.sleep(5)
-    ssh(f"foxos desktop screenshot --path {shlex.quote('/tmp/' + shot.name)}", check=True)
+    ssh(f"foxos desktop screenshot --path shots/{shot.name}", check=True)
     screendump(shot)
     ssh(f"foxos desktop close {shlex.quote(wid)}", check=True)
     time.sleep(5)
