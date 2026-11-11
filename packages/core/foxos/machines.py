@@ -72,13 +72,38 @@ def fingerprint_der(der: bytes) -> str:
     return hashlib.sha256(der).hexdigest()
 
 
-def _connect(url: str, fingerprint: str | None, timeout: float = 30.0) -> tuple[http.client.HTTPSConnection, str]:
+def _self_signed(cert: Path, key: Path, cn: str) -> None:
+    try:
+        subprocess.run(["openssl", "req", "-x509", "-newkey", "ec", "-pkeyopt", "ec_paramgen_curve:prime256v1", "-nodes",
+                        "-keyout", str(key), "-out", str(cert), "-days", "3650", "-subj", f"/CN={cn}/O=FoxOS",
+                        "-addext", "basicConstraints=critical,CA:TRUE"],
+                       check=True, capture_output=True)
+    except (OSError, subprocess.CalledProcessError) as e:
+        raise FoxError("DEPENDENCY_MISSING", tr("machines.openssl_needed", e)) from e
+    os.chmod(key, 0o600)
+
+
+def client_cert() -> tuple[Path, Path, str]:
+    """控制端自己的证书（双向 TLS：配对时交给被控端，以后每次连接都出示）。"""
+    d = home() / "client"
+    d.mkdir(parents=True, exist_ok=True)
+    os.chmod(d, 0o700)
+    cert, key = d / "cert.pem", d / "key.pem"
+    if not cert.exists() or not key.exists():
+        _self_signed(cert, key, f"{socket.gethostname() or 'foxos'}-client")
+    return cert, key, fingerprint_der(ssl.PEM_cert_to_DER_cert(cert.read_text()))
+
+
+def _connect(url: str, fingerprint: str | None, timeout: float = 30.0, with_cert: bool = True) -> tuple[http.client.HTTPSConnection, str]:
     u = urlparse(url)
     if u.scheme != "https":
         raise FoxError("USAGE", tr("machines.https_only"))
     ctx = ssl.create_default_context()
     ctx.check_hostname = False
     ctx.verify_mode = ssl.CERT_NONE  # 自签名证书：改为钉住指纹（下面逐字节比对）
+    if with_cert:
+        c, k, _ = client_cert()
+        ctx.load_cert_chain(str(c), str(k))
     conn = http.client.HTTPSConnection(u.hostname, u.port or 443, timeout=timeout, context=ctx)
     try:
         conn.connect()
@@ -92,8 +117,8 @@ def _connect(url: str, fingerprint: str | None, timeout: float = 30.0) -> tuple[
 
 
 def _request(url: str, fingerprint: str | None, method: str, path: str, body: dict | None = None, token: str | None = None,
-             timeout: float = 600.0) -> tuple[int, dict, str]:
-    conn, fp = _connect(url, fingerprint, timeout)
+             timeout: float = 600.0, with_cert: bool = True) -> tuple[int, dict, str]:
+    conn, fp = _connect(url, fingerprint, timeout, with_cert)
     try:
         data = json.dumps(body or {}, ensure_ascii=False).encode("utf-8") if body is not None else None
         hdr = {"Content-Type": "application/json"}
@@ -115,17 +140,18 @@ def pair(name: str, url: str, code: str, fingerprint: str | None = None, client_
     if not name or name == LOCAL or "/" in name or "@" in name:
         raise FoxError("USAGE", tr("machines.bad_name"))
     url = url.rstrip("/")
-    st, hello, fp = _request(url, fingerprint, "GET", "/v1/hello")
+    st, hello, fp = _request(url, fingerprint, "GET", "/v1/hello", with_cert=False)
     if st != 200:
         raise FoxError("ERROR", tr("machines.not_a_foxos_host", url))
     me = client_name or socket.gethostname()
-    st, r, _ = _request(url, fp, "POST", "/v1/pair", {"code": code, "client": me})
+    ccert, _, cfp = client_cert()
+    st, r, _ = _request(url, fp, "POST", "/v1/pair", {"code": code, "client": me, "client_cert": ccert.read_text()}, with_cert=False)
     if st != 200 or not r.get("token"):
         raise FoxError("PERMISSION_DENIED", (r.get("error") or {}).get("message") or tr("machines.pair_failed"))
     secrets.put(f"machine:{name}:token", r["token"])
     reg = registry()
     reg[name] = {"url": url, "fingerprint": fp, "client": r.get("client", me), "host": hello.get("name"),
-                 "paired_at": audit.now_iso()}
+                 "client_fingerprint": cfp, "paired_at": audit.now_iso()}
     _save_registry(reg)
     return {"name": name, "url": url, "fingerprint": fp, "host": hello.get("name"), "client": r.get("client", me)}
 
@@ -211,14 +237,7 @@ def ensure_cert() -> tuple[Path, Path, str]:
     d = host_dir()
     cert, key = d / "cert.pem", d / "key.pem"
     if not cert.exists() or not key.exists():
-        cn = socket.gethostname() or "foxos"
-        try:
-            subprocess.run(["openssl", "req", "-x509", "-newkey", "ec", "-pkeyopt", "ec_paramgen_curve:prime256v1", "-nodes",
-                            "-keyout", str(key), "-out", str(cert), "-days", "3650", "-subj", f"/CN={cn}/O=FoxOS"],
-                           check=True, capture_output=True)
-        except (OSError, subprocess.CalledProcessError) as e:
-            raise FoxError("DEPENDENCY_MISSING", tr("machines.openssl_needed", e)) from e
-        os.chmod(key, 0o600)
+        _self_signed(cert, key, socket.gethostname() or "foxos")
     der = ssl.PEM_cert_to_DER_cert(cert.read_text())
     return cert, key, fingerprint_der(der)
 
@@ -362,6 +381,13 @@ def serve(ws, host: str = "0.0.0.0", port: int = 7443, name: str | None = None, 
 
     class H(BaseHTTPRequestHandler):
         protocol_version = "HTTP/1.1"
+        timeout = 900
+
+        def setup(self):
+            self.request.settimeout(30)
+            self.request.do_handshake()
+            self.request.settimeout(None)
+            super().setup()
 
         def log_message(self, *a):
             pass
@@ -382,8 +408,20 @@ def serve(ws, host: str = "0.0.0.0", port: int = 7443, name: str | None = None, 
             return json.loads(raw.decode("utf-8") or "{}")
 
         def _client(self):
+            """双向认证：令牌必须属于某个已配对的控制端，且这条 TLS 连接出示的客户端证书就是配对时登记的那张。"""
             auth = self.headers.get("Authorization", "")
-            return _client_by_token(auth[7:]) if auth.startswith("Bearer ") else None
+            c = _client_by_token(auth[7:]) if auth.startswith("Bearer ") else None
+            if not c:
+                return None
+            try:
+                der = self.connection.getpeercert(binary_form=True)
+            except (AttributeError, ValueError):
+                der = None
+            if not der or not pysecrets.compare_digest(fingerprint_der(der), c[1].get("cert_fp") or "-"):
+                audit.append_safe(ws, {"agent": f"remote:{c[0]}", "interface": "remote", "command": self.path, "status": "denied",
+                                       "machine": c[0], "error": {"code": "PERMISSION_DENIED", "message": "client certificate mismatch"}})
+                return None
+            return c
 
         def do_GET(self):  # noqa: N802
             if self.path == "/v1/hello":
@@ -413,7 +451,12 @@ def serve(ws, host: str = "0.0.0.0", port: int = 7443, name: str | None = None, 
                     base, i = cname, 2
                     while cname in d:
                         cname, i = f"{base}-{i}", i + 1
-                    d[cname] = {"token_hash": _hash(token), "paired_at": audit.now_iso(), "grants": {}}
+                    pem = str(body.get("client_cert") or "")
+                    try:
+                        cfp = fingerprint_der(ssl.PEM_cert_to_DER_cert(pem))
+                    except ValueError:
+                        return self._send(400, {"error": {"code": "USAGE", "message": tr("machines.client_cert_needed")}})
+                    d[cname] = {"token_hash": _hash(token), "cert_fp": cfp, "cert_pem": pem, "paired_at": audit.now_iso(), "grants": {}}
                     _save_clients(d)
                 audit.append_safe(ws, {"agent": f"remote:{cname}", "interface": "remote", "command": "machine.pair", "status": "ok",
                                        "machine": cname})
@@ -444,11 +487,27 @@ def serve(ws, host: str = "0.0.0.0", port: int = 7443, name: str | None = None, 
             except FoxError as e:
                 return self._send(200, {"ok": False, "command": cmd.id, "error": e.to_dict()})
 
-    srv = ThreadingHTTPServer((host, port), H)
-    sctx = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
-    sctx.minimum_version = ssl.TLSVersion.TLSv1_2
-    sctx.load_cert_chain(str(cert), str(key))
-    srv.socket = sctx.wrap_socket(srv.socket, server_side=True)
+    def tls_context() -> ssl.SSLContext:
+        # 每个连接按当前已配对的控制端重建：它们的自签名证书就是信任锚；未配对的连接（配对本身）可以不出示证书
+        sctx = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+        sctx.minimum_version = ssl.TLSVersion.TLSv1_2
+        sctx.load_cert_chain(str(cert), str(key))
+        pems = "".join(c.get("cert_pem", "") for c in host_clients().values())
+        if pems:
+            sctx.load_verify_locations(cadata=pems)
+            sctx.verify_mode = ssl.CERT_OPTIONAL
+        return sctx
+
+    class TlsServer(ThreadingHTTPServer):
+        def get_request(self):
+            sock, addr = self.socket.accept()
+            # 握手放到处理线程里第一次读写时做，不阻塞接受新连接
+            return tls_context().wrap_socket(sock, server_side=True, do_handshake_on_connect=False), addr
+
+        def handle_error(self, request, client_address):
+            pass  # TLS 握手失败（证书不对）：静默断开
+
+    srv = TlsServer((host, port), H)
     info = {"url": f"https://{srv.server_address[0]}:{srv.server_address[1]}", "name": me, "fingerprint": fp, "workspace": str(ws.root)}
     if ready:
         ready(info)

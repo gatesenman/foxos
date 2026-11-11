@@ -34,7 +34,8 @@ WINDOW_CLASS = "foxos-bots"
 
 
 def _home() -> Path:
-    return Path(os.environ.get("FOXOS_HOME") or Path.home() / ".foxos")
+    from ..desktop_client import foxos_home
+    return foxos_home()
 
 
 def info_path() -> Path:
