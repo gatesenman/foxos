@@ -51,3 +51,12 @@ def read(ws: Workspace, limit: int | None = None, agent: str | None = None, comm
     if limit is not None and limit >= 0:
         out = out[-limit:] if limit else []
     return out
+
+
+def append_safe(ws, record: dict) -> None:
+    """不经内核的动作（ACP 终端、远程机器调用）也写审计；ws 可以是 Workspace 或工作空间根目录。"""
+    from .workspace import Workspace
+    try:
+        append(ws if isinstance(ws, Workspace) else Workspace(ws), record)
+    except OSError:
+        pass

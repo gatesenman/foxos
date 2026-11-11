@@ -8,6 +8,7 @@ from __future__ import annotations
 
 from foxos.i18n import tr
 import json
+import os
 import sys
 
 from . import __version__, catalog
@@ -48,11 +49,19 @@ def handle(msg: dict, state: dict) -> dict | None:
         return _resp(id_, {"tools": catalog.mcp_tools(state.get("profile", "compact"), state.get("apps"), state.get("names", "underscore"))})
     if method == "tools/call":
         name = params.get("name")
-        args = params.get("arguments") or {}
+        args = dict(params.get("arguments") or {})
         agent = state.get("agent") or (f"mcp:{state['client']}" if state.get("client") else "mcp")
         ctx = Context(state["ws"], agent=agent, task=state.get("task"), interface="mcp")
         try:
-            result = invoke(name, args, ctx)
+            machine = args.pop("machine", None) or os.environ.get("FOXOS_BOT_MACHINE") or None
+            if machine and machine != "local":
+                allowed = [m for m in os.environ.get("FOXOS_BOT_MACHINES", "").split(",") if m]
+                if os.environ.get("FOXOS_BOT_MACHINES") is not None and machine not in allowed:
+                    raise FoxError("PERMISSION_DENIED", tr("machines.bot_not_allowed", machine), hint=tr("machines.bot_allowed_hint"))
+                from . import machines
+                result = machines.invoke(state["ws"], machine, name, args, agent, state.get("task"), interface="mcp")
+            else:
+                result = invoke(name, args, ctx)
             payload = {"ok": True, "command": name, "result": result}
             is_error = False
         except FoxError as e:
