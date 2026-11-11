@@ -32,7 +32,8 @@ curl
 wget
 rsync
 # Hyper-V 来宾（她在 Windows 上用 Hyper-V 测这张 ISO）
-hyperv-daemons
+linux-cloud-tools-generic
+linux-cloud-tools-common
 # 桌面
 labwc
 swaybg
@@ -100,8 +101,7 @@ python3-pip
 # 无障碍与截图测试可能用到
 at-spi2-core
 grub-common
-grub-efi-amd64
 grub-efi-amd64-signed
-grub-pc
 grub-pc-bin
 shim-signed
+grub-efi-amd64-bin

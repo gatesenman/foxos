@@ -55,6 +55,15 @@ trap unmount_chroot EXIT
 chroot_run() { chroot "$CHROOT" /usr/bin/env DEBIAN_FRONTEND=noninteractive "$@"; }
 
 # ------------------------------------------------------------------ 准备目录
+# 给 debootstrap 一个会超时重试的 wget，避免偶发半开连接把整个构建卡住
+mkdir -p "$WORK/bin"
+cat > "$WORK/bin/wget" <<'WGET'
+#!/bin/sh
+exec /usr/bin/wget --timeout=30 --tries=8 --retry-connrefused "$@"
+WGET
+chmod +x "$WORK/bin/wget"
+export PATH="$WORK/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+
 log "工作目录 $WORK"
 mkdir -p "$WORK" "$OUT" "$ISO/casper" "$ISO/boot/grub" "$ISO/.disk" "$STAGING"
 # 把脚本、品牌、面板、仓库里的 foxos 包、图标放到 staging，供 chroot hook 使用
