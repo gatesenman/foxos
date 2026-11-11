@@ -90,7 +90,7 @@ def boot(iso: str | None, from_disk: bool, mem: int, cpus: int) -> dict:
     port = _free_port()
     mon = WORK / "mon.sock"
     serial = WORK / ("serial-disk.log" if from_disk else "serial.log")
-    argv = ["qemu-system-x86_64", "-accel", accel, "-m", str(mem), "-smp", str(cpus), "-machine", "q35",
+    argv = ["qemu-system-x86_64", "-accel", accel + (",tb-size=256" if accel == "tcg" else ""), "-m", str(mem), "-smp", str(cpus), "-machine", "q35",
             "-cpu", "max" if accel == "tcg" else "host",
             "-drive", f"if=pflash,format=raw,readonly=on,file={OVMF_CODE}", "-drive", f"if=pflash,format=raw,file={vars_fd}",
             "-drive", f"file={WORK / 'target.qcow2'},if=none,id=t,format=qcow2", "-device", "virtio-blk-pci,drive=t,serial=foxostarget,bootindex=1",
