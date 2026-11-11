@@ -75,7 +75,7 @@ async function kernelRun(args, { json = true, stdin = null, agent = 'human:deskt
   if (!r) return { ok: false, exitCode: -1, data: { ok: false, error: { code: 'NO_GUEST', message: 'NO_GUEST' } }, stdout: '', stderr: 'NO_GUEST' };
   if (r.machine && !r.ssh) return localKernel().runLocal(['--machine', r.machine, ...args], { json, stdin, agent, timeoutMs });
   let p;
-  try { p = await exec(r, ['foxos', '--agent', agent, ...args, ...(json ? ['--json'] : [])], { input: stdin, timeoutMs }); } catch (e) {
+  try { p = await exec(r, ['foxos', '--agent', agent, ...(json ? ['--json'] : []), ...args], { input: stdin, timeoutMs }); } catch (e) {
     return { ok: false, exitCode: -1, data: { ok: false, error: { code: e.code || 'GUEST_UNAVAILABLE', message: e.message } }, stdout: '', stderr: e.message };
   }
   let data = null;
@@ -110,7 +110,12 @@ async function rfbStream() {
   }
   const s = needSsh(r);
   // 来宾里按需起 x11vnc：只听来宾的 127.0.0.1，-shared 允许多个查看端，桌面会话的 Xauthority 由 -auth guess 找
-  const start = await exec(r, ['sh', '-c', `pgrep -u "$(id -u)" -f "[x]11vnc.*-rfbport ${GUEST_VNC_PORT}" >/dev/null || x11vnc -display "\${DISPLAY:-:0}" -auth guess -localhost -rfbport ${GUEST_VNC_PORT} -forever -shared -nopw -bg -o /tmp/foxos-client-vnc.log >/dev/null 2>&1; sleep 0.5`], { timeoutMs: 30000 });
+  // -auth guess 需要 xauth（狐狸OS 没装）：有 xauth 才猜，否则用会话的 XAUTHORITY，都没有就不带 -auth（Xvfb / 无认证会话）
+  const script = `pgrep -u "$(id -u)" -a -x x11vnc | grep -q -e "-rfbport ${GUEST_VNC_PORT}" && exit 0
+A=""; if command -v xauth >/dev/null 2>&1; then A="-auth guess"; elif [ -n "\${XAUTHORITY:-}" ] && [ -f "\$XAUTHORITY" ]; then A="-auth \$XAUTHORITY"; fi
+x11vnc -display "\${DISPLAY:-:0}" \$A -localhost -rfbport ${GUEST_VNC_PORT} -forever -shared -nopw -bg -o /tmp/foxos-client-vnc.log >/dev/null 2>&1 || { tail -n 5 /tmp/foxos-client-vnc.log >&2; exit 1; }
+sleep 0.5`;
+  const start = await exec(r, ['sh', '-c', script], { timeoutMs: 30000 });
   if (start.code !== 0) throw new Error(`x11vnc: ${start.stderr || start.code}`);
   const p = spawn(sshBin(), [...sshArgs(s).filter((a) => a !== '-T'), '-W', `127.0.0.1:${GUEST_VNC_PORT}`], { stdio: ['pipe', 'pipe', 'pipe'], windowsHide: true });
   // -W 不能和 -T 之后的目标顺序冲突：sshArgs 把目标放在最后，这里去掉 -T 后目标仍在最后

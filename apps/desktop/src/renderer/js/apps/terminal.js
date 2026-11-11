@@ -2,8 +2,18 @@
 'use strict';
 (() => {
   const ptyHandlers = new Map();
-  window.foxos.pty.onData((id, data) => ptyHandlers.get(id)?.data(data));
-  window.foxos.pty.onExit((id, code) => ptyHandlers.get(id)?.exit(code));
+  // 输出可能比 pty.spawn 的返回值先到（短命令、SSH 来宾终端）：先存起来，处理函数登记后再补上
+  const early = new Map(); // id -> { data: [], exit: null }
+  const pend = (id) => { if (!early.has(id)) early.set(id, { data: [], exit: null }); return early.get(id); };
+  window.foxos.pty.onData((id, data) => { const h = ptyHandlers.get(id); if (h) h.data(data); else pend(id).data.push(data); });
+  window.foxos.pty.onExit((id, code) => { const h = ptyHandlers.get(id); if (h) h.exit(code); else pend(id).exit = code; });
+  const claim = (id, h) => {
+    ptyHandlers.set(id, h);
+    const e = early.get(id); if (!e) return;
+    early.delete(id);
+    e.data.forEach((d) => h.data(d));
+    if (e.exit != null) h.exit(e.exit);
+  };
 
   FX.registerApp('terminal', {
     title: (p) => p.title || FX.t('common.terminal'),
@@ -33,7 +43,7 @@
         win.ptyId = info.id;
         win.shell = info.shell;
         if (!params.title) win.setTitle(FX.t('terminal.terminal', info.title));
-        ptyHandlers.set(info.id, {
+        claim(info.id, {
           data: (d) => term.write(d),
           exit: (code) => {
             exited = true;

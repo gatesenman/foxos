@@ -143,3 +143,11 @@ def test_US87_acp_stdio_runs_an_installed_agent_with_stdio_passed_through(tmp_pa
     assert first["id"] == 1 and first["result"]["agentInfo"]["name"] == "foxos-local"
     r = subprocess.run([sys.executable, "-m", "foxos", "acp", "stdio", "nope", "--json"], capture_output=True, text=True, env=env, timeout=60)
     assert r.returncode == 3 and json.loads(r.stdout)["error"]["code"] == "NOT_FOUND"
+
+
+def test_US87_json_flag_goes_before_the_command_so_desktop_launch_does_not_swallow_it():
+    """`foxos desktop launch -- libreoffice --writer --json` 会把 --json 当成 LibreOffice 的参数（Writer 打不开）。"""
+    for f in ("kernel.js", "guest.js"):
+        src = _src(MAIN / f)
+        assert "...(json ? ['--json'] : []), ...args]" in src, f
+        assert "...args, ...(json ? ['--json'] : [])" not in src, f

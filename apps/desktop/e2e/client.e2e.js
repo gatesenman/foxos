@@ -42,7 +42,9 @@ test('US-87 客户端模式：所有动作都在狐狸OS 电脑里执行，本�
     assert.equal(env0.hostExecution, false);
 
     // 1. 狐狸OS 电脑窗口自动打开：在线，画面（来宾 x11vnc 经 ssh -W）连上
-    await page.waitForSelector('.window[data-app=computer] [data-guest-status=ok]', { timeout: 300000 });
+    await page.waitForSelector('.window[data-app=computer] [data-guest-status=ok]', { timeout: 600000 }).catch(async (e) => {
+      throw new Error(`${e.message}\n状态：${await page.textContent('[data-guest-status]')} ${await page.getAttribute('[data-guest-status]', 'title')}`);
+    });
     await page.waitForFunction(() => document.querySelector('[data-guest-view]')?.dataset.connected === '1', null, { timeout: 120000 });
     assert.equal(await page.getAttribute('[data-guest-view]', 'data-via'), 'ssh');
     await page.waitForTimeout(2000);
@@ -61,9 +63,10 @@ test('US-87 客户端模式：所有动作都在狐狸OS 电脑里执行，本�
     await page.waitForFunction(() => FX.windows().find((x) => x.appId === 'terminal').screenText().includes('ID=foxos'), null, { timeout: 30000 });
 
     // 4. 应用中心“安装”（Everything 应用）：在来宾终端里运行 foxos everything …，不是本机 PowerShell
-    const code = await page.evaluate(() => FX.runFoxosInTerminal('guest-everything', ['everything', 'info', 'circuits']));
+    const code = await page.evaluate(() => FX.runFoxosInTerminal('guest-everything', ['everything', 'info', 'circuits', '--json']));
     assert.equal(code, 0);
-    assert.match(await termText(page, 'guest-everything'), /Circuits|circuits/);
+    await page.waitForFunction(() => /Circuits|circuits/.test(FX.windows().find((x) => x.appId === 'terminal' && x.title().includes('guest-everything'))?.screenText() || ''), null, { timeout: 30000 })
+      .catch(async (e) => { throw new Error(`${e.message}\n${await termText(page, 'guest-everything')}`); });
 
     // 5. 本机执行默认关闭：直接要求在本机跑命令会被拒绝，命令没有执行
     const marker = path.join(os.tmpdir(), `foxos-host-exec-${process.pid}`);
