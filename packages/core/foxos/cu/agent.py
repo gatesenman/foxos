@@ -93,10 +93,25 @@ class Agent(Loop):
         import tempfile
         from pathlib import Path
         from ..session import get_backend
+        import subprocess
         with tempfile.TemporaryDirectory() as td:
             f = Path(td) / "s.png"
-            get_backend(self.ctx.workspace).screenshot(f)
+            try:
+                get_backend(self.ctx.workspace).screenshot(f)
+            except (subprocess.TimeoutExpired, OSError) as e:  # 负载高时 scrot 会超时：转成可重试的观察错误
+                raise FoxError("TIMEOUT", f"screenshot: {e}") from e
             return f.read_bytes()
+
+    def _observe(self) -> Observation:
+        """观察一次；失败（截图 / agent-desktop 超时）时记事件并重试一次。"""
+        try:
+            return self.compile()
+        except FoxError as e:
+            if e.code == "PAUSED":
+                raise
+            self.event({"type": "observe_error", "error": e.message[:300]})
+            time.sleep(1.0)
+            return self.compile()
 
     def compile_screen(self, a11y_text: str | None = None, reason: str | None = "surface=screen") -> Observation:
         """screen 面：只有截图（给 Jev / 视觉定位）；给规划器的文字只有窗口列表和标题。"""
@@ -298,7 +313,14 @@ class Agent(Loop):
 
     def verified(self, before: Observation, tool: str, args: dict) -> bool:
         time.sleep(0.4)
-        after = self.compile()
+        try:
+            after = self.compile()
+        except FoxError as e:
+            if e.code == "PAUSED":
+                raise
+            self.event({"type": "observe_error", "error": e.message[:300]})
+            self._pending = None
+            return False
         self._pending = after
         if tool in ("set_text", "type"):
             c = after.by_id(args.get("ref")) if self.kind == "computer" else None
@@ -325,7 +347,7 @@ class Agent(Loop):
         fails = 0
         stall = 0
         self._pending = None
-        obs = self.compile()
+        obs = self._observe()
         self.plan(obs)
         for step in range(1, self.max_steps + 1):
             if not self.wait_if_paused():
