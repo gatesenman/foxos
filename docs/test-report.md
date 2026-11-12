@@ -253,3 +253,49 @@ FOXOS_HOME=~/.local/share/FoxOS npm run test:all          # 全部
 python3 scripts/test_all.py --only e2e --e2e mcp,sandbox  # 只跑部分
 ```
 
+## 0.3.3 ISO 端到端（US-65，发布版 e51ff278，main 923b57a）
+
+ISO：`/var/tmp/foxos-e2e/final2/FoxOS-0.3.3-amd64.iso`；虚拟化：tcg（宿主没有 KVM，按要求显式用 TCG）；时间为北京时间（UTC+8）。
+
+| 用例 | 结果 | 开始 | 结束 | 说明 |
+|---|---|---|---|---|
+| SSH：密钥可登录、默认 / 错误密码与 root 被拒、ufw 放行 22 | **PASS** | 2026-11-12 10:17:40 | 2026-11-12 10:18:03 | 开机后 163s 密钥登录成功；sshd -T：permitrootlogin no pubkeyauthentication yes passwordauthentication yes kbdinteractiveauthentication no；默认 / 错误密码被拒；root 被拒；ufw active 放行 22/tcp；现场会话：一次性 16 位随机密码可登录（不记录），同一密码登录 root 被拒，live-ssh.txt 含警告 |
+| 经 SSH 运行 foxos 与 MCP over SSH（stdio） | **PASS** | 2026-11-12 10:18:03 | 2026-11-12 10:40:48 | foxos 0.3.3；foxos ssh status：active、root_login=no、password_login=True；MCP over SSH：256 个工具，tools/call ssh_status 成功 |
+| foxos runtime doctor | **PASS** | 2026-11-12 10:40:48 | 2026-11-12 10:43:31 | runtime doctor 退出码 0，ok=True，32 项：node, npm, corepack, pnpm, bun, python, pip, pipx, uv, gh, git, curl, wget, jq；agent-desktop 1.2.0 已预装（含 NOTICE） |
+| foxos acp list 与 opencode 握手 | **PASS** | 2026-11-12 10:43:31 | 2026-11-12 10:46:22 | acp list：codex-acp, foxos-local, gemini, opencode, qwen-code；opencode 握手：{"agent": "opencode", "command": "/usr/lib/foxos/runtime/opencode/opencode", "protocolVersion": 1, "agentInfo": {"name": "OpenCode", "version": "2.2.7"}, "authMethods": [{"description": "Run `opencode |
+| 「智能体」窗口启动 + opencode（ACP，DeepSeek）真实对话 | **FAIL** | 2026-11-12 11:45:31 | 2026-11-12 11:52:35 | AssertionError: {   "ok": true,   "command": "bot.message.send",   "result": {     "reply": {       "id": "msg-0dd168669b",       "turn": "turn-a3fda178be",       "role": "bot",       "bot": "e2e-opencode",       "text": "出错了：智能体 opencode 握手失败：等待 initialize 超时。stderr：",       "cards": [],       "plan": [],       "skills_used": [],       "machine": "local",       "stop_reason": "error",       "origin": "person",       "ts": "2026-11-12T11:33:34.355+08:00",       "duration_ms": 63236,       "error": {         "code": "ERROR",         "exit_code": 1,         "message": "智能体 opencode 握手失败：等待 initialize 超时。stderr："       }     }   } }  |
+| Calamares 安装到虚拟磁盘 | **PASS** | 2026-11-12 10:56:10 | 2026-11-12 11:32:36 | 2177s 完成；Starting job "networkcfg" ( 24 / 31 ) Starting job "hwclock" ( 25 / 31 ) Starting job "services-systemd" ( 26 / 31 ) Starting job "安装 Google Chrome（如已同意条款）" ( 27 / 31 ) Starting job "设置 SSH 远程登录" ( 28 / 31 ) Starting job "bootloader" ( 29 / 31 ) Starting job "正在创建 initramfs…" ( 30 / 31 ) Starting job "Unmounting file systems…" ( 31 / 31 )；目标盘：NAME SIZE FSTYPE SERIAL vda 32G foxostarget ├─vda1 300M vfat └─vda2 31.7G ext4 |
+| 重启进入装好的系统：密钥可登录、密码被拒、foxos 可用 | **PASS** | 2026-11-12 11:56:35 | 2026-11-12 11:59:11 | 从虚拟磁盘启动（不挂 ISO）57s 后密钥登录成功；installed；即便用安装时设置的真实密码，密码登录也被拒；root 被拒；foxos ssh status：password_login=false；1 把公钥（Calamares 写入）；need-sudo |
+| Windows 0.3.3 客户端前提：sshd、foxos acp stdio、x11vnc | **PASS** | 2026-11-12 10:46:22 | 2026-11-12 10:48:00 | sshd active/enabled；foxos acp stdio opencode 经 SSH 55s 内 initialize 返回 protocolVersion=1（agentInfo={"name": "OpenCode", "version": "2.2.7"}）；x11vnc（x11vnc: 0.9.16 lastmod: 2019-01-05）-localhost 经 ssh -W 转发读到 RFB 003.008 握手 |
+
+合计 8 项，通过 7，失败 1。
+
+### 说明（发布版 e51ff278）
+
+- **ISO**：`FoxOS-0.3.3-amd64.iso`，2252578816 字节，SHA-256 `e51ff278cfbecfa77a7ef81c624aadf45cf14d66e17484de7f8d3f95d8c150e2`，从 main `923b57a` 构建（含 a781172 及其后的修复：「智能体」窗口等 bot serve 180 秒、安装器 partition.conf / mount.conf）。宿主没有 KVM，全部在 qemu TCG（软件模拟，4 CPU、4 GB）里跑，比真机慢一个数量级。
+- **安装（Calamares）**：在上一个候选版上发现两处真缺陷并已修复、在这个 ISO 上验证通过：① 没有 `partition.conf` 时 Calamares 3.3.5「抹掉磁盘」只建 EFI 分区、不建根分区（系统被拷进现场会话内存）；② 没有 `mount.conf` 的 extraMounts，目标系统里没有 /dev，`grub-install` 失败。这次 31 个任务全部完成（日志「completion: succeeded」），装好的磁盘不挂 ISO 启动到狐狸OS 登录界面（截图 [os-0.3.3-installed-login.png](screenshots/os-0.3.3-installed-login.png)）。测试工具按旧条件（根分区已卸载）判完成，而 Calamares 3.3 只卸子挂载，所以在 Calamares 报成功后手动卸了根分区让判定结束；判定已改为看「completion: succeeded」（aadf7bb）。
+- **「智能体」窗口 + DeepSeek 对话：FAIL（冷启动超时）**。窗口两次都正常打开（[截图](screenshots/os-0.3.3-bots-window.png)），但测试里的首个回合两次失败：10:56 那次 opencode 报 `ServiceUnavailableError: Location plugins did not finish activating`（插件还没激活完就收到 session/new，ACP 返回 -32603「Internal service failure」）；11:52 那次 `initialize` 60 秒超时（窗口的 bot serve 同时在冷启动 opencode）。同一 ISO、同一密钥在约 11:35（来宾时钟慢约 20 分钟，显示 11:15）手动再发一次：162 秒后回答 `FOXOS-E2E-PONG`（stop_reason=end_turn）。上一个候选版上这项 PASS（181 秒）。修复已在 main（**不在这个 ISO 里**）：session/new 遇到「还在启动」类错误稍等重试（aadf7bb，带测试），initialize 默认等 180 秒（ccc2cc6）。
+- **电脑操控（FOXOS_CU_E2E=1）**、**桌面控制**、**Chrome** 只在上一个候选版 6eb0dccf 上跑过（下表）；两版之间这些部分没有改动。电脑操控 7 项里 US121（mousepad 文件仍是 draft）与 US122（没有「eggs」行）失败，其余 5 项通过；怀疑是 TCG 下 mousepad 打开慢于测试里的 2.5 秒等待，未确认。
+- **agent-browser 0.42.0、agent-desktop 1.2.0** 在 ISO 的 /usr/local/bin，声明在 /usr/share/doc/foxos/NOTICE.agent-browser、NOTICE.agent-desktop（`runtime doctor` 的 32 项清单不含这两个，另行检查）。
+- **没有跑**：预设系统的真实下载 + 嵌套启动（在 TCG 里再套 qemu-tcg，之前几次因宿主过载超时；这版没再试）；Windows / macOS 真机；WSL2；cloud-hypervisor；FoxVZ。预设镜像本身在宿主上验证过（presets-2026.11）。
+- 密钥（DeepSeek、TypeSafe）只在测试时经 SSH 标准输入写进来宾，没有进 ISO、提交、日志或截图。
+
+## 0.3.3 ISO 端到端：上一个候选版 6eb0dccf（main deb70a7，未发布）
+
+ISO：`/var/tmp/foxos-e2e/final/FoxOS-0.3.3-amd64.iso`；虚拟化：tcg（宿主没有 KVM，按要求显式用 TCG）；时间为北京时间（UTC+8）。
+
+| 用例 | 结果 | 开始 | 结束 | 说明 |
+|---|---|---|---|---|
+| SSH：密钥可登录、默认 / 错误密码与 root 被拒、ufw 放行 22 | **PASS** | 2026-11-12 07:26:27 | 2026-11-12 07:26:49 | 开机后 147s 密钥登录成功；sshd -T：permitrootlogin no pubkeyauthentication yes passwordauthentication yes kbdinteractiveauthentication no；默认 / 错误密码被拒；root 被拒；ufw active 放行 22/tcp；现场会话：一次性 16 位随机密码可登录（不记录），同一密码登录 root 被拒，live-ssh.txt 含警告 |
+| 经 SSH 运行 foxos 与 MCP over SSH（stdio） | **PASS** | 2026-11-12 07:26:49 | 2026-11-12 07:30:10 | foxos 0.3.3；foxos ssh status：active、root_login=no、password_login=True；MCP over SSH：256 个工具，tools/call ssh_status 成功 |
+| foxos runtime doctor | **PASS** | 2026-11-12 07:30:10 | 2026-11-12 07:33:01 | runtime doctor 退出码 0，ok=True，32 项：node, npm, corepack, pnpm, bun, python, pip, pipx, uv, gh, git, curl, wget, jq；agent-desktop 1.2.0 已预装（含 NOTICE） |
+| foxos acp list 与 opencode 握手 | **PASS** | 2026-11-12 07:33:01 | 2026-11-12 07:35:53 | acp list：codex-acp, foxos-local, gemini, opencode, qwen-code；opencode 握手：{"agent": "opencode", "command": "/usr/lib/foxos/runtime/opencode/opencode", "protocolVersion": 1, "agentInfo": {"name": "OpenCode", "version": "2.2.7"}, "authMethods": [{"description": "Run `opencode |
+| 桌面会话控制（foxos desktop …） | **PASS** | 2026-11-12 07:40:48 | 2026-11-12 07:54:05 | desktop status：{"backend": "x11", "compositor": "XFCE", "display": ":0", "wayland_display": null, "windows": 5, "tools": {"wmctrl": true, "xdotool": true, "scrot": true, "maim；launch → windows 里出现 → focus → type → key → screenshot → close 全部成功 |
+| Google Chrome 安装、默认浏览器、CDP | **PASS** | 2026-11-12 07:54:05 | 2026-11-12 08:06:19 | Google Chrome 157.0.8103.78；从 dl.google.com 装好；CDP 开启后 browser tabs 看到「Example Domain」；默认浏览器：foxos-chrome.desktop Value: /usr/bin/google-chrome-stable |
+| 「智能体」窗口启动 + opencode（ACP，DeepSeek）真实对话 | **PASS** | 2026-11-12 08:06:19 | 2026-11-12 08:28:37 | 智能体窗口「智能体 · 狐狸OS」出现；opencode（ACP，deepseek/deepseek-chat）真实回合 181s，回答含 FOXOS-E2E-PONG；密钥经 SSH 标准输入写入来宾密钥库 |
+| Calamares 安装到虚拟磁盘 | **FAIL** | 2026-11-12 09:11:16 | 2026-11-12 09:57:05 | AssertionError: Calamares 没有完成：    Starting job "networkcfg" ( 24 / 31 )      Starting job "hwclock" ( 25 / 31 )  [PYTHON JOB]: "  .. RTC method failed, trying ISA bus method."      Starting job "services-systemd" ( 26 / 31 )      Starting job "安装 Google Chrome（如已同意条款）" ( 27 / 31 )      Starting job "设置 SSH 远程登录" ( 28 / 31 )      Starting job "bootloader" ( 29 / 31 )      ERROR: Installation failed: "启动加载器安装出错"   |
+| Windows 0.3.3 客户端前提：sshd、foxos acp stdio、x11vnc | **PASS** | 2026-11-12 08:55:51 | 2026-11-12 08:57:48 | sshd active/enabled；foxos acp stdio opencode 经 SSH 73s 内 initialize 返回 protocolVersion=1（agentInfo={"name": "OpenCode", "version": "2.2.7"}）；x11vnc（x11vnc: 0.9.16 lastmod: 2019-01-05）-localhost 经 ssh -W 转发读到 RFB 003.008 握手 |
+| 电脑操控真实端到端（FOXOS_CU_E2E=1） | **FAIL** | 2026-11-12 08:28:37 | 2026-11-12 08:51:06 | AssertionError: 2 failed, 5 passed in 785.53s (0:13:05)；失败：tests/test_cu_real.py::test_US121_default_path_agent_desktop_with_jev_edits_and_saves, tests/test_cu_real.py::test_US122_step_policy_falls_back_to_deepseek_without_typesafe_key |
+
+合计 10 项，通过 8，失败 2。
+
