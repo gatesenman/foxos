@@ -253,6 +253,38 @@ FOXOS_HOME=~/.local/share/FoxOS npm run test:all          # 全部
 python3 scripts/test_all.py --only e2e --e2e mcp,sandbox  # 只跑部分
 ```
 
+## 0.3.4 ISO 端到端（US-65，发布版 79d3dca5，main 63bed04）
+
+ISO：`/var/tmp/foxos-e2e/final034/FoxOS-0.3.4-amd64.iso`；虚拟化：tcg（宿主没有 KVM，按要求显式用 TCG）；时间为北京时间（UTC+8）。
+
+| 用例 | 结果 | 开始 | 结束 | 说明 |
+|---|---|---|---|---|
+| SSH：密钥可登录、默认 / 错误密码与 root 被拒、ufw 放行 22 | **PASS** | 2026-11-12 14:26:53 | 2026-11-12 14:27:15 | 开机后 158s 密钥登录成功；sshd -T：permitrootlogin no pubkeyauthentication yes passwordauthentication yes kbdinteractiveauthentication no；默认 / 错误密码被拒；root 被拒；ufw active 放行 22/tcp；现场会话：一次性 16 位随机密码可登录（不记录），同一密码登录 root 被拒，live-ssh.txt 含警告 |
+| 经 SSH 运行 foxos 与 MCP over SSH（stdio） | **PASS** | 2026-11-12 14:27:15 | 2026-11-12 14:30:56 | foxos 0.3.4；foxos ssh status：active、root_login=no、password_login=True；MCP over SSH：256 个工具，tools/call ssh_status 成功 |
+| foxos runtime doctor | **PASS** | 2026-11-12 14:30:56 | 2026-11-12 14:33:52 | runtime doctor 退出码 0，ok=True，32 项：node, npm, corepack, pnpm, bun, python, pip, pipx, uv, gh, git, curl, wget, jq；agent-desktop 1.2.0 已预装（含 NOTICE） |
+| foxos acp list 与 opencode 握手 | **PASS** | 2026-11-12 14:33:52 | 2026-11-12 14:40:01 | acp list：codex-acp, foxos-local, gemini, opencode, qwen-code；opencode 握手：{"agent": "opencode", "command": "/usr/lib/foxos/runtime/opencode/opencode", "protocolVersion": 1, "agentInfo": {"name": "OpenCode", "version": "2.2.7"}, "authMethods": [{"description": "Run `opencode |
+| 「智能体」窗口启动 + opencode（ACP，DeepSeek）真实对话 | **PASS** | 2026-11-12 14:42:37 | 2026-11-12 14:55:17 | 智能体窗口「Mozilla Firefox」出现；opencode（ACP，deepseek/deepseek-chat）真实回合 358s，回答含 FOXOS-E2E-PONG；密钥经 SSH 标准输入写入来宾密钥库 |
+| Calamares 安装到虚拟磁盘 | **PASS** | 2026-11-12 15:24:48 | 2026-11-12 16:29:28 | 3875s 完成；Starting job "networkcfg" ( 24 / 31 ) Starting job "hwclock" ( 25 / 31 ) Starting job "services-systemd" ( 26 / 31 ) Starting job "安装 Google Chrome（如已同意条款）" ( 27 / 31 ) Starting job "设置 SSH 远程登录" ( 28 / 31 ) Starting job "bootloader" ( 29 / 31 ) Starting job "正在创建 initramfs…" ( 30 / 31 ) Starting job "Unmounting file systems…" ( 31 / 31 )；目标盘：NAME SIZE FSTYPE SERIAL vda 32G foxostarget ├─vda1 300M vfat └─vda2 31.7G ext4 |
+| 重启进入装好的系统：密钥可登录、密码被拒、foxos 可用 | **PASS** | 2026-11-12 16:32:32 | 2026-11-12 16:37:23 | 从虚拟磁盘启动（不挂 ISO）75s 后密钥登录成功；installed；即便用安装时设置的真实密码，密码登录也被拒；root 被拒；foxos ssh status：password_login=false；1 把公钥（Calamares 写入）；need-sudo |
+| Windows 0.3.3 客户端前提：sshd、foxos acp stdio、x11vnc | **PASS** | 2026-11-12 14:40:01 | 2026-11-12 14:42:37 | sshd active/enabled；foxos acp stdio opencode 经 SSH 61s 内 initialize 返回 protocolVersion=1（agentInfo={"name": "OpenCode", "version": "2.2.7"}）；x11vnc（x11vnc: 0.9.16 lastmod: 2019-01-05）-localhost 经 ssh -W 转发读到 RFB 003.008 握手 |
+| 电脑操控真实端到端（FOXOS_CU_E2E=1） | **FAIL** | 2026-11-12 14:55:22 | 2026-11-12 15:18:08 | AssertionError: 2 failed, 5 deselected in 467.26s (0:07:47)；失败：tests/test_cu_real.py::test_US121_default_path_agent_desktop_with_jev_edits_and_saves, tests/test_cu_real.py::test_US122_step_policy_falls_back_to_deepseek_without_typesafe_key |
+
+合计 9 项，通过 8，失败 1。
+
+### 说明（发布版 79d3dca5）
+
+- **ISO**：`FoxOS-0.3.4-amd64.iso`，2252591104 字节，SHA-256 `79d3dca5f54ebe4478de7bbe590ff7af0ab5811a88c0de13f2193b532ff735de`，从 main `63bed04` 构建（含「智能体」窗口界面更新，以及 ACP 冷启动修复：session/new 遇「还在启动」时重试、initialize 默认等 180 秒）。宿主没有 KVM，全部在 qemu TCG（软件模拟，4 CPU、4 GB）里跑。
+- **「智能体」窗口 + DeepSeek 对话：PASS**。窗口打开（标题带 Mozilla Firefox，因为窗口是 Firefox 的 `--app`；见 [os-0.3.4-bots-window.png](screenshots/os-0.3.4-bots-window.png)）。首个回合 358 秒后回答 `FOXOS-E2E-PONG`。密钥只在测试时经 SSH 标准输入写入来宾。这是 0.3.3 发布版上失败的那一项，本版修复已打进 ISO。
+- **电脑操控 US121、US122：FAIL（已定位原因）**。只跑了这两项（其余 5 项在 0.3.3 候选版 6eb0dccf 上通过，本版未再跑全套）。两份来宾任务日志：
+  - **US121**（TypeSafe Jev）：先走上 a11y，多次 `agent-desktop click: AMBIGUOUS_TARGET`（保存的元素引用不唯一，无法安全再识别），随后 `APP_NOT_FOUND`（标题 `~/FoxOS/workspace/us121.txt - Mousepad` 对不上正在运行的应用），于是退到 screen。screen 路径置信度低，14 步用尽，文件仍是 `draft`。
+  - **US122**（无 TypeSafe 密钥，DeepSeek）：政策与最终表面是 deepseek / a11y（所以这两项断言过了），但过程中同样大量 `AMBIGUOUS_TARGET`，也用尽 14 步，文件仍只有 `milk`，没有写出 `eggs`。
+  - 不是密钥或网络问题，也不是「等 2.5 秒 mousepad 没打开」那么简单：a11y 一开始是通的。主要是 agent-desktop 点 Mousepad 时引用不唯一，TCG 下再识别更容易过期。未改测试来放宽断言。
+- **安装与重启：PASS**。31 个任务全部完成（「completion: succeeded」），分区是 EFI 300MiB + 根分区 ext4（[os-0.3.4-installing.png](screenshots/os-0.3.4-installing.png)、[os-0.3.4-install-finished.png](screenshots/os-0.3.4-install-finished.png)）。不挂 ISO 从磁盘启动，75 秒后密钥登录；安装时设置的真实密码和 root 都被拒。登录界面：[os-0.3.4-installed-login.png](screenshots/os-0.3.4-installed-login.png)。
+- **内置预设目录**：本 ISO 构建时 0.3.4 尚未发布，目录里的狐狸OS ISO 条目是 **0.3.3**（不再是 0.3.2）。仓库在发布后已用 `--os-version 0.3.4` 重新生成，下个 ISO 会带上 0.3.4 条目。
+- **没有再跑**：桌面控制、Chrome/CDP（0.3.3 候选版 6eb0dccf 上通过，这两块本版未改）；预设系统真实下载 + 嵌套启动（TCG 里再套 qemu-tcg，之前因宿主过载超时）；Windows / macOS 真机；WSL2；cloud-hypervisor；FoxVZ。
+- 密钥（DeepSeek、TypeSafe）只在测试时经 SSH 标准输入写进来宾，没有进 ISO、提交、日志或截图。
+
+
 ## 0.3.3 ISO 端到端（US-65，发布版 e51ff278，main 923b57a）
 
 ISO：`/var/tmp/foxos-e2e/final2/FoxOS-0.3.3-amd64.iso`；虚拟化：tcg（宿主没有 KVM，按要求显式用 TCG）；时间为北京时间（UTC+8）。
@@ -298,4 +330,3 @@ ISO：`/var/tmp/foxos-e2e/final/FoxOS-0.3.3-amd64.iso`；虚拟化：tcg（宿�
 | 电脑操控真实端到端（FOXOS_CU_E2E=1） | **FAIL** | 2026-11-12 08:28:37 | 2026-11-12 08:51:06 | AssertionError: 2 failed, 5 passed in 785.53s (0:13:05)；失败：tests/test_cu_real.py::test_US121_default_path_agent_desktop_with_jev_edits_and_saves, tests/test_cu_real.py::test_US122_step_policy_falls_back_to_deepseek_without_typesafe_key |
 
 合计 10 项，通过 8，失败 2。
-
