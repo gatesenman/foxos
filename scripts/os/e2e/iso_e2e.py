@@ -582,7 +582,7 @@ def run(names: list[str]) -> int:
     if os.environ.get("FOXOS_E2E_QUIET", "1") == "1" and names != ["ssh"] and names != ["installed_ssh"]:
         # TCG 下每分钟一次的例程定时器（每次启动一个 Python）会占满来宾 CPU；测试期间停掉（不影响被测功能）
         try:
-            ssh("systemctl --user stop foxos-bots-routines.timer 2>/dev/null; true", timeout=900)
+            ssh("systemctl --user stop foxos-bots-routines.timer 2>/dev/null; xset s off -dpms 2>/dev/null; xset dpms force on 2>/dev/null; true", timeout=900)  # 截图前别让屏幕熄灭
         except subprocess.TimeoutExpired:
             pass
     for n in names:

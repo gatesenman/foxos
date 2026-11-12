@@ -62,13 +62,17 @@ def start_server(workspace: str | None) -> str:
     ready.unlink(missing_ok=True)
     argv = [sys.executable, "-m", "foxos", *(["--workspace", workspace] if workspace else []), "bot", "serve", "--ready-file", str(ready)]
     log = open(state / "bots.log", "ab")  # noqa: SIM115 - 交给子进程
-    subprocess.Popen(argv, stdin=subprocess.DEVNULL, stdout=log, stderr=log, start_new_session=True)
-    for _ in range(200):
+    proc = subprocess.Popen(argv, stdin=subprocess.DEVNULL, stdout=log, stderr=log, start_new_session=True)
+    # 慢机器（软件模拟的虚拟机、老电脑）上 Python 启动就要几十秒：等到服务就绪或进程退出，最多 FOXOS_BOTS_START_TIMEOUT 秒
+    deadline = time.time() + float(os.environ.get("FOXOS_BOTS_START_TIMEOUT", "180"))
+    while time.time() < deadline:
         if ready.exists() and ready.read_text().strip():
             url = ready.read_text().strip()
             ready.unlink(missing_ok=True)
             return url
-        time.sleep(0.1)
+        if proc.poll() is not None:
+            break
+        time.sleep(0.2)
     raise SystemExit("foxos-bots: bot serve did not start; see " + str(state / "bots.log"))
 
 
