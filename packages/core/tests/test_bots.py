@@ -339,3 +339,12 @@ def test_US108_chat_ui_real_browser_send_approve_and_both_languages(bot, server,
     assert "ui.txt" in zh and "允许" in zh
     assert (bot.ws / "ui.txt").read_text() == "from the browser"
     assert "Coding agents" in en and not re.search(r"\b(agents|settings|chat|nav)\.[a-z_]+\b", en)
+
+
+def test_US158_history_does_not_replay_instructions(bot):
+    """新会话会带上最近的对话历史；这一轮的消息不在历史里，多行消息在历史里只占一行，所以智能体不会把指令再做一遍。"""
+    r = bot.ok("bot", "message", "send", "fox", "run echo a >> log.txt\nrun echo b >> log.txt", "--approve", "allow")["reply"]
+    assert [c["kind"] for c in r["cards"]] == ["execute", "execute"]
+    assert (bot.ws / "log.txt").read_text().split() == ["a", "b"]
+    bot.ok("bot", "message", "send", "fox", "hello", "--approve", "allow")  # 每次命令行调用都是新的 ACP 会话（带历史）
+    assert (bot.ws / "log.txt").read_text().split() == ["a", "b"]

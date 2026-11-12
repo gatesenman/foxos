@@ -756,11 +756,17 @@ def _preamble(ws, bot: dict, turn: _Turn, envelope: dict | None, attachments: li
     return "\n\n".join(lines)
 
 
-def _history(ws, bot: dict, n: int = 10) -> str:
-    msgs = messages(ws, bot["id"], n)
+def _one_line(text: str) -> str:
+    # 历史里一条消息占一行：多行消息的后续行不能看起来像新的指令
+    return " ⏎ ".join(ln.strip() for ln in str(text).splitlines() if ln.strip())
+
+
+def _history(ws, bot: dict, n: int = 10, turn: str | None = None) -> str:
+    # 这一轮的用户消息已经写进记录了，它在提示正文里，不能再当历史发一遍（否则智能体会把同一条指令做两次）
+    msgs = [m for m in messages(ws, bot["id"], n + 1) if not (turn and m.get("turn") == turn)][-n:]
     if not msgs:
         return ""
-    return tr("bots.pre_history") + "\n" + "\n".join(f"[{m['role']}] {m.get('text', '')[:600]}" for m in msgs)
+    return tr("bots.pre_history") + "\n" + "\n".join(f"[{m['role']}] {_one_line(m.get('text', ''))[:600]}" for m in msgs)
 
 
 def parse_mentions(ws, text: str, self_id: str) -> tuple[list[dict], str]:
@@ -1015,7 +1021,7 @@ def _run_acp(ws, bot, turn: _Turn, text, skill_block, envelope, attachments, ide
     conn.call = call
     pre = _preamble(ws, bot, turn, envelope, attachments)
     if new:
-        h = _history(ws, bot)
+        h = _history(ws, bot, turn=turn.turn)
         if h:
             pre += "\n\n" + h
     turn.emit({"type": "agent", "agent": agent_id, "agentInfo": (pooled.get("init") or {}).get("agentInfo")})

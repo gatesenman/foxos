@@ -43,6 +43,7 @@
 | US-155 | 宿主应用里的智能体只在狐狸OS 虚拟电脑里动手；宿主执行要人明确打开（`foxos bot host-access enable`）并逐个确认 | `packages/core/tests/test_hostguard.py`：`test_US155_…` |
 | US-156 | 桌面客户端的「允许在本机执行」和 `foxos bot host-access` 是同一个开关：默认关，在设置里打开后命令行看得到，命令行关掉后设置里也是关 | `apps/desktop/e2e/hostaccess.e2e.js`：`US-156`；`packages/core/tests/test_hostguard.py`：`test_US156_…` |
 | US-157 | Qwen Code 在狐狸OS 里默认用 `--approval-mode default`：写文件前弹审批卡片，拒绝则不写，批准才写 | `packages/core/tests/test_bots_deepseek.py`：`test_US157_…` |
+| US-158 | 新会话带的对话历史不会让智能体把指令再做一遍：这一轮的消息不进历史，多行消息在历史里只占一行 | `packages/core/tests/test_bots.py`：`test_US158_…` |
 
 说明：
 
@@ -71,4 +72,5 @@ Every story has an automated test, and `scripts/stories.json` maps each story to
 - US-155: on a host app (the Windows companion and other non-FoxOS systems), bots act only inside the FoxOS virtual computer. Host execution needs a person to turn it on, and then a confirmation for every action that isn't read-only.
 - US-156: the Windows client's "Allow running on this PC" setting and `foxos bot host-access` are one switch. It is off by default; turning it on in Settings shows up in the CLI, and turning it off in the CLI shows up in Settings.
 - US-157: inside FoxOS, Qwen Code starts with `--approval-mode default`, so it asks (an approval card) before it writes. A denied write leaves no file; an approved one writes it. Needs the DeepSeek key, like US-140–US-145.
+- US-158: a new agent session gets the recent conversation as history. The current message is no longer repeated in that history, and a multi-line message takes one line there, so an agent doesn't run the same instruction twice.
 - US-146–US-154: the real bots window (Chrome app mode) on its own Xvfb + xfwm4 desktop, driven with Playwright over CDP: create and configure bots, approve and deny real opencode edits, @ delegation, `/` skills, a real local MCP connector, docking with a reserved screen edge, pairing a second machine, and takeover. The code bots use `deepseek/deepseek-flash` when the key file exists and opencode's default free model otherwise (no key, but opencode caps free usage).
