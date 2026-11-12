@@ -13,9 +13,9 @@
   <a href="README.en.md">English</a>
 </p>
 
-![狐狸OS 真实桌面：XFCE、开始菜单、底栏和终端窗口](docs/screenshots/os-031-desktop.png)
+![狐狸OS 0.3.4 真实桌面：XFCE、开始菜单与底栏](docs/screenshots/os-0.3.4-desktop.png)
 
-这张截图来自狐狸OS 的真实 XFCE 图形会话（QEMU / Xvfb 只用于测试）。图里是真正的 xfwm4 窗口：XFCE 终端（`foxos@foxos`）、底部面板（开始、时钟、系统、人工接管）和 Whisker 开始菜单，不是 Electron 里画的假桌面。
+这张截图来自在 QEMU 里引导的狐狸OS 0.3.4 ISO（Live 会话，`zh_CN`，1920×1080），首次登录弹出的对话框都已关掉。图里是真正的 xfwm4 桌面：Whisker「开始」菜单（收藏里有终端、Thunar、Google Chrome、Mousepad 和「安装 狐狸OS」）和底部面板（开始、时钟、人工接管、系统），不是 Electron 里画的假桌面。
 
 ## 狐狸OS 是什么
 
@@ -33,21 +33,18 @@ Windows 上的 `.exe` 是**伴侣程序**（预览版见 [v0.3.4-windows-preview
 - **自研隔离环境**：不依赖 Docker / 虚拟机软件；Linux 上用命名空间运行官方发行版根文件系统，Windows 上一键安装 WSL2 发行版、Windows Sandbox、Hyper-V 虚拟机。
 - **内置智能体熟悉的东西**：标准 `.xlsx` / `.docx` / `.pptx`、Excel 公式、经典 CLI 约定（子命令、`--help`、`--json`、稳定退出码）、git、Python、Node。
 
-## 截图（狐狸OS 0.3.2 / 0.3.1 真实系统）
+## 截图（狐狸OS 0.3.4 真实系统）
 
-下面每一张都来自狐狸OS 本身（Chrome 相关四张为 0.3.2，其余为 0.3.1）：ISO 里的根文件系统以用户 `foxos`、`zh_CN` 语言运行真实的 XFCE 会话（Xvfb，1920×1080），窗口是真实的 xfwm4 窗口和真实应用进程；安装程序和引导两张来自 QEMU 里引导的 ISO。没有任何拼接或模拟界面。截图脚本：[`scripts/os/tools/shoot-desktop.sh`](scripts/os/tools/shoot-desktop.sh)。
+下面每一张都来自狐狸OS 0.3.4 本身：Live 会话、安装程序和装好后的登录画面都是 0.3.4 ISO 在 QEMU 里引导后截的；首次登录的「安装 Google Chrome」「安装智能体命令行」「SSH 远程登录」对话框都已关掉，截图里没有一次性密码。没有任何拼接或模拟界面。
 
 | | |
 | --- | --- |
-| ![桌面与开始菜单](docs/screenshots/os-031-desktop.png)<br>**桌面与开始菜单**：XFCE 桌面，Whisker「开始」菜单（中文、Papirus 图标、收藏里有「安装 狐狸OS」），底栏是时钟 / 人工接管 / 系统 | ![终端里的 foxos 命令](docs/screenshots/os-031-terminal.png)<br>**终端里的 foxos 命令**：XFCE 终端，真实的 `foxos@foxos` 会话：`foxos sheets` 写入公式、`foxos docs` 生成周报、`foxos files` 列出工作空间 |
-| ![Google Chrome](docs/screenshots/os-032-chrome.png)<br>**Google Chrome（0.3.2 默认浏览器）**：`foxos desktop launch chrome` 打开的真实 Chrome 157，中文界面，开始菜单收藏和 xdg 默认浏览器都指向它 | ![智能体通过 CDP 控制 Chrome](docs/screenshots/os-032-chrome-cdp.png)<br>**智能体控制 Chrome（CDP）**：人工执行 `foxos browser cdp on`（只监听 127.0.0.1，默认关闭）后，智能体用 `foxos browser tabs / eval / screenshot` 读标签页、执行脚本、截图 |
-| ![首次登录：安装 Google Chrome](docs/screenshots/os-032-live-boot.png)<br>**首次登录：安装 Google Chrome**：0.3.2 ISO 在 QEMU 里引导后自动弹出的对话框。按 Google 的许可 ISO 不带 Chrome，点「同意并安装」从 Google 官方源安装 | ![Chrome 安装对话框](docs/screenshots/os-032-chrome-setup.png)<br>**安装对话框（完整分辨率）**：同一个对话框在 1920×1080 会话里；不装也可以，Firefox 作为离线后备保留 |
-| ![Thunar 文件管理器](docs/screenshots/os-031-files.png)<br>**Thunar 文件管理器**：打开工作空间，里面是上一步命令生成的 `.xlsx` / `.docx` | ![Firefox](docs/screenshots/os-031-firefox.png)<br>**Firefox**：系统自带浏览器（0.3.1 的默认浏览器；0.3.2 起默认是 Google Chrome，Firefox 保留为离线后备）打开项目 GitHub 页面 |
-| ![Mousepad 文本编辑器](docs/screenshots/os-031-editor.png)<br>**Mousepad 文本编辑器**：中文菜单，编辑工作空间里的 Markdown | ![设置管理器](docs/screenshots/os-031-settings.png)<br>**设置管理器**：XFCE 设置（外观、显示、键盘、输入法等），中文界面 |
-| ![系统菜单](docs/screenshots/os-031-system.png)<br>**系统菜单**：底栏「系统」打开的注销 / 重启 / 关机对话框 | ![人工接管](docs/screenshots/os-031-takeover.png)<br>**人工接管**：执行 `foxos control pause` 后，智能体的写操作被拒绝（`PAUSED`，退出码 8）；终端里是真实输出。截图时底栏指示器尚未刷新成「接管中」，0.3.2 修复 |
-| ![安装 狐狸OS](docs/screenshots/os-031-installer.png)<br>**安装 狐狸OS**：从 0.3.1 ISO 在 QEMU 里引导后启动的 Calamares 安装程序（虚拟机分辨率，挂了一块空白磁盘） | ![从 ISO 引导](docs/screenshots/os-live-boot.png)<br>**从 ISO 引导**：0.3.1 Live 会话在虚拟机里自动登录 `foxos` 进入 XFCE |
+| ![桌面与开始菜单](docs/screenshots/os-0.3.4-desktop.png)<br>**桌面与开始菜单**：XFCE 桌面，Whisker「开始」菜单（中文、Papirus 图标），底栏是时钟 / 人工接管 / 系统 | ![终端里的 foxos 命令](docs/screenshots/os-0.3.4-terminal.png)<br>**终端里的 foxos 命令**：XFCE 终端里真实的 `foxos@foxos` 会话：`foxos sheets` 写入公式并读回、`foxos docs` 生成周报、`foxos files` 列出工作空间 |
+| ![Google Chrome](docs/screenshots/os-0.3.4-chrome.png)<br>**Google Chrome**：首次登录时从 Google 官方源装好的 Chrome 157（默认浏览器），中文界面 | ![Thunar 文件管理器](docs/screenshots/os-0.3.4-files.png)<br>**Thunar 文件管理器**：工作空间里是终端里刚生成的 `.xlsx` / `.docx` |
+| ![智能体窗口](docs/screenshots/os-0.3.4-bots.png)<br>**智能体窗口**：开始菜单「智能体」打开的主智能体「狐狸」，新的聊天界面，底部是审批、连接器、代码智能体、机器、技能、例程和运行环境 | ![安装 狐狸OS](docs/screenshots/os-0.3.4-installing.png)<br>**安装 狐狸OS**：从 0.3.4 ISO 启动的 Calamares 安装程序，摘要页显示 EFI 分区和根分区 |
+| ![装好后的登录画面](docs/screenshots/os-0.3.4-installed-login.png)<br>**装好后的系统**：0.3.4 装到虚拟磁盘后从磁盘启动的登录画面 | |
 
-Windows 伴侣程序的截图在下方单独一节：[Windows 伴侣程序](#windows-伴侣程序在现有-windows-桌面上运行v020--windows-companion-app)。
+智能体聊天界面的更多截图在下方单独一节：[智能体聊天界面](#智能体聊天界面034--bot-chat-ui)。
 
 ## 功能
 
@@ -60,7 +57,7 @@ Windows 伴侣程序的截图在下方单独一节：[Windows 伴侣程序](#win
 | Everything 应用 | 51 个开源应用（9 个分组），本机构建运行；每个应用有从界面实际遍历出的语义命令（`foxos <应用> <资源> <动作>`），见 [docs/everything-apps.md](docs/everything-apps.md) 与 [docs/operations/](docs/operations/) |
 | 智能体 | ACP 客户端（会话面板、运行位置：宿主或某个环境）、ACP 官方注册表一键安装、MCP 服务（stdio / Streamable HTTP、令牌、compact / full 工具集） |
 | 安全与协作 | 工作空间约束（拒绝 `../`、符号链接逃逸、保留目录）、JSONL 审计日志、文件锁、原子保存与版本、人工接管（`PAUSED`，退出码 8） |
-| 环境 | Linux 命名空间运行时（overlayfs、pivot_root、seccomp、cgroup v2 / rlimit）、`.foxenv` 镜像、快照、克隆、导出；Windows：WSL2、Windows Sandbox、Hyper-V；提供者协议；**在线安装预设系统**（已配好桌面、中文、Node / Bun / Python、ACP 智能体与 foxos 桥的 Debian 12 / Ubuntu 24.04 / 狐狸OS，以及按微软 / Apple 官方介质自动配置的 Windows 评估版与 macOS，分卷断点续传、sha256 校验），见 [docs/presets.md](docs/presets.md) 与[截图](docs/screenshots/env-presets-032.png) |
+| 环境 | Linux 命名空间运行时（overlayfs、pivot_root、seccomp、cgroup v2 / rlimit）、`.foxenv` 镜像、快照、克隆、导出；Windows：WSL2、Windows Sandbox、Hyper-V；提供者协议；**在线安装预设系统**（已配好桌面、中文、Node / Bun / Python、ACP 智能体与 foxos 桥的 Debian 12 / Ubuntu 24.04 / 狐狸OS，以及按微软 / Apple 官方介质自动配置的 Windows 评估版与 macOS，分卷断点续传、sha256 校验），见 [docs/presets.md](docs/presets.md) |
 | 多语言 | 简体中文（默认）与 English：安装向导第一步与设置里切换，立即生效并保存；`foxos` 命令行、MCP 工具说明与内核错误消息跟随 `--lang` / `FOXOS_LANG`（JSON 字段名与错误码不变）；Windows 安装程序与 `install.ps1` 中英双语；Everything 应用通过 Chromium 语言接收狐狸OS 语言，上游提供中文界面的（spreadsheet）随之切换，其余在应用中心标“英文界面”（逐个记录见 [docs/everything-apps.md](docs/everything-apps.md)）。词条在 `apps/desktop/src/locales/` 与 `packages/core/foxos/data/locales/` |
 | 滚动条 | 不用系统默认滚动条：外壳、所有窗口与 Everything 应用（注入到每个 webview）统一用狐狸OS 细滚动条——轨道透明、平时隐藏、指向或滚动时出现、指向时加宽、拖动时为强调色，随深浅色主题变化；Monaco 与终端（xterm）使用相同尺寸与颜色 |
 | 安装 | Windows / macOS / Linux 各 x64 与 arm64 的安装包（exe、msi、dmg、deb、rpm、AppImage、tar.gz）都自带 Python 3.12 与办公库，一行安装脚本校验 SHA-256（见 [docs/install.md](docs/install.md)）；首次运行向导按平台在线安装组件 |
@@ -112,22 +109,15 @@ Get-FileHash -Algorithm SHA256 .\FoxOS-0.3.4-amd64.iso
 
 写 U 盘或在 Hyper-V 里启动见 [ISO 测试指南](docs/os-test-guide.md)。旧版本（`v0.3.3-os-preview`、`v0.3.2-os-preview`、`v0.3.1-os-preview`、`v0.3.0-os-preview`、Windows 伴侣程序 `v0.2.0-windows-preview`）仍在 [Releases](https://github.com/gatesenman/foxos/releases) 页面。
 
-## Windows 伴侣程序（在现有 Windows 桌面上运行，v0.2.0） / Windows companion app
+## 智能体聊天界面（0.3.4） / Bot chat UI
 
-这一节是 **Windows 伴侣程序**（`v0.2.0-windows-preview`，Electron）的截图。它运行在你现有的 Windows（或 Linux）桌面上，提供终端、编辑器、Everything 应用、环境和智能体会话；**它不是狐狸OS 操作系统的桌面**，狐狸OS 的样子见上面的[截图](#截图狐狸os-031-真实系统)。截图来自 xvfb 1600×1000，脚本：[`apps/desktop/scripts/screenshots.js`](apps/desktop/scripts/screenshots.js)。
+狐狸OS 0.3.4 里的「智能体」窗口，Windows 伴侣程序 `v0.3.4-windows-preview` 里显示的也是同一个界面。截图里的智能体在本机的测试工作空间里干活。
 
 | | |
 | --- | --- |
-| ![开始菜单](docs/screenshots/start-menu.png)<br>**开始菜单**：内置程序与按 9 个分组列出的已安装 Everything 应用，每个程序显示其开源项目自带的图标 | ![应用中心](docs/screenshots/app-center.png)<br>**应用中心**：51 个 Everything 应用显示各自上游的图标；另有内置应用、LibreOffice、开发工具与 ACP 智能体 |
-| ![安装向导](docs/screenshots/setup-wizard.png)<br>**首次运行安装向导**：检测并在线安装 LibreOffice、Python 办公库、Node.js、git、环境与 Everything 分组 | ![终端](docs/screenshots/terminal.png)<br>**终端**：真实 PTY；`foxos` 命令直接读写工作空间里的表格、文档和环境 |
-| ![文件管理器](docs/screenshots/files.png)<br>**文件管理器**：工作空间实时同步，CLI、MCP、智能体的修改立即出现 | ![编辑器](docs/screenshots/editor.png)<br>**Monaco 编辑器**：语法高亮，保存到工作空间 |
-| ![浏览器](docs/screenshots/browser.png)<br>**浏览器**：内置网页浏览器 | ![设置 → 语言](docs/screenshots/settings-language.png)<br>**设置 → 语言**：简体中文（默认）/ English，立即切换并保存；安装向导第一步也可选 |
-| ![English 界面：应用中心](docs/screenshots/app-center-en.png)<br>**English 界面**：应用中心的分组名与应用说明随语言切换 | ![LibreOffice Writer](docs/screenshots/libreoffice-writer.png)<br>**LibreOffice Writer**：打开由 `foxos docs` 生成的周报 .docx |
-| ![LibreOffice Calc](docs/screenshots/libreoffice-calc.png)<br>**LibreOffice Calc**：`foxos sheets` 写入的公式与原生图表 | ![Everything 表格](docs/screenshots/everything-spreadsheet.png)<br>**Everything · 表格**：打开工作空间里的 `2026年销售.xlsx`；上游自带中文界面，随狐狸OS 语言切换 |
-| ![Everything 文档](docs/screenshots/everything-documents.png)<br>**Everything · 文档**：打开 `项目周报.docx` | ![Everything 白板](docs/screenshots/everything-whiteboard.png)<br>**Everything · 白板** |
-| ![Everything CRM](docs/screenshots/everything-crm.png)<br>**Everything · CRM** | ![Everything 国际象棋](docs/screenshots/everything-chess.png)<br>**Everything · 国际象棋** |
-| ![ACP 智能体一键安装](docs/screenshots/acp-agent-install.png)<br>**ACP 智能体一键安装**：从 ACP 官方注册表安装 Gemini CLI，卡片内显示安装日志，装好即可“启动会话” | ![安装系统](docs/screenshots/environments-catalog.png)<br>**环境 → 安装系统**：WSL2 发行版、LXC / 官方根文件系统、Windows Sandbox、Hyper-V；顶部是本机能力检查 |
-| ![Alpine 环境](docs/screenshots/environments-alpine.png)<br>**环境**：从目录一键安装并运行中的 Alpine，实时资源、快照、自定义操作 | ![审计与人工接管](docs/screenshots/audit-takeover.png)<br>**活动与人工接管**：所有操作进审计日志；接管后智能体写操作被拒绝（`PAUSED`） |
+| ![对话与工具调用](docs/screenshots/bots-ui-chat-after.png)<br>**对话**：主智能体「狐狸」边回答边调用工具，每次读文件、运行命令都是一张能展开的卡片；顶部「正在操作」列出所有智能体当前在做的事 | ![需要你批准](docs/screenshots/bots-ui-approval-after.png)<br>**审批**：「编码助手」要写文件时先给出差异，等你选「允许一次 / 总是允许 / 拒绝」 |
+| ![停靠在屏幕边](docs/screenshots/bots-ui-docked-desktop-after.png)<br>**停靠到屏幕边**：聊天窗停在桌面右侧，其他窗口照常使用 | ![智能体设置](docs/screenshots/bots-ui-settings-after.png)<br>**智能体设置**：名字、头衔、指令、头像，以及技能与权限、记忆、审批规则、例程、委托、机器、电脑操控 |
+| ![空白对话](docs/screenshots/bots-ui-empty-after.png)<br>**新对话**：主智能体的开场页和推荐问题 | ![深色模式](docs/screenshots/bots-ui-chat-dark-after.png)<br>**深色模式**：同一段对话，跟随系统深色主题 |
 
 ## 快速开始
 

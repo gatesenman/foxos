@@ -6,9 +6,9 @@
 
 <p align="center"><a href="README.md">中文</a> · <a href="https://github.com/gatesenman/foxos/releases/tag/v0.3.4-os-preview">Bootable ISO</a> · <a href="https://github.com/gatesenman/foxos/releases/tag/v0.3.4-windows-preview">Windows companion preview</a> · <a href="docs/os-test-guide.md">ISO test guide</a> · <a href="AGENTS.md">AGENTS.md</a></p>
 
-![FoxOS real desktop: XFCE, start menu, bottom panel, and terminal](docs/screenshots/os-031-desktop.png)
+![FoxOS 0.3.4 real desktop: XFCE, start menu and bottom panel](docs/screenshots/os-0.3.4-desktop.png)
 
-This screenshot is from a real FoxOS XFCE graphical session (QEMU / Xvfb used for testing only). It shows real xfwm4 windows: the XFCE terminal (`foxos@foxos`), the bottom panel (Start, clock, System, Take over), and the Whisker applications menu — not a painted Electron fake desktop.
+This screenshot is from the FoxOS 0.3.4 ISO booted in QEMU (live session, `zh_CN`, 1920×1080), with the first-login dialogs closed. It shows the real xfwm4 desktop: the Whisker "开始" menu (favorites: terminal, Thunar, Google Chrome, Mousepad, "安装 狐狸OS") and the bottom panel (Start, clock, Take over, System), not a painted Electron fake desktop.
 
 ## What it is
 
@@ -28,21 +28,18 @@ The workbench includes:
 - **Own scrollbars**: no default OS scrollbars anywhere. The shell, every window and every Everything app webview use a thin FoxOS overlay scrollbar (transparent track, hidden until hover or scroll, wider on hover, accent while dragging, dark/light aware); Monaco and the terminal use matching settings.
 - **Own isolation layer**: no Docker or VM software. Linux namespaces on Linux; one-click WSL2 distros, Windows Sandbox and Hyper-V on Windows.
 
-## Screenshots (the real FoxOS 0.3.2 / 0.3.1 system)
+## Screenshots (the real FoxOS 0.3.4 system)
 
-Every image below comes from FoxOS itself (the four Chrome shots are 0.3.2, the rest 0.3.1): the ISO's root filesystem running a real XFCE session as user `foxos` in `zh_CN` (Xvfb, 1920×1080), with real xfwm4 windows and real application processes. The installer and boot shots come from the ISO booted in QEMU. Nothing is composited or mocked. Script: [`scripts/os/tools/shoot-desktop.sh`](scripts/os/tools/shoot-desktop.sh).
+Every image below comes from FoxOS 0.3.4 itself: the live session, the installer and the installed login screen were captured from the 0.3.4 ISO booted in QEMU. The first-login dialogs ("安装 Google Chrome", "安装智能体命令行", "SSH 远程登录") were closed first, so no one-time password appears in any shot. Nothing is composited or mocked. The UI is in Simplified Chinese, the default.
 
 | | |
 | --- | --- |
-| ![Desktop and start menu](docs/screenshots/os-031-desktop.png)<br>**Desktop and start menu**: XFCE desktop, Whisker "开始" menu (Chinese, Papirus icons, "安装 狐狸OS" in favorites), panel with clock / takeover / system | ![foxos commands in a terminal](docs/screenshots/os-031-terminal.png)<br>**foxos commands in a terminal**: XFCE Terminal, a real `foxos@foxos` session: `foxos sheets` writes formulas, `foxos docs` builds a report, `foxos files` lists the workspace |
-| ![Google Chrome](docs/screenshots/os-032-chrome.png)<br>**Google Chrome (default browser in 0.3.2)**: Real Chrome 157 opened by `foxos desktop launch chrome`, Chinese UI; the start-menu favorite and the xdg default browser point to it | ![An agent driving Chrome over CDP](docs/screenshots/os-032-chrome-cdp.png)<br>**Agent control over CDP**: After a human runs `foxos browser cdp on` (127.0.0.1 only, off by default), an agent reads tabs, evaluates script and takes a screenshot with `foxos browser tabs / eval / screenshot` |
-| ![First login: install Google Chrome](docs/screenshots/os-032-live-boot.png)<br>**First login: install Google Chrome**: The dialog that appears after the 0.3.2 ISO boots in QEMU. Google's terms keep Chrome out of the ISO; "同意并安装" installs it from Google's official repository | ![Chrome setup dialog](docs/screenshots/os-032-chrome-setup.png)<br>**Setup dialog (full resolution)**: The same dialog in a 1920×1080 session; declining is fine, Firefox stays as the offline fallback |
-| ![Thunar file manager](docs/screenshots/os-031-files.png)<br>**Thunar file manager**: The workspace with the `.xlsx` / `.docx` the commands just created | ![Firefox](docs/screenshots/os-031-firefox.png)<br>**Firefox**: The default browser in 0.3.1 (from 0.3.2 the default is Google Chrome; Firefox stays as the offline fallback) showing the project page |
-| ![Mousepad text editor](docs/screenshots/os-031-editor.png)<br>**Mousepad text editor**: Chinese menus, editing Markdown in the workspace | ![Settings Manager](docs/screenshots/os-031-settings.png)<br>**Settings Manager**: XFCE settings (appearance, display, keyboard, input method), Chinese UI |
-| ![System menu](docs/screenshots/os-031-system.png)<br>**System menu**: Log out / restart / shut down dialog from the panel "系统" button | ![Human takeover](docs/screenshots/os-031-takeover.png)<br>**Human takeover**: After `foxos control pause`, agent writes are refused (`PAUSED`, exit code 8); real terminal output. The panel indicator had not refreshed to "接管中" yet in this shot; fixed in 0.3.2 |
-| ![Install FoxOS](docs/screenshots/os-031-installer.png)<br>**Install FoxOS**: Calamares started from the 0.3.1 ISO booted in QEMU (VM resolution, blank disk attached) | ![Booted from the ISO](docs/screenshots/os-live-boot.png)<br>**Booted from the ISO**: The 0.3.1 live session in a VM, auto-logged in as `foxos` on XFCE |
+| ![Desktop and start menu](docs/screenshots/os-0.3.4-desktop.png)<br>**Desktop and start menu**: XFCE desktop, Whisker "开始" menu (Chinese, Papirus icons), panel with clock / takeover / system | ![foxos commands in a terminal](docs/screenshots/os-0.3.4-terminal.png)<br>**foxos commands in a terminal**: a real `foxos@foxos` session in XFCE Terminal: `foxos sheets` writes a formula and reads it back, `foxos docs` builds a report, `foxos files` lists the workspace |
+| ![Google Chrome](docs/screenshots/os-0.3.4-chrome.png)<br>**Google Chrome**: Chrome 157 installed from Google's official repository at first login (the default browser), Chinese UI | ![Thunar file manager](docs/screenshots/os-0.3.4-files.png)<br>**Thunar file manager**: the workspace with the `.xlsx` / `.docx` the terminal just created |
+| ![Bots window](docs/screenshots/os-0.3.4-bots.png)<br>**Bots window**: the main bot "狐狸" opened from the start menu, with the new chat UI; approvals, connectors, code agents, machines, skills, routines and runtimes at the bottom left | ![Install FoxOS](docs/screenshots/os-0.3.4-installing.png)<br>**Install FoxOS**: Calamares started from the 0.3.4 ISO; the summary shows the EFI and root partitions |
+| ![Installed system login](docs/screenshots/os-0.3.4-installed-login.png)<br>**Installed system**: the login screen after installing 0.3.4 to a virtual disk and booting from it | |
 
-Screenshots of the Windows companion app are in their own section below: [Windows companion app](#windows-伴侣程序在现有-windows-桌面上运行v020--windows-companion-app).
+More screenshots of the bot chat UI are in their own section below: [Bot chat UI](#智能体聊天界面034--bot-chat-ui).
 
 ## Download
 
@@ -91,22 +88,15 @@ Get-FileHash -Algorithm SHA256 .\FoxOS-0.3.4-amd64.iso
 
 USB and Hyper-V steps: [ISO test guide](docs/os-test-guide.md). Older releases (`v0.3.3-os-preview`, `v0.3.2-os-preview`, `v0.3.1-os-preview`, `v0.3.0-os-preview`, the Windows companion `v0.2.0-windows-preview`) remain on the [Releases](https://github.com/gatesenman/foxos/releases) page.
 
-## Windows 伴侣程序（在现有 Windows 桌面上运行，v0.2.0） / Windows companion app
+## 智能体聊天界面（0.3.4） / Bot chat UI
 
-These are screenshots of the **Windows companion app** (`v0.2.0-windows-preview`, Electron). It runs on your existing Windows (or Linux) desktop and provides a terminal, editor, Everything apps, environments and agent sessions. **It is not the FoxOS operating system desktop**; see the [screenshots](#screenshots-the-real-foxos-031-system) above for that. Captured with xvfb at 1600×1000 by [`apps/desktop/scripts/screenshots.js`](apps/desktop/scripts/screenshots.js).
+The "智能体" (bots) window in FoxOS 0.3.4. The Windows companion `v0.3.4-windows-preview` shows the same UI. The bots in these shots are working in a local test workspace.
 
 | | |
 | --- | --- |
-| ![Start menu](docs/screenshots/start-menu.png)<br>Start menu: built-ins and installed Everything apps in 9 groups, each with its project's own icon | ![App center](docs/screenshots/app-center.png)<br>App center: 51 Everything apps with their upstream icons, plus built-ins, LibreOffice, tools, ACP agents |
-| ![Setup wizard](docs/screenshots/setup-wizard.png)<br>First-run wizard with component picker | ![Terminal](docs/screenshots/terminal.png)<br>Terminal running `foxos` commands |
-| ![Files](docs/screenshots/files.png)<br>File manager, live-synced workspace | ![Editor](docs/screenshots/editor.png)<br>Monaco editor |
-| ![Browser](docs/screenshots/browser.png)<br>Browser | ![Settings → Language](docs/screenshots/settings-language-en.png)<br>Settings → Language: 简体中文 (default) / English, applies immediately |
-| ![App center (English)](docs/screenshots/app-center-en.png)<br>App center in English: group names and app descriptions follow the language | ![Writer](docs/screenshots/libreoffice-writer.png)<br>LibreOffice Writer with a generated .docx |
-| ![Calc](docs/screenshots/libreoffice-calc.png)<br>LibreOffice Calc: formulas and a native chart | ![Spreadsheet](docs/screenshots/everything-spreadsheet.png)<br>Everything Spreadsheet opening a workspace .xlsx (Chinese UI, shipped upstream, follows the FoxOS language) |
-| ![Documents](docs/screenshots/everything-documents.png)<br>Everything Documents opening a workspace .docx | ![Whiteboard](docs/screenshots/everything-whiteboard.png)<br>Everything Whiteboard |
-| ![CRM](docs/screenshots/everything-crm.png)<br>Everything CRM | ![Chess](docs/screenshots/everything-chess.png)<br>Everything Chess |
-| ![ACP install](docs/screenshots/acp-agent-install.png)<br>One-click ACP agent install from the official registry | ![Install a system](docs/screenshots/environments-catalog.png)<br>Environments → Install a system (WSL2 distros, rootfs, Windows Sandbox, Hyper-V) |
-| ![Alpine](docs/screenshots/environments-alpine.png)<br>A running Alpine environment with live stats | ![Audit and takeover](docs/screenshots/audit-takeover.png)<br>Activity log and human takeover (`PAUSED`) |
+| ![Chat and tool calls](docs/screenshots/bots-ui-chat-after.png)<br>**Chat**: the main bot "狐狸" answers while calling tools; each file read or command is an expandable card, and the "正在操作" bar at the top lists what every bot is doing | ![Approval](docs/screenshots/bots-ui-approval-after.png)<br>**Approval**: before "编码助手" writes a file it shows the diff and waits for allow once / always allow / deny |
+| ![Docked to the screen edge](docs/screenshots/bots-ui-docked-desktop-after.png)<br>**Docked**: the chat docks to the right edge of the desktop while other windows keep working | ![Bot settings](docs/screenshots/bots-ui-settings-after.png)<br>**Bot settings**: name, title, instructions, avatar, plus skills and permissions, memory, approval rules, routines, delegation, machines and computer use |
+| ![New chat](docs/screenshots/bots-ui-empty-after.png)<br>**New chat**: the main bot's start page with suggested prompts | ![Dark mode](docs/screenshots/bots-ui-chat-dark-after.png)<br>**Dark mode**: the same chat following the system dark theme |
 
 ## Quick start (from source)
 
@@ -145,7 +135,7 @@ Runs locally: **50/51** · semantic CLI/MCP commands: **50/51** · boot e2e pass
 
 ## Environments
 
-Linux: unprivileged user namespaces + overlayfs + pivot_root + seccomp, cgroup v2 when delegated (rlimit otherwise), snapshots, clones, `.foxenv` export, agents can run inside. Windows: WSL2 distro catalog with automatic WSL enablement, Windows Sandbox, Hyper-V. macOS: Virtualization.framework backend (untested on hardware). See [docs/environments.md](docs/environments.md) and the [provider protocol](docs/environment-provider-protocol.md). **Online preset systems**: preconfigured Debian 12 / Ubuntu 24.04 / FoxOS guests (desktop, Chinese, Node / Bun / Python, ACP agents, the foxos bridge) plus Windows evaluation and macOS recipes that download the official Microsoft / Apple media at install time; split downloads resume and are checked against sha256. See [docs/presets.md](docs/presets.md) and the [screenshot](docs/screenshots/env-presets-032.png).
+Linux: unprivileged user namespaces + overlayfs + pivot_root + seccomp, cgroup v2 when delegated (rlimit otherwise), snapshots, clones, `.foxenv` export, agents can run inside. Windows: WSL2 distro catalog with automatic WSL enablement, Windows Sandbox, Hyper-V. macOS: Virtualization.framework backend (untested on hardware). See [docs/environments.md](docs/environments.md) and the [provider protocol](docs/environment-provider-protocol.md). **Online preset systems**: preconfigured Debian 12 / Ubuntu 24.04 / FoxOS guests (desktop, Chinese, Node / Bun / Python, ACP agents, the foxos bridge) plus Windows evaluation and macOS recipes that download the official Microsoft / Apple media at install time; split downloads resume and are checked against sha256. See [docs/presets.md](docs/presets.md).
 
 Light isolation (`foxos sandbox`): run host tools directly, but only the workspace is readable/writable and network can be turned off (Linux Landlock + seccomp, macOS Seatbelt, Windows restricted token / AppContainer + job objects). Pick "轻量沙箱" as the run location in the session panel. See [docs/sandbox.md](docs/sandbox.md).
 
