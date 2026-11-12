@@ -2,7 +2,7 @@
 """在真实启动的狐狸OS ISO 上跑端到端用例（US-65），结果写进 JSON，再生成 docs/test-report.md 的一节。
 
 用法（宿主机，Linux + qemu）：
-  FOXOS_E2E_ACCEL=tcg python3 scripts/os/e2e/iso_e2e.py boot  --iso build/os/FoxOS-0.3.3-amd64.iso
+  FOXOS_E2E_ACCEL=tcg python3 scripts/os/e2e/iso_e2e.py boot  --iso build/os/FoxOS-0.3.4-amd64.iso
   python3 scripts/os/e2e/iso_e2e.py run ssh foxos_over_ssh runtime acp desktop chrome bots preset
   python3 scripts/os/e2e/iso_e2e.py install        # Calamares 装到虚拟磁盘（图形界面里按键操作）
   python3 scripts/os/e2e/iso_e2e.py boot --disk    # 从装好的磁盘启动（不挂 ISO）
@@ -655,7 +655,7 @@ def main() -> int:
     rec = sub.add_parser("record"); rec.add_argument("case"); rec.add_argument("status", choices=["PASS", "FAIL"]); rec.add_argument("started"); rec.add_argument("detail")
     rec.add_argument("--evidence", action="append", default=[])
     sub.add_parser("stop"); sub.add_parser("shot")
-    rp = sub.add_parser("report"); rp.add_argument("path"); rp.add_argument("--heading", default="0.3.3 ISO 端到端（US-65）")
+    rp = sub.add_parser("report"); rp.add_argument("path"); rp.add_argument("--heading", default="0.3.4 ISO 端到端（US-65）")
     a = ap.parse_args()
     if a.cmd == "boot":
         if not a.disk and not a.iso:

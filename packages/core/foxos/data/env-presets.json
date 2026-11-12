@@ -29,7 +29,7 @@
     "node": "v24.22.2",
     "bun": "1.3.2",
     "python": "3.13.9",
-    "companion_install": "https://github.com/gatesenman/foxos/releases/download/v0.3.3-windows-preview/install.ps1"
+    "companion_install": "https://github.com/gatesenman/foxos/releases/download/v0.3.4-windows-preview/install.ps1"
    },
    "disk_gb": 8,
    "memory_mb": 2048,
@@ -104,7 +104,7 @@
     "node": "v24.22.2",
     "bun": "1.3.2",
     "python": "3.13.9",
-    "companion_install": "https://github.com/gatesenman/foxos/releases/download/v0.3.3-windows-preview/install.ps1"
+    "companion_install": "https://github.com/gatesenman/foxos/releases/download/v0.3.4-windows-preview/install.ps1"
    },
    "disk_gb": 8,
    "memory_mb": 2048,
@@ -155,11 +155,11 @@
    "license": "各发行版软件包按各自许可；Node.js、Bun 为 MIT；Gemini CLI 为 Apache-2.0。不含不允许再分发的软件。"
   },
   {
-   "id": "foxos-os-0.3.2",
-   "name": "狐狸OS 0.3.2（可引导 ISO，Live + 安装器）",
+   "id": "foxos-os-0.3.3",
+   "name": "狐狸OS 0.3.3（可引导 ISO，Live + 安装器）",
    "guest_os": "linux",
    "family": "foxos",
-   "version": "0.3.2",
+   "version": "0.3.3",
    "kind": "foxos-iso",
    "summary": "狐狸OS 自己作为来宾：XFCE、中文、foxos、人工接管、Calamares 安装器",
    "features": [
@@ -174,20 +174,25 @@
    "disk_gb": 32,
    "artifacts": {
     "iso": {
-     "name": "FoxOS-0.3.2-amd64.iso",
-     "release": "v0.3.2-os-preview",
-     "size": 1564309504,
-     "sha256": "9ce810228b111cc9087e6a6667deae2096f57d7a3e464c128d73604c33bcec5b",
+     "name": "FoxOS-0.3.3-amd64.iso",
+     "release": "v0.3.3-os-preview",
+     "size": 2252578816,
+     "sha256": "e51ff278cfbecfa77a7ef81c624aadf45cf14d66e17484de7f8d3f95d8c150e2",
      "parts": [
       {
-       "name": "FoxOS-0.3.2-amd64.iso.part1",
-       "size": 838860800,
-       "sha256": "545efdcbc41b9227c908af35fe5cf719e03444b463cf84ca2b6735db7313a6c4"
+       "name": "FoxOS-0.3.3-amd64.iso.part-00",
+       "size": 858993459,
+       "sha256": "2956f8ec24a6480f7b05bdcfeed263eab98eb0b0e61e4b420f8d53393ac5bbf9"
       },
       {
-       "name": "FoxOS-0.3.2-amd64.iso.part2",
-       "size": 725448704,
-       "sha256": "79bf7b29cfe28f37bbe712985c0961dfc0868e7bdb4ce754268c40d40a5626d9"
+       "name": "FoxOS-0.3.3-amd64.iso.part-01",
+       "size": 858993459,
+       "sha256": "73834b8c526f61b84089e84846c232d0e0418f9bddfd69b5f5e7159add5478bf"
+      },
+      {
+       "name": "FoxOS-0.3.3-amd64.iso.part-02",
+       "size": 534591898,
+       "sha256": "e235c30f5601bd668d16e60eed715d5d2635a997b95e0717b0cd18ea5ea28037"
       }
      ]
     }
@@ -235,7 +240,7 @@
     "node": "v24.22.2",
     "bun": "1.3.2",
     "python": "3.13.9",
-    "companion_install": "https://github.com/gatesenman/foxos/releases/download/v0.3.3-windows-preview/install.ps1"
+    "companion_install": "https://github.com/gatesenman/foxos/releases/download/v0.3.4-windows-preview/install.ps1"
    },
    "media": {
     "source": "microsoft-evalcenter",
@@ -292,7 +297,7 @@
     "node": "v24.22.2",
     "bun": "1.3.2",
     "python": "3.13.9",
-    "companion_install": "https://github.com/gatesenman/foxos/releases/download/v0.3.3-windows-preview/install.ps1"
+    "companion_install": "https://github.com/gatesenman/foxos/releases/download/v0.3.4-windows-preview/install.ps1"
    },
    "media": {
     "source": "microsoft-evalcenter",
@@ -346,7 +351,7 @@
     "node": "v24.22.2",
     "bun": "1.3.2",
     "python": "3.13.9",
-    "companion_install": "https://github.com/gatesenman/foxos/releases/download/v0.3.3-windows-preview/install.ps1"
+    "companion_install": "https://github.com/gatesenman/foxos/releases/download/v0.3.4-windows-preview/install.ps1"
    },
    "media": {
     "source": "apple-ipsw",

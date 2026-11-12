@@ -6,10 +6,10 @@ welcomeStyleCalamares: true
 strings:
     productName: 狐狸OS
     shortProductName: 狐狸OS
-    version: 0.3.3
-    shortVersion: 0.3.3
-    versionedName: 狐狸OS 0.3.3
-    shortVersionedName: 狐狸OS 0.3.3
+    version: 0.3.4
+    shortVersion: 0.3.4
+    versionedName: 狐狸OS 0.3.4
+    shortVersionedName: 狐狸OS 0.3.4
     bootloaderEntryName: FoxOS
     productUrl: https://github.com/gatesenman/foxos
     supportUrl: https://github.com/gatesenman/foxos/issues

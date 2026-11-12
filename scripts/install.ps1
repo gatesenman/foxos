@@ -4,12 +4,12 @@
   (ASCII-only on purpose so it works with "irm ... | iex" on Windows PowerShell 5.1.)
 
 .EXAMPLE
-  irm https://github.com/gatesenman/foxos/releases/download/v0.3.3-windows-preview/install.ps1 | iex
+  irm https://github.com/gatesenman/foxos/releases/download/v0.3.4-windows-preview/install.ps1 | iex
 
 .EXAMPLE
   powershell -ExecutionPolicy Bypass -File install.ps1 -Portable
 
-.PARAMETER Tag          Release tag. Default v0.3.3-windows-preview; "latest" = newest non-prerelease.
+.PARAMETER Tag          Release tag. Default v0.3.4-windows-preview; "latest" = newest non-prerelease.
 .PARAMETER Token        Optional GitHub token (defaults to $env:GITHUB_TOKEN / $env:GH_TOKEN). Only needed to avoid API rate limits.
 .PARAMETER Portable     Install the portable zip into %LOCALAPPDATA%\FoxOS-Portable instead of running the setup program.
 .PARAMETER Msi          Install the per-machine MSI package (msiexec; needs admin) instead of the NSIS setup.
@@ -22,7 +22,7 @@
 #>
 [CmdletBinding()]
 param(
-  [string]$Tag = 'v0.3.3-windows-preview',
+  [string]$Tag = 'v0.3.4-windows-preview',
   [string]$Token = $(if ($env:GITHUB_TOKEN) { $env:GITHUB_TOKEN } else { $env:GH_TOKEN }),
   [switch]$Portable,
   [switch]$Msi,
