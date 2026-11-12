@@ -1,6 +1,6 @@
 # 狐狸OS Docker Hub 试用镜像：用 cloud-hypervisor + 宿主 KVM 引导 *真正的* ISO。
 # 这是分发通道，不是狐狸OS 的运行时，也不在容器里画假桌面。
-# 不要在本仓库里保存 Docker Hub 密码；推送前需 Sarah 登录。
+# 不要在本仓库里保存 Docker Hub / GHCR 密码；推送前需 Sarah 同意。
 FROM debian:bookworm-slim
 
 ARG CLOUD_HYPERVISOR_VERSION=v46.0
@@ -21,8 +21,15 @@ RUN mkdir -p /usr/lib/foxos/vmm \
       "Licensed under the Apache License, Version 2.0." \
     > /usr/lib/foxos/vmm/NOTICE
 
+# 唯一的版本号：决定默认下载哪个 Release（v<版本>-os-preview）和 ISO 文件名。
+# 放在软件包层之后，换版本不会让 apt 那一层重新构建。
+ARG FOXOS_VERSION=0.3.4
+ENV FOXOS_VERSION=${FOXOS_VERSION}
+LABEL org.opencontainers.image.source="https://github.com/gatesenman/foxos" \
+      org.opencontainers.image.version="${FOXOS_VERSION}-os-preview"
+COPY docker/os/fetch-iso.sh /usr/local/bin/foxos-fetch-iso
 COPY docker/os/entrypoint-trial.sh /usr/local/bin/foxos-docker-trial
-RUN chmod 755 /usr/local/bin/foxos-docker-trial
+RUN chmod 755 /usr/local/bin/foxos-fetch-iso /usr/local/bin/foxos-docker-trial
 
 EXPOSE 5900 6080
 VOLUME ["/var/lib/foxos"]

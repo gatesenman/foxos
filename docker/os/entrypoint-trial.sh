@@ -1,11 +1,12 @@
 #!/bin/sh
 # 用 cloud-hypervisor（狐狸OS 自己的 VMM）在有 KVM 的宿主上引导 *真正的* ISO。
-# 这是 Docker Hub 分发/试用通道，不是狐狸OS 的运行时；容器里不画一个假桌面。
+# 这是 Docker Hub / GHCR 分发与试用通道，不是狐狸OS 的运行时；容器里不画一个假桌面。
 set -eu
 
-ISO_URL=${FOXOS_ISO_URL:-https://github.com/gatesenman/foxos/releases/download/v0.3.1-os-preview/FoxOS-0.3.1-amd64.iso}
-ISO_SHA256=${FOXOS_ISO_SHA256:-}
-ISO_PATH=${FOXOS_ISO_PATH:-/var/lib/foxos/FoxOS-0.3.1-amd64.iso}
+VERSION=${FOXOS_VERSION:-0.3.4}
+ISO_DIR=${FOXOS_ISO_DIR:-/var/lib/foxos}
+ISO_PATH=${FOXOS_ISO_PATH:-$ISO_DIR/${FOXOS_ISO_NAME:-FoxOS-${VERSION}-amd64.iso}}
+FETCH=${FOXOS_FETCH:-/usr/local/bin/foxos-fetch-iso}
 MEM=${FOXOS_MEM:-4G}
 CPUS=${FOXOS_CPUS:-2}
 VNC_PORT=${FOXOS_VNC_PORT:-5900}
@@ -23,17 +24,19 @@ if [ ! -r /dev/kvm ] || [ ! -w /dev/kvm ]; then
 fi
 [ -x "$CH" ] || die "找不到 cloud-hypervisor（$CH）"
 
-mkdir -p "$(dirname "$ISO_PATH")"
-if [ ! -f "$ISO_PATH" ]; then
-  log "下载 ISO：$ISO_URL"
-  wget -O "$ISO_PATH.part" "$ISO_URL"
-  mv "$ISO_PATH.part" "$ISO_PATH"
-fi
-if [ -n "$ISO_SHA256" ]; then
-  echo "$ISO_SHA256  $ISO_PATH" | sha256sum -c - || die "ISO 校验和不匹配"
-  log "ISO sha256 校验通过"
+# 下载并校验 ISO：默认从 v${VERSION}-os-preview 的 Release 读 SHA256SUMS，
+# 按里面列出的分卷下载、拼接、逐卷和整张校验；已有且校验通过的 ISO 不会重下。
+# 自己挂进来的 ISO（FOXOS_ISO_PATH 指向已存在的文件）只在给了 FOXOS_ISO_SHA256 时校验。
+if [ -n "${FOXOS_ISO_PATH:-}" ] && [ -f "$ISO_PATH" ]; then
+  if [ -n "${FOXOS_ISO_SHA256:-}" ]; then
+    [ "$(sha256sum "$ISO_PATH" | awk '{print $1}')" = "$FOXOS_ISO_SHA256" ] || die "ISO 校验和不匹配"
+    log "ISO sha256 校验通过"
+  else
+    log "使用挂载的 ISO：$ISO_PATH（未设置 FOXOS_ISO_SHA256，跳过校验）"
+  fi
 else
-  log "未设置 FOXOS_ISO_SHA256，跳过校验（请在文档记录的正式发布里传入校验和）"
+  FOXOS_VERSION=$VERSION FOXOS_ISO_NAME=$(basename "$ISO_PATH") "$FETCH" "$(dirname "$ISO_PATH")" \
+    || die "下载或校验 ISO 失败"
 fi
 
 # 从 ISO 取出内核和 initrd，用与产品相同的 casper 参数直接引导（避免再套一层 GRUB）。
@@ -49,7 +52,10 @@ ip link show "$TAP" >/dev/null 2>&1 || ip tuntap add dev "$TAP" mode tap
 ip addr show dev "$TAP" | grep -q '172.30.0.1' || ip addr add 172.30.0.1/24 dev "$TAP" || true
 ip link set "$TAP" up
 # IPv4 转发 + DNAT：宿主机连容器的 5900，转到来宾 172.30.0.2:5900
-echo 1 > /proc/sys/net/ipv4/ip_forward || true
+if [ "$(cat /proc/sys/net/ipv4/ip_forward 2>/dev/null)" != 1 ]; then
+  (echo 1 > /proc/sys/net/ipv4/ip_forward) 2>/dev/null \
+    || log "警告：无法打开 IPv4 转发（/proc/sys 只读）；端口不通时请加 --sysctl net.ipv4.ip_forward=1"
+fi
 iptables -t nat -C PREROUTING -p tcp --dport "$VNC_PORT" -j DNAT --to-destination 172.30.0.2:5900 2>/dev/null \
   || iptables -t nat -A PREROUTING -p tcp --dport "$VNC_PORT" -j DNAT --to-destination 172.30.0.2:5900
 iptables -C FORWARD -i eth0 -o "$TAP" -p tcp -d 172.30.0.2 --dport 5900 -j ACCEPT 2>/dev/null \

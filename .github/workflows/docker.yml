@@ -1,44 +1,90 @@
-# 构建狐狸OS 的 Docker Hub 镜像。默认只 build，不 login、不 push。
-# 推送需要 Sarah 提供 Docker Hub 账号，并在仓库 Secrets 里配置
-# DOCKERHUB_USERNAME / DOCKERHUB_TOKEN。不要把密码写进仓库或提交记录。
+# 构建狐狸OS 的容器镜像。默认只 build，不 login、不 push。
+# 两个推送目标都默认关闭，必须在手动运行时勾选对应开关：
+#   - Docker Hub：docker.io/gatesenman/foxos，需要仓库 Secrets DOCKERHUB_USERNAME / DOCKERHUB_TOKEN
+#   - GHCR：ghcr.io/gatesenman/foxos，默认用本次运行的 GITHUB_TOKEN（packages: write），
+#     也可以配 GHCR_USERNAME / GHCR_TOKEN（经典 PAT，write:packages）
+# 推送前要得到 Sarah 的明确同意。不要把密码或令牌写进仓库或提交记录。
 name: docker
 
 on:
   workflow_dispatch:
     inputs:
-      push:
-        description: '推送到 Docker Hub（必须已配置 secrets，且已得到 Sarah 明确同意）'
+      version:
+        description: '狐狸OS 版本号（与 GitHub Release v<版本>-os-preview 对应，例如 0.3.4）'
+        type: string
+        default: '0.3.4'
+      push_dockerhub:
+        description: '推送到 Docker Hub（需 DOCKERHUB_USERNAME / DOCKERHUB_TOKEN，且已得到 Sarah 明确同意）'
         type: boolean
         default: false
-      tag:
-        description: '镜像标签（与 GitHub Release 版本一致，例如 0.3.0-os-preview）'
-        type: string
-        default: '0.3.0-os-preview'
+      push_ghcr:
+        description: '推送到 GHCR ghcr.io/gatesenman/foxos（已得到 Sarah 明确同意）'
+        type: boolean
+        default: false
+
+env:
+  DOCKERHUB_IMAGE: docker.io/gatesenman/foxos
+  GHCR_IMAGE: ghcr.io/gatesenman/foxos
 
 jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      # 只有勾选 push_ghcr 时才会用到；不勾选时没有任何 login / push 步骤。
+      packages: write
+    env:
+      VERSION: ${{ inputs.version }}
+      TAG: ${{ inputs.version }}-os-preview
     steps:
       - uses: actions/checkout@v4
-      - name: Build trial image
-        run: docker build -f docker/os/Dockerfile -t gatesenman/foxos:${{ inputs.tag }} .
-      - name: Build installer image
-        run: docker build -f docker/os/Dockerfile.installer -t gatesenman/foxos:${{ inputs.tag }}-installer .
-      - name: Log in to Docker Hub
-        if: ${{ inputs.push }}
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - name: Push
-        if: ${{ inputs.push }}
+      - name: Check version
         run: |
-          if [ -z "${{ secrets.DOCKERHUB_USERNAME }}" ]; then
-            echo "未配置 DOCKERHUB_USERNAME，跳过推送。"
+          case "$VERSION" in
+            *[!0-9.]*|'') echo "版本号只能是数字和点，例如 0.3.4：$VERSION"; exit 1 ;;
+          esac
+          curl -fsSL -o /dev/null "https://github.com/gatesenman/foxos/releases/download/v${VERSION}-os-preview/SHA256SUMS" \
+            || { echo "Release v${VERSION}-os-preview 没有 SHA256SUMS"; exit 1; }
+      - name: Build trial image
+        run: |
+          docker build -f docker/os/Dockerfile --build-arg FOXOS_VERSION="$VERSION" \
+            -t "$DOCKERHUB_IMAGE:$TAG" -t "$GHCR_IMAGE:$TAG" .
+      - name: Build installer image
+        run: |
+          docker build -f docker/os/Dockerfile.installer --build-arg FOXOS_VERSION="$VERSION" \
+            -t "$DOCKERHUB_IMAGE:$TAG-installer" -t "$GHCR_IMAGE:$TAG-installer" .
+      - name: Image sizes
+        run: docker images --format '{{.Repository}}:{{.Tag}} {{.Size}}' | grep foxos
+
+      - name: Log in to Docker Hub
+        if: ${{ inputs.push_dockerhub }}
+        env:
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+        run: |
+          if [ -z "$DOCKERHUB_USERNAME" ] || [ -z "$DOCKERHUB_TOKEN" ]; then
+            echo "未配置 DOCKERHUB_USERNAME / DOCKERHUB_TOKEN，不推送 Docker Hub。"
             exit 1
           fi
-          docker tag "gatesenman/foxos:${{ inputs.tag }}" gatesenman/foxos:os-preview
-          docker push "gatesenman/foxos:${{ inputs.tag }}"
-          docker push "gatesenman/foxos:${{ inputs.tag }}-installer"
+          printf '%s' "$DOCKERHUB_TOKEN" | docker login docker.io -u "$DOCKERHUB_USERNAME" --password-stdin
+      - name: Push to Docker Hub
+        if: ${{ inputs.push_dockerhub }}
+        run: |
+          docker tag "$DOCKERHUB_IMAGE:$TAG" "$DOCKERHUB_IMAGE:os-preview"
+          docker push "$DOCKERHUB_IMAGE:$TAG"
+          docker push "$DOCKERHUB_IMAGE:$TAG-installer"
+          docker push "$DOCKERHUB_IMAGE:os-preview"
+
+      - name: Log in to GHCR
+        if: ${{ inputs.push_ghcr }}
+        env:
+          GHCR_USERNAME: ${{ secrets.GHCR_USERNAME || github.actor }}
+          GHCR_TOKEN: ${{ secrets.GHCR_TOKEN || secrets.GITHUB_TOKEN }}
+        run: printf '%s' "$GHCR_TOKEN" | docker login ghcr.io -u "$GHCR_USERNAME" --password-stdin
+      - name: Push to GHCR
+        if: ${{ inputs.push_ghcr }}
+        run: |
+          docker tag "$GHCR_IMAGE:$TAG" "$GHCR_IMAGE:os-preview"
+          docker push "$GHCR_IMAGE:$TAG"
+          docker push "$GHCR_IMAGE:$TAG-installer"
+          docker push "$GHCR_IMAGE:os-preview"
