@@ -90,7 +90,7 @@ def boot(iso: str | None, from_disk: bool, mem: int, cpus: int) -> dict:
     port = _free_port()
     mon = WORK / "mon.sock"
     serial = WORK / ("serial-disk.log" if from_disk else "serial.log")
-    argv = ["qemu-system-x86_64", "-accel", accel, "-m", str(mem), "-smp", str(cpus), "-machine", "q35",
+    argv = ["qemu-system-x86_64", "-accel", accel + (",tb-size=256" if accel == "tcg" else ""), "-m", str(mem), "-smp", str(cpus), "-machine", "q35",
             "-cpu", "max" if accel == "tcg" else "host",
             "-drive", f"if=pflash,format=raw,readonly=on,file={OVMF_CODE}", "-drive", f"if=pflash,format=raw,file={vars_fd}",
             "-drive", f"file={WORK / 'target.qcow2'},if=none,id=t,format=qcow2", "-device", "virtio-blk-pci,drive=t,serial=foxostarget,bootindex=1",
@@ -528,7 +528,9 @@ def case_win_client() -> str:
     assert rep and "result" in rep and rep["result"].get("protocolVersion") == 1, ("".join(seen_lines)[-500:], scrub(err))
     # x11vnc：按需起在来宾回环，ssh -W 转发后能读到 RFB 握手
     ssh("pkill -x x11vnc; (x11vnc -display :0 -localhost -shared -rfbport 5917 -nopw -once -quiet >/tmp/x11vnc-e2e.log 2>&1 &); sleep 20", timeout=300)
-    w = subprocess.run(ssh_base(extra=["-W", "127.0.0.1:5917"]), input="", capture_output=True, timeout=120)
+    # ssh -W 的标准输入要开着（像 VNC 客户端那样），否则连上就断、读不到服务器握手
+    w = subprocess.run(["bash", "-c", "(sleep 20) | " + shlex.join(ssh_base(extra=["-W", "127.0.0.1:5917"])) + " | head -c 12"],
+                       capture_output=True, timeout=180)
     banner = w.stdout[:12].decode("latin1", "replace")
     assert banner.startswith("RFB "), (banner, w.stderr[-300:])
     ver = ssh("x11vnc -version 2>/dev/null | head -1").stdout.strip()
@@ -580,7 +582,7 @@ def run(names: list[str]) -> int:
     if os.environ.get("FOXOS_E2E_QUIET", "1") == "1" and names != ["ssh"] and names != ["installed_ssh"]:
         # TCG 下每分钟一次的例程定时器（每次启动一个 Python）会占满来宾 CPU；测试期间停掉（不影响被测功能）
         try:
-            ssh("systemctl --user stop foxos-bots-routines.timer 2>/dev/null; true", timeout=900)
+            ssh("systemctl --user stop foxos-bots-routines.timer 2>/dev/null; xset s off -dpms 2>/dev/null; xset dpms force on 2>/dev/null; true", timeout=900)  # 截图前别让屏幕熄灭
         except subprocess.TimeoutExpired:
             pass
     for n in names:
