@@ -33,6 +33,14 @@ class AcpError(Exception):
         self.data = data
 
 
+def _still_starting(e: AcpError) -> bool:
+    """智能体报「服务暂不可用」类的内部错误（还在启动），值得重试；认证、参数等错误不重试。"""
+    if e.code not in (-32603, None):
+        return False
+    text = f"{e} {e.data or ''}".lower()
+    return any(k in text for k in ("service failure", "serviceunavailable", "service unavailable", "did not finish activating", "not ready"))
+
+
 class _Terminal:
     def __init__(self, proc: subprocess.Popen, limit: int):
         self.proc = proc
@@ -340,7 +348,19 @@ class AcpConnection:
         return self.request("authenticate", {"methodId": method_id}, timeout)
 
     def new_session(self, mcp_servers: list | None = None, timeout: float = 120.0) -> dict:
-        return self.request("session/new", {"cwd": str(self.scope_root), "mcpServers": mcp_servers or []}, timeout)
+        """session/new。智能体还在启动时（如 opencode 插件没激活完，报 -32603「Internal service failure」）
+        稍等重试，总时长不超过 timeout；慢机器（TCG 虚拟机）上首个回合常遇到。"""
+        deadline = time.monotonic() + timeout
+        delay = 2.0
+        while True:
+            left = max(1.0, deadline - time.monotonic())
+            try:
+                return self.request("session/new", {"cwd": str(self.scope_root), "mcpServers": mcp_servers or []}, left)
+            except AcpError as e:
+                if not _still_starting(e) or self.closed or time.monotonic() + delay >= deadline:
+                    raise
+            time.sleep(delay)
+            delay = min(delay * 2, 15.0)
 
     def configure_session(self, session: dict, model: str | None = None, mode: str | None = None, timeout: float = 30.0) -> dict:
         """按设置切换会话的模型与模式（ACP session/set_model、session/set_mode）。

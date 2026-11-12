@@ -488,7 +488,13 @@ def case_install() -> str:
         lg = _x("tail -c 4000 /tmp/calamares-e2e.log").stdout
         if re.search(r"Installation failed|ERROR.*Job .* failed|Bad Python script|Boost.Python error", lg):
             break
-        # 完成 = 最后一个任务（N / N）已开始，且目标根不再挂着（umount 任务做完）
+        # Calamares 3.3 结束时记「completion: succeeded」（根分区可能还挂着，umount 模块只卸子挂载）
+        if "completion: succeeded" in lg:
+            done = True
+            break
+        if "completion: failed" in lg:
+            break
+        # 旧判断：最后一个任务（N / N）已开始，且目标根不再挂着
         last = _x("grep -oE 'Starting job .*\\( *[0-9]+ / *[0-9]+ *\\)' /tmp/calamares-e2e.log | tail -1").stdout
         m = re.search(r"\( *(\d+) / *(\d+) *\)", last)
         if m and m.group(1) == m.group(2) and not _x("findmnt -rn -o TARGET | grep -c calamares-root || true").stdout.strip().strip("0"):
