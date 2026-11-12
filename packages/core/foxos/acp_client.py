@@ -336,7 +336,10 @@ class AcpConnection:
         return {"terminalId": tid}
 
     # ------------------------------------------------------------------ ACP 方法
-    def initialize(self, timeout: float = 60.0) -> dict:
+    def initialize(self, timeout: float | None = None) -> dict:
+        # 冷启动的智能体（opencode 等）在慢机器上要一分多钟才回 initialize（TCG 虚拟机里实测 55–75 秒），默认等 180 秒
+        if timeout is None:
+            timeout = float(os.environ.get("FOXOS_ACP_INIT_TIMEOUT", "180"))
         self.init = self.request("initialize", {
             "protocolVersion": PROTOCOL_VERSION,
             "clientCapabilities": {"fs": {"readTextFile": True, "writeTextFile": True}, "terminal": True},
