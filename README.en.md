@@ -4,7 +4,7 @@
 
 <p align="center">A desktop operating system for agents: real desktop apps, one <code>foxos</code> command line and MCP tool set for everything, audit log and human takeover, and a home-grown isolation layer.</p>
 
-<p align="center"><a href="README.md">中文</a> · <a href="https://github.com/gatesenman/foxos/releases/tag/v0.3.2-os-preview">Bootable ISO</a> · <a href="https://github.com/gatesenman/foxos/releases/tag/v0.3.3-windows-preview">Windows companion preview</a> · <a href="docs/os-test-guide.md">ISO test guide</a> · <a href="AGENTS.md">AGENTS.md</a></p>
+<p align="center"><a href="README.md">中文</a> · <a href="https://github.com/gatesenman/foxos/releases/tag/v0.3.3-os-preview">Bootable ISO</a> · <a href="https://github.com/gatesenman/foxos/releases/tag/v0.3.3-windows-preview">Windows companion preview</a> · <a href="docs/os-test-guide.md">ISO test guide</a> · <a href="AGENTS.md">AGENTS.md</a></p>
 
 ![FoxOS real desktop: XFCE, start menu, bottom panel, and terminal](docs/screenshots/os-031-desktop.png)
 
@@ -58,7 +58,7 @@ Everything is on [v0.3.2-os-preview](https://github.com/gatesenman/foxos/release
 | Ubuntu / Debian / Mint | `FoxOS-0.3.2-linux-x64.deb` | `FoxOS-0.3.2-linux-arm64.deb` |
 | Fedora / RHEL / Rocky / Alma / openSUSE | `FoxOS-0.3.2-linux-x64.rpm` | `FoxOS-0.3.2-linux-arm64.rpm` |
 | Arch / Manjaro / other distros | `FoxOS-0.3.2-linux-x64.tar.gz` · `.AppImage` | `FoxOS-0.3.2-linux-arm64.tar.gz` · `.AppImage` |
-| **FoxOS OS ISO** | `FoxOS-0.3.2-amd64.iso.part1` + `.part2` (join into the ISO; UEFI + BIOS) | build script ready (`FOXOS_OS_ARCH=arm64`); built on an arm64 runner once GitHub Actions is available |
+| **FoxOS OS ISO** | `FoxOS-0.3.3-amd64.iso.part-00` + `.part-01` + `.part-02` (on [v0.3.3-os-preview](https://github.com/gatesenman/foxos/releases/tag/v0.3.3-os-preview); join into the ISO; UEFI + BIOS) | build script ready (`FOXOS_OS_ARCH=arm64`); built on an arm64 runner once GitHub Actions is available |
 | Package managers (drafts, not submitted) | winget `gatesenman.FoxOS` · Homebrew cask `foxos` · AUR `foxos-bin`, see `FoxOS-0.3.2-package-manifests.zip` and [`packaging/`](packaging/) | same |
 
 End-to-end tests (install → desktop launch → `foxos --version` → `foxos sheets create` → uninstall): the Linux x64 deb / rpm / tar.gz / AppImage pass on Ubuntu 24.04, Debian 12, Fedora 43, openSUSE Tumbleweed and Arch. Linux arm64 install, CLI and uninstall pass under qemu; the desktop launch still needs a real arm64 machine. **The Windows and macOS builds have not been tested on real machines yet, so treat them as previews.** The MSI, dmg, arm64 ISO and single-file ISO are built by GitHub Actions ([`release.yml`](.github/workflows/release.yml)), which also runs the end-to-end tests on every platform. Actions cannot start on this repository right now because of a GitHub account billing lock; re-run the workflow once that is fixed. See [docs/install.md](docs/install.md) and the [test report](docs/test-report.md).
@@ -77,19 +77,19 @@ irm https://github.com/gatesenman/foxos/releases/download/v0.3.2-os-preview/inst
 
 The packages are not code-signed yet: on Windows, SmartScreen → "More info" → "Run anyway"; on macOS, Control-click FoxOS in Applications → Open (macOS 15+: System Settings → Privacy & Security → "Open Anyway"). Per-OS details, AppImage and ISO usage: **[docs/install.md](docs/install.md#english)**.
 
-The ISO is published as two parts; join and verify them:
+The ISO ([v0.3.3-os-preview](https://github.com/gatesenman/foxos/releases/tag/v0.3.3-os-preview)) is published as three parts, each under 1 GiB; join and verify them (`SHA256SUMS` is in the same release):
 
 ```bash
-cat FoxOS-0.3.2-amd64.iso.part1 FoxOS-0.3.2-amd64.iso.part2 > FoxOS-0.3.2-amd64.iso
+cat FoxOS-0.3.3-amd64.iso.part-00 FoxOS-0.3.3-amd64.iso.part-01 FoxOS-0.3.3-amd64.iso.part-02 > FoxOS-0.3.3-amd64.iso
 sha256sum -c SHA256SUMS --ignore-missing
 ```
 
 ```powershell
-cmd /c copy /b FoxOS-0.3.2-amd64.iso.part1+FoxOS-0.3.2-amd64.iso.part2 FoxOS-0.3.2-amd64.iso
-Get-FileHash -Algorithm SHA256 .\FoxOS-0.3.2-amd64.iso
+cmd /c copy /b FoxOS-0.3.3-amd64.iso.part-00+FoxOS-0.3.3-amd64.iso.part-01+FoxOS-0.3.3-amd64.iso.part-02 FoxOS-0.3.3-amd64.iso
+Get-FileHash -Algorithm SHA256 .\FoxOS-0.3.3-amd64.iso
 ```
 
-USB and Hyper-V steps: [ISO test guide](docs/os-test-guide.md). Older releases (`v0.3.1-os-preview`, `v0.3.0-os-preview`, the Windows companion `v0.2.0-windows-preview`) remain on the [Releases](https://github.com/gatesenman/foxos/releases) page.
+USB and Hyper-V steps: [ISO test guide](docs/os-test-guide.md). Older releases (`v0.3.2-os-preview`, `v0.3.1-os-preview`, `v0.3.0-os-preview`, the Windows companion `v0.2.0-windows-preview`) remain on the [Releases](https://github.com/gatesenman/foxos/releases) page.
 
 ## Windows 伴侣程序（在现有 Windows 桌面上运行，v0.2.0） / Windows companion app
 

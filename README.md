@@ -5,7 +5,7 @@
 <p align="center">给智能体使用的桌面操作系统：真实的桌面与应用、统一的 <code>foxos</code> 命令与 MCP 工具、审计与人工接管、自研隔离环境。</p>
 
 <p align="center">
-  <a href="https://github.com/gatesenman/foxos/releases/tag/v0.3.2-os-preview">下载可引导 ISO</a> ·
+  <a href="https://github.com/gatesenman/foxos/releases/tag/v0.3.3-os-preview">下载可引导 ISO</a> ·
   <a href="https://github.com/gatesenman/foxos/releases/tag/v0.3.3-windows-preview">Windows 伴侣预览</a> ·
   <a href="#快速开始">快速开始</a> ·
   <a href="AGENTS.md">智能体接入</a> ·
@@ -79,7 +79,7 @@ Windows 伴侣程序的截图在下方单独一节：[Windows 伴侣程序](#win
 | Ubuntu / Debian / Mint / deepin / UOS | `FoxOS-0.3.2-linux-x64.deb` | `FoxOS-0.3.2-linux-arm64.deb` |
 | Fedora / RHEL / Rocky / Alma / openEuler / openSUSE | `FoxOS-0.3.2-linux-x64.rpm` | `FoxOS-0.3.2-linux-arm64.rpm` |
 | Arch / Manjaro / 其他发行版 | `FoxOS-0.3.2-linux-x64.tar.gz` · `.AppImage` | `FoxOS-0.3.2-linux-arm64.tar.gz` · `.AppImage` |
-| **狐狸OS 系统 ISO** | `FoxOS-0.3.2-amd64.iso.part1` + `.part2`（合并成 ISO，UEFI + BIOS） | 构建脚本已支持（`FOXOS_OS_ARCH=arm64`），等 GitHub Actions 恢复后在 arm64 机器上构建 |
+| **狐狸OS 系统 ISO** | `FoxOS-0.3.3-amd64.iso.part-00` + `.part-01` + `.part-02`（在 [v0.3.3-os-preview](https://github.com/gatesenman/foxos/releases/tag/v0.3.3-os-preview)，合并成 ISO，UEFI + BIOS） | 构建脚本已支持（`FOXOS_OS_ARCH=arm64`），等 GitHub Actions 恢复后在 arm64 机器上构建 |
 | 包管理器（草稿，未提交） | winget `gatesenman.FoxOS` · Homebrew cask `foxos` · AUR `foxos-bin`，见 `FoxOS-0.3.2-package-manifests.zip` 与 [`packaging/`](packaging/) | 同左 |
 
 端到端测试（安装 → 启动桌面 → `foxos --version` → `foxos sheets create` → 卸载）：Linux x64 的 deb / rpm / tar.gz / AppImage 已在 Ubuntu 24.04、Debian 12、Fedora 43、openSUSE Tumbleweed、Arch 上全部通过；Linux arm64 在 qemu 里验证了安装、命令行与卸载，桌面启动还要在真 arm64 机器上验证；**Windows 与 macOS 的安装包还没有在真机上测过，请当作预览**。MSI、dmg、arm64 ISO 和单文件 ISO 由 GitHub Actions（[`release.yml`](.github/workflows/release.yml)）构建并在各系统上跑端到端测试；仓库的 Actions 目前因 GitHub 账户账单问题无法启动，恢复后重新运行即可补上。详见 [docs/install.md](docs/install.md) 与[测试报告](docs/test-report.md)。
@@ -98,19 +98,19 @@ irm https://github.com/gatesenman/foxos/releases/download/v0.3.2-os-preview/inst
 
 安装包还没有代码签名：Windows 首次运行时 SmartScreen 选「更多信息 → 仍要运行」；macOS 首次打开时在「应用程序」里按住 Control 点按 FoxOS → 「打开」（macOS 15 起到「系统设置 → 隐私与安全性」点「仍要打开」）。每个系统的细节、AppImage 与 ISO 的用法见 **[docs/install.md](docs/install.md)**。
 
-ISO 目前只提供两个分卷，下载后合并、校验：
+ISO（[v0.3.3-os-preview](https://github.com/gatesenman/foxos/releases/tag/v0.3.3-os-preview)）分三卷发布，每卷不到 1 GiB，下载后合并、校验（`SHA256SUMS` 在同一发布里）：
 
 ```bash
-cat FoxOS-0.3.2-amd64.iso.part1 FoxOS-0.3.2-amd64.iso.part2 > FoxOS-0.3.2-amd64.iso
+cat FoxOS-0.3.3-amd64.iso.part-00 FoxOS-0.3.3-amd64.iso.part-01 FoxOS-0.3.3-amd64.iso.part-02 > FoxOS-0.3.3-amd64.iso
 sha256sum -c SHA256SUMS --ignore-missing
 ```
 
 ```powershell
-cmd /c copy /b FoxOS-0.3.2-amd64.iso.part1+FoxOS-0.3.2-amd64.iso.part2 FoxOS-0.3.2-amd64.iso
-Get-FileHash -Algorithm SHA256 .\FoxOS-0.3.2-amd64.iso
+cmd /c copy /b FoxOS-0.3.3-amd64.iso.part-00+FoxOS-0.3.3-amd64.iso.part-01+FoxOS-0.3.3-amd64.iso.part-02 FoxOS-0.3.3-amd64.iso
+Get-FileHash -Algorithm SHA256 .\FoxOS-0.3.3-amd64.iso
 ```
 
-写 U 盘或在 Hyper-V 里启动见 [ISO 测试指南](docs/os-test-guide.md)。旧版本（`v0.3.1-os-preview`、`v0.3.0-os-preview`、Windows 伴侣程序 `v0.2.0-windows-preview`）仍在 [Releases](https://github.com/gatesenman/foxos/releases) 页面。
+写 U 盘或在 Hyper-V 里启动见 [ISO 测试指南](docs/os-test-guide.md)。旧版本（`v0.3.2-os-preview`、`v0.3.1-os-preview`、`v0.3.0-os-preview`、Windows 伴侣程序 `v0.2.0-windows-preview`）仍在 [Releases](https://github.com/gatesenman/foxos/releases) 页面。
 
 ## Windows 伴侣程序（在现有 Windows 桌面上运行，v0.2.0） / Windows companion app
 
