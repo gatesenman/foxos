@@ -1,14 +1,14 @@
 {
- "generated": "2026-11-12T07:03:11+08:00",
- "commit": "b42220a",
+ "generated": "2026-11-12T08:34:45+08:00",
+ "commit": "140ce4a",
  "cases": {
-  "pass": 233,
+  "pass": 236,
   "fail": 0,
   "skip": 19,
   "known": 1
  },
  "stories": {
-  "pass": 76,
+  "pass": 78,
   "fail": 0,
   "skip": 13,
   "known": 1,
@@ -830,6 +830,24 @@
    "title": "宿主应用里的智能体只在狐狸OS 虚拟电脑里动手；宿主执行要人明确打开并逐个确认",
    "status": "pass",
    "pass": 3,
+   "fail": 0,
+   "skip": 0,
+   "known": 0
+  },
+  {
+   "id": "US-156",
+   "title": "桌面客户端的「允许在本机执行」和 foxos bot host-access 是同一个开关（默认关，两边互相看得到）",
+   "status": "pass",
+   "pass": 2,
+   "fail": 0,
+   "skip": 0,
+   "known": 0
+  },
+  {
+   "id": "US-157",
+   "title": "Qwen Code 在狐狸OS 里默认要审批：写文件前弹审批卡片，拒绝则不写",
+   "status": "pass",
+   "pass": 1,
    "fail": 0,
    "skip": 0,
    "known": 0

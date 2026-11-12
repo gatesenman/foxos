@@ -1,6 +1,8 @@
-- **真实模型（US-140–US-145）：** 这些用例用 DeepSeek 的 OpenAI 兼容接口真实回答。密钥从 `~/.secrets/deepseek_api_key`（或 `FOXOS_TEST_DEEPSEEK_KEY_FILE`）读取，只经标准输入存进测试自己的密钥库，不出现在日志、截图和本报告里。这次运行有密钥文件，6 个都通过。没有密钥文件时它们**跳过**（不算失败），没有密钥的 CI 仍然是绿的。
+- **真实模型（US-140–US-145、US-157）：** 这些用例用 DeepSeek 的 OpenAI 兼容接口真实回答。密钥从 `~/.secrets/deepseek_api_key`（或 `FOXOS_TEST_DEEPSEEK_KEY_FILE`）读取，只经标准输入存进测试自己的密钥库，不出现在日志、截图和本报告里。这次运行有密钥文件，7 个都通过。没有密钥文件时它们**跳过**（不算失败），没有密钥的 CI 仍然是绿的。
 - **智能体窗口（US-146–US-154）：** 在自己的 Xvfb + xfwm4 桌面里打开真实的智能体窗口（Chrome 应用模式），用 Playwright 经 CDP 点界面。代码智能体是 opencode，这次用 `deepseek/deepseek-flash`。没有密钥时用 opencode 的默认免费模型，不需要密钥，但 opencode 对免费用量有上限，用完会报 “Free usage limit reached”。停靠用例检查 `_NET_WM_STRUT_PARTIAL`：窗口停靠时占住屏幕右边，最大化的窗口不盖住它，取消停靠后释放。截图在 `docs/screenshots/bots-e2e-*.png`。
 - **宿主保护（US-155）：** 在宿主应用里，智能体只在狐狸OS 虚拟电脑里动手。其余测试用 `FOXOS_PLACE=foxos` 模拟虚拟电脑里面。
+- **一个本机执行开关（US-156）：** 桌面客户端设置里的「允许在本机执行」和 `foxos bot host-access` 读写同一个状态文件。用例在客户端模式下打开真实的 Electron 设置窗口：在设置里打开后命令行看到已打开，在命令行里关掉后设置里也是关的，旧 `settings.json` 里的值不算数，智能体改不了这个开关。
+- **Qwen Code 默认要审批（US-157）：** 狐狸OS 用 `--approval-mode default` 启动 Qwen Code。去掉这个参数重跑同一个用例时，Qwen Code 不问就写了文件，用例失败；加上以后，拒绝时文件没有出现，批准后才写入。
 - **US-44 tasks 偶发失败的根因：** 等价检查先按“含数字”过滤控件，再把生成的 ID 归一化。tasks 的 ID 是 `Date.now().toString(36) + '-' + 6 位随机 base36`，有时含数字，有时不含。同一个下拉框因此在一次结果里被丢掉，在另一次里留成 `<id>`。模拟 10 万次，不一致率约 16%。现在先归一化再过滤，不一致率为 0。这次 tasks 通过。
-- **这次运行：** 合并 main（85f21b7）以后，在 06:14–06:52（UTC+8）完整跑了一遍 `npm run test:all`。只有 US-53 失败，原因是 main 新加的「狐狸电脑」程序（computer）不在图标测试的自带图标名单里。已补进名单，单独重跑后通过。本报告汇总的就是这两次的结果。
+- **这次运行：** 07:42–08:28（UTC+8）完整跑了一遍 `npm run test:all`，没有失败。photo-studio 仍是已知的上游缺陷。
 - **之前修过的问题：** 构建盒和其他构建共用机器，负载一度到 80–100。那时 US-41 calendar / signatures（桌面控制通道超时）、US-50 和智能体窗口（opencode 首次运行的版本检查超过 60 秒）都失败过。版本检查的超时已放宽到 240 秒。US-50 另有一个真问题：有 KVM 的宿主上，安装 Alpine 这类根文件系统条目时会优先选 linux-kvm，但这类条目没有可引导的磁盘。已改为不优先 linux-kvm。
