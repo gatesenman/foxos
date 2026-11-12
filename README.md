@@ -6,7 +6,7 @@
 
 <p align="center">
   <a href="https://github.com/gatesenman/foxos/releases/tag/v0.3.3-os-preview">下载可引导 ISO</a> ·
-  <a href="https://github.com/gatesenman/foxos/releases/tag/v0.3.3-windows-preview">Windows 伴侣预览</a> ·
+  <a href="https://github.com/gatesenman/foxos/releases/tag/v0.3.4-windows-preview">Windows 伴侣预览</a> ·
   <a href="#快速开始">快速开始</a> ·
   <a href="AGENTS.md">智能体接入</a> ·
   <a href="docs/os-test-guide.md">ISO 测试指南</a> ·
@@ -21,7 +21,7 @@
 
 狐狸OS 首先是一个**可引导、可安装的 Linux 操作系统**（Ubuntu 24.04 基础，默认中文，XFCE 桌面）。它给智能体（Claude Code、Codex、Gemini CLI 等 ACP / MCP 客户端）和人一个共同的真实桌面：每个窗口都是真实的 OS 进程。
 
-Windows 上的 `.exe` 是**伴侣程序**（预览版见 [v0.3.3-windows-preview](https://github.com/gatesenman/foxos/releases/tag/v0.3.3-windows-preview)），它是狐狸OS 虚拟电脑的客户端：显示来宾桌面和智能体聊天，所有动作都在狐狸OS 电脑里执行，本机执行默认关闭（见 [docs/windows-client.md](docs/windows-client.md)）；它不是这张 ISO 本身。我们不会在非 Apple 硬件上提供 macOS 系统镜像。
+Windows 上的 `.exe` 是**伴侣程序**（预览版见 [v0.3.4-windows-preview](https://github.com/gatesenman/foxos/releases/tag/v0.3.4-windows-preview)），它是狐狸OS 虚拟电脑的客户端：显示来宾桌面和智能体聊天，所有动作都在狐狸OS 电脑里执行，本机执行默认关闭（见 [docs/windows-client.md](docs/windows-client.md)）；它不是这张 ISO 本身。我们不会在非 Apple 硬件上提供 macOS 系统镜像。
 
 产品里的「环境」不依赖 Docker / Podman / QEMU 作为运行时：Linux 上来宾完整虚拟机走内核 KVM + cloud-hypervisor（Apache-2.0），轻量场景走命名空间。Docker Hub 只是可选的分发通道，见 [docs/docker.md](docs/docker.md)。
 

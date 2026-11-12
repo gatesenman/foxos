@@ -1,4 +1,4 @@
-# Windows 实机测试清单（v0.3.3-windows-preview）
+# Windows 实机测试清单（v0.3.4-windows-preview）
 
 给 Sarah 在真实 Windows 电脑上验收用。0.3.3 起，Windows 上的狐狸OS 是**狐狸OS 电脑的客户端**：
 智能体、应用中心、「打开 Word」、终端、文件都在狐狸OS 虚拟机（来宾）里执行，**不在 Windows 本机执行**；
@@ -22,23 +22,23 @@
 
 ```powershell
 # 一行安装（安装程序）
-irm https://github.com/gatesenman/foxos/releases/download/v0.3.3-windows-preview/install.ps1 | iex
+irm https://github.com/gatesenman/foxos/releases/download/v0.3.4-windows-preview/install.ps1 | iex
 # 便携版
-$env:FOXOS_PORTABLE = '1'; irm https://github.com/gatesenman/foxos/releases/download/v0.3.3-windows-preview/install.ps1 | iex
+$env:FOXOS_PORTABLE = '1'; irm https://github.com/gatesenman/foxos/releases/download/v0.3.4-windows-preview/install.ps1 | iex
 ```
 
-或从 [发布页](https://github.com/gatesenman/foxos/releases/tag/v0.3.3-windows-preview) 手动下载 `FoxOS-Setup-0.3.3-x64.exe` / `FoxOS-0.3.3-win-x64.zip`（arm64 同名换成 `arm64`），
+或从 [发布页](https://github.com/gatesenman/foxos/releases/tag/v0.3.4-windows-preview) 手动下载 `FoxOS-Setup-0.3.4-x64.exe` / `FoxOS-0.3.4-win-x64.zip`（arm64 同名换成 `arm64`），
 用 `Get-FileHash -Algorithm SHA256 <文件>` 和 `SHA256SUMS` 对照。
 
 - [ ] 脚本打印 `SHA-256 OK`；开始菜单出现「狐狸OS」
-- [ ] **新开**一个 PowerShell，运行 `foxos --version`，输出 `foxos 0.3.3`（0.2.0 的「foxos 不是内部或外部命令」不再出现）
+- [ ] **新开**一个 PowerShell，运行 `foxos --version`，输出 `foxos 0.3.4`（0.2.0 的「foxos 不是内部或外部命令」不再出现）
 - [ ] 截图①：`foxos --version` 的输出
 
 ## 2. 准备一台狐狸OS 电脑（来宾）
 
 客户端需要**狐狸OS 0.3.3 或更新**的来宾（0.3.2 及更早的 ISO 没有 SSH，连不上）。先看 [系统预览发布页](https://github.com/gatesenman/foxos/releases?q=os-preview&expanded=true) 有没有 0.3.3 或更新的 ISO：
 
-**A. 有 0.3.3+ ISO**：在 Hyper-V（专业版）或 VirtualBox 里新建虚拟机，内存 4 GB、磁盘 32 GB，挂 ISO 安装（[安装指南](os-test-guide.md)）。装好后在狐狸OS 终端：
+**A. 有 0.3.3+ ISO**（推荐 [v0.3.4-os-preview](https://github.com/gatesenman/foxos/releases/tag/v0.3.4-os-preview)，三个分卷合并后安装）：在 Hyper-V（专业版）或 VirtualBox 里新建虚拟机，内存 4 GB、磁盘 32 GB，挂 ISO 安装（[安装指南](os-test-guide.md)）。装好后在狐狸OS 终端：
 
 ```sh
 foxos --version                     # 0.3.3 或更新
@@ -64,7 +64,7 @@ ip -4 addr
 ## 3. 首次运行与连接
 
 - [ ] 双击启动，出现桌面（不是白屏 / 黑屏）；中文正常；「狐狸OS 电脑」窗口自动打开，显示「未连接」和连接页
-- [ ] 连接页最上面有「需要一台狐狸OS 电脑」说明（需要的版本、下载 ISO、开 SSH、新建或远程）。**这一块是发布后加的，0.3.3 预览安装包里可能还没有，没有就记「无」**
+- [ ] 连接页最上面有「需要一台狐狸OS 电脑」说明（需要的版本、下载 ISO、开 SSH、新建或远程）。（0.3.4 起随安装包提供；三个链接分别打开发布页、ISO 指南、客户端指南）
 - [ ] 截图②：首次运行的连接页
 - [ ] 「远程狐狸OS（SSH）」填：地址 = 虚拟机 IP，端口 22，用户 = 来宾用户名（狐狸OS 是 `foxos`），私钥 = 点「选择」选 `%USERPROFILE%\.ssh\id_ed25519` → 「连接」
 - [ ] 状态变成绿色「在线 · foxos 0.3.x」，几秒内窗口里出现**来宾的桌面画面**，能用鼠标点、键盘打字（试一下中文输入法、Windows 键）
