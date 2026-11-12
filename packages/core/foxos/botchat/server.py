@@ -552,7 +552,8 @@ def make_handler(st: State):
             # 窗口
             if parts == ["prefs"]:
                 p = save_prefs(b)
-                return {"prefs": p, "window": apply_window_mode(p)}
+                # 只改主题时不动窗口位置
+                return {"prefs": p, "window": apply_window_mode(p) if {"dock", "side", "width"} & set(b) else None}
             raise FoxError("NOT_FOUND", "/".join(parts))
 
         def _send_turn(self, bid: str, b: dict):

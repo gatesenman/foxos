@@ -6,7 +6,7 @@ const $$ = (s, r = document) => [...r.querySelectorAll(s)];
 const S = {
   lang: localStorage.getItem("foxos.lang") || "",
   dict: {}, bots: [], current: null, view: "chat", messages: {}, live: {}, running: {}, approvals: [], activity: [], control: {}, prefs: {},
-  machines: ["local"], skillsByBot: {}, agents: null, connectors: null, jobs: {}, attach: [], paused: {}, terminals: {}, desktopOwner: null,
+  machines: ["local"], skillsByBot: {}, agents: null, connectors: null, jobs: {}, attach: [], paused: {}, terminals: {}, desktopOwner: null, cardOpen: {},
 };
 const ICONS = ["sparkles", "robot", "code", "terminal-2", "search", "world", "pencil", "chart-bar", "bug", "book", "database", "brush", "mail",
   "calendar", "file-text", "shield-check", "rocket", "brain", "bolt", "cpu", "cloud", "palette", "flask", "briefcase", "music", "camera", "heart", "leaf"];
@@ -14,6 +14,17 @@ const COLORS = ["#E8743B", "#3B82F6", "#10B981", "#8B5CF6", "#EF4444", "#F59E0B"
 const KIND_ICON = { read: "file-search", edit: "pencil", delete: "trash", move: "arrows-move", search: "search", execute: "terminal-2", think: "bulb",
   fetch: "world-download", switch_mode: "switch-horizontal", other: "tool" };
 const ACP_KINDS = ["read", "edit", "delete", "move", "search", "execute", "fetch", "think", "other"];
+// 主题：设置里选「跟随系统 / 浅色 / 深色」；跟随系统时随系统切换
+const THEME_MQ = matchMedia("(prefers-color-scheme: dark)");
+const THEME_ICON = { auto: "device-desktop", light: "sun", dark: "moon" };
+function applyTheme() {
+  const p = (S.prefs && S.prefs.theme) || "auto";
+  document.documentElement.dataset.theme = p !== "auto" ? p : THEME_MQ.matches ? "dark" : "light";
+  const b = document.getElementById("btn-theme");
+  if (b) { b.innerHTML = `<i class="ti ti-${THEME_ICON[p] || THEME_ICON.auto}"></i>`; b.title = t("app.theme") + " · " + t("app.theme_" + p); }
+}
+applyTheme();
+THEME_MQ.addEventListener("change", applyTheme);
 
 // ------------------------------------------------------------------ 基础
 function t(key, ...args) {
@@ -64,15 +75,80 @@ async function loadLang(lang) {
   S.dict = await (await fetch(`locales/${lang}.json`)).json();
   applyI18n(); $("#lang").value = lang;
 }
+// Markdown（先转义再排版）：标题、段落、列表、引用、表格、分隔线、代码块（带语言和复制）、行内代码、粗体、斜体、删除线、链接。
+// 流式回复里没写完的代码块也按代码块显示。
 function md(text) {
-  // 极简 Markdown：代码块、行内代码、粗体、链接（全部先转义）
-  let s = esc(text || "");
-  s = s.replace(/```[\w-]*\n([\s\S]*?)```/g, (m, c) => `<pre>${c}</pre>`);
-  s = s.replace(/`([^`\n]+)`/g, "<code>$1</code>").replace(/\*\*([^*\n]+)\*\*/g, "<b>$1</b>");
-  s = s.replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank" rel="noopener">$1</a>');
-  return s;
+  const blocks = [];
+  let src = String(text || "").replace(/\r\n?/g, "\n");
+  src = src.replace(/(^|\n)```([\w+#.-]*)[^\n]*\n([\s\S]*?)(?:\n?```[ \t]*(?=\n|$)|$)/g, (m, pre, lang, code) => {
+    blocks.push(codeBlock(code, lang)); return `${pre}\u0000B${blocks.length - 1}\u0000\n`;
+  });
+  const lines = src.split("\n"), out = [], para = [];
+  const LIST = /^\s*([-*+]|\d+[.)])\s+/;
+  const flush = () => { if (para.length) { out.push(`<p>${para.map(inline).join("<br>")}</p>`); para.length = 0; } };
+  for (let i = 0; i < lines.length;) {
+    const ln = lines[i]; let m;
+    if ((m = ln.match(/^\u0000B(\d+)\u0000$/))) { flush(); out.push(blocks[+m[1]]); i++; continue; }
+    if (!ln.trim()) { flush(); i++; continue; }
+    if ((m = ln.match(/^(#{1,4})\s+(.*)$/))) { flush(); const n = m[1].length; out.push(`<h${n}>${inline(m[2])}</h${n}>`); i++; continue; }
+    if (/^\s*([-*_])(\s*\1){2,}\s*$/.test(ln)) { flush(); out.push("<hr>"); i++; continue; }
+    if (/^\s*>/.test(ln)) {
+      flush(); const q = [];
+      while (i < lines.length && /^\s*>/.test(lines[i])) q.push(lines[i++].replace(/^\s*>\s?/, ""));
+      out.push(`<blockquote>${md(q.join("\n"))}</blockquote>`); continue;
+    }
+    if (LIST.test(ln)) {
+      flush(); const ordered = /^\s*\d/.test(ln), start = ordered ? parseInt(ln.trim(), 10) : 1, items = [];
+      while (i < lines.length && LIST.test(lines[i]) && /^\s*\d/.test(lines[i]) === ordered) {
+        items.push(lines[i++].replace(LIST, ""));
+        while (i < lines.length && /^\s{2,}\S/.test(lines[i]) && !LIST.test(lines[i])) items[items.length - 1] += "\n" + lines[i++].trim();
+      }
+      const tag = ordered ? "ol" : "ul";
+      out.push(`<${tag}${ordered && start !== 1 ? ` start="${start}"` : ""}>${items.map(x => `<li>${x.split("\n").map(inline).join("<br>")}</li>`).join("")}</${tag}>`); continue;
+    }
+    if (/^\s*\|.*\|\s*$/.test(ln) && /^\s*\|?\s*:?-{2,}/.test(lines[i + 1] || "")) {
+      flush(); const row = r => r.trim().replace(/^\||\|$/g, "").split("|").map(c => c.trim());
+      const head = row(ln); i += 2; const body = [];
+      while (i < lines.length && /^\s*\|.*\|\s*$/.test(lines[i])) body.push(row(lines[i++]));
+      out.push(`<table><thead><tr>${head.map(c => `<th>${inline(c)}</th>`).join("")}</tr></thead><tbody>${body.map(r => `<tr>${r.map(c => `<td>${inline(c)}</td>`).join("")}</tr>`).join("")}</tbody></table>`); continue;
+    }
+    para.push(ln); i++;
+  }
+  flush();
+  return out.join("");
 }
-
+function inline(s) {
+  const codes = [];
+  let x = String(s).replace(/`([^`\n]+)`/g, (m, c) => { codes.push(c); return `\u0001${codes.length - 1}\u0001`; });
+  x = esc(x)
+    .replace(/\*\*([^*\n]+)\*\*/g, "<strong>$1</strong>")
+    .replace(/(^|[^\w*])\*([^*\s][^*\n]*)\*(?!\w)/g, "$1<em>$2</em>")
+    .replace(/~~([^~\n]+)~~/g, "<del>$1</del>")
+    .replace(/\[([^\]\n]+)\]\((https?:\/\/[^\s)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>')
+    .replace(/(^|[\s(（])(https?:\/\/[^\s<]*[^\s<.,;:!?)\]'"。，；：！？）])/g, '$1<a href="$2" target="_blank" rel="noopener">$2</a>');
+  return x.replace(/\u0001(\d+)\u0001/g, (m, k) => `<code>${esc(codes[+k])}</code>`);
+}
+function codeBlock(code, lang) {
+  return `<div class="code-block"><div class="code-head"><span>${esc(lang || "text")}</span><span class="grow"></span>` +
+    `<button class="copy-btn" data-copy type="button"><i class="ti ti-copy"></i><span>${esc(t("chat.copy"))}</span></button></div><pre>${esc(code)}</pre></div>`;
+}
+async function copyText(txt) {
+  try { await navigator.clipboard.writeText(txt); return; } catch { /* 页面没有剪贴板权限时退回旧方法 */ }
+  const ta = Object.assign(document.createElement("textarea"), { value: txt }); ta.style.position = "fixed"; ta.style.opacity = "0";
+  document.body.append(ta); ta.select(); document.execCommand("copy"); ta.remove();
+}
+document.addEventListener("click", e => {
+  const b = e.target.closest("[data-copy]"); if (!b) return;
+  const blk = b.closest(".code-block");
+  copyText(blk ? blk.querySelector("pre").textContent : b.dataset.copy || "").then(() => {
+    b.classList.add("done"); const ic = b.querySelector("i"); if (ic) ic.className = "ti ti-check";
+    const sp = b.querySelector("span"); const old = sp && sp.textContent; if (sp) sp.textContent = t("chat.copied");
+    setTimeout(() => { b.classList.remove("done"); if (ic) ic.className = "ti ti-copy"; if (sp) sp.textContent = old; }, 1400);
+  });
+});
+function emptyState(icon, title, text, cls = "small") {
+  return `<div class="empty ${cls}"><span class="big"><i class="ti ti-${esc(icon)}"></i></span>${title ? `<b>${esc(title)}</b>` : ""}${text ? `<p>${esc(text)}</p>` : ""}</div>`;
+}
 // ------------------------------------------------------------------ 状态与事件
 async function refreshState() {
   const st = await api("GET", "state");
@@ -80,8 +156,7 @@ async function refreshState() {
   S.activity = st.activity || []; S.paused = st.paused || {}; S.desktopOwner = st.desktop_owner;
   S.running = Object.fromEntries(Object.entries(st.running || {}).map(([k, v]) => [k, v.turn || true]));
   if (!S.current || !botById(S.current)) S.current = (S.bots.find(b => b.main) || S.bots[0])?.id;
-  if (S.prefs.theme && S.prefs.theme !== "auto") document.documentElement.dataset.theme = S.prefs.theme;
-  else document.documentElement.dataset.theme = matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+  applyTheme();
   renderSidebar(); renderActing();
 }
 function connectEvents() {
@@ -140,24 +215,34 @@ function renderSidebar() {
   const q = ($("#bot-search").value || "").toLowerCase();
   const list = S.bots.filter(b => !b.hidden || b.id === S.current).filter(b => !q || (b.name + " " + (b.title || "") + " " + b.id).toLowerCase().includes(q));
   list.sort((a, b) => (b.main - a.main) || (b.pinned - a.pinned) || a.name.localeCompare(b.name));
+  $("#bot-count").textContent = S.bots.length || "";
   const el = $("#bot-list"); el.innerHTML = "";
+  if (!list.length) el.innerHTML = emptyState(q ? "search" : "robot-off", q ? t("bots.no_match") : t("bots.none"), "");
   for (const b of list) {
-    const it = h(`<div class="bot-item ${b.id === S.current && S.view === "chat" ? "active" : ""}" data-id="${esc(b.id)}">
+    const it = h(`<div class="bot-item ${b.id === S.current && S.view === "chat" ? "active" : ""}" data-id="${esc(b.id)}" title="${esc(b.name)}">
       ${avatar(b, "", `<span class="dot" data-dot="${esc(b.id)}"></span>`)}
       <div class="meta"><div class="name">${esc(b.name)}${b.main ? ` <span class="chip accent">${esc(t("bots.main"))}</span>` : ""}</div>
-      <div class="sub" data-sub="${esc(b.id)}">${esc(b.title || b.role || "")}</div></div>
+      <div class="sub" data-sub="${esc(b.id)}"></div></div>
       ${b.pinned && !b.main ? '<i class="ti ti-pin pin"></i>' : ""}</div>`);
     it.onclick = () => openBot(b.id);
     el.append(it);
   }
   updateBotDots();
 }
+function botState(b) {
+  if (!b.active) return "off";
+  if (S.paused[b.id] || (S.control?.paused && !(S.control.state?.targets?.length))) return "paused";
+  return S.running[b.id] ? "busy" : "";
+}
 function updateBotDots() {
   for (const b of S.bots) {
     const d = $(`[data-dot="${CSS.escape(b.id)}"]`); if (!d) continue;
-    d.className = "dot " + (!b.active ? "off" : S.paused[b.id] || S.control?.paused && !(S.control.state?.targets?.length) ? "paused" : S.running[b.id] ? "busy" : "");
+    const st = botState(b);
+    d.className = "dot " + st;
     const sub = $(`[data-sub="${CSS.escape(b.id)}"]`);
-    if (sub) sub.innerHTML = S.running[b.id] ? `<span class="state">${esc(t("bots.working"))}</span>` : esc(b.title || b.role || "");
+    if (sub) sub.innerHTML = st === "busy" ? `<span class="state"><i class="ti ti-loader-2 spin"></i>${esc(t("bots.working"))}</span>`
+      : st === "paused" ? `<span class="state" style="color:var(--warn)">${esc(t("bots.paused"))}</span>`
+      : st === "off" ? esc(t("bots.inactive")) : esc(b.title || b.role || "");
   }
 }
 function renderActing() {
@@ -178,6 +263,8 @@ function renderTakeover() {
   const b = $("#btn-takeover"); const on = !!S.control?.paused;
   b.classList.toggle("on", on);
   b.innerHTML = on ? `<i class="ti ti-player-play"></i><span>${esc(t("control.resume"))}</span>` : `<i class="ti ti-hand-stop"></i><span>${esc(t("control.take_over"))}</span>`;
+  b.title = on ? t("control.resume_tip") : t("control.take_over_tip");
+  if (S.view === "chat") renderBanner();
 }
 
 // ------------------------------------------------------------------ 对话
@@ -196,40 +283,44 @@ async function loadSkillsFor(id) {
 }
 function renderChat() {
   const b = botById(S.current); const v = $("#view");
-  if (!b) { v.innerHTML = `<div class="empty">${esc(t("bots.none"))}</div>`; return; }
+  if (!b) { v.innerHTML = emptyState("robot", t("bots.none"), t("bots.none_help"), ""); return; }
   const mach = b.machines || {}; const allowed = mach.allowed || ["local"];
   const paused = S.paused[b.id];
   v.innerHTML = `
   <div class="chat-head">
-    <button class="icon-btn only-narrow" id="btn-side"><i class="ti ti-menu-2"></i></button>
+    <button class="icon-btn only-narrow" id="btn-side" title="${esc(t("app.menu"))}"><i class="ti ti-menu-2"></i></button>
     ${avatar(b, "lg")}
     <div class="title"><b>${esc(b.name)}</b>
-      <div class="sub">${esc(b.title || "")}
-        ${backendLabel(b)}
+      <div class="sub">${b.title ? `<span class="hide-narrow">${esc(b.title)}</span>` : ""}
         <span class="chip" title="${esc(t("chat.machine_tip"))}"><i class="ti ti-device-desktop"></i>
           <select id="sel-machine">${allowed.map(m => `<option value="${esc(m)}" ${m === (mach.default || "local") ? "selected" : ""}>${esc(m === "local" ? t("machines.local") : m)}</option>`).join("")}</select></span>
-        <span class="chip"><i class="ti ti-folder"></i>${esc(b.scope || ".")}</span>
-        ${b.isolated ? `<span class="chip"><i class="ti ti-lock"></i>${esc(t("settings.isolated"))}</span>` : ""}
+        <span class="chip hide-narrow" title="${esc(t("settings.scope"))}"><i class="ti ti-folder"></i>${esc(b.scope || ".")}</span>
+        ${b.isolated ? `<span class="chip hide-narrow"><i class="ti ti-lock"></i>${esc(t("settings.isolated"))}</span>` : ""}
       </div></div>
-    <button class="btn sm ghost" id="btn-pause-bot" title="${esc(t("chat.pause_bot_tip"))}"><i class="ti ti-${paused ? "player-play" : "player-pause"}"></i>${esc(paused ? t("control.resume") : t("chat.pause_bot"))}</button>
-    <button class="icon-btn" id="btn-reset" title="${esc(t("chat.new_conversation"))}"><i class="ti ti-message-plus"></i></button>
-    <button class="icon-btn" id="btn-settings" title="${esc(t("chat.settings"))}"><i class="ti ti-settings"></i></button>
+    <div class="acts">
+      <button class="btn sm ghost" id="btn-pause-bot" title="${esc(t("chat.pause_bot_tip"))}"><i class="ti ti-${paused ? "player-play" : "player-pause"}"></i><span class="hide-narrow">${esc(paused ? t("control.resume") : t("chat.pause_bot"))}</span></button>
+      <button class="icon-btn" id="btn-reset" title="${esc(t("chat.new_conversation"))}"><i class="ti ti-message-plus"></i></button>
+      <button class="icon-btn" id="btn-settings" title="${esc(t("chat.settings"))}"><i class="ti ti-settings"></i></button>
+    </div>
   </div>
+  <div id="chat-banner"></div>
   <div class="messages" id="messages"><div class="msgs-inner" id="msgs"></div></div>
   <div class="composer-wrap"><div class="composer" id="composer">
     <div class="attach-list" id="attach-list"></div>
-    <textarea id="input" rows="2" placeholder="${esc(t("chat.placeholder", b.name))}"></textarea>
+    <textarea id="input" rows="1" placeholder="${esc(t("chat.placeholder", b.name))}"></textarea>
     <div class="row">
       <button class="icon-btn" id="btn-attach" title="${esc(t("chat.attach"))}"><i class="ti ti-paperclip"></i></button>
       <button class="icon-btn" id="btn-mention" title="${esc(t("chat.mention"))}"><i class="ti ti-at"></i></button>
       <button class="icon-btn" id="btn-skill" title="${esc(t("chat.skill"))}"><i class="ti ti-slash"></i></button>
+      <label class="picker" id="picker" title="${esc(t("chat.backend_tip"))}"></label>
       <span class="grow"></span>
-      <span class="chip" id="hint-keys">${esc(t("chat.enter_hint"))}</span>
-      <button class="btn sm danger hidden" id="btn-stop"><i class="ti ti-player-stop"></i>${esc(t("chat.stop"))}</button>
-      <button class="btn primary sm" id="btn-send"><i class="ti ti-send"></i>${esc(t("chat.send"))}</button>
+      <span class="hint" id="hint-keys">${esc(t("chat.enter_hint"))}</span>
+      <button class="send-btn stop hidden" id="btn-stop" title="${esc(t("chat.stop"))}"><i class="ti ti-player-stop"></i></button>
+      <button class="send-btn" id="btn-send" title="${esc(t("chat.send"))}"><i class="ti ti-arrow-up"></i></button>
     </div>
     <input type="file" id="file" multiple class="hidden">
   </div></div>`;
+  renderPicker(); renderBanner();
   $("#btn-side").onclick = () => $("#app").classList.toggle("side-open");
   $("#btn-settings").onclick = () => openSettings(b.id);
   $("#btn-reset").onclick = () => confirmModal(t("chat.new_conversation"), t("chat.reset_confirm", b.name), async () => {
@@ -241,17 +332,48 @@ function renderChat() {
     if (popupKey(ev)) return;
     if (ev.key === "Enter" && !ev.shiftKey && !ev.isComposing) { ev.preventDefault(); send(); }
   };
-  inp.oninput = () => { inp.style.height = "auto"; inp.style.height = Math.min(220, inp.scrollHeight) + "px"; updatePopup(); };
+  inp.oninput = () => { inp.style.height = "auto"; inp.style.height = Math.min(240, inp.scrollHeight) + "px"; updatePopup(); };
   $("#btn-send").onclick = send;
   $("#btn-stop").onclick = () => guard(() => api("POST", `bots/${b.id}/cancel`, {}));
   $("#btn-attach").onclick = () => $("#file").click();
   $("#file").onchange = e => uploadFiles([...e.target.files]);
   $("#btn-mention").onclick = () => { insertAtCursor("@"); updatePopup(); };
   $("#btn-skill").onclick = () => { if (!inp.value) inp.value = "/"; inp.focus(); updatePopup(); };
-  $("#composer").ondragover = e => e.preventDefault();
-  $("#composer").ondrop = e => { e.preventDefault(); uploadFiles([...e.dataTransfer.files]); };
+  const comp = $("#composer");
+  comp.ondragover = e => { e.preventDefault(); comp.classList.add("drag"); };
+  comp.ondragleave = () => comp.classList.remove("drag");
+  comp.ondrop = e => { e.preventDefault(); comp.classList.remove("drag"); uploadFiles([...e.dataTransfer.files]); };
   inp.onpaste = e => { const f = [...(e.clipboardData?.files || [])]; if (f.length) { e.preventDefault(); uploadFiles(f); } };
   inp.focus();
+}
+// 输入框里的代码智能体 / 模型选择：换成另一个已安装的 ACP 智能体；模型后端在设置里改
+function renderPicker() {
+  const el = $("#picker"); const b = botById(S.current); if (!el || !b) return;
+  const be = b.backend || {};
+  const agents = [{ id: "foxos-local", name: t("agents.local") }, ...(S.agents?.installed || []).filter(a => a.id !== "foxos-local")];
+  if (be.kind !== "model" && be.agent && !agents.some(a => a.id === be.agent)) agents.push({ id: be.agent, name: be.agent });
+  const opts = agents.map(a => `<option value="acp:${esc(a.id)}" ${be.kind !== "model" && (be.agent || "foxos-local") === a.id ? "selected" : ""}>${esc(a.name)}${be.kind !== "model" && be.agent === a.id && b.model ? " · " + esc(b.model) : ""}</option>`);
+  if (be.kind === "model") opts.unshift(`<option value="model" selected>${esc(t("chat.model_backend", be.model || ""))}</option>`);
+  el.innerHTML = `${be.kind === "model" ? '<i class="ti ti-cpu"></i>' : agentIcon(be.agent || "foxos-local")}<select id="sel-backend">${opts.join("")}</select>`;
+  $("#sel-backend").onchange = e => guard(async () => {
+    const v2 = e.target.value; if (!v2.startsWith("acp:")) return;
+    await api("PATCH", `bots/${b.id}`, { agent: v2.slice(4) }); await refreshState(); renderPicker();
+    toast(t("chat.backend_set", e.target.selectedOptions[0].textContent));
+  });
+}
+// 人工接管 / 暂停这个智能体时，在对话上方说清楚
+function renderBanner() {
+  const el = $("#chat-banner"); const b = botById(S.current); if (!el || !b) return;
+  const all = S.control?.paused && !(S.control.state?.targets?.length);
+  const some = S.control?.paused && (S.control.state?.targets || []).some(x => x === "bot:" + b.id || x.startsWith("bot:" + b.id + "/"));
+  const mine = S.paused[b.id];
+  if (!(all || some || mine)) { el.innerHTML = ""; return; }
+  el.innerHTML = `<div class="banner ${all || some ? "" : "warn"}"><i class="ti ti-hand-stop"></i><span class="grow">${esc(all || some ? t("chat.banner_takeover") : t("chat.banner_paused", b.name))}</span>
+    <button class="btn sm" id="btn-banner-resume"><i class="ti ti-player-play"></i>${esc(t("control.resume"))}</button></div>`;
+  $("#btn-banner-resume").onclick = () => guard(async () => {
+    await api("POST", all || some ? "control/resume" : `bots/${b.id}/resume`, all || some ? { reason: "ui" } : {});
+    await refreshState(); renderTakeover(); renderChat(); renderMessages(true);
+  });
 }
 function insertAtCursor(txt) {
   const inp = $("#input"); const p = inp.selectionStart ?? inp.value.length;
@@ -328,86 +450,121 @@ let renderTimer = null;
 function renderMessagesSoon() { if (!renderTimer) renderTimer = requestAnimationFrame(() => { renderTimer = null; renderMessages(); }); }
 function renderMessages(scroll) {
   const box = $("#msgs"); if (!box) return;
-  const wrap = $("#messages"); const atBottom = wrap.scrollHeight - wrap.scrollTop - wrap.clientHeight < 80;
+  const wrap = $("#messages"); const atBottom = wrap.scrollHeight - wrap.scrollTop - wrap.clientHeight < 120;
   const b = botById(S.current); const msgs = S.messages[S.current] || []; const L = S.live[S.current];
-  const parts = [];
-  if (!msgs.length && !L) {
-    const others = S.bots.filter(x => x.id !== b.id && x.active !== false).slice(0, 3);
-    parts.push(`<div class="empty">${avatar(b, "lg")}<h2>${esc(b.name)}</h2><p>${esc(b.role || t("chat.empty"))}</p>
-      <div class="suggest">${[t("chat.try_hello"), ...others.map(o => "@" + o.name + " " + t("chat.try_delegate")), "/architect " + t("chat.try_skill")]
-        .map(s => `<button class="btn sm" data-suggest="${esc(s)}">${esc(s)}</button>`).join("")}</div></div>`);
-  }
-  for (const m of msgs) parts.push(renderMsg(m, b));
-  if (L) {
-    if (L.user && !msgs.some(m => m.id === L.user.id)) parts.push(renderMsg(L.user, b));
-    parts.push(renderMsg({ role: "bot", bot: b.id, text: L.text, cards: L.order.map(id => L.cards[id]), plan: L.plan, skills_used: L.skills, live: true, thoughts: L.thoughts, machine: (b.machines || {}).default }, b));
-  } else if (S.running[S.current]) {
-    parts.push(renderMsg({ role: "bot", bot: b.id, text: "", cards: [], live: true }, b));
-  }
-  box.innerHTML = parts.join("");
-  $$("[data-suggest]", box).forEach(x => x.onclick = () => { $("#input").value = x.dataset.suggest; $("#input").focus(); });
-  $$(".card-head", box).forEach(hd => hd.onclick = ev => { if (ev.target.closest("button")) return; hd.parentElement.classList.toggle("collapsed"); });
-  $$("[data-approve]", box).forEach(x => x.onclick = () => answerApproval(x.dataset.approve, x.dataset.option || null));
-  $$("[data-open-bot]", box).forEach(x => x.onclick = () => openBot(x.dataset.openBot));
   const running = !!S.running[S.current];
+  if (!$("#msgs-static", box)) { box.innerHTML = `<div id="msgs-static" style="display:contents"></div><div id="msgs-live" style="display:contents"></div>`; renderMessages.sig = ""; }
+  // 已经结束的消息只在有变化时重画；正在进行的回合每帧只重画它自己（滚动、选中的文字、展开的卡片都不受影响）
+  const sig = [S.current, msgs.length, msgs.length && msgs[msgs.length - 1].id, S.lang, !!(L || running)].join("|");
+  if (scroll || sig !== renderMessages.sig) {
+    renderMessages.sig = sig;
+    const parts = [];
+    if (!msgs.length && !L && !running) {
+      const others = S.bots.filter(x => x.id !== b.id && x.active !== false).slice(0, 1);
+      const sug = [["hand-finger-right", t("chat.try_hello")], ...others.map(o => ["at", "@" + o.name + " " + t("chat.try_delegate")]), ["slash", "/architect " + t("chat.try_skill")]];
+      parts.push(`<div class="empty">${avatar(b, "xl")}<h2>${esc(b.name)}</h2><p>${esc(b.role || b.title || t("chat.empty"))}</p>
+        <p class="help">${esc(t("chat.empty_help"))}</p>
+        <div class="suggest">${sug.map(([ic, s]) => `<button data-suggest="${esc(s)}"><i class="ti ti-${ic}"></i><span>${esc(s)}</span></button>`).join("")}</div></div>`);
+    }
+    for (const m of msgs) parts.push(renderMsg(m, b));
+    const st = $("#msgs-static", box); st.innerHTML = parts.join(""); bindMsgs(st);
+  }
+  let live = "";
+  if (L) {
+    if (L.user && !msgs.some(m => m.id === L.user.id)) live += renderMsg(L.user, b);
+    live += renderMsg({ role: "bot", bot: b.id, text: L.text, cards: L.order.map(id => L.cards[id]), plan: L.plan, skills_used: L.skills, live: true, thoughts: L.thoughts, machine: (b.machines || {}).default }, b);
+  } else if (running) {
+    live = renderMsg({ role: "bot", bot: b.id, text: "", cards: [], live: true }, b);
+  }
+  const lv = $("#msgs-live", box);
+  if (lv.innerHTML !== live) { lv.innerHTML = live; bindMsgs(lv); }
   $("#btn-stop")?.classList.toggle("hidden", !running);
   if (scroll || atBottom) wrap.scrollTop = wrap.scrollHeight;
+}
+function bindMsgs(root) {
+  $$("[data-suggest]", root).forEach(x => x.onclick = () => { const i = $("#input"); i.value = x.dataset.suggest; i.focus(); i.oninput(); });
+  $$(".card-head", root).forEach(hd => hd.onclick = ev => {
+    if (ev.target.closest("button, select, a")) return;
+    const c = hd.parentElement; if (!$(".card-body", c)) return;
+    c.classList.toggle("collapsed"); if (c.dataset.card) S.cardOpen[c.dataset.card] = !c.classList.contains("collapsed");
+  });
+  $$("[data-approve]", root).forEach(x => x.onclick = () => { x.disabled = true; answerApproval(x.dataset.approve, x.dataset.option || null); });
+  $$("[data-open-bot]", root).forEach(x => x.onclick = () => openBot(x.dataset.openBot));
 }
 function renderMsg(m, b) {
   if (m.role === "user") {
     const from = m.from && m.from !== "human" ? m.from : "";
     const fromBot = from.startsWith("bot:") ? botById(from.slice(4).split(/[/@]/)[0]) : null;
-    const who = fromBot ? `${avatar(fromBot, "sm")} ${esc(t("chat.from_bot", fromBot.name))}` : from ? esc(from) : "";
-    return `<div class="msg user">${fromBot ? avatar(fromBot) : ""}<div class="body">${who ? `<div class="who">${who}</div>` : ""}
-      ${m.text ? `<div class="bubble">${md(m.text)}</div>` : ""}
+    const who = fromBot ? `<b>${esc(fromBot.name)}</b><span>${esc(t("chat.from_bot", fromBot.name))}</span>` : from ? `<span>${esc(from)}</span>` : "";
+    return `<div class="msg user${fromBot ? " from-bot" : ""}">${fromBot ? avatar(fromBot) : ""}<div class="body">${who ? `<div class="who">${who}</div>` : ""}
+      ${m.text ? `<div class="bubble prose">${md(m.text)}</div>` : ""}
       ${(m.attachments || []).length ? `<div class="attach-list">${m.attachments.map(a => `<span class="chip"><i class="ti ti-file"></i>${esc(a.split("/").pop())}</span>`).join("")}</div>` : ""}
-      ${m.envelope ? `<div class="chip">${esc(t("chat.handoff", m.envelope.from || ""))}</div>` : ""}</div></div>`;
+      ${m.envelope ? `<span class="chip"><i class="ti ti-arrow-forward-up"></i>${esc(t("chat.handoff", m.envelope.from || ""))}</span>` : ""}</div></div>`;
   }
   const bot = botById(m.bot) || b;
-  const cards = (m.cards || []).map(c => renderCard(c, m)).join("");
-  const skills = (m.skills_used || []).length ? `<div class="skills-used"><i class="ti ti-books"></i>${esc(t("chat.skills_used"))}${m.skills_used.map(s => `<span class="chip accent">${esc(s)}</span>`).join("")}</div>` : "";
-  const plan = (m.plan || []).length ? `<div class="card"><div class="card-head"><span class="ico"><i class="ti ti-list-check"></i></span><span class="t">${esc(t("chat.plan"))}</span></div>
-    <div class="card-body">${m.plan.map(p => `<div><i class="ti ti-${p.status === "completed" ? "circle-check" : p.status === "in_progress" ? "loader" : "circle"}"></i> ${esc(p.content)}</div>`).join("")}</div></div>` : "";
+  const cardsArr = (m.cards || []).filter(Boolean);
+  const cards = cardsArr.map(c => renderCard(c, m)).join("");
+  const skills = (m.skills_used || []).length ? `<div class="skills-used"><i class="ti ti-books"></i>${esc(t("chat.skills_used"))}${m.skills_used.map(s => `<span class="chip accent">/${esc(s)}</span>`).join("")}</div>` : "";
+  const plan = (m.plan || []).length ? renderPlan(m.plan, m.live) : "";
   const meta = [m.ts ? fmtTime(m.ts) : "", m.duration_ms ? (m.duration_ms / 1000).toFixed(1) + "s" : "", m.machine && m.machine !== "local" ? "@" + m.machine : "",
     m.origin && !["person", "mention"].includes(m.origin) ? t("origin." + m.origin) : ""].filter(Boolean).join(" · ");
   const text = m.text || "";
-  return `<div class="msg bot">${avatar(bot)}<div class="body"><div class="who"><b>${esc(bot.name)}</b> ${esc(meta)}</div>
+  const busy = cardsArr.some(c => ["in_progress", "pending"].includes(c.status) || c.approval?.decision === "pending");
+  let body = "";
+  if (text) {
+    const html = md(text);
+    body = `<div class="prose">${m.live ? (html.endsWith("</p>") ? html.slice(0, -4) + '<span class="caret"></span></p>' : html + '<span class="caret"></span>') : html}</div>`;
+  } else if (m.live && !busy) body = `<div class="typing"><span></span><span></span><span></span><small>${esc(t(cardsArr.length ? "chat.working" : "chat.thinking"))}</small></div>`;
+  const tools = !m.live && text ? `<span class="tools"><button class="icon-btn" data-copy="${esc(text)}" title="${esc(t("chat.copy"))}"><i class="ti ti-copy"></i></button></span>` : "";
+  return `<div class="msg bot${m.live ? " live" : ""}">${avatar(bot)}<div class="body"><div class="who"><b>${esc(bot.name)}</b>${meta ? `<span>${esc(meta)}</span>` : ""}${m.live ? `<span class="chip accent"><i class="ti ti-loader-2 spin"></i>${esc(t("chat.replying"))}</span>` : ""}${tools}</div>
     ${m.thoughts ? `<div class="thought">${esc(m.thoughts.slice(-600))}</div>` : ""}
-    ${plan}${cards}
-    ${text || m.live ? `<div class="bubble ${m.live ? "caret" : ""}">${md(text)}</div>` : ""}
+    ${plan}${cards}${body}
     ${skills}
-    ${m.error ? `<div class="chip bad"><i class="ti ti-alert-triangle"></i>${esc(m.error.message)}</div>` : ""}</div></div>`;
+    ${m.error ? `<div class="err"><i class="ti ti-alert-triangle"></i><span>${esc(m.error.message)}</span></div>` : ""}</div></div>`;
+}
+function renderPlan(plan, live) {
+  const done = plan.filter(p => p.status === "completed").length;
+  const id = "plan:" + (live ? "live" : plan.map(p => p.content).join("|").slice(0, 60));
+  const open = S.cardOpen[id] ?? !!live;
+  return `<div class="card ${open ? "" : "collapsed"}" data-card="${esc(id)}"><div class="card-head"><span class="ico"><i class="ti ti-list-check"></i></span>
+    <span class="t">${esc(t("chat.plan"))}<small>${done}/${plan.length}</small></span><i class="ti ti-chevron-down chev"></i></div>
+    <div class="card-body">${plan.map(p => `<div class="plan-row ${esc(p.status || "")}"><i class="ti ti-${p.status === "completed" ? "circle-check" : p.status === "in_progress" ? "progress" : "circle"}"></i><span>${esc(p.content)}</span></div>`).join("")}</div></div>`;
 }
 function renderCard(c, m) {
   if (c.type === "delegation") return renderDelegation(c);
   const st = c.status || "pending";
-  const mach = c.machine && c.machine !== "local" ? `<span class="chip"><i class="ti ti-device-desktop"></i>${esc(c.machine)}</span>` : `<span class="chip"><i class="ti ti-device-desktop"></i>${esc(t("machines.local"))}</span>`;
+  const mach = c.machine && c.machine !== "local" ? `<span class="chip"><i class="ti ti-device-desktop"></i>${esc(c.machine)}</span>` : "";
   const body = [];
   for (const x of c.content || []) {
     if (x.type === "diff") body.push(renderDiff(x));
     else if (x.type === "terminal") { const T = S.terminals[x.terminalId]; body.push(`<div class="term">${T ? `<span class="cmd">$ ${esc(T.command)}</span>\n${esc(T.output)}` : esc(t("chat.terminal_gone"))}</div>`); }
-    else if (x.type === "content" && x.content?.type === "text" && x.content.text) body.push(`<div class="${c.kind === "execute" ? "term" : "bubble"}">${esc(x.content.text.slice(0, 6000))}</div>`);
+    else if (x.type === "content" && x.content?.type === "text" && x.content.text) body.push(`<div class="${c.kind === "execute" ? "term" : "out"}">${esc(x.content.text.slice(0, 6000))}</div>`);
   }
   if (!body.length && c.rawInput && Object.keys(c.rawInput).length) body.push(`<div class="mono">${esc(JSON.stringify(c.rawInput).slice(0, 800))}</div>`);
-  for (const l of c.locations || []) body.push(`<div class="chip"><i class="ti ti-file"></i>${esc(l.path)}${l.line ? ":" + l.line : ""}</div>`);
+  if ((c.locations || []).length) body.push(`<div class="attach-list">${c.locations.map(l => `<span class="chip"><i class="ti ti-file"></i>${esc(l.path)}${l.line ? ":" + l.line : ""}</span>`).join("")}</div>`);
   const ap = c.approval || {};
+  const asking = ap.decision === "pending" && ap.request;
   let apHtml = "";
-  if (ap.decision === "pending" && ap.request) {
-    apHtml = `<div class="approval"><div class="q"><i class="ti ti-shield-question"></i> ${esc(t("approvals.question"))}</div>
-      ${(ap.options || []).map(o => `<button class="btn sm ${String(o.kind).startsWith("allow") ? "primary" : ""}" data-approve="${esc(ap.request)}" data-option="${esc(o.optionId)}">${esc(optName(o))}</button>`).join("")}</div>`;
+  if (asking) {
+    const who = botById(m?.bot)?.name || "";
+    apHtml = `<div class="approval ask"><div class="q"><i class="ti ti-shield-lock"></i>${esc(t("approvals.needs_you"))}<small>${esc(t("approvals.wants", who, c.title || t("kind." + (c.kind || "other"))))}</small></div>
+      ${(ap.options || []).map(o => { const k = String(o.kind); const cls = k === "allow_once" ? "primary" : k.startsWith("allow") ? "primary soft" : "danger";
+        return `<button class="btn sm ${cls}" data-approve="${esc(ap.request)}" data-option="${esc(o.optionId)}"><i class="ti ti-${k.startsWith("allow") ? "check" : "x"}"></i>${esc(optName(o))}</button>`; }).join("")}</div>`;
   } else if (ap.decision) {
     apHtml = `<div class="approval"><span class="chip ${ap.decision === "allow" ? "ok" : "bad"}"><i class="ti ti-${ap.decision === "allow" ? "check" : "x"}"></i>${esc(t("approvals." + ap.decision))}</span><small>${esc(ap.by ? t("approvals.by", ["rule", "takeover", "timeout"].includes(ap.by) ? t("approvals.by_" + ap.by) : ap.by === "human" ? t("origin.person") : ap.by) : "")}</small></div>`;
   }
-  const collapsed = st === "completed" && !(c.content || []).some(x => x.type === "diff") && ap.decision !== "pending";
-  return `<div class="card ${collapsed ? "collapsed" : ""}"><div class="card-head"><span class="ico"><i class="ti ti-${KIND_ICON[c.kind] || "tool"}"></i></span>
-    <span class="t">${esc(c.title || c.kind || t("chat.tool"))}</span>${mach}<span class="st ${esc(st)}">${statusIcon(st)}${esc(t("status." + st))}</span></div>
+  const hasDiff = (c.content || []).some(x => x.type === "diff");
+  const auto = st === "completed" && !hasDiff && !asking;
+  const collapsed = !asking && body.length && !(S.cardOpen[c.id] ?? !auto);
+  return `<div class="card st-${esc(st)}${asking ? " needs-approval" : ""}${collapsed ? " collapsed" : ""}" data-card="${esc(c.id || "")}"><div class="card-head"><span class="ico"><i class="ti ti-${KIND_ICON[c.kind] || "tool"}"></i></span>
+    <span class="t">${esc(c.title || c.kind || t("chat.tool"))}<small class="hide-narrow">${esc(t("kind." + (c.kind || "other")))}</small></span>${mach}<span class="st ${esc(st)}">${statusIcon(st)}${esc(t("status." + st))}</span>${body.length ? '<i class="ti ti-chevron-down chev"></i>' : ""}</div>
     ${body.length ? `<div class="card-body">${body.join("")}</div>` : ""}${apHtml}</div>`;
 }
 function optName(o) {
   const k = { allow_once: "approvals.allow_once", allow_always: "approvals.allow_always", reject_once: "approvals.deny", reject_always: "approvals.deny_always" }[o.kind];
   return k ? t(k) : (o.name || o.optionId);
 }
-function statusIcon(st) { return `<i class="ti ti-${{ completed: "circle-check", failed: "circle-x", in_progress: "loader-2", pending: "clock" }[st] || "circle"}"></i>`; }
+function statusIcon(st) { return `<i class="ti ti-${{ completed: "check", failed: "x", in_progress: "loader-2", pending: "clock" }[st] || "circle"}"></i>`; }
 function renderDiff(x) {
   const oldL = (x.oldText || "").split("\n"); const newL = (x.newText || "").split("\n");
   const rows = [`<div class="hdr">${esc(x.path)}</div>`];
@@ -438,14 +595,16 @@ function renderDelegation(c) {
   const to = botById(c.to); const st = c.status || "in_progress";
   const live = to && S.live[to.id];
   const progress = st === "in_progress" && live ? `<div class="skills-used">${live.order.slice(-3).map(id => `<span class="chip"><i class="ti ti-${KIND_ICON[live.cards[id].kind] || "tool"}"></i>${esc(live.cards[id].title || "")}</span>`).join("")}</div>
-     ${live.text ? `<div class="bubble caret">${md(live.text.slice(-800))}</div>` : ""}` : st === "in_progress" ? `<div class="progress"><div></div></div>` : "";
-  return `<div class="card deleg"><div class="card-head"><span class="ico"><i class="ti ti-arrow-forward-up"></i></span>
+     ${live.text ? `<div class="prose">${md(live.text.slice(-800))}<span class="caret"></span></div>` : ""}` : st === "in_progress" ? `<div class="progress"><div></div></div>` : "";
+  const id = "deleg:" + (c.id || c.to + ":" + (c.task || "").slice(0, 40));
+  const collapsed = !(S.cardOpen[id] ?? true);
+  return `<div class="card deleg st-${esc(st)}${collapsed ? " collapsed" : ""}" data-card="${esc(id)}"><div class="card-head"><span class="ico"><i class="ti ti-arrow-forward-up"></i></span>
     <span class="t">${esc(t("chat.delegated_to", to?.name || c.to_name || c.to || "?"))}</span>
-    ${to ? `<button class="btn sm ghost" data-open-bot="${esc(to.id)}">${avatar(to, "sm")}${esc(t("chat.open"))}</button>` : ""}
-    <span class="st ${esc(st)}">${statusIcon(st)}${esc(c.refused ? t("chat.refused") : t("status." + st))}</span></div>
+    ${to ? `<button class="btn sm ghost" data-open-bot="${esc(to.id)}">${avatar(to, "sm")}<span class="hide-narrow">${esc(t("chat.open"))}</span></button>` : ""}
+    <span class="st ${esc(st)}">${statusIcon(st)}${esc(c.refused ? t("chat.refused") : t("status." + st))}</span><i class="ti ti-chevron-down chev"></i></div>
     <div class="card-body">${c.task ? `<div><b>${esc(t("chat.task"))}</b> ${esc(c.task)}</div>` : ""}${progress}
-    ${c.answer ? `<div class="answer">${md(c.answer)}</div>` : ""}
-    ${(c.skills_used || []).length ? `<div class="skills-used"><i class="ti ti-books"></i>${c.skills_used.map(s => `<span class="chip accent">${esc(s)}</span>`).join("")}</div>` : ""}</div></div>`;
+    ${c.answer ? `<div class="answer prose">${md(c.answer)}</div>` : ""}
+    ${(c.skills_used || []).length ? `<div class="skills-used"><i class="ti ti-books"></i>${c.skills_used.map(s => `<span class="chip accent">/${esc(s)}</span>`).join("")}</div>` : ""}</div></div>`;
 }
 async function answerApproval(req, option) {
   await guard(() => api("POST", `approvals/${encodeURIComponent(req)}`, option ? { option } : {}));
@@ -576,7 +735,7 @@ async function tabMemory(body, d) {
   body.innerHTML = `<div class="section"><h4><i class="ti ti-brain"></i>${esc(t("settings.memory"))}</h4><p class="lead">${esc(t("settings.memory_help"))}</p>
     <div style="display:flex;gap:8px"><input class="inp" id="m-text" placeholder="${esc(t("settings.memory_add_ph"))}"><button class="btn primary" id="m-add"><i class="ti ti-plus"></i>${esc(t("common.add"))}</button></div>
     <div class="row-list">${mem.length ? mem.slice().reverse().map(x => `<div class="r"><i class="ti ti-point"></i><div class="grow">${esc(x.text)}<small>${esc(fmtTime(x.ts || x.created))} · ${esc(x.source || "")}</small></div>
-      <button class="icon-btn" data-forget="${esc(x.id)}"><i class="ti ti-trash"></i></button></div>`).join("") : `<div class="r"><span class="help">${esc(t("settings.memory_empty"))}</span></div>`}</div></div>`;
+      <button class="icon-btn" data-forget="${esc(x.id)}"><i class="ti ti-trash"></i></button></div>`).join("") : `<div class="r">${emptyState("brain", t("settings.memory_empty"), "")}</div>`}</div></div>`;
   $("#m-add").onclick = () => guard(async () => { const v = $("#m-text").value.trim(); if (!v) return; await api("POST", `bots/${d.id}/memory`, { text: v }); tabMemory(body, d); });
   $$("[data-forget]", body).forEach(x => x.onclick = () => guard(async () => { await api("DELETE", `bots/${d.id}/memory/${x.dataset.forget}`); tabMemory(body, d); }));
 }
@@ -614,7 +773,7 @@ async function tabRoutines(body, d) {
     <div class="two"><div class="field"><label>${esc(t("settings.routine_instruction"))}</label><input id="r-ins"></div>
     <div class="field"><label>${esc(t("settings.routine_every"))}</label><input type="number" id="r-every" value="60" min="15"></div></div>
     <div><button class="btn primary" id="r-add"><i class="ti ti-plus"></i>${esc(t("common.add"))}</button></div>
-    <div class="row-list">${rs.length ? rs.map(r => routineRow(r)).join("") : `<div class="r"><span class="help">${esc(t("settings.routines_empty"))}</span></div>`}</div></div>`;
+    <div class="row-list">${rs.length ? rs.map(r => routineRow(r)).join("") : `<div class="r">${emptyState("repeat", t("settings.routines_empty"), t("routines.empty_help"))}</div>`}</div></div>`;
   $("#r-add").onclick = () => guard(async () => { await api("POST", "routines", { bot: d.id, instruction: $("#r-ins").value, every_minutes: +$("#r-every").value }); tabRoutines(body, d); });
   bindRoutineRows(body, () => tabRoutines(body, d));
 }
@@ -699,10 +858,11 @@ async function renderApprovals() {
   const a = S.approvals;
   page(t("nav.approvals"), "shield-check", t("approvals.lead"), `<div class="row-list">${a.length ? a.map(x => { const b = botById(x.bot);
     return `<div class="r">${avatar(b)}<div class="grow"><b>${esc(x.bot_name || x.bot)}</b> · ${esc(x.toolCall?.title || x.toolCall?.kind || "")}
-      <small>${esc(t("kind." + (x.toolCall?.kind || "other")))} · ${esc(x.machine || "local")} · ${esc(fmtTime(x.created))}</small></div>
-      ${(x.options || []).map(o => `<button class="btn sm ${String(o.kind).startsWith("allow") ? "primary" : ""}" data-approve="${esc(x.id)}" data-option="${esc(o.optionId)}">${esc(optName(o))}</button>`).join("")}</div>`; }).join("")
-    : `<div class="r"><span class="help">${esc(t("approvals.none"))}</span></div>`}</div>`);
-  $$("[data-approve]").forEach(x => x.onclick = () => answerApproval(x.dataset.approve, x.dataset.option));
+      <small><i class="ti ti-${KIND_ICON[x.toolCall?.kind] || "tool"}"></i> ${esc(t("kind." + (x.toolCall?.kind || "other")))} · <i class="ti ti-device-desktop"></i> ${esc(x.machine && x.machine !== "local" ? x.machine : t("machines.local"))} · ${esc(fmtTime(x.created))}</small></div>
+      ${(x.options || []).map(o => { const k = String(o.kind); const cls = k === "allow_once" ? "primary" : k.startsWith("allow") ? "primary soft" : "danger";
+        return `<button class="btn sm ${cls}" data-approve="${esc(x.id)}" data-option="${esc(o.optionId)}"><i class="ti ti-${k.startsWith("allow") ? "check" : "x"}"></i>${esc(optName(o))}</button>`; }).join("")}</div>`; }).join("")
+    : `<div class="r">${emptyState("shield-check", t("approvals.none"), t("approvals.none_help"))}</div>`}</div>`);
+  $$("[data-approve]").forEach(x => x.onclick = () => { x.disabled = true; answerApproval(x.dataset.approve, x.dataset.option); });
 }
 async function loadAgents(force) { if (!S.agents || force) S.agents = await api("GET", "agents"); return S.agents; }
 async function renderConnectors() {
@@ -717,7 +877,7 @@ async function renderConnectors() {
       ${(x.auth || {}).kind !== "none" ? `<button class="btn sm ${x.connected ? "" : "primary"}" data-cconnect="${esc(x.id)}">${esc(x.connected ? t("connectors.reconnect") : t("common.connect"))}</button>` : ""}
       <button class="btn sm" data-ctools="${esc(x.id)}">${esc(t("connectors.tools_btn"))}</button>
       ${x.connected && (x.auth || {}).kind !== "none" ? `<button class="btn sm ghost" data-cdisc="${esc(x.id)}">${esc(t("connectors.disconnect"))}</button>` : ""}
-      <button class="icon-btn" data-crm="${esc(x.id)}"><i class="ti ti-trash"></i></button></div>`).join("") : `<div class="r"><span class="help">${esc(t("connectors.none"))}</span></div>`}</div>
+      <button class="icon-btn" data-crm="${esc(x.id)}"><i class="ti ti-trash"></i></button></div>`).join("") : `<div class="r">${emptyState("plug-connected-x", t("connectors.none"), t("connectors.none_help"))}</div>`}</div>
     <h3>${esc(t("connectors.catalog"))}</h3>
     <div class="grid">${c.catalog.map(x => `<div class="tile"><div class="top"><span class="logo"><i class="ti ti-${esc(x.icon || "plug")}"></i></span><div><b>${esc(x.title)}</b><small>${esc(x.vendor)} · ${esc(t("connectors.auth_" + x.auth.kind))}</small></div></div>
       <div class="desc">${esc(x.summary)}</div><div class="acts">${x.installed ? `<span class="chip ok"><i class="ti ti-check"></i>${esc(t("connectors.added_chip"))}</span>` : `<button class="btn sm primary" data-cadd="${esc(x.key)}"><i class="ti ti-plus"></i>${esc(t("common.add"))}</button>`}
@@ -852,7 +1012,7 @@ async function renderMachines() {
       <div class="row-list">${(host.clients || []).length ? host.clients.map(c => `<div class="r"><i class="ti ti-device-laptop"></i><div class="grow"><b>${esc(c.client)}</b><small>${esc(fmtTime(c.paired_at))}</small>
         <small>${esc(Object.entries(c.grants || {}).map(([b, g]) => `${b}: ${(g.permissions || []).join("/")}${g.apps?.length ? " [" + g.apps.join(",") + "]" : ""} ${g.scope || "."}`).join("; ") || t("machines.no_grants"))}</small></div>
         <button class="btn sm" data-grant="${esc(c.client)}">${esc(t("machines.grant"))}</button><button class="btn sm ghost" data-revoke="${esc(c.client)}">${esc(t("machines.revoke_all"))}</button>
-        <button class="icon-btn" data-unpair="${esc(c.client)}"><i class="ti ti-unlink"></i></button></div>`).join("") : `<div class="r"><span class="help">${esc(t("machines.no_clients"))}</span></div>`}</div></div>`);
+        <button class="icon-btn" data-unpair="${esc(c.client)}"><i class="ti ti-unlink"></i></button></div>`).join("") : `<div class="r">${emptyState("device-laptop", t("machines.no_clients"), "")}</div>`}</div></div>`);
   $("#p-go").onclick = () => guard(async () => { const x = await api("POST", "machines/pair", { name: $("#p-name").value.trim(), url: $("#p-url").value.trim(), code: $("#p-code").value.trim(), fingerprint: $("#p-fp").value.trim() || null });
     toast(x.message); await refreshState(); renderMachines(); });
   $$("[data-mrm]").forEach(x => x.onclick = () => confirmModal(t("common.remove"), t("machines.remove_confirm", x.dataset.mrm), async () => { await api("DELETE", `machines/${x.dataset.mrm}`); await refreshState(); renderMachines(); }));
@@ -886,7 +1046,7 @@ async function renderSkills() {
 }
 async function renderRoutines() {
   const rs = (await api("GET", "routines")).routines;
-  page(t("nav.routines"), "repeat", t("routines.lead"), `<div class="row-list">${rs.length ? rs.map(routineRow).join("") : `<div class="r"><span class="help">${esc(t("settings.routines_empty"))}</span></div>`}</div>`);
+  page(t("nav.routines"), "repeat", t("routines.lead"), `<div class="row-list">${rs.length ? rs.map(routineRow).join("") : `<div class="r">${emptyState("repeat", t("settings.routines_empty"), t("routines.empty_help"))}</div>`}</div>`);
   bindRoutineRows($("#view"), renderRoutines);
 }
 async function renderRuntime() {
@@ -940,15 +1100,19 @@ function layout() { $("#app").classList.toggle("narrow", innerWidth < 760); }
 async function init() {
   const st0 = await api("GET", "state").catch(() => null);
   await loadLang(S.lang || st0?.lang || "zh-CN");
-  $("#lang").onchange = e => { loadLang(e.target.value).then(() => { renderSidebar(); S.view === "chat" ? (renderChat(), renderMessages(true)) : S.view === "settings" ? openSettings(S.current) : showView(S.view); }); };
+  $("#lang").onchange = e => { loadLang(e.target.value).then(() => { renderSidebar(); renderTakeover(); applyTheme(); renderDock(); S.view === "chat" ? (renderChat(), renderMessages(true)) : S.view === "settings" ? openSettings(S.current) : showView(S.view); }); };
   $("#bot-search").oninput = renderSidebar;
   $("#btn-new-bot").onclick = newBot;
   $$(".nav-item").forEach(n => n.onclick = () => showView(n.dataset.view));
   $("#btn-takeover").onclick = () => guard(async () => { await api("POST", S.control?.paused ? "control/resume" : "control/pause", { reason: "ui" }); await refreshState(); renderTakeover(); });
+  $("#btn-theme").onclick = () => guard(async () => {
+    const order = ["auto", "light", "dark"]; const nx = order[(order.indexOf(S.prefs.theme || "auto") + 1) % order.length];
+    const r = await api("PUT", "prefs", { theme: nx }); S.prefs = r.prefs; applyTheme(); toast(t("app.theme") + " · " + t("app.theme_" + nx));
+  });
   $("#btn-dock").onclick = () => guard(async () => { const r = await api("PUT", "prefs", { dock: !S.prefs.dock }); S.prefs = r.prefs; renderDock(); toast(S.prefs.dock ? t("app.docked") : t("app.undocked")); });
   addEventListener("resize", layout); layout();
   await refreshState(); renderTakeover(); renderDock();
-  loadAgents().catch(() => {});
+  loadAgents().then(() => renderPicker()).catch(() => {});
   connectEvents();
   // #approvals、#bot/<id>、#settings/<id>/<tab>
   const [h0, h1, h2] = decodeURIComponent(location.hash.slice(1)).split("/");
