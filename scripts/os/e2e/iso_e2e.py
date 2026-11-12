@@ -577,7 +577,8 @@ def case_cu() -> str:
     cmd = ("read -r DEEPSEEK_API_KEY; read -r TYPESAFE_API_KEY; export DEEPSEEK_API_KEY TYPESAFE_API_KEY; "
            "[ -n \"$TYPESAFE_API_KEY\" ] || unset TYPESAFE_API_KEY; cd ~/cu-e2e/packages/core; "
            "FOXOS_CU_E2E=1 FOXOS_CU_E2E_WS=$HOME/FoxOS/workspace PYTHONPATH=/tmp/cu-pt:/usr/lib/foxos/python "
-           "timeout 7000 /usr/lib/foxos/venv/bin/python -m pytest -q -p no:cacheprovider -rA tests/test_cu_real.py 2>&1 | tail -40")
+           "timeout 7000 /usr/lib/foxos/venv/bin/python -m pytest -q -p no:cacheprovider -rA tests/test_cu_real.py" + (f" -k {shlex.quote(os.environ['FOXOS_E2E_CU_K'])}" if os.environ.get("FOXOS_E2E_CU_K") else "")
+           + " > /tmp/cu-e2e.log 2>&1; tail -60 /tmp/cu-e2e.log")
     p = ssh(cmd, input=f"{ds}\n{ts}\n", timeout=7500)
     out = scrub(p.stdout)
     (WORK / f"cu-{int(time.time())}.log").write_text(out)
