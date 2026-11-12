@@ -130,8 +130,22 @@ OpenBot 是「AI 同事」工作区：React（Vite）前端 + Hono API 服务器
 - `foxos-bots`（开始菜单「智能体」）打开独立窗口（Chromium 系 `--app`，没有时用 Firefox 专用配置），窗口类 `foxos-bots`；已经开着就切到前台。
 - **停靠**：标题栏按钮或 `foxos-bots --dock [--side left|right]`，窗口贴到屏幕一侧、全高、置顶、所有工作区可见；`--undock` 恢复。选择按用户保存在 `~/.config/foxos/bots-ui.json`。截图：`docs/screenshots/bots-window-separate.png`、`bots-window-docked.png`。
 - `foxos-bots --page approvals|connectors|agents|machines|skills|routines|runtime|settings/<bot>/<tab>` 直达页面。
-- 限制：停靠用 wmctrl 移动窗口，不预留屏幕边（strut），最大化的其他窗口会被盖住一部分。
+- 停靠时窗口设置 `_NET_WM_STRUT_PARTIAL` 预留屏幕边，最大化的其他窗口不会被盖住；取消停靠后释放（US-152）。窗口宽度小于 760 时界面换成窄布局，侧栏收进菜单按钮。
 - Electron 伴侣里的「智能体」应用用 webview 打开同一个界面。
+
+### 7.1 界面
+
+布局和交互参照 OpenBot，配色换成狐狸OS 的暖橙色。默认中文，也有英文。
+
+- **消息列表**：智能体的回答左侧带头像、名字、时间和耗时，正文直接排在背景上；你的消息是右侧的浅橙气泡。正文支持 Markdown（标题、列表、表格、引用、链接），代码块带语言标签和「复制」按钮。正在回答时名字旁显示「正在回复」，正文末尾有光标；还没有文字时显示「正在思考 / 正在处理」的跳动点。流式更新只重绘正在变的那条消息，滚动位置、选中的文字和卡片的展开状态都不会丢。
+- **工具卡片**：一行显示图标、标题、类型和状态（完成绿、失败红、进行中橙、等待中黄），点一下展开或收起输出。已完成、没有改动的卡片默认收起；有 diff 或在等审批的卡片默认展开。只有在别的机器上执行时才显示机器名。
+- **审批卡片**：等审批的卡片带黄边，底部写明谁想做什么，「允许一次 / 总是允许 / 拒绝」三个按钮；处理后显示结果和由谁决定。审批页用同样的样式列出所有待审批项。
+- **输入框**：附件（也能拖入）、`@` 交给别的智能体、`/` 技能、选择代码智能体（模型智能体显示「模型 · 名字」），Enter 发送，回答时多一个停止按钮。
+- **侧栏**：智能体列表显示头像、名字、头衔和状态（在线、正在工作、已暂停、已停用）；底部是语言、外观（跟随系统 / 浅色 / 深色）和连接状态。
+- **空状态**：新智能体、没有审批、没有连接器、没有例程等都有图标和一句说明，新对话给出几个可以直接点的示例。
+- **样式**：统一的间距、字号和圆角刻度，细滚动条，图标全部用随附的 Tabler 图标字体，产品图标用狐狸图标。深浅色默认跟随系统。
+
+截图（中文，浅色）：改之前 `docs/screenshots/bots-ui-*-before.png`，改之后 `docs/screenshots/bots-ui-*-after.png`，深色是 `bots-ui-*-dark-after.png`。包括主聊天（正在流式回答，带工具卡片）`chat`、审批卡片 `approval`、智能体设置 `settings`、停靠侧栏 `docked` / `docked-desktop`、空状态 `empty`。用 `node apps/desktop/scripts/bots-ui-shots.mjs <标签> [--dark]` 重新生成。
 
 ## 8. 实现位置
 
@@ -203,6 +217,8 @@ The Chinese section above has the full tables. In short:
 ## 4. Chat window
 
 `foxos-bots` opens a separate window (class `foxos-bots`). `--dock`/`--undock` docks it to a screen edge or detaches it, and the choice is saved per user. `--page` opens a given page.
+
+The UI follows OpenBot's layout in FoxOS's warm orange theme, in Chinese by default and in English. Bot replies have an avatar, name and timing and sit on the background; your messages are light orange bubbles on the right. Replies render Markdown, and code blocks have a copy button. While a bot replies, a "replying" chip and a caret show, or bouncing dots before any text arrives. Only the live message re-renders, so scroll position, selection and open cards are kept. Tool cards are one line with a status color (green done, red failed, orange running, yellow waiting) and expand on click. Approval cards have a yellow edge and Allow once / Always allow / Deny buttons. The composer has attachments, `@`, `/`, an agent picker, send and stop. The bot list shows avatar, name and status, and empty pages explain what goes there. Light and dark themes follow the system unless you pick one. Screenshots: `docs/screenshots/bots-ui-*-before.png`, `bots-ui-*-after.png` and `bots-ui-*-dark-after.png`, made with `node apps/desktop/scripts/bots-ui-shots.mjs <tag> [--dark]`.
 
 ## 5. Where it lives
 
