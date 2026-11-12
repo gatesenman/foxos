@@ -19,3 +19,5 @@ Thumbs.db
 /out/
 /dist-*/
 scripts/os/e2e/__pycache__/
+
+.env
