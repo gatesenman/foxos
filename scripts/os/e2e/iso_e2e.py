@@ -425,6 +425,8 @@ def case_installed_ssh() -> str:
 
 INSTALL_PW = os.environ.get("FOXOS_E2E_INSTALL_PW", "Fox-E2E-install-2026!")
 # Calamares 页面上的按键（xdotool，中文界面）。坐标是 1280x800 下「你的名字」输入框；之后 Tab 依次到登录名、主机名、密码、确认密码。
+PARTITION_CONF = Path(__file__).resolve().parents[1] / "calamares" / "modules" / "partition.conf"
+
 CAL_STEPS = [
     ("wait", "欢迎"), ("key", "alt+n"), ("sleep", 8), ("key", "alt+n"), ("sleep", 8), ("key", "alt+n"), ("sleep", 15),   # 欢迎 → 位置 → 键盘 → 分区
     ("key", "alt+n"), ("sleep", 10),                                                                                    # 分区（预选「抹掉磁盘」）→ 用户
@@ -446,7 +448,11 @@ def case_install() -> str:
     pub = KEY.with_suffix(".pub").read_text().strip()
     setup = (
         "set -e; rm -rf /tmp/cal-e2e; cp -a /etc/calamares /tmp/cal-e2e; "
-        "printf 'initialPartitioningChoice: erase\\ninitialSwapChoice: none\\ndefaultFileSystemType: ext4\\nefiSystemPartition: /boot/efi\\n' > /tmp/cal-e2e/modules/partition.conf; "
+        # -c 指定的目录里 Calamares 还要 qml/（缺了直接拒绝启动）
+        "ln -sfn /usr/share/calamares/qml /tmp/cal-e2e/qml; "
+        # 分区设置用 ISO 自带的 partition.conf，只把默认选项改成「抹掉磁盘」；旧 ISO 没带这个文件时用本仓库的
+        "test -f /tmp/cal-e2e/modules/partition.conf || printf '%s' " + shlex.quote(PARTITION_CONF.read_text()) + " > /tmp/cal-e2e/modules/partition.conf; "
+        "sed -i 's/^initialPartitioningChoice:.*/initialPartitioningChoice: erase/' /tmp/cal-e2e/modules/partition.conf; "
         "printf 'presets:\\n  fullName:\\n    value: foxos\\n    editable: true\\n  loginName:\\n    value: foxos\\n    editable: true\\n' >> /tmp/cal-e2e/modules/users.conf; "
         "mkdir -p /run/foxos/ssh-install; printf '%s\\n' " + shlex.quote(pub) + " > /run/foxos/ssh-install/authorized_keys; "
         "rm -f /run/foxos/ssh-install/password /run/foxos/ssh-install/password-value; "
@@ -480,17 +486,20 @@ def case_install() -> str:
     done = False
     for _ in range(int(os.environ.get("FOXOS_E2E_INSTALL_TIMEOUT", "14400")) // 30):
         lg = _x("tail -c 4000 /tmp/calamares-e2e.log").stdout
-        if re.search(r"Installation (complete|finished)|ViewModule \"finished|Finished\. Exit code|FinishedPage", lg) or \
-           "finished" in _x("grep -o 'Starting job \"[a-z@]*' /tmp/calamares-e2e.log | tail -1").stdout:
-            done = True
+        if re.search(r"Installation failed|ERROR.*Job .* failed|Bad Python script|Boost.Python error", lg):
             break
-        if re.search(r"Installation failed|ERROR.*Job .* failed", lg):
+        # 完成 = 最后一个任务（N / N）已开始，且目标根不再挂着（umount 任务做完）
+        last = _x("grep -oE 'Starting job .*\\( *[0-9]+ / *[0-9]+ *\\)' /tmp/calamares-e2e.log | tail -1").stdout
+        m = re.search(r"\( *(\d+) / *(\d+) *\)", last)
+        if m and m.group(1) == m.group(2) and not _x("findmnt -rn -o TARGET | grep -c calamares-root || true").stdout.strip().strip("0"):
+            done = True
             break
         time.sleep(30)
     shots.append(str(screendump(WORK / f"e2e-cal-finished-{int(time.time())}.png")))
     tail = _x("grep -E 'Starting job|Installation (failed|complete)|failed' /tmp/calamares-e2e.log | tail -8").stdout
     assert done, f"Calamares 没有完成：{tail[-800:]}"
     lsblk = _x("lsblk -o NAME,SIZE,FSTYPE,SERIAL /dev/disk/by-id/virtio-foxostarget").stdout
+    assert "ext4" in lsblk, f"目标盘上没有根分区（ext4）：{lsblk}"
     return f"{time.time() - t0:.0f}s 完成；{' '.join(tail.split())[-400:]}；目标盘：{' '.join(lsblk.split())}", shots
 
 
