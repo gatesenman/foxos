@@ -1,14 +1,14 @@
 {
- "generated": "2026-11-12T08:34:45+08:00",
- "commit": "140ce4a",
+ "generated": "2026-11-12T11:45:48+08:00",
+ "commit": "0070d7f",
  "cases": {
-  "pass": 236,
+  "pass": 239,
   "fail": 0,
   "skip": 19,
   "known": 1
  },
  "stories": {
-  "pass": 78,
+  "pass": 80,
   "fail": 0,
   "skip": 13,
   "known": 1,
@@ -848,6 +848,24 @@
    "title": "Qwen Code 在狐狸OS 里默认要审批：写文件前弹审批卡片，拒绝则不写",
    "status": "pass",
    "pass": 1,
+   "fail": 0,
+   "skip": 0,
+   "known": 0
+  },
+  {
+   "id": "US-158",
+   "title": "新会话带的对话历史不会让智能体把指令再做一遍（这一轮的消息不进历史，多行消息只占一行）",
+   "status": "pass",
+   "pass": 1,
+   "fail": 0,
+   "skip": 0,
+   "known": 0
+  },
+  {
+   "id": "US-159",
+   "title": "智能体窗口界面：中英文文案齐全、只用随附的图标字体、深浅色主题跟随系统",
+   "status": "pass",
+   "pass": 2,
    "fail": 0,
    "skip": 0,
    "known": 0
