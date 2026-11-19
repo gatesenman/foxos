@@ -230,3 +230,117 @@ def test_bot_computer_use_setting_validated(tmp_path):
         "computer_use": {"surface": "screen", "step_policy": "typesafe"}}
     with pytest.raises(FoxError):
         bots.validate_patch(None, {"computer_use": {"surface": "everything"}})
+
+# ------------------------------------------------------------------ 慢快照时限、标题当 --app、动作重试
+
+class _WS:
+    def __init__(self, tmp):
+        self.data_dir = tmp / "wsdata"
+        self.data_dir.mkdir(parents=True, exist_ok=True)
+
+
+def _py_ad(tmp_path, body: str) -> str:
+    f = tmp_path / "agent-desktop"
+    f.write_text("#!/usr/bin/env python3\nimport json,sys\n" + body + "\n")
+    f.chmod(f.stat().st_mode | stat.S_IEXEC)
+    return str(f)
+
+
+def test_snapshot_passes_longer_timeout_and_retries_incomplete(tmp_path, monkeypatch):
+    """默认把 --timeout-ms 提到 30s；第一次 complete=false 时加倍再拍，第二次的引用才用来点击。"""
+    log = tmp_path / "argv.log"
+    body = (
+        "argv=sys.argv[1:]\n"
+        f"open({str(log)!r}, 'a').write(' '.join(argv)+'\\n')\n"
+        "cmd=argv[0]\n"
+        "ms=3000\n"
+        "if '--timeout-ms' in argv:\n"
+        "    ms=int(argv[argv.index('--timeout-ms')+1])\n"
+        "if cmd=='snapshot':\n"
+        "    ok = ms >= 60000\n"
+        "    sid = 's2' if ok else 's1'\n"
+        "    tree={'role':'window','name':'us121.txt','children':[\n"
+        "        {'role':'document','name':'','ref_id':'@'+sid+':e2','available_actions':['set-value']}]}\n"
+        "    print(json.dumps({'ok': True, 'data': {'snapshot_id': sid, 'app': 'mousepad',\n"
+        "        'complete': ok, 'ref_count': 1, 'tree': tree}}))\n"
+        "elif cmd=='list-windows':\n"
+        "    print(json.dumps({'ok': True, 'data': [{'id': 'w-mp', 'title': 'us121.txt - Mousepad', 'app': 'mousepad'}]}))\n"
+        "else:\n"
+        "    print(json.dumps({'ok': True, 'data': {}}))\n"
+    )
+    monkeypatch.setenv("FOXOS_AGENT_DESKTOP", _py_ad(tmp_path, body))
+    monkeypatch.delenv("FOXOS_AD_TIMEOUT_MS", raising=False)
+    ws = _WS(tmp_path)
+    r = agent_desktop.snapshot(ws, app="mousepad")
+    lines = log.read_text().strip().splitlines()
+    assert any("--timeout-ms 30000" in ln and ln.startswith("snapshot") for ln in lines)
+    assert any("--timeout-ms 60000" in ln and ln.startswith("snapshot") for ln in lines)
+    assert r["complete"] is True and r["snapshot_id"] == "s2"
+    assert r["app"] == "mousepad"
+
+
+def test_snapshot_window_title_as_app_uses_window_id(tmp_path, monkeypatch):
+    """--app 传入窗口标题时 agent-desktop 会 APP_NOT_FOUND：改成按标题找到窗口 id。"""
+    log = tmp_path / "argv.log"
+    body = (
+        "argv=sys.argv[1:]\n"
+        f"open({str(log)!r}, 'a').write(' '.join(argv)+'\\n')\n"
+        "cmd=argv[0]\n"
+        "if cmd=='list-windows':\n"
+        "    if '--app' in argv:\n"
+        "        app=argv[argv.index('--app')+1]\n"
+        "        if app!='mousepad':\n"
+        "            print(json.dumps({'ok': False, 'error': {'code': 'APP_NOT_FOUND', 'message': app, 'disposition': {'retry': 'safe'}}}))\n"
+        "            raise SystemExit(0)\n"
+        "    print(json.dumps({'ok': True, 'data': [{'id': 'w-mp', 'title': '~/FoxOS/workspace/us121.txt - Mousepad', 'app': 'mousepad'}]}))\n"
+        "elif cmd=='snapshot':\n"
+        "    assert '--window-id' in argv and argv[argv.index('--window-id')+1]=='w-mp'\n"
+        "    print(json.dumps({'ok': True, 'data': {'snapshot_id': 's9', 'app': 'mousepad', 'complete': True, 'ref_count': 1,\n"
+        "        'tree': {'role':'window','name':'us121.txt','children':[{'role':'document','ref_id':'@s9:e2'}]}}}))\n"
+        "else:\n"
+        "    print(json.dumps({'ok': True, 'data': {}}))\n"
+    )
+    monkeypatch.setenv("FOXOS_AGENT_DESKTOP", _py_ad(tmp_path, body))
+    r = agent_desktop.snapshot(_WS(tmp_path), app="~/FoxOS/workspace/us121.txt - Mousepad")
+    assert r["app"] == "mousepad" and r["snapshot_id"] == "s9"
+
+
+def test_act_retries_ambiguous_after_fresh_snapshot(tmp_path, monkeypatch):
+    """click 遇到 identity_not_unique 时，加大时限重拍并把 e2 对到新快照再点一次。"""
+    log = tmp_path / "argv.log"
+    body = (
+        "argv=sys.argv[1:]\n"
+        f"open({str(log)!r}, 'a').write(' '.join(argv)+'\\n')\n"
+        "cmd=argv[0]\n"
+        "if cmd=='list-windows':\n"
+        "    print(json.dumps({'ok': True, 'data': [{'id': 'w-mp', 'title': 'us121.txt - Mousepad', 'app': 'mousepad'}]}))\n"
+        "elif cmd=='snapshot':\n"
+        "    sid = 's-new' if '--timeout-ms' in argv and int(argv[argv.index('--timeout-ms')+1]) >= 60000 else 's-old'\n"
+        "    print(json.dumps({'ok': True, 'data': {'snapshot_id': sid, 'app': 'mousepad', 'complete': True, 'ref_count': 1,\n"
+        "        'tree': {'role':'window','name':'us121.txt','children':[{'role':'document','name':'','ref_id':'@'+sid+':e2'}]}}}))\n"
+        "elif cmd=='click':\n"
+        "    ref=argv[1]\n"
+        "    if ref.startswith('@s-old:'):\n"
+        "        print(json.dumps({'ok': False, 'error': {'code': 'AMBIGUOUS_TARGET', 'message': 'not unique',\n"
+        "            'disposition': {'retry': 'safe'}, 'details': {'kind': 'identity_not_unique'}}}))\n"
+        "    else:\n"
+        "        print(json.dumps({'ok': True, 'data': {'clicked': ref}}))\n"
+        "else:\n"
+        "    print(json.dumps({'ok': True, 'data': {}}))\n"
+    )
+    monkeypatch.setenv("FOXOS_AGENT_DESKTOP", _py_ad(tmp_path, body))
+    monkeypatch.delenv("FOXOS_AD_TIMEOUT_MS", raising=False)
+    ws = _WS(tmp_path)
+    agent_desktop.snapshot(ws, app="mousepad")
+    r = agent_desktop.act(ws, "click", "e2")
+    clicks = [ln for ln in log.read_text().splitlines() if ln.startswith("click ")]
+    assert any("@s-old:e2" in ln for ln in clicks)
+    assert any("@s-new:e2" in ln for ln in clicks)
+    assert r.get("clicked") == "@s-new:e2"
+
+
+def test_timeout_ms_env_override(monkeypatch):
+    monkeypatch.setenv("FOXOS_AD_TIMEOUT_MS", "45000")
+    assert agent_desktop.timeout_ms() == 45000
+    monkeypatch.delenv("FOXOS_AD_TIMEOUT_MS")
+    assert agent_desktop.timeout_ms() == 30000

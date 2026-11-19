@@ -49,11 +49,30 @@ def sh(cmd: str) -> None:
     subprocess.run(cmd, shell=True, check=False, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
 
+def _wait_window(needle: str, seconds: float = 60) -> None:
+    """等到窗口标题里出现 needle（TCG 上来宾开机慢，固定 sleep 不够）。"""
+    deadline = time.time() + seconds
+    while time.time() < deadline:
+        p = subprocess.run(["wmctrl", "-l"], capture_output=True, text=True)
+        if p.returncode == 0 and needle.lower() in (p.stdout or "").lower():
+            time.sleep(0.8)
+            return
+        time.sleep(1)
+    raise RuntimeError(f"window {needle!r} did not appear in {seconds:.0f}s")
+
+
 def mousepad(ws: Path, name: str, text: str) -> None:
     sh("pkill -x mousepad; sleep 1")
+    # 确认旧进程已经退出，避免 snapshot --app mousepad 打到两个窗口
+    deadline = time.time() + 20
+    while time.time() < deadline:
+        if subprocess.run(["pgrep", "-x", "mousepad"], capture_output=True).returncode != 0:
+            break
+        sh("pkill -x mousepad")
+        time.sleep(1)
     (ws / name).write_text(text, encoding="utf-8")
     subprocess.Popen(["mousepad", str(ws / name)], cwd=ws, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, start_new_session=True)
-    time.sleep(2.5)
+    _wait_window(name, 60)
 
 
 def xedit(ws: Path, name: str) -> None:

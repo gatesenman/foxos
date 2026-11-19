@@ -559,6 +559,10 @@ def case_cu() -> str:
     测试文件从本仓库拷进来宾 ~/cu-e2e；pytest 装到 /tmp/cu-pt（测试专用）；xedit（x11-apps）不在 ISO 里，测试时从 Ubuntu 源装。
     DeepSeek 与 TypeSafe（Jev）密钥只经 SSH 标准输入传进这一次命令的环境变量，不落盘、不进输出。
     """
+    # 关掉首次登录弹窗，避免挡住 Mousepad，也避免截图里出现 SSH 一次性密码。
+    ssh('export DISPLAY=:0; xset s off -dpms; xset dpms force on; '
+        'for t in "SSH 远程登录（Live）" "安装 Google Chrome" "安装智能体命令行"; do wmctrl -c "$t" 2>/dev/null; done; true',
+        timeout=300)
     root = Path(__file__).resolve().parents[3]
     import io, tarfile
     buf = io.BytesIO()
