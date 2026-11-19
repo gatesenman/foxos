@@ -79,9 +79,10 @@ def run(args: list[str], stdin: str | None = None, timeout: float | None = None,
     if not b:
         raise FoxError("DEPENDENCY_MISSING", tr("ad.missing"), hint="foxos computer backend install")
     ms = timeout_ms(timeout_ms_)
-    # snapshot / find 等观察命令吃 --timeout-ms；其它命令忽略未知标志会失败，所以只加给认识它的命令。
-    obs = args and args[0] in {"snapshot", "find", "get", "is", "wait"}
-    if obs and "--timeout-ms" not in args:
+    # snapshot 和 click/set-value/type 等都接受 --timeout-ms。列表类命令没有这个标志。
+    if args and args[0] in { "snapshot", "find", "get", "is", "wait", "click", "double-click", "right-click",
+            "type", "set-value", "clear", "focus", "select", "toggle", "check", "uncheck",
+            "expand", "collapse", "scroll", "scroll-to", "press" } and "--timeout-ms" not in args:
         args = [*args, "--timeout-ms", str(ms)]
     wall = timeout if timeout is not None else max(60.0, ms / 1000 + 30)
     try:
@@ -368,13 +369,32 @@ def act(ws, action: str, ref: str | None = None, value: str | None = None, **kw)
 
 
 def press(combo: str, window_id: str | None = None, app: str | None = None) -> dict:
-    """按键发给指定程序的进程（--app / --window-id），不依赖哪个窗口有焦点。"""
+    """按键发给指定程序的进程（--app / --window-id）。无头模式在窗口未被确认激活时会拒发；
+    先 focus-window，仍失败则加 --headed 再发一次（只用于按键，不点坐标）。"""
     args = ["press", combo]
     if window_id:
         args += ["--window-id", str(window_id)]
     elif app:
         args += ["--app", app]
-    return run(args)
+    try:
+        return run(args)
+    except FoxError as e:
+        det = e.details or {}
+        kind = (det.get("details") or {}).get("cause") if isinstance(det.get("details"), dict) else None
+        if det.get("agent_desktop_code") != "ACTION_FAILED" or kind not in {"display_active_window", None}:
+            # 无 details.cause 时也看消息
+            if "focus changes are not allowed" not in (e.message or "") and kind != "display_active_window":
+                raise
+        try:
+            focus_window(window_id=window_id, app=app)
+        except FoxError:
+            pass
+        try:
+            return run(args)
+        except FoxError as e2:
+            if "focus changes are not allowed" not in (e2.message or "") and (e2.details or {}).get("agent_desktop_code") != "ACTION_FAILED":
+                raise
+            return run([*args, "--headed"])
 
 
 def windows(app: str | None = None) -> list[dict]:

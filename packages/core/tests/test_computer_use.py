@@ -344,3 +344,36 @@ def test_timeout_ms_env_override(monkeypatch):
     assert agent_desktop.timeout_ms() == 45000
     monkeypatch.delenv("FOXOS_AD_TIMEOUT_MS")
     assert agent_desktop.timeout_ms() == 30000
+
+
+def test_set_value_and_press_get_timeout_ms(tmp_path, monkeypatch):
+    log = tmp_path / "argv.log"
+    body = (
+        "argv=sys.argv[1:]\n"
+        f"open({str(log)!r}, 'a').write(' '.join(argv)+'\\n')\n"
+        "cmd=argv[0]\n"
+        "if cmd=='list-windows':\n"
+        "    print(__import__('json').dumps({'ok': True, 'data': [{'id': 'w', 'title': 't', 'app': 'mousepad'}]}))\n"
+        "elif cmd=='snapshot':\n"
+        "    print(__import__('json').dumps({'ok': True, 'data': {'snapshot_id': 's1', 'app': 'mousepad', 'complete': True, 'ref_count': 1,\n"
+        "        'tree': {'role':'window','children':[{'role':'textfield','ref_id':'@s1:e2'}]}}}))\n"
+        "elif cmd=='press' and '--headed' not in argv:\n"
+        "    print(__import__('json').dumps({'ok': False, 'error': {'code': 'ACTION_FAILED',\n"
+        "        'message': 'focus changes are not allowed', 'disposition': {'retry': 'safe'},\n"
+        "        'details': {'cause': 'display_active_window'}}}))\n"
+        "elif cmd=='focus-window':\n"
+        "    print(__import__('json').dumps({'ok': False, 'error': {'code': 'ACTION_FAILED', 'message': 'did not settle',\n"
+        "        'disposition': {'retry': 'unknown'}}}))\n"
+        "else:\n"
+        "    print(__import__('json').dumps({'ok': True, 'data': {'args': argv}}))\n"
+    )
+    monkeypatch.setenv("FOXOS_AGENT_DESKTOP", _py_ad(tmp_path, body))
+    monkeypatch.delenv("FOXOS_AD_TIMEOUT_MS", raising=False)
+    ws = _WS(tmp_path)
+    agent_desktop.snapshot(ws, app="mousepad")
+    agent_desktop.act(ws, "set-value", "e2", "hello")
+    r = agent_desktop.press("ctrl+s", app="mousepad")
+    lines = log.read_text().splitlines()
+    assert any(ln.startswith("set-value ") and "--timeout-ms 30000" in ln and "@s1:e2" in ln for ln in lines)
+    assert any(ln.startswith("press ctrl+s") and "--headed" in ln for ln in lines)
+    assert r.get("args") and "--headed" in r["args"]
