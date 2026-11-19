@@ -10,6 +10,17 @@
 
 This screenshot is from the FoxOS 0.3.4 ISO booted in QEMU (live session, `zh_CN`, 1920×1080), with the first-login dialogs closed. It shows the real xfwm4 desktop: the Whisker "开始" menu (favorites: terminal, Thunar, Google Chrome, Mousepad, "安装 狐狸OS") and the bottom panel (Start, clock, Take over, System), not a painted Electron fake desktop.
 
+## First-run doctor
+
+Confirm a local install without building a Live ISO:
+
+```bash
+python -m foxos status --json
+python -m foxos status
+```
+
+The report includes the version, audit log path, human-takeover commands (`foxos control status|pause|resume`), and MCP endpoints (stdio / HTTP).
+
 ## What it is
 
 FoxOS is first a **bootable, installable Linux OS** (Ubuntu 24.04 base, Chinese default, XFCE desktop). Agents (ACP/MCP clients such as Claude Code, Codex, Gemini CLI) and humans share a real desktop: every window is a real OS process.
