@@ -1,0 +1,26 @@
+# yaml-language-server: $schema=https://aka.ms/winget-manifest.installer.1.6.0.schema.json
+
+PackageIdentifier: gatesenman.FoxOS
+PackageVersion: 0.3.4
+MinimumOSVersion: 10.0.17763.0
+UpgradeBehavior: install
+ReleaseDate: 2026-11-12
+Installers:
+- Architecture: x64
+  InstallerType: nullsoft
+  Scope: user
+  InstallerUrl: https://github.com/gatesenman/foxos/releases/download/v0.3.4-windows-preview/FoxOS-Setup-0.3.4-x64.exe
+  InstallerSha256: 90AF7B8E2E84E4AE0CC056BA1693A02CF7C87F2AB0C6D9FA321A238D222849E1
+  InstallerSwitches:
+    Silent: /S
+    SilentWithProgress: /S
+- Architecture: arm64
+  InstallerType: nullsoft
+  Scope: user
+  InstallerUrl: https://github.com/gatesenman/foxos/releases/download/v0.3.4-windows-preview/FoxOS-Setup-0.3.4-arm64.exe
+  InstallerSha256: 219F8727F41D3CAE9C0D87B6146C9C2395014B0FABBD736116B28F4978B58D18
+  InstallerSwitches:
+    Silent: /S
+    SilentWithProgress: /S
+ManifestType: installer
+ManifestVersion: 1.6.0
