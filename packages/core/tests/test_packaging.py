@@ -185,3 +185,31 @@ def test_US85_install_ps1_is_ascii_and_supports_arm64_and_msi():
     t = s.decode()
     assert "FoxOS-Setup-*-$Arch.exe" in t and "FoxOS-*-win-$Arch.msi" in t and "FoxOS-*-win-$Arch.zip" in t
     assert "'ARM64'" in t and "msiexec.exe" in t and "v0.3.4-windows-preview" in t
+
+
+def test_committed_winget_manifest_matches_current_windows_preview():
+    """The checked-in winget manifest must track the current app version and
+    the official SHA256SUMS from v{version}-windows-preview."""
+    version = VERSION
+    inst_path = ROOT / "packaging/winget/manifests/g/gatesenman/FoxOS" / version / "gatesenman.FoxOS.installer.yaml"
+    assert inst_path.is_file(), f"missing winget installer manifest for {version}"
+    text = inst_path.read_text(encoding="utf-8")
+    assert f"PackageVersion: {version}" in text
+    tag = f"v{version}-windows-preview"
+    assert tag in text
+    sums_path = ROOT / "packaging/checksums" / f"{tag}.SHA256SUMS"
+    assert sums_path.is_file(), f"missing official checksums copy {sums_path.relative_to(ROOT)}"
+    sums = {}
+    for line in sums_path.read_text(encoding="utf-8").splitlines():
+        if not line.strip():
+            continue
+        digest, name = line.split()
+        sums[name] = digest.upper()
+    for arch in ("x64", "arm64"):
+        setup = f"FoxOS-Setup-{version}-{arch}.exe"
+        assert setup in sums, setup
+        assert f"FoxOS-Setup-{version}-{arch}.exe" in text
+        assert sums[setup] in text
+        assert f"{tag}/FoxOS-Setup-{version}-{arch}.exe" in text
+    locale = (inst_path.parent / "gatesenman.FoxOS.locale.en-US.yaml").read_text(encoding="utf-8")
+    assert f"releases/tag/{tag}" in locale
