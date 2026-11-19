@@ -12,6 +12,8 @@
 
 import json
 import os
+import urllib.error
+import urllib.request
 import subprocess
 import sys
 import time
@@ -24,9 +26,40 @@ from test_acp_real import CACHE, _online
 from test_machines import Node, pair
 
 KEY_FILE = Path(os.environ.get("FOXOS_TEST_DEEPSEEK_KEY_FILE", "~/.secrets/deepseek_api_key")).expanduser()
+
+
+def _deepseek_key_accepted() -> bool:
+    """True when the key file is accepted by the DeepSeek API.
+
+    A 401/403 must skip these live tests rather than fail the suite. The
+    response body is not logged — it can contain a redacted key.
+    """
+    try:
+        key = KEY_FILE.read_text(encoding="utf-8").strip()
+    except OSError:
+        return False
+    if not key:
+        return False
+    req = urllib.request.Request(
+        "https://api.deepseek.com/models",
+        headers={"Authorization": "Bearer " + key, "User-Agent": "foxos-core-tests"},
+        method="GET",
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=15) as resp:
+            return 200 <= getattr(resp, "status", 200) < 300
+    except urllib.error.HTTPError as exc:
+        return exc.code not in {401, 403}
+    except OSError:
+        # Network already required by _online(); if this probe cannot run, let
+        # the tests themselves surface a connection error.
+        return True
+
+
 pytestmark = [
     pytest.mark.skipif(not KEY_FILE.is_file() or not KEY_FILE.read_text().strip(), reason="no DeepSeek key file (real-model e2e)"),
     pytest.mark.skipif(not _online(), reason="no network"),
+    pytest.mark.skipif(not _deepseek_key_accepted(), reason="DeepSeek API rejected the test key (HTTP 401/403)"),
 ]
 MODEL = "deepseek/deepseek-flash"
 
