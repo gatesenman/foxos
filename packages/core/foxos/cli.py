@@ -168,6 +168,8 @@ def build_parser() -> argparse.ArgumentParser:
     m.set_defaults(_special="mcp")
     t2 = apps.add_parser("agent-guide", help=tr("cli.print_the_agent_guide_docs_agent"), parents=parents)
     t2.set_defaults(_special="agent-guide")
+    st = apps.add_parser("status", help=tr("cli.first_run_status"), parents=parents)
+    st.set_defaults(_special="status")
 
     app_subs = {}
     for app, meta in APPS.items():
@@ -401,6 +403,14 @@ def main(argv: list[str] | None = None) -> int:
                 print(json.dumps(g, ensure_ascii=False, indent=2))
             else:
                 print(g["markdown"])
+            return 0
+        if special == "status":
+            from .status import doctor_status, format_status
+            report = doctor_status(Workspace(ns.workspace))
+            if as_json:
+                print(json.dumps(report, ensure_ascii=False, indent=2))
+            else:
+                print(format_status(report), end="")
             return 0
         if special == "tools":
             tools = catalog.mcp_tools() if ns.format == "mcp" else catalog.openai_tools()

@@ -1622,5 +1622,6 @@
   "host.status_off": "宿主上：智能体不能在本机动手（默认）",
   "host.status_on": "宿主上：已允许智能体在本机执行，每个操作都要人逐个确认",
   "bot.c_host_access": "查看或更改：宿主上的智能体能否在本机执行（默认不能，只在狐狸OS 虚拟电脑里）",
-  "bot.p_host_action": "status、enable（只有人能做，之后每个操作仍要确认）或 disable"
+  "bot.p_host_action": "status、enable（只有人能做，之后每个操作仍要确认）或 disable",
+  "cli.first_run_status": "首次运行体检：版本、审计日志、接管命令和 MCP 入口"
 }

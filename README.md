@@ -17,6 +17,17 @@
 
 这张截图来自在 QEMU 里引导的狐狸OS 0.3.4 ISO（Live 会话，`zh_CN`，1920×1080），首次登录弹出的对话框都已关掉。图里是真正的 xfwm4 桌面：Whisker「开始」菜单（收藏里有终端、Thunar、Google Chrome、Mousepad 和「安装 狐狸OS」）和底部面板（开始、时钟、人工接管、系统），不是 Electron 里画的假桌面。
 
+## 首次运行体检
+
+在本机确认安装是否可用（不必构建 Live ISO）：
+
+```bash
+python -m foxos status --json
+python -m foxos status
+```
+
+报告包含版本、审计日志路径、人工接管命令（`foxos control status|pause|resume`）以及 MCP 入口（stdio / HTTP）。
+
 ## 狐狸OS 是什么
 
 狐狸OS 首先是一个**可引导、可安装的 Linux 操作系统**（Ubuntu 24.04 基础，默认中文，XFCE 桌面）。它给智能体（Claude Code、Codex、Gemini CLI 等 ACP / MCP 客户端）和人一个共同的真实桌面：每个窗口都是真实的 OS 进程。

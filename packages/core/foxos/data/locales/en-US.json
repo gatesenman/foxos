@@ -1622,5 +1622,6 @@
   "host.status_off": "On the host: bots can't act on this computer (default)",
   "host.status_on": "On the host: host execution is allowed, and every action needs a person's confirmation",
   "bot.c_host_access": "Show or change whether bots on the host may act on this computer (default: no, only inside the FoxOS virtual computer)",
-  "bot.p_host_action": "status, enable (people only; every action still needs confirmation) or disable"
+  "bot.p_host_action": "status, enable (people only; every action still needs confirmation) or disable",
+  "cli.first_run_status": "First-run doctor: version, audit log, takeover command, and MCP endpoints"
 }
