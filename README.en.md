@@ -43,14 +43,16 @@ More screenshots of the bot chat UI are in their own section below: [Bot chat UI
 
 ## Download
 
-Everything is on [v0.3.2-os-preview](https://github.com/gatesenman/foxos/releases/tag/v0.3.2-os-preview) (pre-release); `SHA256SUMS` in the same release covers every file. Two different things:
+Releases are split by product line, and all current tags are pre-release. Two different things:
 
-- **The FoxOS operating system**: the bootable ISO (Ubuntu 24.04 + XFCE). The screenshots above are this system. From 0.3.2 the default browser is Google Chrome, installed from Google's official repository at first login (see [docs/os.md](docs/os.md)).
-- **The desktop companion + `foxos` CLI**: an app for your existing Windows / macOS / Linux. It bundles Python 3.12 and the kernel, so `foxos` works in a terminal right after install.
+- **The FoxOS operating system**: the bootable ISO (Ubuntu 24.04 + XFCE). The screenshots above are the 0.3.4 system. ISO parts are on [v0.3.4-os-preview](https://github.com/gatesenman/foxos/releases/tag/v0.3.4-os-preview) with `SHA256SUMS` in that release. From 0.3.2 the default browser is Google Chrome, installed from Google's official repository at first login (see [docs/os.md](docs/os.md)).
+- **The desktop companion + `foxos` CLI**: an app for existing Windows / macOS / Linux. **Windows companion builds are on [v0.3.4-windows-preview](https://github.com/gatesenman/foxos/releases/tag/v0.3.4-windows-preview)**. macOS / Linux companion builds are still only on [v0.3.2-os-preview](https://github.com/gatesenman/foxos/releases/tag/v0.3.2-os-preview); this repo has no 0.3.4 mac/linux companion packages. Each release includes `SHA256SUMS`.
+
+Windows 0.3.4 SHA256 (from that release's `SHA256SUMS`): `FoxOS-Setup-0.3.4-x64.exe` = `90af7b8e2e84e4ae0cc056ba1693a02cf7c87f2ab0c6d9fa321a238d222849e1`; `FoxOS-0.3.4-win-x64.zip` = `8e14a5c8d66eb8c62b87ac967a9a034ebf3dcaae77074145cb6b5f858e6c0744`. Windows and macOS packages have not been smoke-tested on real machines; treat them as previews.
 
 | OS | x64 | arm64 |
 | --- | --- | --- |
-| Windows 10 1809+ / 11 | `FoxOS-Setup-0.3.2-x64.exe` (installer) · `FoxOS-0.3.2-win-x64.zip` (portable) | `FoxOS-Setup-0.3.2-arm64.exe` · `FoxOS-0.3.2-win-arm64.zip` |
+| Windows 10 1809+ / 11 (0.3.4 companion) | [FoxOS-Setup-0.3.4-x64.exe](https://github.com/gatesenman/foxos/releases/download/v0.3.4-windows-preview/FoxOS-Setup-0.3.4-x64.exe) · [FoxOS-0.3.4-win-x64.zip](https://github.com/gatesenman/foxos/releases/download/v0.3.4-windows-preview/FoxOS-0.3.4-win-x64.zip) | [FoxOS-Setup-0.3.4-arm64.exe](https://github.com/gatesenman/foxos/releases/download/v0.3.4-windows-preview/FoxOS-Setup-0.3.4-arm64.exe) · [FoxOS-0.3.4-win-arm64.zip](https://github.com/gatesenman/foxos/releases/download/v0.3.4-windows-preview/FoxOS-0.3.4-win-arm64.zip) |
 | macOS 11+ | Intel: `FoxOS-0.3.2-mac-x64.zip` | Apple silicon: `FoxOS-0.3.2-mac-arm64.zip` |
 | Ubuntu / Debian / Mint | `FoxOS-0.3.2-linux-x64.deb` | `FoxOS-0.3.2-linux-arm64.deb` |
 | Fedora / RHEL / Rocky / Alma / openSUSE | `FoxOS-0.3.2-linux-x64.rpm` | `FoxOS-0.3.2-linux-arm64.rpm` |
