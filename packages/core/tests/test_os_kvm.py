@@ -16,9 +16,15 @@ def test_US61_linux_kvm_is_a_builtin_provider(fox, fxhome=None):
     # 此构建盒是 KVM 来宾，/dev/kvm 往往存在但创建 vCPU 会触发内核 BUG。
     probe = kvm.kvm_probe()
     assert probe["device"] == "/dev/kvm"
-    if probe["known_broken"] or os.environ.get("FOXOS_KVM") == "0":
+    reason = probe["reason"] or ""
+    if os.environ.get("FOXOS_KVM") == "0":
         assert probe["available"] is False
-        assert "kvm_arch_vcpu_create" in (probe["reason"] or "") or "FOXOS_KVM" in (probe["reason"] or "")
+        assert "FOXOS_KVM" in reason
+    elif probe["known_broken"]:
+        assert probe["available"] is False
+        # kvm_probe 先报告缺设备 / 无读写权限，只有设备可用时才报告内核 BUG。
+        if probe["exists"] and probe["writable"]:
+            assert "kvm_arch_vcpu_create" in reason
 
 
 def test_US61_env_run_and_desktop_attach_verbs(fox, tmp_path):
