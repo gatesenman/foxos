@@ -64,14 +64,16 @@ Windows 上的 `.exe` 是**伴侣程序**（预览版见 [v0.3.4-windows-preview
 
 ## 下载
 
-所有文件都在 [v0.3.2-os-preview](https://github.com/gatesenman/foxos/releases/tag/v0.3.2-os-preview)（预发布），每个文件的 SHA-256 在同一发布的 `SHA256SUMS` 里。两种东西不要混淆：
+文件按产品线分开发布，都是预发布。两种东西不要混淆：
 
-- **狐狸OS 操作系统**：可引导 ISO（Ubuntu 24.04 + XFCE），上面的截图就是它。0.3.2 起默认浏览器是 Google Chrome（首次登录时从 Google 官方源安装，见 [docs/os.md](docs/os.md#浏览器为什么-chrome-不在-iso-里怎么装)）。
-- **桌面伴侣程序 + `foxos` 命令行**：装在现有 Windows / macOS / Linux 上的应用程序，自带 Python 3.12 与内核，装好就能在终端里用 `foxos`。
+- **狐狸OS 操作系统**：可引导 ISO（Ubuntu 24.04 + XFCE），上面的截图就是 0.3.4 系统。ISO 分卷在 [v0.3.4-os-preview](https://github.com/gatesenman/foxos/releases/tag/v0.3.4-os-preview)，SHA-256 见同一发布的 `SHA256SUMS`。0.3.2 起默认浏览器是 Google Chrome（首次登录时从 Google 官方源安装，见 [docs/os.md](docs/os.md#浏览器为什么-chrome-不在-iso-里怎么装)）。
+- **桌面伴侣程序 + `foxos` 命令行**：装在现有 Windows / macOS / Linux 上的应用程序。**Windows 伴侣请用 [v0.3.4-windows-preview](https://github.com/gatesenman/foxos/releases/tag/v0.3.4-windows-preview)**；macOS / Linux 伴侣在本仓库目前仍只发布在 [v0.3.2-os-preview](https://github.com/gatesenman/foxos/releases/tag/v0.3.2-os-preview)，没有 0.3.4 的 mac/linux 伴侣包。各发布都带 `SHA256SUMS`。
+
+Windows 0.3.4 伴侣 SHA256（摘自该发布的 `SHA256SUMS`）：`FoxOS-Setup-0.3.4-x64.exe` = `90af7b8e2e84e4ae0cc056ba1693a02cf7c87f2ab0c6d9fa321a238d222849e1`；`FoxOS-0.3.4-win-x64.zip` = `8e14a5c8d66eb8c62b87ac967a9a034ebf3dcaae77074145cb6b5f858e6c0744`；arm64 Setup/zip 见同一文件。Windows 与 macOS 安装包尚未在真机上测过，请当作预览。
 
 | 系统 | x64 | arm64 |
 | --- | --- | --- |
-| Windows 10 1809+ / 11 | `FoxOS-Setup-0.3.2-x64.exe`（安装程序）· `FoxOS-0.3.2-win-x64.zip`（便携版） | `FoxOS-Setup-0.3.2-arm64.exe` · `FoxOS-0.3.2-win-arm64.zip` |
+| Windows 10 1809+ / 11（0.3.4 伴侣） | [FoxOS-Setup-0.3.4-x64.exe](https://github.com/gatesenman/foxos/releases/download/v0.3.4-windows-preview/FoxOS-Setup-0.3.4-x64.exe) · [FoxOS-0.3.4-win-x64.zip](https://github.com/gatesenman/foxos/releases/download/v0.3.4-windows-preview/FoxOS-0.3.4-win-x64.zip) | [FoxOS-Setup-0.3.4-arm64.exe](https://github.com/gatesenman/foxos/releases/download/v0.3.4-windows-preview/FoxOS-Setup-0.3.4-arm64.exe) · [FoxOS-0.3.4-win-arm64.zip](https://github.com/gatesenman/foxos/releases/download/v0.3.4-windows-preview/FoxOS-0.3.4-win-arm64.zip) |
 | macOS 11+ | Intel：`FoxOS-0.3.2-mac-x64.zip` | Apple 芯片：`FoxOS-0.3.2-mac-arm64.zip` |
 | Ubuntu / Debian / Mint / deepin / UOS | `FoxOS-0.3.2-linux-x64.deb` | `FoxOS-0.3.2-linux-arm64.deb` |
 | Fedora / RHEL / Rocky / Alma / openEuler / openSUSE | `FoxOS-0.3.2-linux-x64.rpm` | `FoxOS-0.3.2-linux-arm64.rpm` |
