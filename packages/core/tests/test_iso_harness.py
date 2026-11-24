@@ -53,3 +53,93 @@ def test_boot_defaults_to_tcg_even_when_kvm_looks_accessible(harness, monkeypatc
     assert state["accel"] == "tcg"
     assert qemu[qemu.index("-accel") + 1] == "tcg,tb-size=256"
     assert qemu[qemu.index("-cpu") + 1] == "max"
+
+
+def test_storage_preflight_uses_resolved_disk_destinations(harness, monkeypatch, tmp_path):
+    work = tmp_path / 'metadata'; work.mkdir()
+    disk = tmp_path / 'artifact-mount'; disk.mkdir()
+    (disk / 'target').touch()
+    (work / 'target.qcow2').symlink_to(disk / 'target')
+    monkeypatch.setattr(harness, 'WORK', work)
+    checked = []
+    def usage(path):
+        checked.append(Path(path))
+        return SimpleNamespace(free=100 * 1024**3)
+    monkeypatch.setattr(harness.shutil, 'disk_usage', usage)
+    harness.storage_preflight()
+    assert disk / 'target' in checked and work in checked
+    assert Path('/') not in checked
+
+
+def test_storage_preflight_refuses_before_qemu(harness, monkeypatch, tmp_path):
+    monkeypatch.setattr(harness, 'WORK', tmp_path)
+    monkeypatch.setattr(harness.shutil, 'disk_usage', lambda path: SimpleNamespace(free=0))
+    with pytest.raises(RuntimeError, match='Insufficient artifact storage'):
+        harness.boot('candidate.iso', False, 1024, 1)
+    assert not (tmp_path / 'qemu.pid').exists()
+
+
+def test_existing_guest_is_not_restarted(harness, monkeypatch):
+    monkeypatch.setattr(harness, 'guest_running', lambda: True)
+    with pytest.raises(RuntimeError, match='Existing VM'):
+        harness.boot('candidate.iso', False, 1024, 1)
+
+
+def test_installed_boot_never_attaches_key_seed(harness, monkeypatch, tmp_path):
+    monkeypatch.setattr(harness, 'WORK', tmp_path)
+    monkeypatch.setattr(harness, 'STATE', tmp_path / 'vm.json')
+    (tmp_path / 'vars.fd').write_bytes(b'fixture')
+    monkeypatch.setattr(harness, 'make_seed', lambda: pytest.fail('installed boot must not create seed'))
+    calls = []
+    monkeypatch.setattr(harness.subprocess, 'run', lambda args, **kw: calls.append(args))
+    harness.boot(None, True, 1024, 1)
+    assert not any('media=cdrom' in arg or 'ide-cd' in arg for arg in calls[-1])
+    assert 'chardev:serial0' in calls[-1]
+
+
+@pytest.mark.parametrize('blocks,accepted', [([], True), ([{'removable': True}], True),
+    ([{'removable': True, 'inserted': {'file': 'seed.iso'}}], False),
+    ([{'removable': False, 'inserted': {'file': 'target.qcow2'}}], True)])
+def test_empty_optical_hardware_is_not_inserted_media(harness, blocks, accepted):
+    if accepted:
+        harness.assert_no_optical_media(blocks)
+    else:
+        with pytest.raises(AssertionError): harness.assert_no_optical_media(blocks)
+
+
+@pytest.mark.parametrize('text,phase', [('healthy', 'no-errors'),
+    ('SQUASHFS error\nPlease remove the installation medium', 'before-removal-prompt'),
+    ('Please remove the installation medium\nSQUASHFS error', 'after-removal-prompt')])
+def test_squashfs_error_timing_is_not_hidden(harness, text, phase):
+    assert harness.squashfs_phase(text) == phase
+
+
+def test_installed_admin_uses_stdin_without_exposing_fixture(harness, monkeypatch):
+    monkeypatch.setattr(harness, 'state', lambda: {'from_disk': True})
+    monkeypatch.setattr(harness, 'INSTALL_PW', 'temporary-fixture-only')
+    calls = []
+    monkeypatch.setattr(harness, 'ssh', lambda cmd, **kw: calls.append((cmd, kw)))
+    harness.admin('id -u')
+    command, options = calls[0]
+    assert 'temporary-fixture-only' not in command
+    assert options['input'] == 'temporary-fixture-only\n'
+    assert harness.scrub('temporary-fixture-only') == '***'
+
+
+def test_disconnect_does_not_replay_mutating_ssh(harness, monkeypatch):
+    monkeypatch.setattr(harness, 'ssh_base', lambda *a: ['ssh'])
+    calls = []
+    def run(*a, **kw):
+        calls.append(a); return SimpleNamespace(returncode=255, stdout='', stderr='disconnected')
+    monkeypatch.setattr(harness.subprocess, 'run', run)
+    harness.ssh('sudo systemctl reboot')
+    assert len(calls) == 1
+
+
+def test_browser_checks_observed_document_not_body_title(harness):
+    document = {'url': 'https://example.com/', 'title': 'Example Domain',
+                'backend': 'agent-browser@0.42.0', 'refs': 1,
+                'snapshot': 'This domain is for use in documentation examples\n- link "Learn more" [ref=e1]'}
+    harness.assert_browser_document(document)
+    for changed in ({'snapshot': ''}, {'url': 'https://wrong.example/'}, {'backend': 'builtin'}, {'refs': 0}):
+        with pytest.raises(AssertionError): harness.assert_browser_document(document | changed)

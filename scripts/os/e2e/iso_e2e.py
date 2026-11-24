@@ -22,6 +22,7 @@ import json
 import os
 import re
 import shlex
+import shutil
 import socket
 import subprocess
 import sys
@@ -74,13 +75,119 @@ def make_seed() -> Path:
     return iso
 
 
+def storage_preflight() -> list[dict]:
+    """Budget writes on each resolved destination device, including disk symlinks."""
+    budgets = [(WORK, 128 * 1024**2), (WORK / "target.qcow2", 12 * 1024**3),
+               (WORK / "data.qcow2", 2 * 1024**3)]
+    devices = {}
+    for destination, required in budgets:
+        location = destination.resolve()
+        while not location.exists():
+            location = location.parent
+        device = location.stat().st_dev
+        row = devices.setdefault(device, {"path": str(location), "required": 0,
+                                           "free": shutil.disk_usage(location).free})
+        row["required"] += required
+    for row in devices.values():
+        if row["free"] < row["required"]:
+            raise RuntimeError(f"Insufficient artifact storage: {row}")
+    return list(devices.values())
+
+
+def guest_running() -> bool:
+    pidfile = WORK / "qemu.pid"
+    if not pidfile.exists():
+        return False
+    process = Path("/proc") / pidfile.read_text().strip()
+    try:
+        status = (process / "stat").read_text().rsplit(")", 1)[1].split()[0]
+        if status == "Z":
+            return False
+        args = (process / "cmdline").read_bytes().split(b"\0")
+        if str(WORK / "qemu.pid").encode() not in args:
+            raise RuntimeError("PID file points to an unrelated process; refusing VM control")
+        return True
+    except FileNotFoundError:
+        return False
+
+
+def assert_no_optical_media(blocks: list[dict]) -> None:
+    """Empty optical hardware is valid; inserted media is not."""
+    assert isinstance(blocks, list)
+    assert not [b for b in blocks if b.get("removable") and b.get("inserted")], blocks
+
+
+def admin(command: str, *, timeout: float = 600, check: bool = True):
+    if state()["from_disk"]:
+        if INSTALL_PW not in _SECRETS:
+            _SECRETS.append(INSTALL_PW)
+        return ssh("sudo -S -p '' -- sh -c " + shlex.quote(command),
+                   input=INSTALL_PW + "\n", timeout=timeout, check=check)
+    return ssh("sudo -n -- sh -c " + shlex.quote(command), timeout=timeout, check=check)
+
+
+def squashfs_phase(console: str) -> str:
+    error = console.find("SQUASHFS error")
+    prompt = console.find("Please remove the installation medium")
+    if error < 0:
+        return "no-errors"
+    return "after-removal-prompt" if 0 <= prompt < error else "before-removal-prompt"
+
+
+def assert_browser_document(result: dict) -> None:
+    assert result.get("backend") == "agent-browser@0.42.0", result
+    assert result.get("url") == "https://example.com/" and result.get("title") == "Example Domain", result
+    text = result.get("snapshot", "")
+    assert "This domain is for use in documentation examples" in text, text
+    assert 'link "Learn more"' in text and result.get("refs", 0) >= 1, text
+
+
+def poweroff(timeout: float = 180) -> dict:
+    """Normal guest shutdown; only acknowledge the observed Casper prompt."""
+    serial = socket.socket(socket.AF_UNIX)
+    serial.settimeout(1)
+    serial.connect(str(WORK / "serial.sock"))
+    serial.setblocking(False)
+    started = time.monotonic()
+    sent = False
+    try:
+        admin("systemctl poweroff", timeout=60, check=False)
+        while guest_running() and time.monotonic() - started < timeout:
+            # Keep the console connected; closing immediately can lose input.
+            try:
+                serial.recv(65536)
+            except (BlockingIOError, OSError):
+                pass
+            text = Path(state()["serial"]).read_text(errors="replace")
+            if not state()["from_disk"] and not sent and "Please remove the installation medium" in text:
+                serial.sendall(b"\r")
+                sent = True
+            time.sleep(0.5)
+        assert not guest_running(), "Normal shutdown timed out; no forced stop counted as success"
+    finally:
+        serial.close()
+    (WORK / "qemu.pid").unlink(missing_ok=True)
+    console = Path(state()["serial"])
+    text = console.read_text(errors="replace")
+    phase = squashfs_phase(text)
+    clean = re.sub(r"((?:一次性密码|password)[^:：\n]*[:：]\s*)\S{16}", r"\1[REDACTED]", text, flags=re.I)
+    console.write_text(clean)
+    result = {"normal_exit": True, "forced_stop": False, "prompt_acknowledged": sent,
+              "squashfs_phase": phase, "seconds": round(time.monotonic() - started, 2)}
+    (WORK / "shutdown.json").write_text(json.dumps(result, indent=2) + "\n")
+    assert phase != "before-removal-prompt", "Squashfs errors preceded media removal"
+    return result
+
+
 def boot(iso: str | None, from_disk: bool, mem: int, cpus: int) -> dict:
     accel = os.environ.get("FOXOS_E2E_ACCEL", "tcg")
     if accel not in ("kvm", "tcg"):
         sys.exit("没有可用的 /dev/kvm；用软件模拟请显式设 FOXOS_E2E_ACCEL=tcg")
-    stop()
+    if guest_running():
+        raise RuntimeError("Existing VM is running; refusing duplicate boot")
+    capacity = storage_preflight()
     WORK.mkdir(parents=True, exist_ok=True)
-    seed = make_seed()
+    seed = make_seed() if not from_disk else None
     for name, size in (("target.qcow2", "32G"), ("data.qcow2", "40G")):
         if not (WORK / name).exists():
             subprocess.run(["qemu-img", "create", "-q", "-f", "qcow2", str(WORK / name), size], check=True)
@@ -95,16 +202,19 @@ def boot(iso: str | None, from_disk: bool, mem: int, cpus: int) -> dict:
             "-drive", f"if=pflash,format=raw,readonly=on,file={OVMF_CODE}", "-drive", f"if=pflash,format=raw,file={vars_fd}",
             "-drive", f"file={WORK / 'target.qcow2'},if=none,id=t,format=qcow2", "-device", "virtio-blk-pci,drive=t,serial=foxostarget,bootindex=1",
             "-drive", f"file={WORK / 'data.qcow2'},if=none,id=dd,format=qcow2", "-device", "virtio-blk-pci,drive=dd,serial=foxosdata",
-            "-drive", f"file={seed},media=cdrom,if=none,id=seed,readonly=on", "-device", "ide-cd,drive=seed,bus=ide.1",
             "-netdev", f"user,id=n0,hostfwd=tcp:127.0.0.1:{port}-:22", "-device", "virtio-net-pci,netdev=n0",
             "-vga", "virtio", "-display", "none", "-qmp", f"unix:{mon},server,nowait",
-            "-serial", f"file:{serial}", "-device", "virtio-rng-pci", "-daemonize", "-pidfile", str(WORK / "qemu.pid")]
+            "-chardev", f"socket,id=serial0,path={WORK / 'serial.sock'},server=on,wait=off,logfile={serial}",
+            "-serial", "chardev:serial0", "-device", "virtio-rng-pci", "-daemonize", "-pidfile", str(WORK / "qemu.pid")]
     if not from_disk:
+        argv += ["-drive", f"file={seed},media=cdrom,if=none,id=seed,readonly=on", "-device", "ide-cd,drive=seed,bus=ide.1"]
         argv += ["-drive", f"file={iso},media=cdrom,if=none,id=cd,readonly=on", "-device", "ide-cd,drive=cd,bus=ide.0,bootindex=0"]
     if serial.exists():
         serial.rename(serial.with_suffix(f".{int(time.time())}.log"))
     subprocess.run(argv, check=True)
     st = {"port": port, "accel": accel, "iso": iso, "from_disk": from_disk, "started": now(), "serial": str(serial), "mem": mem}
+    st["storage_preflight"] = capacity
+    (WORK / "qemu-argv.json").write_text(json.dumps(argv, indent=2))
     STATE.write_text(json.dumps(st))
     log(f"VM 已启动：accel={accel} ssh 127.0.0.1:{port} {'磁盘' if from_disk else iso}")
     return st
@@ -166,11 +276,8 @@ def ssh_base(user: str = "foxos", key: bool = True, extra: list[str] | None = No
 def ssh(command: str, *, user: str = "foxos", input: str | None = None, timeout: float = 600, check: bool = False) -> subprocess.CompletedProcess:
     # 远端用登录 shell，PATH 与图形会话变量和用户自己登录时一样
     wrapped = "export DISPLAY=:0 XAUTHORITY=$HOME/.Xauthority XDG_RUNTIME_DIR=/run/user/$(id -u); " + command
-    for attempt in range(3):  # TCG 下来宾很忙时偶尔连不上（255），重试
-        p = subprocess.run(ssh_base(user) + ["bash", "-lc", shlex.quote(wrapped)], input=input, capture_output=True, text=True, timeout=timeout)
-        if p.returncode != 255 or p.stdout:
-            break
-        time.sleep(15)
+    # Never replay a mutating command after an ambiguous SSH disconnect.
+    p = subprocess.run(ssh_base(user) + ["bash", "-lc", shlex.quote(wrapped)], input=input, capture_output=True, text=True, timeout=timeout)
     if check and p.returncode != 0:
         raise AssertionError(f"`{command}` 退出码 {p.returncode}: {scrub(p.stderr[-800:])}")
     return p
@@ -339,6 +446,7 @@ def case_chrome() -> str:
             break
         time.sleep(10)
     assert title, "CDP 没有看到 example.com 的标签页"
+    assert_browser_document(j(ssh("foxos browser snapshot --json", check=True))["result"])
     shot = screendump(WORK / f"e2e-chrome-{int(time.time())}.png")
     default = ssh("xdg-settings get default-web-browser 2>/dev/null; update-alternatives --query x-www-browser | grep Value").stdout
     return f"{ver}；从 dl.google.com 装好；CDP 开启后 browser tabs 看到「{title}」；默认浏览器：{' '.join(default.split())}", [str(shot)]
@@ -407,7 +515,9 @@ def case_preset() -> str:
 def case_installed_ssh() -> str:
     """从 Calamares 装好的磁盘启动后：密钥可登录、密码登录关闭并被拒、root 被拒、foxos 可用、不是现场会话。"""
     took = wait_ssh(float(os.environ.get("FOXOS_E2E_BOOT_TIMEOUT", "3600")))
-    eff = ssh("sudo -n sshd -T 2>/dev/null | grep -E '^(passwordauthentication|permitrootlogin) ' || echo need-sudo").stdout
+    eff = admin("/usr/sbin/sshd -T | grep -E '^(passwordauthentication|permitrootlogin) '").stdout
+    assert "passwordauthentication no" in eff and "permitrootlogin no" in eff
+    assert_no_optical_media(qmp({"execute": "query-block"})[0]["return"])
     casper = ssh("test -d /run/casper || grep -q boot=casper /proc/cmdline && echo live || echo installed").stdout.strip()
     assert casper == "installed", casper
     bad = password_attempt(os.environ.get("FOXOS_E2E_USER", "foxos"), os.environ.get("FOXOS_E2E_INSTALL_PW", "Fox-E2E-install-2026!"))
