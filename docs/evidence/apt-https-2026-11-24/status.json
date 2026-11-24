@@ -20,5 +20,6 @@
   "runtime_source_changed": false,
   "iso_rebuilt": false,
   "chrome_original_configuration": "FAIL retained; no installation rerun in this diagnostic",
-  "conclusion": "APT transport failure reproduced outside FoxOS and without FoxOS apt configuration. Exact network/intermediary mechanism unresolved. No safe product patch justified; stop this diagnostic branch rather than downgrade TLS or HTTP."
+  "conclusion": "APT transport failure reproduced outside FoxOS and without FoxOS apt configuration. Exact network/intermediary mechanism unresolved. No safe product patch justified; stop this diagnostic branch rather than downgrade TLS or HTTP.",
+  "publication_normalization": "configuration.log: trailing whitespace removed only; original local log unchanged"
 }

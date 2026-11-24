@@ -1,0 +1,9 @@
+xorriso 1.5.6 : RockRidge filesystem manipulator, libburnia project.
+
+[2026-11-24 16:27:32] VM 已启动：accel=tcg ssh 127.0.0.1:48095 /opt/foxos-artifacts/candidate-86c7c2e/FoxOS-0.3.4-candidate-86c7c2e-amd64.iso
+2026-11-24 16:29:37 configuration returncode 0
+2026-11-24 16:29:39 curl-default-get returncode 0
+2026-11-24 16:29:41 curl-http11-get returncode 0
+2026-11-24 16:29:42 ubuntu-signature returncode 0
+2026-11-24 16:29:43 apt-default-get returncode 100
+2026-11-24 16:29:44 apt-clean-config-get returncode 100

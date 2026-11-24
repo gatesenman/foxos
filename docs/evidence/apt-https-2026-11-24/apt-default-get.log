@@ -1,0 +1,4 @@
+Err:1 https://archive.ubuntu.com/ubuntu/dists/noble/InRelease
+  Could not handshake: The TLS connection was non-properly terminated. [IP: 198.18.0.1 443]
+E: Failed to fetch https://archive.ubuntu.com/ubuntu/dists/noble/InRelease  Could not handshake: The TLS connection was non-properly terminated. [IP: 198.18.0.1 443]
+E: Download Failed
