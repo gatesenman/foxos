@@ -9,7 +9,7 @@
   python3 scripts/os/e2e/iso_e2e.py run installed_ssh
   python3 scripts/os/e2e/iso_e2e.py report docs/test-report.md
 
-没有 KVM 时必须显式设 FOXOS_E2E_ACCEL=tcg（很慢，但能跑）。
+测试默认使用 TCG，不探测或自动启用 KVM。
 DeepSeek 密钥只在 bots 用例运行时从 ~/.secrets/deepseek_api_key 读出，经 SSH 的标准输入写进来宾的 foxos 密钥库；
 不写日志、不进结果文件（所有输出在保存前都会把密钥替换成 ***）。
 """
@@ -75,7 +75,7 @@ def make_seed() -> Path:
 
 
 def boot(iso: str | None, from_disk: bool, mem: int, cpus: int) -> dict:
-    accel = os.environ.get("FOXOS_E2E_ACCEL") or ("kvm" if os.access("/dev/kvm", os.R_OK | os.W_OK) else "")
+    accel = os.environ.get("FOXOS_E2E_ACCEL", "tcg")
     if accel not in ("kvm", "tcg"):
         sys.exit("没有可用的 /dev/kvm；用软件模拟请显式设 FOXOS_E2E_ACCEL=tcg")
     stop()
@@ -553,7 +553,7 @@ def case_win_client() -> str:
             f"x11vnc（{ver}）-localhost 经 ssh -W 转发读到 {banner.strip()} 握手")
 
 
-def case_cu() -> str:
+def case_cu(semantic_only: bool = False) -> str:
     """电脑操控真实端到端（test_cu_real.py，FOXOS_CU_E2E=1）在启动的 ISO 里跑：agent-desktop / agent-browser / Chrome CDP / Jev / DeepSeek。
 
     测试文件从本仓库拷进来宾 ~/cu-e2e；pytest 装到 /tmp/cu-pt（测试专用）；xedit（x11-apps）不在 ISO 里，测试时从 Ubuntu 源装。
@@ -567,23 +567,32 @@ def case_cu() -> str:
     import io, tarfile
     buf = io.BytesIO()
     with tarfile.open(fileobj=buf, mode="w:gz") as tf:
-        for rel in ("packages/core/tests/test_cu_real.py", "packages/core/tests/conftest.py", "scripts/cu_bench.py"):
+        for rel in ("packages/core/tests/test_cu_real.py", "packages/core/tests/test_cu_gui.py", "packages/core/tests/conftest.py", "scripts/cu_bench.py"):
             tf.add(root / rel, arcname=rel)
     up = subprocess.run(ssh_base() + ["rm -rf ~/cu-e2e && mkdir -p ~/cu-e2e/packages/core && tar -xzf - -C ~/cu-e2e"], input=buf.getvalue(), capture_output=True, timeout=300)
     assert up.returncode == 0, up.stderr[-300:]
     ssh("ln -sfn /usr/lib/foxos/python/foxos ~/cu-e2e/packages/core/foxos; "
         "test -d /tmp/cu-pt || /usr/lib/foxos/venv/bin/python -m pip install -q --target /tmp/cu-pt pytest; "
         "command -v xedit || { sudo -n apt-get update -q >/dev/null; sudo -n DEBIAN_FRONTEND=noninteractive apt-get install -y -q x11-apps >/dev/null; }", check=True, timeout=3600)
-    ds = SECRET_FILE.read_text().strip()
-    tsf = Path(os.environ.get("FOXOS_E2E_TYPESAFE_KEY_FILE", str(Path.home() / ".secrets/typesafe_api_key")))
-    ts = tsf.read_text().strip() if tsf.exists() else ""
-    _SECRETS.extend([ds, ts])
-    cmd = ("read -r DEEPSEEK_API_KEY; read -r TYPESAFE_API_KEY; export DEEPSEEK_API_KEY TYPESAFE_API_KEY; "
-           "[ -n \"$TYPESAFE_API_KEY\" ] || unset TYPESAFE_API_KEY; cd ~/cu-e2e/packages/core; "
-           "FOXOS_CU_E2E=1 FOXOS_CU_E2E_WS=$HOME/FoxOS/workspace PYTHONPATH=/tmp/cu-pt:/usr/lib/foxos/python "
-           "timeout 7000 /usr/lib/foxos/venv/bin/python -m pytest -q -p no:cacheprovider -rA tests/test_cu_real.py" + (f" -k {shlex.quote(os.environ['FOXOS_E2E_CU_K'])}" if os.environ.get("FOXOS_E2E_CU_K") else "")
-           + " > /tmp/cu-e2e.log 2>&1; tail -60 /tmp/cu-e2e.log")
-    p = ssh(cmd, input=f"{ds}\n{ts}\n", timeout=7500)
+    if semantic_only:
+        # 只导入 ISO 自带的运行代码。此分支不读取任何模型密钥。
+        cmd = ("cd ~/cu-e2e/packages/core; DISPLAY=:0 FOXOS_CU_GUI=1 LANG=C.UTF-8 "
+               "FOXOS_CU_EVIDENCE_DIR=$HOME/cu-evidence "
+               "PYTHONPATH=/tmp/cu-pt:/usr/lib/foxos/python "
+               "timeout 1200 /usr/lib/foxos/venv/bin/python -m pytest -q -s -p no:cacheprovider -rA "
+               "tests/test_cu_gui.py > /tmp/cu-semantic.log 2>&1; cat /tmp/cu-semantic.log")
+        p = ssh(cmd, timeout=1300)
+    else:
+        ds = SECRET_FILE.read_text().strip()
+        tsf = Path(os.environ.get("FOXOS_E2E_TYPESAFE_KEY_FILE", str(Path.home() / ".secrets/typesafe_api_key")))
+        ts = tsf.read_text().strip() if tsf.exists() else ""
+        _SECRETS.extend([ds, ts])
+        cmd = ("read -r DEEPSEEK_API_KEY; read -r TYPESAFE_API_KEY; export DEEPSEEK_API_KEY TYPESAFE_API_KEY; "
+               "[ -n \"$TYPESAFE_API_KEY\" ] || unset TYPESAFE_API_KEY; cd ~/cu-e2e/packages/core; "
+               "FOXOS_CU_E2E=1 FOXOS_CU_E2E_WS=$HOME/FoxOS/workspace PYTHONPATH=/tmp/cu-pt:/usr/lib/foxos/python "
+               "timeout 7000 /usr/lib/foxos/venv/bin/python -m pytest -q -p no:cacheprovider -rA tests/test_cu_real.py" + (f" -k {shlex.quote(os.environ['FOXOS_E2E_CU_K'])}" if os.environ.get("FOXOS_E2E_CU_K") else "")
+               + " > /tmp/cu-e2e.log 2>&1; tail -60 /tmp/cu-e2e.log")
+        p = ssh(cmd, input=f"{ds}\n{ts}\n", timeout=7500)
     out = scrub(p.stdout)
     (WORK / f"cu-{int(time.time())}.log").write_text(out)
     summary = next((l for l in reversed(out.splitlines()) if re.search(r"\d+ (passed|failed)", l)), out[-300:])
@@ -594,7 +603,7 @@ def case_cu() -> str:
 
 
 CASES = {"ssh": case_ssh, "foxos_over_ssh": case_foxos_over_ssh, "runtime": case_runtime, "acp": case_acp, "desktop": case_desktop,
-         "chrome": case_chrome, "bots": case_bots, "preset": case_preset, "installed_ssh": case_installed_ssh, "install": case_install, "win_client": case_win_client, "cu": case_cu}
+         "chrome": case_chrome, "bots": case_bots, "preset": case_preset, "installed_ssh": case_installed_ssh, "install": case_install, "win_client": case_win_client, "cu": case_cu, "cu_semantic": lambda: case_cu(semantic_only=True)}
 
 
 def run(names: list[str]) -> int:
