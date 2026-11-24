@@ -1,0 +1,8 @@
+{
+  "iso_sha256": "8f7658ba6019b40b2b39ecd9d2e096b323512abd491e92a18f3cce3724530bee",
+  "extracted_squashfs_bytes": 2158350336,
+  "extract_exit_code": 0,
+  "all_data_pseudo_stream_exit_code": 0,
+  "all_data_command": "unsquashfs -processors 2 -no-progress -strict-errors -pf /dev/null filesystem.squashfs",
+  "claim": "Native full data reconstruction succeeded; does not prove the prior guest post-eject error fixed"
+}

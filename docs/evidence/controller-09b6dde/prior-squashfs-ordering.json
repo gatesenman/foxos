@@ -1,0 +1,9 @@
+{
+  "prior_console_sha256": "93d1c884933a47f8a7ad5b23535f7194a52bd98b48419c408d029c6e34d4cbe6",
+  "first_error_phase": "after-removal-prompt",
+  "error_lines": 207,
+  "iso_casper_stop_sha256": "25bd214ffef20ad7a2569073df3a2385cbb5bb5547adbf5f3cf1526e15a8206f",
+  "packaged_behavior": "prints removal prompt, ejects device, then waits on console",
+  "full_squashfs_reconstruction_exit": 0,
+  "conclusion": "Consistent with post-ejection unavailable medium, not current ISO corruption. Does not establish a fixed guest cache or shutdown issue."
+}

@@ -1,0 +1,30 @@
+{
+  "request_results": [
+    {
+      "url": "https://archive.ubuntu.com/ubuntu/dists/noble/InRelease",
+      "method": "HEAD",
+      "http_status_lines": [
+        "HTTP/2 200 "
+      ],
+      "tls_verification_disabled": false
+    },
+    {
+      "url": "https://security.ubuntu.com/ubuntu/dists/noble/InRelease",
+      "method": "HEAD",
+      "http_status_lines": [
+        "HTTP/2 200 "
+      ],
+      "tls_verification_disabled": false
+    },
+    {
+      "url": "https://dl.google.com/linux/linux_signing_key.pub",
+      "method": "HEAD",
+      "http_status_lines": [
+        "HTTP/2 200 "
+      ],
+      "tls_verification_disabled": false
+    }
+  ],
+  "cookies_omitted": true,
+  "does_not_prove_apt_get_succeeded": true
+}

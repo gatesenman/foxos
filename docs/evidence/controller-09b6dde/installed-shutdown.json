@@ -1,0 +1,7 @@
+{
+  "normal_exit": true,
+  "forced_stop": false,
+  "prompt_acknowledged": false,
+  "squashfs_phase": "no-errors",
+  "seconds": 5.32
+}

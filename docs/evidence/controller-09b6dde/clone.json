@@ -1,0 +1,7 @@
+{
+  "source": "/opt/foxos-artifacts/candidate-86c7c2e/target.qcow2",
+  "clone_sha256": "9eb43a93b24e318d2de81900d09800ed608e2c9d2db62f653b612e8543340425",
+  "controller_commit": "09b6dde",
+  "candidate_source": "86c7c2e",
+  "old_evidence_untouched": true
+}

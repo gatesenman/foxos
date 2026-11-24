@@ -1,0 +1,5 @@
+{
+  "pass": true,
+  "scope": "previous actual guest response, not a new browser run",
+  "sha256": "1b2779f14d1a577bc26289fe2c2d32e8c69520023c1ea6ae60b7db65fe76f275"
+}

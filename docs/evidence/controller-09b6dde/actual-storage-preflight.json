@@ -1,0 +1,16 @@
+{
+  "split_mount_layout": [
+    {
+      "path": "/workspace/foxos-evidence/2026-11-24/candidate-86c7c2e/vm",
+      "required": 2281701376,
+      "free": 9548046336
+    },
+    {
+      "path": "/opt/foxos-artifacts/candidate-86c7c2e/target.qcow2",
+      "required": 12884901888,
+      "free": 99918569472
+    }
+  ],
+  "all_workspace_refused_before_write": "Insufficient artifact storage: {'path': '/workspace/foxos-evidence/2026-11-24', 'required': 15166603264, 'free': 9548046336}",
+  "actual_boot_or_disk_creation_attempted": false
+}

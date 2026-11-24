@@ -1,0 +1,34 @@
+[
+  {
+    "case": "installed_ssh",
+    "status": "PASS",
+    "started": "2026-11-24 16:15:03",
+    "finished": "2026-11-24 16:17:26",
+    "detail": "从虚拟磁盘启动（不挂 ISO）46s 后密钥登录成功；installed；即便用安装时设置的真实密码，密码登录也被拒；root 被拒；foxos ssh status：password_login=false；1 把公钥（Calamares 写入）；permitrootlogin no passwordauthentication no",
+    "evidence": [
+      "/opt/foxos-artifacts/controller-validation-09b6dde/vm/e2e-installed-1795508245.png"
+    ],
+    "iso": null,
+    "from_disk": true
+  },
+  {
+    "case": "ssh",
+    "status": "PASS",
+    "started": "2026-11-24 16:17:36",
+    "finished": "2026-11-24 16:19:55",
+    "detail": "开机后 122s 密钥登录成功；sshd -T：permitrootlogin no pubkeyauthentication yes passwordauthentication yes kbdinteractiveauthentication no；默认 / 错误密码被拒；root 被拒；ufw active 放行 22/tcp；现场会话：一次性 16 位随机密码可登录（不记录），同一密码登录 root 被拒，live-ssh.txt 含警告",
+    "evidence": [],
+    "iso": "/workspace/foxos-evidence/2026-11-24/candidate-86c7c2e/FoxOS-0.3.4-candidate-86c7c2e-amd64.iso",
+    "from_disk": false
+  },
+  {
+    "case": "chrome",
+    "status": "FAIL",
+    "started": "2026-11-24 16:20:01",
+    "finished": "2026-11-24 16:20:21",
+    "detail": "AssertionError: properly terminated. [IP: 198.18.0.1 443]\nFetched 5276 kB in 11s (485 kB/s)\nReading package lists...\nReading package lists...\nBuilding dependency tree...\nReading state information...\nSome packages could not be installed. This may mean that you have\nrequested an impossible situation or if you are using the unstable\ndistribution that some required packages have not yet been created\nor been moved out of Incoming.\nThe following information may help to resolve the situation:\n\nThe following packages have unmet dependencies:\n google-chrome-stable : Depends: fonts-liberation but it is not installable\nW: Failed to fetch https://archive.ubuntu.com/ubuntu/dists/noble/InRelease  Could not handshake: The TLS connection was non-properly terminated. [IP: 198.18.0.1 443]\nW: Failed to fetch https://archive.ubuntu.com/ubuntu/dists/noble-updates/InRelease  Could not handshake: The TLS connection was non-properly terminated. [IP: 198.18.0.1 443]\nW: Some index files failed to download. They have been ignored, or old ones used instead.\nE: Unable to correct problems, you have held broken packages.\n",
+    "evidence": [],
+    "iso": "/workspace/foxos-evidence/2026-11-24/candidate-86c7c2e/FoxOS-0.3.4-candidate-86c7c2e-amd64.iso",
+    "from_disk": false
+  }
+]
