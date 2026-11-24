@@ -27,7 +27,7 @@
 | 公共 HTTPS 诊断 | PASS，有限范围 | 同一来宾对 Ubuntu archive、security 和 Google 签名公钥的 curl HEAD 均返回 HTTP/2 200，默认校验证书。不能把 HEAD 成功当成 APT 获取索引或安装成功，也不足以确定具体 TLS 客户端故障原因。 |
 | 新浏览器断言 | PASS，保存响应检查 | 新断言验证此前真实来宾保存的响应。由于新一轮原配置 Chrome 仍失败，没有宣称新一轮浏览器 E2E 通过。 |
 | 原始 squashfs 数据重建 | PASS | 从完整 ISO 提取 squashfs，以 strict-errors 完整重建 pseudo 数据流到 /dev/null，退出 0。不是仅查看超级块。 |
-| 完整免模型回归 | RUNNING | 新批次仍在运行，不能沿用旧的 183/27 结果冒充本次完成。 |
+| 完整免模型回归 | PASS | 新批次197通过、27跳过、零失败，日志已保存。包含上面的16项便宜回归，不能相加计算。官方ACP真实下载此前独立验证，本批次不重复运行。 |
 
 实际来宾 case 记录为 2 PASS、1 FAIL。外围执行脚本退出 0 只表示执行到收尾，不表示用例全通过。`real-cases.json` 明确保留 Chrome FAIL。
 
@@ -41,4 +41,4 @@
 
 精简证据见 [evidence/controller-09b6dde](evidence/controller-09b6dde)。完整过程与恢复状态位于 `/opt/foxos-artifacts/controller-validation-09b6dde/`，包括 `run.log`、`vm/results.json`、`chrome-original-https-probe.log`、`core-no-key.log`。原始网络头只保存在本机，公开摘要不含 Set-Cookie。
 
-仍需等待新全套回归；继续定位默认 APT 的 HTTPS 客户端与当前网络兼容问题，保持证书与包签名验证。没有改 OS 安装脚本，因此没有声称新的系统修复或新 ISO 已完成。模型规划器、模型首轮与真实 Windows 仍未验证。没有认证重试、发布、Docker、KVM 或用户电脑操作。
+新全套回归已完成。继续定位默认 APT 的 HTTPS 客户端与当前网络兼容问题，保持证书与包签名验证。没有改 OS 安装脚本，因此没有声称新的系统修复或新 ISO 已完成。模型规划器、模型首轮与真实 Windows 仍未验证。没有认证重试、发布、Docker、KVM 或用户电脑操作。

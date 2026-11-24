@@ -3,7 +3,14 @@
   "cheap_regressions_passed": 16,
   "actual_guest_case_passed": 2,
   "actual_guest_case_failed": 1,
-  "native_full_regression": "RUNNING; not counted as passed",
+  "native_full_regression": {
+    "passed": 197,
+    "skipped": 27,
+    "failed": 0,
+    "log_sha256": "389bcea6519329601775d7bd8a81cb52ea01ae220be9364ac660dac13caaeb2c",
+    "controller_code_commit": "09b6dde39a5c2dcda23c6a3d88c776826a6decc5",
+    "official_real_acp_test_excluded_and_previously_run_separately": true
+  },
   "native_full_log": "/opt/foxos-artifacts/controller-validation-09b6dde/core-no-key.log",
   "actual_runner_finished": true,
   "test_guests_stopped": true,
