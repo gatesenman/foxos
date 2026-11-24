@@ -1,0 +1,5 @@
+{
+  "stdout": "Status: active\n\nTo                         Action      From\n--                         ------      ----\n22/tcp                     ALLOW       Anywhere                  \n22/tcp (v6)                ALLOW       Anywhere (v6)             \n\npermitrootlogin no\npasswordauthentication no\n/dev/vda2\nsr0  rom\nvda  disk\nvdb  disk\n",
+  "sha256_of_raw_stdout": "e11f010d08af9f883321002d65a59d2e0573013214f227f9229f98ace5926076",
+  "note": "Exact original stdout preserved as JSON string, including padding whitespace"
+}

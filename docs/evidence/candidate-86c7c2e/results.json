@@ -1,0 +1,200 @@
+{
+  "timezone": "Asia/Shanghai",
+  "source_sha": "86c7c2e3977e11060ea7816cc5a59130acd0716e",
+  "unreleased": true,
+  "case_warning": "win_client checks guest channels only, not actual Windows; retained FAIL rows include environment and controller assumptions; no model planner run",
+  "cases": [
+    {
+      "case": "ssh",
+      "status": "PASS",
+      "started": "2026-11-24 14:41:23",
+      "finished": "2026-11-24 14:41:45",
+      "from_disk": false,
+      "detail": "开机后 127s 密钥登录成功；sshd -T：permitrootlogin no pubkeyauthentication yes passwordauthentication yes kbdinteractiveauthentication no；默认 / 错误密码被拒；root 被拒；ufw active 放行 22/tcp；现场会话：一次性 16 位随机密码可登录（不记录），同一密码登录 root 被拒，live-ssh.txt 含警告"
+    },
+    {
+      "case": "foxos_over_ssh",
+      "status": "PASS",
+      "started": "2026-11-24 14:41:45",
+      "finished": "2026-11-24 14:44:44",
+      "from_disk": false,
+      "detail": "foxos 0.3.4；foxos ssh status：active、root_login=no、password_login=True；MCP over SSH：256 个工具，tools/call ssh_status 成功"
+    },
+    {
+      "case": "runtime",
+      "status": "PASS",
+      "started": "2026-11-24 14:44:44",
+      "finished": "2026-11-24 14:47:04",
+      "from_disk": false,
+      "detail": "runtime doctor 退出码 0，ok=True，32 项：node, npm, corepack, pnpm, bun, python, pip, pipx, uv, gh, git, curl, wget, jq；agent-desktop 1.2.0 已预装（含 NOTICE）"
+    },
+    {
+      "case": "acp",
+      "status": "PASS",
+      "started": "2026-11-24 14:47:04",
+      "finished": "2026-11-24 14:49:45",
+      "from_disk": false,
+      "detail": "acp list：codex-acp, foxos-local, gemini, opencode, qwen-code；opencode 握手：{\"agent\": \"opencode\", \"command\": \"/usr/lib/foxos/runtime/opencode/opencode\", \"protocolVersion\": 1, \"agentInfo\": {\"name\": \"OpenCode\", \"version\": \"2.2.7\"}, \"authMethods\": [{\"description\": \"Run `opencode"
+    },
+    {
+      "case": "win_client",
+      "status": "PASS",
+      "started": "2026-11-24 14:49:45",
+      "finished": "2026-11-24 14:51:23",
+      "from_disk": false,
+      "detail": "sshd active/enabled；foxos acp stdio opencode 经 SSH 54s 内 initialize 返回 protocolVersion=1（agentInfo={\"name\": \"OpenCode\", \"version\": \"2.2.7\"}）；x11vnc（x11vnc: 0.9.16 lastmod: 2019-01-05）-localhost 经 ssh -W 转发读到 RFB 003.008 握手"
+    },
+    {
+      "case": "desktop",
+      "status": "PASS",
+      "started": "2026-11-24 14:52:09",
+      "finished": "2026-11-24 14:58:51",
+      "from_disk": false,
+      "detail": "desktop status：{\"backend\": \"x11\", \"compositor\": \"XFCE\", \"display\": \":0\", \"wayland_display\": null, \"windows\": 3, \"tools\": {\"wmctrl\": true, \"xdotool\": true, \"scrot\": true, \"maim；launch → windows 里出现 → focus → type → key → screenshot → close 全部成功"
+    },
+    {
+      "case": "chrome",
+      "status": "FAIL",
+      "started": "2026-11-24 14:58:51",
+      "finished": "2026-11-24 14:59:05",
+      "from_disk": false,
+      "detail": "AssertionError: -properly terminated. [IP: 198.18.0.1 443]\nFetched 5276 kB in 8s (648 kB/s)\nReading package lists...\nReading package lists...\nBuilding dependency tree...\nReading state information...\nSome packages could not be installed. This may mean that you have\nrequested an impossible situation or if you are using the unstable\ndistribution that some required packages have not yet been created\nor been moved out of Incoming.\nThe following information may help to resolve the situation:\n\nThe following packages have unmet dependencies:\n google-chrome-stable : Depends: fonts-liberation but it is not installable\nW: Failed to fetch https://archive.ubuntu.com/ubuntu/dists/noble/InRelease  Could not handshake: The TLS connection was non-properly terminated. [IP: 198.18.0.1 443]\nW: Failed to fetch https://archive.ubuntu.com/ubuntu/dists/noble-updates/InRelease  Could not handshake: The TLS connection was non-properly terminated. [IP: 198.18.0.1 443]\nW: Some index files failed to download. They have been ignored, or old ones used instead.\nE: Unable to correct problems, you have held broken packages.\n"
+    },
+    {
+      "case": "cu_semantic",
+      "status": "PASS",
+      "started": "2026-11-24 14:59:05",
+      "finished": "2026-11-24 15:01:01",
+      "from_disk": false,
+      "detail": "2 passed in 73.70s (0:01:13)；通过：test_mousepad_semantic_edit_and_save[replace-draft\\n-Shopping, test_mousepad_semantic_edit_and_save[append-milk\\n-milk\\neggs]"
+    },
+    {
+      "case": "browser_semantic",
+      "status": "FAIL",
+      "started": "2026-11-24 15:01:01",
+      "finished": "2026-11-24 15:01:48",
+      "from_disk": false,
+      "detail": "AssertionError: `foxos browser snapshot --json` 退出码 1: "
+    },
+    {
+      "case": "acp_strict",
+      "status": "PASS",
+      "started": "2026-11-24 15:01:48",
+      "finished": "2026-11-24 15:03:33",
+      "from_disk": false,
+      "detail": "Fresh process, warm filesystem cache: initialize and session/new both passed, adapter total 59675 ms; no model prompt or first-turn speed comparison"
+    },
+    {
+      "case": "install",
+      "status": "FAIL",
+      "started": "2026-11-24 15:04:11",
+      "finished": "2026-11-24 15:22:14",
+      "from_disk": false,
+      "detail": "TimeoutExpired: Command '['ssh', '-p', '58837', '-o', 'StrictHostKeyChecking=no', '-o', 'UserKnownHostsFile=/dev/null', '-o', 'LogLevel=ERROR', '-o', 'ConnectTimeout=180', '-o', 'ServerAliveInterval=60', '-o', 'ServerAliveCountMax=10', '-i', '[private-test-key]', '-o', 'IdentitiesOnly=yes', '-o', 'BatchMode=yes', '-o', 'PreferredAuthentications=publickey', 'foxos@127.0.0.1', 'bash', '-lc', \"'export DISPLAY=:0 XAUTHORITY=$HOME/.Xauthority XDG_RUNTIME_DIR=/run/user/$(id -u); tail -c 4000 /tmp/calamares-e2e.log'\"]' timed out after 120 seconds"
+    },
+    {
+      "case": "install_resumed_after_storage",
+      "status": "PASS",
+      "started": "2026-11-24 15:25:30",
+      "finished": "2026-11-24 15:36:12",
+      "from_disk": false,
+      "detail": "Same Calamares process completed after host ENOSPC pause was recovered; original harness timeout retained. NAME    SIZE FSTYPE SERIAL\nvda      32G        foxostarget\n├─vda1  300M vfat   \n└─vda2 31.7G ext4   \n"
+    },
+    {
+      "case": "chrome_after_http_mirror",
+      "status": "PASS",
+      "started": "2026-11-24 15:38:22",
+      "finished": "2026-11-24 15:44:54",
+      "from_disk": false,
+      "detail": "Google Chrome 158.0.8127.88；从 dl.google.com 装好；CDP 开启后 browser tabs 看到「Example Domain」；默认浏览器：foxos-chrome.desktop Value: /usr/bin/google-chrome-stable"
+    },
+    {
+      "case": "browser_after_http_mirror",
+      "status": "FAIL",
+      "started": "2026-11-24 15:44:54",
+      "finished": "2026-11-24 15:45:43",
+      "from_disk": false,
+      "detail": "AssertionError: "
+    },
+    {
+      "case": "browser_snapshot_observed_content",
+      "status": "PASS",
+      "started": "2026-11-24 15:46:31",
+      "finished": "2026-11-24 15:47:17",
+      "from_disk": false,
+      "detail": "Fresh actual agent-browser snapshot returned the live document paragraph and Learn more link; earlier assertion incorrectly required title text in body; Live Ubuntu APT HTTP transport repair only"
+    },
+    {
+      "case": "live_shutdown_initial",
+      "status": "FAIL",
+      "started": "2026-11-24 15:47:22",
+      "finished": "2026-11-24 15:50:54",
+      "from_disk": false,
+      "detail": "Normal Live systemctl poweroff waited at Casper /dev/console medium-removal prompt; 120s observer timed out. No forced stop counted as reboot. Serial backend was file-only; virtual keyboard Enter did not acknowledge serial console."
+    },
+    {
+      "case": "live_shutdown_after_console_enter",
+      "status": "PASS",
+      "started": "2026-11-24 15:50:54",
+      "finished": "2026-11-24 15:53:39",
+      "from_disk": false,
+      "detail": "Actual kernel reported Power down, QEMU558846 exited normally without kill/reset. PTY had to stay connected during input. Original 120s observer failure and premature EOF observer retained."
+    },
+    {
+      "case": "installed_ssh",
+      "status": "PASS",
+      "started": "2026-11-24 15:55:11",
+      "finished": "2026-11-24 15:56:45",
+      "from_disk": true,
+      "detail": "从虚拟磁盘启动（不挂 ISO）46s 后密钥登录成功；installed；即便用安装时设置的真实密码，密码登录也被拒；root 被拒；foxos ssh status：password_login=false；1 把公钥（Calamares 写入）；need-sudo"
+    },
+    {
+      "case": "installed_reboot_controller_initial",
+      "status": "FAIL",
+      "started": "2026-11-24 15:56:45",
+      "finished": "2026-11-24 15:59:25",
+      "from_disk": true,
+      "detail": "Controller incorrectly assumed passwordless sudo in installed system. No new boot ID was observed; stopped only this observer, not QEMU. Actual installed sudo must use the known disposable-install fixture password over SSH stdin."
+    },
+    {
+      "case": "installed_reboot",
+      "status": "PASS",
+      "started": "2026-11-24 16:00:01",
+      "finished": "2026-11-24 16:00:55",
+      "from_disk": true,
+      "detail": "Actual installed guest systemctl reboot changed kernel boot ID and key login returned; no OS ISO or SSH seed attached"
+    },
+    {
+      "case": "installed_mcp",
+      "status": "PASS",
+      "started": "2026-11-24 16:00:55",
+      "finished": "2026-11-24 16:02:26",
+      "from_disk": true,
+      "detail": "foxos 0.3.4；foxos ssh status：active、root_login=no、password_login=False；MCP over SSH：256 个工具，tools/call ssh_status 成功"
+    },
+    {
+      "case": "installed_firewall",
+      "status": "FAIL",
+      "started": "2026-11-24 16:02:26",
+      "finished": "2026-11-24 16:02:28",
+      "from_disk": true,
+      "detail": "AssertionError: Status: active\n\nTo                         Action      From\n--                         ------      ----\n22/tcp                     ALLOW       Anywhere                  \n22/tcp (v6)                ALLOW       Anywhere (v6)             \n\npermitrootlogin no\npasswordauthentication no\n/dev/vda2\nsr0  rom\nvda  disk\nvdb  disk\n"
+    },
+    {
+      "case": "installed_security_captured_output",
+      "status": "PASS",
+      "started": "2026-11-24 16:02:26",
+      "finished": "2026-11-24 16:03:58",
+      "from_disk": true,
+      "detail": "Validated actual captured post-reboot root command output: ufw active22/tcp, sshd passwordauthentication=no and permitrootlogin=no, root=/dev/vda2. Earlier compound case failed ONLY because it incorrectly prohibited even an empty default optical device. No rerun or fabricated output."
+    },
+    {
+      "case": "installed_disk_integrity",
+      "status": "PASS",
+      "started": "2026-11-24 16:02:34",
+      "finished": "2026-11-24 16:03:58",
+      "from_disk": true,
+      "detail": "Actual stopped installed qcow2 passed qemu-img check; same disk copied with SHA equality before boot, then booted, rebooted and normally powered off."
+    }
+  ]
+}

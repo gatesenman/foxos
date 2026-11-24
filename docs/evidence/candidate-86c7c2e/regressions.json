@@ -1,0 +1,23 @@
+{
+  "full_model_isolated_after_zstandard": {
+    "passed": 183,
+    "skipped": 27,
+    "failed": 0
+  },
+  "targeted": {
+    "passed": 53
+  },
+  "native_real_gui": {
+    "passed": 2
+  },
+  "counts_overlap_do_not_sum": true,
+  "official_real_acp_was_run_separately": true,
+  "log_sha256": {
+    "core-restored-full.log": "aa187db55bf746ad507cb683ae4a67cf2b37f417983416f2772371a06221fe2f",
+    "core-all.log": "6d1676bba466a8b52eec149ef25d7e001321a075fb4d023f4aa63dcc20e454b4",
+    "core-no-key.log": "49ea69ee0a61a8929a7d598f37dccde24dd03630e58a4f847c458ca7bba4d7de",
+    "final-targeted.log": "668f400030ad39b606185a48e39feb92519ae63626022a4188f26da7d0859307",
+    "gui.log": "1e0c8f35bc67544c8f86933260da9a90b404bceb53511e8b7d4b4b3d3b05b1b6",
+    "acp-real.log": "317b611e39953f0f40abd3aa1cc21d096ebc07d0e2292576c8673a65682f0885"
+  }
+}

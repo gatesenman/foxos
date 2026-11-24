@@ -1,0 +1,17 @@
+{
+  "source_sha": "86c7c2e3977e11060ea7816cc5a59130acd0716e",
+  "iso": "FoxOS-0.3.4-candidate-86c7c2e-amd64.iso",
+  "iso_sha256": "8f7658ba6019b40b2b39ecd9d2e096b323512abd491e92a18f3cce3724530bee",
+  "iso_bytes": 2250704896,
+  "internal_version": "0.3.4",
+  "status": "UNRELEASED CANDIDATE, not the published 0.3.4 image",
+  "acceleration": "tcg only",
+  "test_iso_readonly": true,
+  "build_parameters": {
+    "arch": "amd64",
+    "suite": "noble",
+    "mirror": "https://archive.ubuntu.com/ubuntu",
+    "keep_chroot": true,
+    "model_credentials_unset": true
+  }
+}

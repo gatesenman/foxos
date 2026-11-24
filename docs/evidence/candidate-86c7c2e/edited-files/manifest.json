@@ -1,0 +1,10 @@
+{
+  "replace.txt": {
+    "bytes": 27,
+    "sha256": "1be0d69c17603e3902e750b6eb3187c9433cf257da06832ec3c733e502fff788"
+  },
+  "append.txt": {
+    "bytes": 9,
+    "sha256": "45514ceecad27e2deb0fd0997ab10588e0398c129c57ed929874e8a9e549d422"
+  }
+}

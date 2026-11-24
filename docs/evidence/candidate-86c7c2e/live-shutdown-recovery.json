@@ -1,0 +1,8 @@
+{
+  "normal_exit": true,
+  "forced_stop": false,
+  "kernel_power_down_observed": true,
+  "qemu_pid_absent": 558846,
+  "input": "serial-console CR while PTY connected",
+  "immediate_observer_exited_on_EOF_before_process_cleanup": true
+}
