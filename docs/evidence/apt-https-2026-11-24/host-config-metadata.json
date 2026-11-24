@@ -1,0 +1,31 @@
+{
+  "proxy_or_loader_env_present": {
+    "http_proxy": false,
+    "https_proxy": false,
+    "HTTP_PROXY": false,
+    "HTTPS_PROXY": false,
+    "ALL_PROXY": false,
+    "all_proxy": false,
+    "LD_PRELOAD": false
+  },
+  "apt_proxy_directive_names": [],
+  "curl_executable": "/usr/bin/curl",
+  "getent": "172.66.152.176  STREAM archive.ubuntu.com.cdn.cloudflare.net\n172.66.152.176  DGRAM  \n172.66.152.176  RAW    \n104.20.28.246   STREAM \n104.20.28.246   DGRAM  \n104.20.28.246   RAW    \n",
+  "curl_without_proxy_or_curlrc": {
+    "returncode": 0,
+    "stdout": "http=200 verify=0 remote=104.20.28.246 bytes=255850\n",
+    "stderr": ""
+  },
+  "apt_version": "apt 3.0.4 (amd64)",
+  "curl_version": "curl 8.14.1 (x86_64-pc-linux-gnu) libcurl/8.14.1 OpenSSL/3.5.9 zlib/1.3.1 brotli/1.1.0 zstd/1.5.7 libidn2/2.3.8 libpsl/0.21.2 libssh2/1.11.1 nghttp2/1.64.0 nghttp3/1.8.0 librtmp/2.3 OpenLDAP/2.6.10",
+  "downloaded_files": {
+    "host-curl-release": {
+      "bytes": 255850,
+      "sha256": "cdb2f31d809f589719a53c6ad15f255b27569c4059542ada282aaa21b8e164b0"
+    },
+    "host-curl-direct-release": {
+      "bytes": 255850,
+      "sha256": "cdb2f31d809f589719a53c6ad15f255b27569c4059542ada282aaa21b8e164b0"
+    }
+  }
+}

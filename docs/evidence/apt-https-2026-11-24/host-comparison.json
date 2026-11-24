@@ -1,0 +1,18 @@
+{
+  "at": "2026-11-24T16:27:38.286072+08:00",
+  "url": "https://archive.ubuntu.com/ubuntu/dists/noble/InRelease",
+  "probes": [
+    {
+      "case": "host-curl-http11",
+      "returncode": 0,
+      "stdout": "http=200 verify=0 remote=104.20.28.246 bytes=255850\n",
+      "stderr": ""
+    },
+    {
+      "case": "host-apt",
+      "returncode": 100,
+      "stdout": "Err:1 https://archive.ubuntu.com/ubuntu/dists/noble/InRelease\n  SSL connection failed: error:0A000126:SSL routines::unexpected eof while reading / Success [IP: 198.18.0.1 443]\n",
+      "stderr": "E: Failed to fetch https://archive.ubuntu.com/ubuntu/dists/noble/InRelease  SSL connection failed: error:0A000126:SSL routines::unexpected eof while reading / Success [IP: 198.18.0.1 443]\nE: Download Failed\n"
+    }
+  ]
+}

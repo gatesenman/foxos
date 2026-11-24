@@ -41,4 +41,4 @@
 
 精简证据见 [evidence/controller-09b6dde](evidence/controller-09b6dde)。完整过程与恢复状态位于 `/opt/foxos-artifacts/controller-validation-09b6dde/`，包括 `run.log`、`vm/results.json`、`chrome-original-https-probe.log`、`core-no-key.log`。原始网络头只保存在本机，公开摘要不含 Set-Cookie。
 
-新全套回归已完成。继续定位默认 APT 的 HTTPS 客户端与当前网络兼容问题，保持证书与包签名验证。没有改 OS 安装脚本，因此没有声称新的系统修复或新 ISO 已完成。模型规划器、模型首轮与真实 Windows 仍未验证。没有认证重试、发布、Docker、KVM 或用户电脑操作。
+新全套回归已完成。后续[APT HTTPS 实际诊断](apt-https-diagnostic-2026-11-24.md)在原生构建机和隔离配置来宾都复现了失败。curl 完整 GET 和 Ubuntu 签名验证通过，但不等于安装通过。具体网络机制尚未定位，没有足够证据支持安全的产品补丁，已停止该诊断分支。没有改 OS 安装脚本，没有新 ISO。模型规划器、模型首轮与真实 Windows 仍未验证。没有认证重试、发布、Docker、KVM 或用户电脑操作。

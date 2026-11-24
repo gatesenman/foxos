@@ -1,0 +1,37 @@
+{
+  "at": "2026-11-24 16:30:10",
+  "probes": [
+    {
+      "case": "configuration",
+      "returncode": 0,
+      "command": "python3 - <<'P'\nimport os,json,subprocess\nfrom pathlib import Path\nnames=['http_proxy','https_proxy','HTTP_PROXY','HTTPS_PROXY','ALL_PROXY','all_proxy']\na=subprocess.check_output(['apt-config','dump'],text=True)\nprint(json.dumps({'proxy_env_present':{n:bool(os.environ.get(n)) for n in names},'proxy_directive_names':[x.split()[0] for x in a.splitlines() if 'Proxy' in x],'ssl_verify_directives':[x for x in a.splitlines() if 'Verify-Peer' in x or 'Verify-Host' in x],'ca_pem_files':len(list(Path('/etc/ssl/certs').glob('*.pem')))},indent=2))\nP\ncat /etc/apt/sources.list; curl --version; apt-get --version; ldd /usr/lib/apt/methods/https; getent ahostsv4 archive.ubuntu.com"
+    },
+    {
+      "case": "curl-default-get",
+      "returncode": 0,
+      "command": "curl --fail --connect-timeout 10 --max-time 25 -sS -w 'http=%{http_code} verify=%{ssl_verify_result} remote=%{remote_ip} bytes=%{size_download}\\n' -o /tmp/noble-curl https://archive.ubuntu.com/ubuntu/dists/noble/InRelease; rc=$?; test $rc = 0 && sha256sum /tmp/noble-curl; exit $rc"
+    },
+    {
+      "case": "curl-http11-get",
+      "returncode": 0,
+      "command": "curl --http1.1 --fail --connect-timeout 10 --max-time 25 -sS -w 'http=%{http_code} verify=%{ssl_verify_result} remote=%{remote_ip} bytes=%{size_download}\\n' -o /tmp/noble-curl11 https://archive.ubuntu.com/ubuntu/dists/noble/InRelease; rc=$?; test $rc = 0 && sha256sum /tmp/noble-curl11; exit $rc"
+    },
+    {
+      "case": "ubuntu-signature",
+      "returncode": 0,
+      "command": "gpgv --keyring /usr/share/keyrings/ubuntu-archive-keyring.gpg /tmp/noble-curl; rc=$?; test $rc = 0 && cmp /tmp/noble-curl /tmp/noble-curl11; exit $rc"
+    },
+    {
+      "case": "apt-default-get",
+      "returncode": 100,
+      "command": "/usr/lib/apt/apt-helper -o Acquire::Retries=0 -o Acquire::https::Timeout=15 download-file https://archive.ubuntu.com/ubuntu/dists/noble/InRelease /tmp/noble-apt"
+    },
+    {
+      "case": "apt-clean-config-get",
+      "returncode": 100,
+      "command": "printf %s 'Dir::Etc::parts \"-\";\nDir::Etc::main \"-\";\nAcquire::Retries \"0\";\nAcquire::https::Timeout \"15\";\n' > /tmp/foxos-apt-isolated.conf; env -u http_proxy -u https_proxy -u HTTP_PROXY -u HTTPS_PROXY -u ALL_PROXY -u all_proxy APT_CONFIG=/tmp/foxos-apt-isolated.conf /usr/lib/apt/apt-helper download-file https://archive.ubuntu.com/ubuntu/dists/noble/InRelease /tmp/noble-apt-clean"
+    }
+  ],
+  "production_sources_changed": false,
+  "tls_or_signature_bypass": false
+}
