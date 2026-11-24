@@ -1,5 +1,7 @@
 # 测试报告
 
+> 2026-11-24 更新：[桌面编辑回归与当前阻塞](verification-2026-11-24.md)。本轮没有新 ISO，不能把构建机上的回归通过算作镜像验收。下文 0.3.4 的测试结果仍是历史记录。
+
 由 `npm run test:all`（[scripts/test_all.py](../scripts/test_all.py)）生成，不使用模拟：pytest 调用真实 CLI / 内核，桌面端到端测试用 Playwright 驱动真实的 Electron 桌面，MCP 测试使用官方 MCP SDK 作为客户端。
 
 - 时间：2026-11-12 11:45（UTC+8）　提交：`0070d7f`　用时：28 分 38 秒

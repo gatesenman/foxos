@@ -557,7 +557,8 @@ def case_cu(semantic_only: bool = False) -> str:
     """电脑操控真实端到端（test_cu_real.py，FOXOS_CU_E2E=1）在启动的 ISO 里跑：agent-desktop / agent-browser / Chrome CDP / Jev / DeepSeek。
 
     测试文件从本仓库拷进来宾 ~/cu-e2e；pytest 装到 /tmp/cu-pt（测试专用）；xedit（x11-apps）不在 ISO 里，测试时从 Ubuntu 源装。
-    DeepSeek 与 TypeSafe（Jev）密钥只经 SSH 标准输入传进这一次命令的环境变量，不落盘、不进输出。
+    semantic_only 只运行实际编辑与保存，不读取模型密钥，不代表规划器端到端通过。
+    完整规划器用例的 DeepSeek 与 TypeSafe（Jev）密钥只经 SSH 标准输入传入，不落盘、不进输出。
     """
     # 关掉首次登录弹窗，避免挡住 Mousepad，也避免截图里出现 SSH 一次性密码。
     ssh('export DISPLAY=:0; xset s off -dpms; xset dpms force on; '
@@ -571,9 +572,12 @@ def case_cu(semantic_only: bool = False) -> str:
             tf.add(root / rel, arcname=rel)
     up = subprocess.run(ssh_base() + ["rm -rf ~/cu-e2e && mkdir -p ~/cu-e2e/packages/core && tar -xzf - -C ~/cu-e2e"], input=buf.getvalue(), capture_output=True, timeout=300)
     assert up.returncode == 0, up.stderr[-300:]
-    ssh("ln -sfn /usr/lib/foxos/python/foxos ~/cu-e2e/packages/core/foxos; "
-        "test -d /tmp/cu-pt || /usr/lib/foxos/venv/bin/python -m pip install -q --target /tmp/cu-pt pytest; "
-        "command -v xedit || { sudo -n apt-get update -q >/dev/null; sudo -n DEBIAN_FRONTEND=noninteractive apt-get install -y -q x11-apps >/dev/null; }", check=True, timeout=3600)
+    setup = ("ln -sfn /usr/lib/foxos/python/foxos ~/cu-e2e/packages/core/foxos; "
+             "PYTHONPATH=/tmp/cu-pt /usr/lib/foxos/venv/bin/python -c 'import pytest' 2>/dev/null || "
+             "/usr/lib/foxos/venv/bin/python -m pip install -q --target /tmp/cu-pt pytest")
+    if not semantic_only:
+        setup += "; command -v xedit || { sudo -n apt-get update -q >/dev/null; sudo -n DEBIAN_FRONTEND=noninteractive apt-get install -y -q x11-apps >/dev/null; }"
+    ssh(setup, check=True, timeout=3600)
     if semantic_only:
         # 只导入 ISO 自带的运行代码。此分支不读取任何模型密钥。
         cmd = ("cd ~/cu-e2e/packages/core; DISPLAY=:0 FOXOS_CU_GUI=1 LANG=C.UTF-8 "

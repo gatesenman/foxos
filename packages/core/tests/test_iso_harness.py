@@ -33,6 +33,7 @@ def test_semantic_case_never_reads_model_secret(harness, monkeypatch, tmp_path):
     assert "PYTHONPATH=/tmp/cu-pt:/usr/lib/foxos/python" in command
     assert "FOXOS_CU_GUI=1" in command and "test_cu_gui.py" in command
     assert "DEEPSEEK_API_KEY" not in command and "TYPESAFE_API_KEY" not in command
+    assert all("x11-apps" not in cmd for cmd in commands)
     assert not harness._SECRETS
 
 

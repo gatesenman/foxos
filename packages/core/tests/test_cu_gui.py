@@ -28,7 +28,8 @@ def test_mousepad_semantic_edit_and_save(tmp_path, case, initial, expected):
     data = tmp_path / "state"
     data.mkdir()
     ws = SimpleNamespace(data_dir=data)
-    proc = subprocess.Popen(["mousepad", "--disable-server", str(path)])
+    proc = subprocess.Popen(["mousepad", "--disable-server", str(path)],
+                            env={**os.environ, "LC_ALL": "C.UTF-8"})
     try:
         deadline = time.monotonic() + 60
         while True:

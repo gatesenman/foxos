@@ -55,6 +55,17 @@
 - US-146–US-154 在自己的 Xvfb + xfwm4 桌面里打开真实的智能体窗口（Chrome 应用模式），用 Playwright 经 CDP 点界面。代码智能体是 opencode：有 DeepSeek 密钥时用 `deepseek/deepseek-flash`，没有时用 opencode 的默认免费模型（不需要密钥，但 opencode 对免费用量有上限，用完会报 “Free usage limit reached”）。
 - 真实的 Gemini、Codex、Claude、Cursor 测到的是 ACP 握手和会话建立，见 [agent-runtime.md](agent-runtime.md)。
 
+## 2026-11-24 桌面编辑验收补充
+
+作为用户，我要在虚拟电脑内修改并保存文本。正文的首尾空格、换行都必须保留。目标不明确或按键送达状态不明时，系统应重新观察，不能猜测另一个目标或自动改成物理输入。
+
+- US-121、US-122 的完整规划器验收仍受 DeepSeek HTTP 401 阻塞，不能标为完成。
+- 免密钥的底层回归使用真正的 Mousepad，覆盖替换正文、增加 `eggs` 一行、菜单保存，以及读取磁盘文件核对内容。
+- 构建机的两个实际编辑用例通过。最终 ISO 上新增的 `cu_semantic` 用例尚未运行。
+- 宿主执行默认关闭、显式打开后逐项审批的规则不变。模拟宿主与来宾的进程测试不能替代真实 Windows 验收。
+
+详细状态见[本轮验证记录](verification-2026-11-24.md)。
+
 ---
 
 <a id="english"></a>
