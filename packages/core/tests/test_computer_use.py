@@ -294,7 +294,10 @@ def test_snapshot_window_title_as_app_uses_window_id(tmp_path, monkeypatch):
         "            raise SystemExit(0)\n"
         "    print(json.dumps({'ok': True, 'data': [{'id': 'w-mp', 'title': '~/FoxOS/workspace/us121.txt - Mousepad', 'app': 'mousepad'}]}))\n"
         "elif cmd=='snapshot':\n"
-        "    assert '--window-id' in argv and argv[argv.index('--window-id')+1]=='w-mp'\n"
+        "    if '--window-id' not in argv:\n"
+        "        print(json.dumps({'ok':False,'error':{'code':'APP_NOT_FOUND','disposition':{'retry':'safe'}}}))\n"
+        "        raise SystemExit(0)\n"
+        "    assert argv[argv.index('--window-id')+1]=='w-mp'\n"
         "    print(json.dumps({'ok': True, 'data': {'snapshot_id': 's9', 'app': 'mousepad', 'complete': True, 'ref_count': 1,\n"
         "        'tree': {'role':'window','name':'us121.txt','children':[{'role':'document','ref_id':'@s9:e2'}]}}}))\n"
         "else:\n"
@@ -305,38 +308,24 @@ def test_snapshot_window_title_as_app_uses_window_id(tmp_path, monkeypatch):
     assert r["app"] == "mousepad" and r["snapshot_id"] == "s9"
 
 
-def test_act_retries_ambiguous_after_fresh_snapshot(tmp_path, monkeypatch):
-    """click 遇到 identity_not_unique 时，加大时限重拍并把 e2 对到新快照再点一次。"""
-    log = tmp_path / "argv.log"
-    body = (
-        "argv=sys.argv[1:]\n"
-        f"open({str(log)!r}, 'a').write(' '.join(argv)+'\\n')\n"
-        "cmd=argv[0]\n"
-        "if cmd=='list-windows':\n"
-        "    print(json.dumps({'ok': True, 'data': [{'id': 'w-mp', 'title': 'us121.txt - Mousepad', 'app': 'mousepad'}]}))\n"
-        "elif cmd=='snapshot':\n"
-        "    sid = 's-new' if '--timeout-ms' in argv and int(argv[argv.index('--timeout-ms')+1]) >= 60000 else 's-old'\n"
-        "    print(json.dumps({'ok': True, 'data': {'snapshot_id': sid, 'app': 'mousepad', 'complete': True, 'ref_count': 1,\n"
-        "        'tree': {'role':'window','name':'us121.txt','children':[{'role':'document','name':'','ref_id':'@'+sid+':e2'}]}}}))\n"
-        "elif cmd=='click':\n"
-        "    ref=argv[1]\n"
-        "    if ref.startswith('@s-old:'):\n"
-        "        print(json.dumps({'ok': False, 'error': {'code': 'AMBIGUOUS_TARGET', 'message': 'not unique',\n"
-        "            'disposition': {'retry': 'safe'}, 'details': {'kind': 'identity_not_unique'}}}))\n"
-        "    else:\n"
-        "        print(json.dumps({'ok': True, 'data': {'clicked': ref}}))\n"
-        "else:\n"
-        "    print(json.dumps({'ok': True, 'data': {}}))\n"
-    )
-    monkeypatch.setenv("FOXOS_AGENT_DESKTOP", _py_ad(tmp_path, body))
-    monkeypatch.delenv("FOXOS_AD_TIMEOUT_MS", raising=False)
+@pytest.mark.parametrize("code,retry", [("AMBIGUOUS_TARGET", "safe"), ("STALE_REF", "safe"),
+                                        ("TIMEOUT", "unknown"), ("ACTION_FAILED", None)])
+def test_ref_failure_never_replayed_or_rebound(tmp_path, monkeypatch, code, retry):
     ws = _WS(tmp_path)
-    agent_desktop.snapshot(ws, app="mousepad")
-    r = agent_desktop.act(ws, "click", "e2")
-    clicks = [ln for ln in log.read_text().splitlines() if ln.startswith("click ")]
-    assert any("@s-old:e2" in ln for ln in clicks)
-    assert any("@s-new:e2" in ln for ln in clicks)
-    assert r.get("clicked") == "@s-new:e2"
+    calls = []
+    error = FoxError("CONFLICT", "not delivered or unknown")
+    error.details = {"agent_desktop_code": code, "retry": retry}
+
+    def run(args, **kw):
+        calls.append(args)
+        raise error
+
+    agent_desktop._save_sid(ws, "old", "mousepad", None, {"e2": "@old:e2"})
+    monkeypatch.setattr(agent_desktop, "run", run)
+    with pytest.raises(FoxError) as exc:
+        agent_desktop.act(ws, "click", "e2")
+    assert exc.value is error
+    assert calls == [["click", "@old:e2"]]
 
 
 def test_timeout_ms_env_override(monkeypatch):
@@ -346,34 +335,58 @@ def test_timeout_ms_env_override(monkeypatch):
     assert agent_desktop.timeout_ms() == 30000
 
 
-def test_set_value_and_press_get_timeout_ms(tmp_path, monkeypatch):
+def test_set_value_timeout_but_press_uses_supported_flags_only(tmp_path, monkeypatch):
     log = tmp_path / "argv.log"
     body = (
-        "argv=sys.argv[1:]\n"
-        f"open({str(log)!r}, 'a').write(' '.join(argv)+'\\n')\n"
-        "cmd=argv[0]\n"
-        "if cmd=='list-windows':\n"
-        "    print(__import__('json').dumps({'ok': True, 'data': [{'id': 'w', 'title': 't', 'app': 'mousepad'}]}))\n"
-        "elif cmd=='snapshot':\n"
-        "    print(__import__('json').dumps({'ok': True, 'data': {'snapshot_id': 's1', 'app': 'mousepad', 'complete': True, 'ref_count': 1,\n"
-        "        'tree': {'role':'window','children':[{'role':'textfield','ref_id':'@s1:e2'}]}}}))\n"
-        "elif cmd=='press' and '--headed' not in argv:\n"
-        "    print(__import__('json').dumps({'ok': False, 'error': {'code': 'ACTION_FAILED',\n"
-        "        'message': 'focus changes are not allowed', 'disposition': {'retry': 'safe'},\n"
-        "        'details': {'cause': 'display_active_window'}}}))\n"
-        "elif cmd=='focus-window':\n"
-        "    print(__import__('json').dumps({'ok': False, 'error': {'code': 'ACTION_FAILED', 'message': 'did not settle',\n"
-        "        'disposition': {'retry': 'unknown'}}}))\n"
-        "else:\n"
-        "    print(__import__('json').dumps({'ok': True, 'data': {'args': argv}}))\n"
+        f"open({str(log)!r}, 'a').write(' '.join(sys.argv[1:])+'\\n')\n"
+        "print(json.dumps({'ok':True,'data':{}}))\n"
     )
     monkeypatch.setenv("FOXOS_AGENT_DESKTOP", _py_ad(tmp_path, body))
     monkeypatch.delenv("FOXOS_AD_TIMEOUT_MS", raising=False)
     ws = _WS(tmp_path)
-    agent_desktop.snapshot(ws, app="mousepad")
+    agent_desktop._save_sid(ws, "s1", "mousepad", None, {"e2":"@s1:e2"})
     agent_desktop.act(ws, "set-value", "e2", "hello")
-    r = agent_desktop.press("ctrl+s", app="mousepad")
-    lines = log.read_text().splitlines()
-    assert any(ln.startswith("set-value ") and "--timeout-ms 30000" in ln and "@s1:e2" in ln for ln in lines)
-    assert any(ln.startswith("press ctrl+s") and "--headed" in ln for ln in lines)
-    assert r.get("args") and "--headed" in r["args"]
+    agent_desktop.press("ctrl+s", app="mousepad")
+    assert log.read_text().splitlines() == [
+        "set-value @s1:e2 --stdin --timeout-ms 30000", "press ctrl+s --app mousepad"]
+
+
+@pytest.mark.parametrize("retry", ["safe", "unsafe", "unknown", None])
+def test_press_failure_does_not_change_focus_or_replay(monkeypatch, retry):
+    calls = []
+    error = FoxError("ERROR", "focus changes are not allowed")
+    error.details = {"agent_desktop_code": "ACTION_FAILED", "retry": retry}
+
+    def run(args, **kw):
+        calls.append(args)
+        raise error
+
+    monkeypatch.setattr(agent_desktop, "run", run)
+    with pytest.raises(FoxError):
+        agent_desktop.press("ctrl+s", app="mousepad")
+    assert calls == [["press", "ctrl+s", "--app", "mousepad"]]
+
+
+def test_ambiguous_window_title_is_not_first_match(tmp_path, monkeypatch):
+    def windows(app=None):
+        if app:
+            return []
+        return [{"id":"a","title":"notes - Mousepad"}, {"id":"b","title":"notes - Mousepad"}]
+
+    monkeypatch.setattr(agent_desktop, "windows", windows)
+    with pytest.raises(FoxError) as e:
+        agent_desktop.resolve_app("notes - Mousepad")
+    assert e.value.code == "CONFLICT"
+
+
+@pytest.mark.parametrize("cmd", ["get", "is", "wait", "press"])
+def test_commands_without_observation_timeout_flag(tmp_path, monkeypatch, cmd):
+    body = "assert '--timeout-ms' not in sys.argv\nprint(json.dumps({'ok':True,'data':{'valid':True}}))"
+    monkeypatch.setenv("FOXOS_AGENT_DESKTOP", _py_ad(tmp_path, body))
+    assert agent_desktop.run([cmd])["valid"]
+
+
+def test_flatten_preserves_document_whitespace():
+    node = {"role": "textfield", "value": "  milk\neggs\n", "text": "\n"}
+    result = agent_desktop.flatten(node)[0]
+    assert result["value"] == node["value"] and result["text"] == "\n"

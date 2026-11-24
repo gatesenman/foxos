@@ -80,9 +80,9 @@ def run(args: list[str], stdin: str | None = None, timeout: float | None = None,
         raise FoxError("DEPENDENCY_MISSING", tr("ad.missing"), hint="foxos computer backend install")
     ms = timeout_ms(timeout_ms_)
     # snapshot 和 click/set-value/type 等都接受 --timeout-ms。列表类命令没有这个标志。
-    if args and args[0] in { "snapshot", "find", "get", "is", "wait", "click", "double-click", "right-click",
+    if args and args[0] in { "snapshot", "find", "click", "double-click", "right-click",
             "type", "set-value", "clear", "focus", "select", "toggle", "check", "uncheck",
-            "expand", "collapse", "scroll", "scroll-to", "press" } and "--timeout-ms" not in args:
+            "expand", "collapse", "scroll", "scroll-to" } and "--timeout-ms" not in args:
         args = [*args, "--timeout-ms", str(ms)]
     wall = timeout if timeout is not None else max(60.0, ms / 1000 + 30)
     try:
@@ -108,11 +108,8 @@ def _state_path(ws) -> Path:
     return ws.data_dir / "agent-desktop.json"
 
 
-def _save_sid(ws, sid: str, app: str | None, window_id: str | None, refs: dict | None = None, nodes: list | None = None) -> None:
-    slim = [{k: n.get(k) for k in ("ref", "qref", "role", "name", "description", "value") if n.get(k) not in (None, "")}
-            for n in (nodes or []) if n.get("ref")]
-    _state_path(ws).write_text(json.dumps({"snapshot_id": sid, "app": app, "window_id": window_id, "refs": refs or {},
-                                           "nodes": slim}), encoding="utf-8")
+def _save_sid(ws, sid: str, app: str | None, window_id: str | None, refs: dict | None = None) -> None:
+    _state_path(ws).write_text(json.dumps({"snapshot_id": sid, "app": app, "window_id": window_id, "refs": refs or {}}), encoding="utf-8")
 
 
 def last(ws) -> dict:
@@ -147,7 +144,7 @@ def flatten(tree: dict) -> list[dict]:
             item["qref"] = ref
         for k in ("description", "value", "text"):
             if n.get(k) not in (None, ""):
-                item[k] = n[k] if not isinstance(n[k], str) else n[k].strip()
+                item[k] = n[k]
         if n.get("states"):
             item["states"] = n["states"]
         if n.get("available_actions"):
@@ -218,14 +215,16 @@ def resolve_app(app: str | None, window_id: str | None = None) -> tuple[str | No
     except FoxError:
         return app, None
     low = app.lower().strip()
-    hits = [w for w in all_w if low == (w.get("app") or "").lower()
-            or low in (w.get("title") or "").lower()
-            or (w.get("title") or "").lower() in low]
+    if not low:
+        return app, None
+    exact = [w for w in all_w if (w.get("title") or "").lower() == low]
+    hits = exact or [w for w in all_w if low in (w.get("title") or "").lower()]
     if not hits:
         return app, None
-    exact = [w for w in hits if (w.get("title") or "").lower() == low]
-    w = exact[0] if exact else hits[0]
-    return (w.get("app") or app), w.get("id")
+    if len(hits) != 1:
+        raise FoxError("CONFLICT", "Window title is ambiguous; use a window_id from list-windows")
+    w = hits[0]
+    return (w.get("app_name") or w.get("app") or app), w.get("id")
 
 
 def snapshot(ws, app: str | None = None, window_id: str | None = None, interactive: bool = False, bounds: bool = True,
@@ -233,7 +232,6 @@ def snapshot(ws, app: str | None = None, window_id: str | None = None, interacti
     """一个程序有好几个窗口（例如主窗口 + 对话框）时 agent-desktop 报 AMBIGUOUS_TARGET：逐个窗口快照再合并，
     对话框排在前面；第二个及以后窗口的引用加窗口前缀（w2e5），适配层记住它们对应的限定引用。
     快照若在时限内没读完（complete=false），把时限加倍再拍一次，避免引用带着 identity_not_unique。"""
-    app, window_id = resolve_app(app, window_id)
     root_q = qualify(ws, root) if root else None
     ms = timeout_ms(timeout_ms_)
 
@@ -300,7 +298,7 @@ def snapshot(ws, app: str | None = None, window_id: str | None = None, interacti
     result = {"app": parts[0][1].get("app") or app, "snapshot_id": sid0, "ref_count": sum(d.get("ref_count") or 0 for _, d in parts),
               "complete": all(d.get("complete") is not False for _, d in parts), "windows": len(parts), "nodes": nodes,
               "snapshot": render(nodes)}
-    _save_sid(ws, sid0, result["app"], window_id, refs, nodes)
+    _save_sid(ws, sid0, result["app"], window_id, refs)
     return result
 
 
@@ -321,80 +319,19 @@ def _act_once(ws, action: str, ref: str | None = None, value: str | None = None,
     return run(args, stdin=stdin)
 
 
-def _remap_ref(ws, ref: str | None, prev_nodes: list[dict] | None = None) -> str | None:
-    """新快照之后，把旧引用对到新的短引用：先按短 id，再按角色+名字+描述（唯一时）。"""
-    if not ref:
-        return ref
-    short = str(ref).split(":")[-1].lstrip("@")
-    st = last(ws)
-    if short in (st.get("refs") or {}):
-        return short
-    prev = next((n for n in (prev_nodes or []) if n.get("ref") == short or n.get("qref") == ref), None)
-    if not prev:
-        return short
-    nodes = st.get("nodes") or []
-    keys = ("role", "name", "description")
-    def same(n, ks):
-        return all((n.get(k) or "") == (prev.get(k) or "") for k in ks)
-    for ks in (("role", "name", "description", "value"), keys, ("role", "name")):
-        hits = [n for n in nodes if n.get("ref") and same(n, ks)]
-        if len(hits) == 1:
-            return hits[0]["ref"]
-    return short
-
-
 def act(ws, action: str, ref: str | None = None, value: str | None = None, **kw) -> dict:
-    """click | double-click | right-click | type | set-value | clear | focus | select | toggle | check | uncheck |
-    expand | collapse | scroll | get。STALE_REF / AMBIGUOUS_TARGET（identity_not_unique，多半是快照没读完）时
-    加大时限重拍快照、对上新引用再试一次。"""
-    try:
-        return _act_once(ws, action, ref, value, **kw)
-    except FoxError as e:
-        det = e.details or {}
-        code = det.get("agent_desktop_code")
-        retry = det.get("retry")
-        kind = (det.get("details") or {}).get("kind") if isinstance(det.get("details"), dict) else None
-        # 只在动作确定没落地时重试，避免点两次。identity_not_unique 是观察问题，重拍即可。
-        if code not in {"STALE_REF", "AMBIGUOUS_TARGET"} or (retry and retry != "safe"):
-            raise
-        st = last(ws)
-        prev_nodes = st.get("nodes") or []
-        bigger = min(max(timeout_ms() * 2, timeout_ms() + 15_000), MAX_TIMEOUT_MS)
-        try:
-            snapshot(ws, app=st.get("app"), window_id=st.get("window_id"), interactive=False, timeout_ms_=bigger)
-        except FoxError:
-            raise e
-        new_ref = _remap_ref(ws, ref, prev_nodes)
-        return _act_once(ws, action, new_ref, value, **kw)
+    """快照引用不能跨快照复用。失败交给观察循环重新决策，不在适配层重放动作。"""
+    return _act_once(ws, action, ref, value, **kw)
 
 
 def press(combo: str, window_id: str | None = None, app: str | None = None) -> dict:
-    """按键发给指定程序的进程（--app / --window-id）。无头模式在窗口未被确认激活时会拒发；
-    先 focus-window，仍失败则加 --headed 再发一次（只用于按键，不点坐标）。"""
+    """保留无头按键语义，不自动切换物理输入，也不重放送达状态不明的按键。"""
     args = ["press", combo]
     if window_id:
         args += ["--window-id", str(window_id)]
     elif app:
         args += ["--app", app]
-    try:
-        return run(args)
-    except FoxError as e:
-        det = e.details or {}
-        kind = (det.get("details") or {}).get("cause") if isinstance(det.get("details"), dict) else None
-        if det.get("agent_desktop_code") != "ACTION_FAILED" or kind not in {"display_active_window", None}:
-            # 无 details.cause 时也看消息
-            if "focus changes are not allowed" not in (e.message or "") and kind != "display_active_window":
-                raise
-        try:
-            focus_window(window_id=window_id, app=app)
-        except FoxError:
-            pass
-        try:
-            return run(args)
-        except FoxError as e2:
-            if "focus changes are not allowed" not in (e2.message or "") and (e2.details or {}).get("agent_desktop_code") != "ACTION_FAILED":
-                raise
-            return run([*args, "--headed"])
+    return run(args)
 
 
 def windows(app: str | None = None) -> list[dict]:
