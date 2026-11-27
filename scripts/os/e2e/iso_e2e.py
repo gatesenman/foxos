@@ -279,7 +279,8 @@ def ssh(command: str, *, user: str = "foxos", input: str | None = None, timeout:
     # Never replay a mutating command after an ambiguous SSH disconnect.
     p = subprocess.run(ssh_base(user) + ["bash", "-lc", shlex.quote(wrapped)], input=input, capture_output=True, text=True, timeout=timeout)
     if check and p.returncode != 0:
-        raise AssertionError(f"`{command}` 退出码 {p.returncode}: {scrub(p.stderr[-800:])}")
+        shown = command if len(command) <= 200 else command[:200] + "…"
+        raise AssertionError(f"`{shown}` 退出码 {p.returncode}: {scrub((p.stderr or "")[-800:] or (p.stdout or "")[-400:])}")
     return p
 
 
@@ -556,19 +557,24 @@ def case_install() -> str:
     SSH 设置对话框（foxos-ssh-setup --installer）的产物直接写进 /run/foxos/ssh-install：一把公钥，不开密码登录。
     """
     pub = KEY.with_suffix(".pub").read_text().strip()
-    setup = (
-        "set -e; rm -rf /tmp/cal-e2e; cp -a /etc/calamares /tmp/cal-e2e; "
-        # -c 指定的目录里 Calamares 还要 qml/（缺了直接拒绝启动）
-        "ln -sfn /usr/share/calamares/qml /tmp/cal-e2e/qml; "
-        # 分区设置用 ISO 自带的 partition.conf，只把默认选项改成「抹掉磁盘」；旧 ISO 没带这个文件时用本仓库的
-        "test -f /tmp/cal-e2e/modules/partition.conf || printf '%s' " + shlex.quote(PARTITION_CONF.read_text()) + " > /tmp/cal-e2e/modules/partition.conf; "
-        "sed -i 's/^initialPartitioningChoice:.*/initialPartitioningChoice: erase/' /tmp/cal-e2e/modules/partition.conf; "
-        "printf 'presets:\\n  fullName:\\n    value: foxos\\n    editable: true\\n  loginName:\\n    value: foxos\\n    editable: true\\n' >> /tmp/cal-e2e/modules/users.conf; "
-        "mkdir -p /run/foxos/ssh-install; printf '%s\\n' " + shlex.quote(pub) + " > /run/foxos/ssh-install/authorized_keys; "
-        "rm -f /run/foxos/ssh-install/password /run/foxos/ssh-install/password-value; "
-        "sudo -n pkill -x calamares || true; "
-        "(sudo -n -E calamares -c /tmp/cal-e2e -d > /tmp/calamares-e2e.log 2>&1 &) ; sleep 2; echo started")
-    ssh(setup, check=True)
+    # 分步下发配置，避免把整份 partition.conf / 公钥塞进一层 ssh + shlex.quote 后远程再解析失败。
+    ssh("set -e; rm -rf /tmp/cal-e2e; cp -a /etc/calamares /tmp/cal-e2e; "
+        "ln -sfn /usr/share/calamares/qml /tmp/cal-e2e/qml", check=True)
+    has_part = ssh("test -f /tmp/cal-e2e/modules/partition.conf").returncode == 0
+    if not has_part:
+        ssh("cat > /tmp/cal-e2e/modules/partition.conf", input=PARTITION_CONF.read_text(), check=True)
+    ssh("set -e; sed -i 's/^initialPartitioningChoice:.*/initialPartitioningChoice: erase/' /tmp/cal-e2e/modules/partition.conf; "
+        "printf '%s\n' 'presets:' '  fullName:' '    value: foxos' '    editable: true' "
+        "'  loginName:' '    value: foxos' '    editable: true' >> /tmp/cal-e2e/modules/users.conf; "
+        "mkdir -p /run/foxos/ssh-install", check=True)
+    ssh("cat > /run/foxos/ssh-install/authorized_keys; "
+        "rm -f /run/foxos/ssh-install/password /run/foxos/ssh-install/password-value",
+        input=pub + "\n", check=True)
+    started = ssh("sudo -n pkill -x calamares || true; "
+                  "(sudo -n -E calamares -c /tmp/cal-e2e -d > /tmp/calamares-e2e.log 2>&1 &); "
+                  "sleep 2; echo started", check=True)
+    assert "started" in started.stdout, started.stdout
+
     t0 = time.time()
     for _ in range(120):
         if "Calamares" in _x("xdotool search --name '安装|Calamares|狐狸OS' getwindowname %@ 2>/dev/null").stdout or \
