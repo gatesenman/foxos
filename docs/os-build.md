@@ -16,7 +16,7 @@
 
 ```bash
 sudo apt-get install debootstrap squashfs-tools xorriso grub-efi-amd64-bin grub-pc-bin \
-  mtools dosfstools rsync wget ca-certificates
+  mtools dosfstools rsync wget ca-certificates zstd
 ```
 
 测试引导（**不是产品依赖**，不要装进 ISO）再加：

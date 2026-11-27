@@ -68,6 +68,10 @@ WGET
 chmod +x "$WORK/bin/wget"
 export PATH="$WORK/bin:/usr/sbin:/usr/bin:/sbin:/bin"
 
+for tool in debootstrap mksquashfs xorriso grub-mkrescue rsync wget sha256sum python3 zstd; do
+  command -v "$tool" >/dev/null || die "构建机缺少 $tool。请先安装：sudo apt-get install debootstrap squashfs-tools xorriso grub-efi-amd64-bin grub-pc-bin mtools dosfstools rsync wget ca-certificates zstd"
+done
+
 log "工作目录 $WORK"
 mkdir -p "$WORK" "$OUT" "$ISO/casper" "$ISO/boot/grub" "$ISO/.disk" "$STAGING"
 # 把脚本、品牌、面板、仓库里的 foxos 包、图标放到 staging，供 chroot hook 使用

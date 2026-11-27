@@ -5,15 +5,18 @@
 #     macOS arm64 / x64    dmg · zip（未签名，签名与公证可通过 secrets 打开）  macos-14 / macos-15-intel
 #     Linux x64 / arm64    AppImage · deb · rpm · tar.gz              ubuntu-24.04 / ubuntu-24.04-arm
 #   系统镜像（Ubuntu 24.04 + XFCE）
-#     amd64  默认用发布里已有的分卷合并出单文件 ISO；勾选 iso_amd64_build 才在 CI 重建
-#     arm64  在 ubuntu-24.04-arm 上原生构建（UEFI）
+#     amd64  默认跳过。本项目的验收路径是在构建机用 TCG 引导并实测后再上传分卷。
+#            勾选 iso_amd64_build 才在 CI 重建；勾选 iso_amd64_assemble 才把已上传的分卷合并成单文件。
+#            新版本不要在分卷还不存在时默认合并，否则安装包流水线会失败。
+#     arm64  默认跳过。勾选 iso_arm64 才在 ubuntu-24.04-arm 上原生构建（UEFI）。
 #   每个文件都 < 2 GiB（GitHub Release 单文件上限）；ISO 同时提供单文件和 800 MiB 分卷。
 #   最后统一重算 SHA256SUMS，生成 winget / Homebrew / AUR 清单草稿，并在各系统上用 install.sh / install.ps1 真装一遍。
 #
 # 签名（可选，没配就出未签名包）：
 #   macOS   MAC_CSC_LINK（base64 的 .p12）· MAC_CSC_KEY_PASSWORD · APPLE_ID · APPLE_APP_SPECIFIC_PASSWORD · APPLE_TEAM_ID
 #   Windows WIN_CSC_LINK · WIN_CSC_KEY_PASSWORD
-# Docker Hub 推送不在这里（见 docker.yml，等 Sarah 登录后再开）。
+#   没有 Apple 开发者账号时，macOS 包保持 ad-hoc 签名、未公证。
+# Docker Hub / GHCR 推送不在这里（见 docker.yml）。默认不要打开那些推送开关。
 name: release
 
 on:
@@ -24,17 +27,21 @@ on:
       tag:
         description: '发布标签（不存在会建成预发布）'
         type: string
-        default: 'v0.3.2-os-preview'
+        default: 'v0.3.5-windows-preview'
       desktop:
         description: '构建桌面安装包（Windows / macOS / Linux）'
         type: boolean
         default: true
       iso_arm64:
-        description: '构建 arm64 系统镜像'
+        description: '构建 arm64 系统镜像（默认关闭）'
         type: boolean
-        default: true
+        default: false
       iso_amd64_build:
-        description: '在 CI 重建 amd64 系统镜像（默认只把已有分卷合并成单文件上传）'
+        description: '在 CI 重建 amd64 系统镜像（默认关闭；验收过的 amd64 ISO 在构建机出品）'
+        type: boolean
+        default: false
+      iso_amd64_assemble:
+        description: '把本发布已有的 amd64 分卷合并成单文件并上传（分卷不存在时不要勾选）'
         type: boolean
         default: false
 
@@ -233,10 +240,15 @@ jobs:
       - name: 决定是构建还是合并
         id: mode
         run: |
+          # 安装包流水线默认跳过 ISO。只有明确要求，或推送了 os-preview 标签时才处理镜像。
           if [ "${{ matrix.arch }}" = arm64 ]; then
-            if [ "${{ github.event_name }}" = push ] || [ "${{ inputs.iso_arm64 }}" = true ]; then echo "mode=build" >> "$GITHUB_OUTPUT"; else echo "mode=skip" >> "$GITHUB_OUTPUT"; fi
+            if [ "${{ inputs.iso_arm64 }}" = true ]; then echo "mode=build" >> "$GITHUB_OUTPUT"
+            elif [ "${{ github.event_name }}" = push ] && [[ "$TAG" == *os-preview* ]]; then echo "mode=build" >> "$GITHUB_OUTPUT"
+            else echo "mode=skip" >> "$GITHUB_OUTPUT"; fi
           elif [ "${{ inputs.iso_amd64_build }}" = true ]; then echo "mode=build" >> "$GITHUB_OUTPUT"
-          else echo "mode=assemble" >> "$GITHUB_OUTPUT"; fi
+          elif [ "${{ inputs.iso_amd64_assemble }}" = true ]; then echo "mode=assemble" >> "$GITHUB_OUTPUT"
+          elif [ "${{ github.event_name }}" = push ] && [[ "$TAG" == *os-preview* ]]; then echo "mode=assemble" >> "$GITHUB_OUTPUT"
+          else echo "mode=skip" >> "$GITHUB_OUTPUT"; fi
       - name: 腾出磁盘
         if: steps.mode.outputs.mode == 'build'
         run: |
@@ -326,7 +338,7 @@ jobs:
         run: |
           set -euo pipefail
           V=${{ needs.release.outputs.version }}
-          sed -i "s/v0\.3\.2-os-preview/$TAG/g" scripts/install.sh scripts/install.ps1
+          python3 scripts/packaging/rewrite-install-tags.py
           gh release upload "$TAG" scripts/install.sh scripts/install.ps1 --clobber
           mkdir -p all && cd all
           gh release download "$TAG" --skip-existing -p '*' 
