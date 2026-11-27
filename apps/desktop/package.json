@@ -1,6 +1,6 @@
 {
   "name": "foxos-desktop",
-  "version": "0.3.4",
+  "version": "0.3.5",
   "private": true,
   "description": "狐狸OS（FoxOS）桌面",
   "main": "src/main/index.js",
