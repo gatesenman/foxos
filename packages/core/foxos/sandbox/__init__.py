@@ -52,8 +52,12 @@ class Policy:
 def system_read_paths() -> list[str]:
     """程序正常运行所需的只读系统路径（按平台）。"""
     if PLATFORM == "linux":
-        cands = ["/usr", "/bin", "/sbin", "/lib", "/lib32", "/lib64", "/libx32", "/etc", "/opt", "/proc", "/sys", "/run/systemd/resolve",
+        # 不要把整个 /opt 作为只读树：里面可能有工作区、密钥或用户数据。
+        # 只开放常见软件安装前缀。
+        cands = ["/usr", "/bin", "/sbin", "/lib", "/lib32", "/lib64", "/libx32", "/etc", "/proc", "/sys", "/run/systemd/resolve",
                  "/var/lib/ca-certificates", "/nix/store", "/snap"]
+        for name in ("foxos", "firefox", "google", "microsoft", "containerd", "podman", "rocm", "cuda"):
+            cands.append("/opt/" + name)
     elif PLATFORM == "macos":
         cands = ["/usr", "/bin", "/sbin", "/System", "/Library", "/Applications", "/opt/homebrew", "/usr/local", "/private/etc", "/etc",
                  "/private/var/db/timezone", "/var/db/timezone", "/dev"]

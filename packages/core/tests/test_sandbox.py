@@ -6,6 +6,9 @@ import socket
 import subprocess
 import sys
 import threading
+from pathlib import Path
+
+from conftest import FoxCLI
 
 import pytest
 
@@ -231,3 +234,34 @@ def test_windows_code_path_under_wine(tmp_path):
     r = json.loads(p.stdout.strip().splitlines()[-1])
     assert r["code"] == 0 and "hi" in r["out"] and "light" in r["out"], p.stdout + p.stderr
     assert (tmp_path / "ws" / "out.txt").exists()
+
+
+def test_system_read_paths_does_not_grant_all_of_opt():
+    paths = sb.system_read_paths()
+    assert "/opt" not in paths
+    assert "/opt/foxos-artifacts" not in paths
+    assert all(not p.startswith("/opt/foxos-artifacts") for p in paths)
+
+
+@needs_landlock
+def test_workspace_under_opt_does_not_read_sibling(tmp_path):
+    """工作区若位于 /opt 下，相邻目录里的文件仍不可读、不可写。"""
+    import shutil
+    root = Path("/opt/foxos-artifacts/tmp/sandbox-opt-isolation")
+    if root.exists():
+        shutil.rmtree(root)
+    root.mkdir(parents=True)
+    ws = root / "ws"
+    outside = root / "outside"
+    ws.mkdir()
+    outside.mkdir()
+    (outside / "secret.txt").write_text("top secret")
+    try:
+        cli = FoxCLI(ws)
+        r = srun(cli, "sh", "-c", f"echo hello > in.txt && cat in.txt; echo x > {outside}/escape.txt; cat {outside}/secret.txt", home=tmp_path / "foxhome")
+        assert r["stdout"].startswith("hello")
+        assert (ws / "in.txt").read_text() == "hello\n"
+        assert not (outside / "escape.txt").exists()
+        assert "top secret" not in r["stdout"]
+    finally:
+        shutil.rmtree(root, ignore_errors=True)
